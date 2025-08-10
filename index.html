@@ -14,8 +14,12 @@
       --bg:#f8fbff; --panel:#ffffff; --soft:#f2f6ff; --ink:#132030; --muted:#76849c;
       --pri:#7a6cff; --sec:#16c6a1; --warn:#ff7b7b; --ok:#2fb875; --accent:#ffd166;
       --btn:#e9eefc; --btnText:#0b101a; --border:rgba(19,32,48,.10);
-      --radius:18px; --shadow:0 0 0 0 rgba(15,23,34,.10); /* Reduced shadow for a cleaner look */
+      --radius:18px; --shadow:0 6px 18px rgba(15,23,34,.08); /* Adjusted shadow for a softer look */
       --ring: 0 0 0 3px rgba(122,108,255,.28);
+      /* Variabel warna latar belakang tombol OK dan WARN untuk tema pastel */
+      --okBg:#dff4ea;
+      --warnBg:#ffe5e5;
+      --iconColor: var(--muted); /* Default icon color */
     }
     [data-theme="hc"]{
       --bg:#0a0f1a; --panel:#0f1626; --soft:#0c1220; --ink:#e6efff; --muted:#9fb0cc;
@@ -24,6 +28,8 @@
       --btnText:#e6efff;
       --border:rgba(230,239,255,.12);
       --ring: 0 0 0 3px rgba(143,168,255,.35);
+      --okBg:#1a3a2e;
+      --warnBg:#3a1a1a;
       --iconColor: var(--ink);
     }
     *{box-sizing:border-box}
@@ -100,7 +106,7 @@
 
     input, select, textarea{
       width:100%;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--soft);color:var(--ink);
-      transition: border-color 0.2s ease-out, background-color 0.2s ease-out;
+      transition: border-color 0.2s ease-out, background-color 0.2s ease-out, box-shadow 0.2s ease-out; /* Added box-shadow transition */
       -webkit-appearance: none;
       -moz-appearance: none;
       appearance: none;
@@ -116,7 +122,8 @@
 
     input:focus, select:focus, textarea:focus {
         border-color: var(--pri);
-        box-shadow: var(--ring); /* Added consistent ring on focus for inputs/selects */
+        outline: none; /* Remove default outline */
+        box-shadow: var(--ring); /* Use custom ring on focus */
     }
 
     .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
@@ -210,7 +217,18 @@
       font-size:12px;
       color:var(--muted);
     }
-    .kana.checked{background:linear-gradient(135deg, rgba(122,108,255,.12), rgba(22,198,161,.12));outline:1px solid rgba(122,108,255,.25)}
+    /* Visual for mastered Kana */
+    .kana.mastered {
+      background: linear-gradient(135deg, var(--okBg), rgba(47,184,117,.2)); /* Greenish background */
+      border-color: var(--ok);
+      box-shadow: 0 0 0 2px var(--ok); /* Green ring */
+    }
+    [data-theme="hc"] .kana.mastered {
+        background: linear-gradient(135deg, var(--okBg), rgba(61,216,181,.1));
+        box-shadow: 0 0 0 2px var(--ok);
+    }
+
+
     .kana:focus-visible{outline:none; box-shadow:var(--ring)}
 
     .chips{
@@ -342,9 +360,9 @@
       animation: streakGrow 0.2s ease-out;
     }
 
-    /* Spinner for loading audio (now removed from HTML) */
+    /* Spinner for loading audio (removed from HTML, but keeping CSS in case we re-add) */
     .spinner {
-      display: none !important; /* Force hide if any JS tries to show it */
+      display: none !important;
     }
 
 
@@ -550,10 +568,16 @@
     const KEY = 'kanaTrainer_v8';
     const initState = () => ({
       theme:'pastel',
-      audio:true, // Audio toggle still exists for click tones
+      audio:false, // Audio is now explicitly false as TTS API is removed
       hiraMastered:[], kataMastered:[],
-      test:{subset:'aiueo', set:'hira', mode:'type', qType:'k2r', score:0, total:0, correctStreak:0, target:10, rangeMode:'range'},
-      pomo:{mode:'work', work:25, break:5, remaining:25*60, running:false, last:0}
+      test:{
+        subset:'aiueo', set:'hira', mode:'type', qType:'k2r',
+        score:0, total:0, correctStreak:0, target:10, rangeMode:'range'
+      },
+      pomo:{mode:'work', work:25, break:5, remaining:25*60, running:false, last:0},
+      totalPoints: 0, // New: Total points for gamification
+      level: 1,       // New: User's current level
+      pointsToNextLevel: 100 // New: Points needed for next level
     });
     let state = load();
     function load(){ try{ const raw=localStorage.getItem(KEY); return raw? JSON.parse(raw): initState(); }catch{ return initState(); } }
@@ -623,16 +647,93 @@
       const frag=df();
       rom.forEach(r=>{
         const ch = map.get(r);
-        const b = document.createElement('button'); b.type='button'; b.className='kana'+(mastered.includes(r)?' checked':'');
+        const b = document.createElement('button'); b.type='button';
+        // Add 'mastered' class if applicable
+        b.className='kana' + (mastered.includes(r) ? ' mastered' : '');
         b.innerHTML=`<div class="jp">${ch}</div><div class="ro">${r}</div>`; b.title=r; b.setAttribute('aria-pressed', mastered.includes(r));
         attachLongPress(b, ()=>toggleMaster(r,set), ()=>uncheck(r,set));
         frag.appendChild(b);
       });
       box.appendChild(frag);
     }
-    function toggleMaster(label, set){ const arr=(set==='hira'?state.hiraMastered:state.kataMastered); const i=arr.indexOf(label); if(i<0) arr.push(label); else arr.splice(i,1); save(); renderStats(); buildKana(set==='hira'?'hiraBox':'kataBox', set); }
-    function uncheck(label,set){ const arr=(set==='hira'?state.hiraMastered:state.kataMastered); const i=arr.indexOf(label); if(i>-1){arr.splice(i,1); save(); renderStats(); buildKana(set==='hira'?'hiraBox':'kataBox', set);} }
+    function toggleMaster(label, set){
+      const arr=(set==='hira'?state.hiraMastered:state.kataMastered);
+      const i=arr.indexOf(label);
+      if(i<0) {
+        arr.push(label);
+        state.totalPoints += 5; // Add points for mastering a new Kana
+        checkLevelUp();
+      } else {
+        arr.splice(i,1);
+        state.totalPoints = Math.max(0, state.totalPoints - 5); // Deduct points if unmastered
+      }
+      save();
+      renderStats();
+      buildKana(set==='hira'?'hiraBox':'kataBox', set);
+      updatePointsAndLevelDisplay(); // Update display immediately
+    }
+    function uncheck(label,set){
+      const arr=(set==='hira'?state.hiraMastered:state.kataMastered);
+      const i=arr.indexOf(label);
+      if(i>-1){
+        arr.splice(i,1);
+        state.totalPoints = Math.max(0, state.totalPoints - 5); // Deduct points if unmastered
+        save();
+        renderStats();
+        buildKana(set==='hira'?'hiraBox':'kataBox', set);
+        updatePointsAndLevelDisplay(); // Update display immediately
+      }
+    }
     function renderStats(){ qs('#jpStats').textContent = `${state.hiraMastered.length}/${ALL_ROMAJI.length} hira • ${state.kataMastered.length}/${ALL_ROMAJI.length} kata`; }
+
+    // Gamification: Leveling system
+    const LEVEL_THRESHOLDS = [0, 100, 250, 500, 1000, 2000, 3500, 5000, 7500, 10000]; // Points needed for each level (index 0 is level 1)
+    const LEVEL_NAMES = ["Pemula", "Pengenal Kana", "Penyelidik Kana", "Penjelajah Kana", "Master Kana", "Sensei Kana", "Grandmaster Kana", "Kana Legendaris", "Dewa Kana", "Kana Abadi"];
+
+    function getLevelAndThreshold(points) {
+        let level = 1;
+        let threshold = LEVEL_THRESHOLDS[0];
+        let nextThreshold = LEVEL_THRESHOLDS[1] || Infinity;
+
+        for (let i = 0; i < LEVEL_THRESHOLDS.length; i++) {
+            if (points >= LEVEL_THRESHOLDS[i]) {
+                level = i + 1;
+                threshold = LEVEL_THRESHOLDS[i];
+                nextThreshold = LEVEL_THRESHOLDS[i + 1] || Infinity;
+            } else {
+                break;
+            }
+        }
+        return { level, threshold, nextThreshold };
+    }
+
+    function checkLevelUp() {
+        const { level: oldLevel } = getLevelAndThreshold(state.totalPoints - 5); // Check level before adding points
+        const { level: newLevel, nextThreshold } = getLevelAndThreshold(state.totalPoints);
+
+        if (newLevel > oldLevel) {
+            state.level = newLevel;
+            state.pointsToNextLevel = nextThreshold;
+            openCelebrate('levelUp', newLevel); // Show level up celebration
+        } else {
+            state.pointsToNextLevel = nextThreshold;
+        }
+    }
+
+    function updatePointsAndLevelDisplay() {
+        const pointsDisplay = qs('#totalPointsDisplay');
+        const levelDisplay = qs('#levelDisplay');
+        if (pointsDisplay) pointsDisplay.textContent = `Poin: ${state.totalPoints}`;
+        if (levelDisplay) {
+            const { level, nextThreshold } = getLevelAndThreshold(state.totalPoints);
+            levelDisplay.textContent = `Level: ${level} (${LEVEL_NAMES[level-1]})`;
+            // Optionally, show progress to next level
+            const progressToNext = nextThreshold === Infinity ? "MAX" : `${state.totalPoints - (LEVEL_THRESHOLDS[level-1] || 0)} / ${nextThreshold - (LEVEL_THRESHOLDS[level-1] || 0)}`;
+            // You can add this to the levelDisplay or a separate element
+            // console.log(`Progress to next level: ${progressToNext}`);
+        }
+    }
+
 
     // ---------- LEARN MODE ----------
     function fillLearnRange(){ const fromSel=qs('#fromGrp'), toSel=qs('#toGrp'); fromSel.innerHTML=''; toSel.innerHTML=''; GROUPS.forEach(g=>{ const o1=new Option(g.label,g.key); const o2=new Option(g.label,g.key); fromSel.add(o1); toSel.add(o2); }); fromSel.value='aiueo'; toSel.value='k'; }
@@ -775,6 +876,8 @@
       if(correct){
         state.test.score+=1;
         state.test.correctStreak+=1;
+        state.totalPoints += 1; // Add 1 point for each correct answer
+        checkLevelUp(); // Check for level up
         maybeCelebrate('streak');
         clickTone('ok');
         qKanaElement.classList.add('correct-answer');
@@ -831,7 +934,15 @@
 
     function updateProgress(){ const pct = (state.test.total/state.test.target)*100; const bar = qs('#bar'); bar.style.width = pct+'%'; const prog = qs('.progress'); prog.setAttribute('aria-valuenow', Math.round(pct)); }
 
-    function finishTest(){ openCelebrate('finish'); burst(); clickTone('ok'); renderReview(); }
+    function finishTest(){
+      state.totalPoints += state.test.score; // Add bonus points for finishing test
+      checkLevelUp(); // Check for level up after test bonus
+      openCelebrate('finish');
+      burst();
+      clickTone('ok');
+      renderReview();
+      updatePointsAndLevelDisplay(); // Update after test completion
+    }
 
     function renderReview(){ const box=qs('#reviewWrap'); const hasWrong = wrongList.length>0; qs('#btnReviewWrong').hidden=!hasWrong; box.hidden=!hasWrong; qs('#celebrateMsg').textContent=`Skor: ${state.test.score}/${state.test.total}`; if(!hasWrong){ box.innerHTML=''; return; } const set=state.test.set; box.innerHTML = wrongList.map((w,i)=>{ const expected = (state.test.qType==='k2r')? w.romaji : (set==='hira'? HIRA_MAP.get(w.romaji): KATA_MAP.get(w.romaji)); const got = w.chosen||w.normalized||w.typed||''; const left = (state.test.qType==='k2r')? (set==='hira'? HIRA_MAP.get(w.romaji): KATA_MAP.get(w.romaji)) : w.romaji; return `<div style="padding:8px;border:1px solid var(--border);border-radius:12px;margin:6px 0;display:flex;justify-content:space-between;gap:8px"><div><div class="small">Soal ${i+1}</div><div><b>${left}</b> → <span style="color:var(--ok)">${expected}</span></div><div class="small">Jawaban kamu: ${got||'-'}</div></div><button class="btn" onclick="(function(){window._speak && window._speak('${w.romaji}')})()">🎧</button></div>`; }).join(''); }
 
@@ -885,12 +996,12 @@
     function applyTheme(){ document.documentElement.setAttribute('data-theme', state.theme==='hc'?'hc':'pastel'); qs('#tPastel').classList.toggle('active', state.theme!=='hc'); qs('#tHC').classList.toggle('active', state.theme==='hc'); }
     function applyAudio(){ const ck=qs('#audToggle'); ck.checked = !!state.audio; }
 
-    // Reverted speak function to use SpeechSynthesisUtterance
+    // Reverted speak function to use SpeechSynthesisUtterance (or no-op if unsupported/disabled)
     function speak(text){
         try{
-            if(!state.audio) return;
+            if(!state.audio) return; // Only play if audio is enabled
             if(!('speechSynthesis' in window)) {
-                console.warn("SpeechSynthesis API not supported in this browser.");
+                // console.warn("SpeechSynthesis API not supported in this browser.");
                 return;
             }
             const u=new SpeechSynthesisUtterance(text);
@@ -910,8 +1021,29 @@
 
     // ---------- CELEBRATION ----------
     const modal = qs('#celebrate'); const burstBox = qs('#burst');
-    function maybeCelebrate(type){ if(type==='streak' && state.test.correctStreak>0 && state.test.correctStreak % 10 === 0){ openCelebrate('streak'); burst(); clickTone('ok'); } }
-    function openCelebrate(mode){ const title=qs('#celebrateTitle'), msg=qs('#celebrateMsg'); if(mode==='finish'){ title.textContent='Tes selesai! 🎉'; msg.textContent=`Skor: ${state.test.score}/${state.test.total}`; } else { title.textContent='Wii! Keren banget! 🎉'; msg.textContent='10 jawaban benar berturut-turut. Lanjutkan momentummu! 🔥'; } modal.style.display='flex'; }
+    function maybeCelebrate(type, level = 0){
+      if(type==='streak' && state.test.correctStreak>0 && state.test.correctStreak % 10 === 0){
+        openCelebrate('streak'); burst(); clickTone('ok');
+      } else if (type === 'levelUp') {
+        qs('#celebrateTitle').textContent = `Level Up! 🎉 Level ${level}!`;
+        qs('#celebrateMsg').textContent = `Kamu sekarang seorang ${LEVEL_NAMES[level-1]}! Terus semangat! 🔥`;
+        modal.style.display='flex';
+        burst(); clickTone('ok');
+      }
+    }
+    function openCelebrate(mode){
+      const title=qs('#celebrateTitle'), msg=qs('#celebrateMsg');
+      if(mode==='finish'){
+        title.textContent='Tes selesai! 🎉';
+        msg.textContent=`Skor: ${state.test.score}/${state.test.total}`;
+      } else if (mode === 'levelUp') {
+        // Handled by maybeCelebrate directly
+      } else { // streak
+        title.textContent='Wii! Keren banget! 🎉';
+        msg.textContent='10 jawaban benar berturut-turut. Lanjutkan momentummu! 🔥';
+      }
+      modal.style.display='flex';
+    }
     function closeCelebrate(){ modal.style.display='none'; }
     qs('#btnCloseModal').onclick = closeCelebrate;
     function burst(){ burstBox.innerHTML=''; const colors=['#7a6cff','#16c6a1','#ffd166','#ff7b7b','#2fb875','#8acbff']; const w=window.innerWidth, h=window.innerHeight; for(let i=0;i<90;i++){ const p=document.createElement('div'); p.className='particle'; p.style.background=colors[i%colors.length]; const dx=(Math.random()*w - w/2)+'px'; const dy=(Math.random()*h/2)+'px'; p.style.setProperty('--dx',dx); p.style.setProperty('--dy',dy); p.style.left=(w/2)+'px'; p.style.top=(h/3)+'px'; burstBox.appendChild(p);} setTimeout(()=>{ burstBox.innerHTML=''; }, 1000); }
@@ -946,7 +1078,7 @@
     qs('#btnEnd').onclick = endTest;
     qs('#btnSkip').onclick = skipQ;
     qs('#btnCheck').onclick = checkAns;
-    // Removed btnListen event listener
+    // Removed btnListen event listener as TTS API is removed
     // qs('#btnListen').onclick = ()=>{ speakCurrent(); clickTone('click'); };
 
 
@@ -1019,6 +1151,7 @@
       qs('#pomoBreak').value=state.pomo.break;
       qs('#testCount').value=state.test.target||10;
       toggleAnswerUI(); // Ensure initial answer UI is correct on load
+      updatePointsAndLevelDisplay(); // Initial display of points and level
     }
 
     document.addEventListener('DOMContentLoaded', ()=>{
