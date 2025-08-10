@@ -7,6 +7,8 @@
   <meta name="description" content="Belajar Hiragana & Katakana lengkap (dasar, dakuon/handakuon, youon) dengan tes ketik & pilihan ganda, review jawaban salah, Pomodoro, audio, progress bar, dan tema pastel/high-contrast. Data lokal (localStorage)." />
   <!-- Google Fonts - Inter -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Font Awesome for Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <style>
     :root{
       --bg:#f8fbff; --panel:#ffffff; --soft:#f2f6ff; --ink:#132030; --muted:#76849c;
@@ -14,6 +16,10 @@
       --btn:#e9eefc; --btnText:#0b101a; --border:rgba(19,32,48,.10);
       --radius:18px; --shadow:0 12px 28px rgba(15,23,34,.10);
       --ring: 0 0 0 3px rgba(122,108,255,.28);
+      /* Variabel warna latar belakang tombol OK dan WARN untuk tema pastel */
+      --okBg:#dff4ea;
+      --warnBg:#ffe5e5;
+      --iconColor: var(--muted); /* Default icon color */
     }
     [data-theme="hc"]{
       --bg:#0a0f1a; --panel:#0f1626; --soft:#0c1220; --ink:#e6efff; --muted:#9fb0cc;
@@ -25,6 +31,7 @@
       /* Variabel warna latar belakang tombol OK dan WARN untuk tema high-contrast */
       --okBg:#1a3a2e; /* Warna hijau gelap yang kontras dengan teks terang */
       --warnBg:#3a1a1a; /* Warna merah gelap yang kontras dengan teks terang */
+      --iconColor: var(--ink); /* Icon color in HC will be bright */
     }
     *{box-sizing:border-box}
     html,body{height:100%}
@@ -98,13 +105,30 @@
     }
 
     .card{grid-column:span 12;background:var(--panel);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px;border:1px solid var(--border)}
-    .card h2{font-size:16px;margin:0 0 10px 0}
+    .card h2{font-size:16px;margin:0 0 10px 0; display: flex; align-items: center; gap: 8px;} /* Added flex for icon alignment */
+    .card h2 .icon { color: var(--iconColor); } /* Style for icons in titles */
     .muted{color:var(--muted);font-size:13px}
 
     input, select, textarea{
       width:100%;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--soft);color:var(--ink);
       transition: border-color 0.2s ease-out, background-color 0.2s ease-out; /* Smooth transition */
+      -webkit-appearance: none; /* Remove default select arrow on WebKit */
+      -moz-appearance: none; /* Remove default select arrow on Firefox */
+      appearance: none; /* Remove default select arrow */
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2376849c' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E"); /* Custom arrow */
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      background-size: 16px;
+      padding-right: 36px; /* Make space for the arrow */
     }
+    [data-theme="hc"] input, [data-theme="hc"] select, [data-theme="hc"] textarea {
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23e6efff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E"); /* White arrow for HC */
+    }
+
+    input:focus, select:focus, textarea:focus {
+        border-color: var(--pri); /* Highlight border on focus */
+    }
+
     .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
     
     /* Universal styling for form controls within .row for better responsiveness */
@@ -139,6 +163,10 @@
       transition: all 0.2s ease-out;
       color: var(--ink); /* Default button text color from --ink, applies to "Lewati", "Pause" */
       background: var(--btn); /* Pastikan tombol dasar menggunakan variabel background */
+      display: flex; /* For icon alignment */
+      align-items: center;
+      justify-content: center;
+      gap: 8px; /* Space between icon and text */
     }
     .btn:active{transform:translateY(1px)}
     .btn.primary{
@@ -367,7 +395,7 @@
     <!-- LEARN MODE -->
     <section class="grid" aria-labelledby="learnTitle">
       <div class="card" style="grid-column: span 12;">
-        <h2 id="learnTitle">Belajar (Pilih Rentang Kana)</h2>
+        <h2 id="learnTitle"><i class="fas fa-book icon"></i> Belajar (Pilih Rentang Kana)</h2>
         <div class="small">Pilih set (Hiragana/Katakana) dan rentang fleksibel. Ketuk tile untuk dengar pelafalan.</div>
         <div class="spacer"></div>
         <div class="row">
@@ -377,7 +405,7 @@
           </select>
           <select id="fromGrp" aria-label="Dari kelompok"></select>
           <select id="toGrp" aria-label="Sampai kelompok"></select>
-          <button class="btn primary" id="btnShowLearn">Tampilkan</button>
+          <button class="btn primary" id="btnShowLearn"><i class="fas fa-eye"></i> Tampilkan</button>
         </div>
         <div class="spacer"></div>
         <div id="learnTiles" class="pillbox" aria-live="polite"></div>
@@ -386,7 +414,7 @@
     <!-- TEST MODE -->
     <section class="grid" aria-labelledby="testTitle">
       <div class="card" style="grid-column: span 12;">
-        <h2 id="testTitle">Tes (Subset / Rentang, Tipe Soal & Mode Jawab)</h2>
+        <h2 id="testTitle"><i class="fas fa-pencil-alt icon"></i> Tes (Subset / Rentang, Tipe Soal & Mode Jawab)</h2>
         <div class="small">Gunakan chip untuk subset cepat atau rentang khusus. Tentukan tipe soal, mode jawab, dan jumlah soal.</div>
         <div class="spacer"></div>
         <!-- START MODIFIED ROW FOR SUBSET CHIPS -->
@@ -431,9 +459,9 @@
             <button class="chip" data-count="50">50</button>
             <button class="chip" data-count="100">100</button>
           </div>
-          <button class="btn primary" id="btnStart">Mulai Tes</button>
-          <button class="btn" id="btnSkip" title="Lewati soal (→)">Lewati</button>
-          <button class="btn warn" id="btnEnd">Selesai</button>
+          <button class="btn primary" id="btnStart"><i class="fas fa-play"></i> Mulai Tes</button>
+          <button class="btn" id="btnSkip" title="Lewati soal (→)"><i class="fas fa-forward"></i> Lewati</button>
+          <button class="btn warn" id="btnEnd"><i class="fas fa-stop"></i> Selesai</button>
         </div>
         <div class="spacer"></div>
         <div class="progress" aria-label="Progress Tes" role="progressbar" aria-valuemin="0" aria-valuemax="100"><div id="bar" class="bar"></div></div>
@@ -446,7 +474,7 @@
           <div id="typeWrap" style="max-width:520px;margin:0 auto">
             <input id="ans" placeholder="Ketik jawaban…" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" inputmode="latin" aria-label="Jawaban" />
             <div class="spacer"></div>
-            <button class="btn" id="btnCheck">Cek (Enter)</button>
+            <button class="btn" id="btnCheck"><i class="fas fa-check"></i> Cek (Enter)</button>
           </div>
           <div id="mcWrap" class="optwrap" hidden>
             <button class="btn opt" id="optA">A</button>
@@ -466,7 +494,7 @@
     <!-- POMODORO -->
     <section class="grid" aria-labelledby="pomoTitle" id="pomoSection">
       <div class="card">
-        <h2 id="pomoTitle">Timer Pomodoro (Opsional)</h2>
+        <h2 id="pomoTitle"><i class="fas fa-clock icon"></i> Timer Pomodoro (Opsional)</h2>
         <div class="small">Default 25/5, bisa diubah. Status dan sisa waktu tersimpan otomatis.</div>
         <div class="row" role="group" aria-label="Kontrol Pomodoro">
           <label>
@@ -477,9 +505,9 @@
             <span class="sr-only">Menit istirahat</span>
             <input id="pomoBreak" type="number" min="1" value="5" style="width:90px"> menit istirahat
           </label>
-          <button class="btn primary" id="pStart">Mulai</button>
-          <button class="btn" id="pPause">Pause</button>
-          <button class="btn warn" id="pReset">Reset</button>
+          <button class="btn primary" id="pStart"><i class="fas fa-play"></i> Mulai</button>
+          <button class="btn" id="pPause"><i class="fas fa-pause"></i> Pause</button>
+          <button class="btn warn" id="pReset"><i class="fas fa-redo"></i> Reset</button>
         </div>
         <div class="spacer"></div>
         <div class="center">
@@ -492,7 +520,7 @@
     <!-- TRACKER -->
     <section class="grid" aria-labelledby="trackTitle" id="trackerSection">
       <div class="card">
-        <h2 id="trackTitle">Tracker Kana</h2>
+        <h2 id="trackTitle"><i class="fas fa-chart-line icon"></i> Tracker Kana</h2>
         <div class="small">Ketuk untuk tandai sudah hafal. Tahan (long-press) untuk batal.</div>
         <div class="spacer"></div>
         <div class="row">
@@ -521,8 +549,8 @@
       <div class="spacer"></div>
       <div id="reviewWrap" style="text-align:left;max-height:40vh;overflow:auto;margin:8px 0" hidden></div>
       <div class="row" style="justify-content:center">
-        <button class="btn" id="btnReviewWrong" hidden>Belajar ulang yang salah</button>
-        <button class="btn primary" id="btnCloseModal">Lanjut</button>
+        <button class="btn" id="btnReviewWrong" hidden><i class="fas fa-redo-alt"></i> Belajar ulang yang salah</button>
+        <button class="btn primary" id="btnCloseModal"><i class="fas fa-times"></i> Lanjut</button>
       </div>
     </div>
     <div id="burst" class="burst" aria-hidden="true"></div>
@@ -546,7 +574,6 @@
     const DAKUON = ['ga','gi','gu','ge','go','za','ji','zu','ze','zo','da','ji','zu','de','do','ba','bi','bu','be','bo','pa','pi','pu','pe','po'];
     const YOUON = ['kya','kyu','kyo','sha','shu','sho','cha','chu','cho','nya','nyu','nyo','hya','hyu','hyo','mya','myu','myo','rya','ryu','ryo','gya','gyu','gyo','ja','ju','jo','bya','byu','byo','pya','pyu','pyo'];
 
-    // Corrected Hiragana Dakuon and Youon
     const HIRA_BASE = ['あ','い','う','え','お','か','き','く','け','こ','さ','し','す','せ','そ','た','ち','つ','て','と','な','に','ぬ','ね','の','は','ひ','ふ','へ','ほ','ま','み','む','め','も','や','ゆ','よ','ら','り','る','れ','ろ','わ','を','ん'];
     const KATA_BASE = ['ア','イ','ウ','エ','オ','カ','キ','ク','ケ','コ','サ','シ','ス','セ','ソ','タ','チ','ツ','テ','ト','ナ','ニ','ヌ','ネ','ノ','ハ','ヒ','フ','ヘ','ホ','マ','ミ','ム','メ','モ','ヤ','ユ','ヨ','ラ','リ','ル','レ','ロ','ワ','ヲ','ン'];
 
