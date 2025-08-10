@@ -14,9 +14,6 @@
       --btn:#e9eefc; --btnText:#0b101a; --border:rgba(19,32,48,.10);
       --radius:18px; --shadow:0 12px 28px rgba(15,23,34,.10);
       --ring: 0 0 0 3px rgba(122,108,255,.28);
-      /* Variabel warna latar belakang tombol OK dan WARN untuk tema pastel */
-      --okBg:#dff4ea;
-      --warnBg:#ffe5e5;
     }
     [data-theme="hc"]{
       --bg:#0a0f1a; --panel:#0f1626; --soft:#0c1220; --ink:#e6efff; --muted:#9fb0cc;
@@ -370,8 +367,17 @@
         <div class="spacer"></div>
         <div class="row">
           <div class="tag">Atau rentang khusus:</div>
+          <!-- New select for range mode -->
+          <select id="rangeMode" aria-label="Mode rentang">
+            <option value="range">Rentang</option>
+            <option value="single">Grup Tunggal</option>
+          </select>
           <select id="testFrom" aria-label="Tes dari"></select>
-          <select id="testTo" aria-label="Tes sampai"></select>
+          <div id="testToWrap"> <!-- Wrapper for testTo to be hidden/shown -->
+            <select id="testTo" aria-label="Tes sampai"></select>
+          </div>
+          <select id="testSingleGroup" aria-label="Pilih Grup" hidden></select> <!-- New select for single group mode -->
+
           <div class="tag">Jumlah soal:</div>
           <input id="testCount" type="number" min="1" value="10" style="width:100px" aria-label="Jumlah soal" />
           <div class="chips" id="countChips">
@@ -480,7 +486,7 @@
       theme:'pastel',
       audio:true,
       hiraMastered:[], kataMastered:[],
-      test:{subset:'aiueo', set:'hira', mode:'type', qType:'k2r', score:0, total:0, correctStreak:0, target:10},
+      test:{subset:'aiueo', set:'hira', mode:'type', qType:'k2r', score:0, total:0, correctStreak:0, target:10, rangeMode:'range'}, // Added rangeMode to state
       pomo:{mode:'work', work:25, break:5, remaining:25*60, running:false, last:0}
     });
     let state = load();
@@ -492,13 +498,13 @@
     const DAKUON = ['ga','gi','gu','ge','go','za','ji','zu','ze','zo','da','ji','zu','de','do','ba','bi','bu','be','bo','pa','pi','pu','pe','po'];
     const YOUON = ['kya','kyu','kyo','sha','shu','sho','cha','chu','cho','nya','nyu','nyo','hya','hyu','hyo','mya','myu','myo','rya','ryu','ryo','gya','gyu','gyo','ja','ju','jo','bya','byu','byo','pya','pyu','pyo'];
 
-    const HIRA_BASE = ['あ','い','う','え','お','か','き','く','け','こ','さ','し','す','せ','そ','た','ち','つ','て','と','な','に','ぬ','ね','の','は','ひ','ふ','へ','ほ','ま','み','む','め','も','や','ゆ','よ','ら','り','る','れ','ろ','wa','wo','n'];
+    const HIRA_BASE = ['あ','い','う','え','お','か','き','く','け','こ','さ','し','す','せ','そ','た','ち','つ','て','と','な','に','ぬ','ね','の','は','ひ','ふ','へ','ほ','ま','み','む','め','も','や','ゆ','よ','ら','り','る','れ','ろ','わ','を','ん'];
     const KATA_BASE = ['ア','イ','ウ','エ','オ','カ','キ','ク','ケ','コ','サ','シ','ス','セ','ソ','タ','チ','ツ','テ','ト','ナ','ニ','ヌ','ネ','ノ','ハ','ヒ','フ','ヘ','ホ','マ','ミ','ム','メ','モ','ヤ','ユ','ヨ','ラ','リ','ル','レ','ロ','ワ','ヲ','ン'];
 
-    const HIRA_DAKU = ['が','ぎ','ぐ','げ','ご','ざ','じ','ず','ぜ','ぞ','だ','ぢ','づ','で','ど','ba','bi','bu','be','bo','ぱ','ぴ','ぷ','ぺ','ぽ'];
+    const HIRA_DAKU = ['が','ぎ','ぐ','げ','ご','ざ','じ','ず','ぜ','ぞ','だ','ぢ','づ','で','ど','ば','び','ぶ','べ','ぼ','ぱ','ぴ','ぷ','ぺ','ぽ'];
     const KATA_DAKU = ['ガ','ギ','グ','ゲ','ゴ','ザ','ジ','ズ','ゼ','ゾ','ダ','ヂ','ヅ','デ','ド','バ','ビ','ブ','ベ','ボ','パ','ピ','プ','ペ','ポ'];
 
-    const HIRA_YOU = ['きゃ','きゅ','きょ','しゃ','しゅ','しょ','ちゃ','ちゅ','ちょ','にゃ','にゅ','にょ','ひゃ','ひゅ','ひょ','miya','myu','myo','rya','ryu','ryo','gya','gyu','gyo','ja','ju','jo','bya','byu','byo','pya','pyu','pyo'];
+    const HIRA_YOU = ['きゃ','きゅ','きょ','しゃ','しゅ','しょ','ちゃ','ちゅ','ちょ','にゃ','にゅ','にょ','ひゃ','ひゅ','ひょ','みゃ','miyu','muyo','りゃ','りゅ','りょ','ぎゃ','ぎゅ','ぎょ','じゃ','じゅ','じょ','びゃ','びゅ','びょ','ぴゃ','ぴゅ','ぴょ'];
     const KATA_YOU = ['キャ','キュ','キョ','シャ','シュ','ショ','チャ','チュ','チョ','ニャ','ニュ','ニョ','ヒャ','ヒュ','ヒョ','ミャ','ミュ','ミョ','リャ','リュ','リョ','ギャ','ギュ','ギョ','ジャ','ジュ','ジョ','ビャ','ビュ','ビョ','ピャ','ピュ','ピョ'];
 
     const GROUPS = [
@@ -568,33 +574,108 @@
 
     // ---------- TEST MODE ----------
     let testPool=[], poolIdx=[], usingRange=false, qIndex=0, currentItem=null, mcMap={}, wrongList=[];
-    function fillTestRange(){ const tf=qs('#testFrom'), tt=qs('#testTo'); tf.innerHTML=''; tt.innerHTML=''; GROUPS.forEach(g=>{ tf.add(new Option(g.label,g.key)); tt.add(new Option(g.label,g.key)); }); tf.value='aiueo'; tt.value='k'; }
+    function fillTestRange(){
+      const tf=qs('#testFrom'), tt=qs('#testTo'), ts=qs('#testSingleGroup');
+      tf.innerHTML=''; tt.innerHTML=''; ts.innerHTML='';
+      GROUPS.forEach(g=>{
+        tf.add(new Option(g.label,g.key));
+        tt.add(new Option(g.label,g.key));
+        ts.add(new Option(g.label,g.key));
+      });
+      tf.value='aiueo';
+      tt.value='k';
+      ts.value='aiueo'; // Default single group selection
+      qs('#rangeMode').value = state.test.rangeMode; // Set initial value from state
+      toggleRangeInputs(); // Call to set initial visibility
+    }
+
     function buildSubsetChips(){ const box=qs('#subsetChips'); box.innerHTML=''; const frag=df(); GROUPS.forEach(g=>{ const b=document.createElement('button'); b.className='chip'+(state.test.subset===g.key?' active':''); b.textContent=g.label; b.onclick=()=>{ state.test.subset=g.key; save(); buildSubsetChips(); }; frag.appendChild(b); }); box.appendChild(frag); }
 
     function startTest(){
-      wrongList=[]; const set=qs('#testSet').value; state.test.set=set; const mode=qs('#answerMode').value; state.test.mode=mode; const qType=qs('#qType').value; state.test.qType=qType; const req = Math.max(1, parseInt(qs('#testCount').value,10)||10);
-      const labels = buildPoolLabels();
+      wrongList=[];
+      const set=qs('#testSet').value; state.test.set=set;
+      const mode=qs('#answerMode').value; state.test.mode=mode;
+      const qType=qs('#qType').value; state.test.qType=qType;
+      const rangeMode = qs('#rangeMode').value; state.test.rangeMode = rangeMode; // Save range mode to state
+      const req = Math.max(1, parseInt(qs('#testCount').value,10)||10);
+      
+      const labels = buildPoolLabels(); // This function now handles rangeMode
       testPool = labels.map(r=>({romaji:r, char: (set==='hira'?HIRA_MAP:KATA_MAP).get(r)}));
+      
       if(!testPool.length){ alert('Pilih subset atau rentang yang valid.'); return; }
       poolIdx = labels.map(r=> ALL_ROMAJI.indexOf(r)).filter(x=>x>=0);
       shuffleSync(testPool, poolIdx);
       state.test.target = Math.min(req, qType==='seq'? 60: testPool.length || req);
       state.test.score=0; state.test.total=0; state.test.correctStreak=0; qIndex=0; save();
       qs('#testArea').hidden=false; updateProgress();
-      toggleAnswerUI(); nextQ();
+      nextQ(); // nextQ will call toggleAnswerUI
     }
-    function toggleAnswerUI(){ const qType=state.test.qType; const mode=state.test.mode; if(qType==='r2k'){ qs('#typeWrap').hidden=true; qs('#mcWrap').hidden=false; } else if(qType==='k2r'){ qs('#typeWrap').hidden=(mode==='mc'); qs('#mcWrap').hidden=!(mode==='mc'); } else { qs('#typeWrap').hidden=false; qs('#mcWrap').hidden=true; } }
+
+    // Corrected toggleAnswerUI logic
+    function toggleAnswerUI(){
+      const typeWrap = qs('#typeWrap');
+      const mcWrap = qs('#mcWrap');
+      const answerModeSelect = qs('#answerMode');
+      const qTypeSelect = qs('#qType');
+
+      const mode = answerModeSelect.value;
+      const qType = qTypeSelect.value;
+
+      // Explicitly set display to none for both, overriding any other styles
+      typeWrap.style.display = 'none';
+      mcWrap.style.display = 'none';
+      answerModeSelect.disabled = false; // Enable by default, then disable if needed
+
+      if (qType === 'seq') {
+        typeWrap.style.display = 'block';
+        answerModeSelect.value = 'type';
+        answerModeSelect.disabled = true;
+      } else if (qType === 'r2k') {
+        mcWrap.style.display = 'grid';
+        answerModeSelect.value = 'mc';
+        answerModeSelect.disabled = true;
+      } else { // qType is 'k2r' (Kana -> Romaji)
+        if (mode === 'type') {
+          typeWrap.style.display = 'block';
+        } else { // mode === 'mc'
+          mcWrap.style.display = 'grid';
+        }
+      }
+    }
+
     function endTest(){ qs('#testArea').hidden=true; updateProgress(0); }
 
     function nextQ(){
       if(state.test.total>=state.test.target){ finishTest(); return; }
       if(!testPool.length){ qs('#qKana').textContent='Selesai!'; return; }
       currentItem = testPool[qIndex % testPool.length]; const qType=state.test.qType; const ansEl=qs('#ans'); if(ansEl) ansEl.value='';
-      if(qType==='seq'){ const seq = makeSequence(poolIdx, state.test.set); currentItem = {...currentItem, seq}; qs('#qKana').style.fontSize='28px'; qs('#qKana').textContent=`Romaji: ${seq.romaji}`; }
-      else if(qType==='k2r'){ qs('#qKana').style.fontSize='64px'; qs('#qKana').textContent=currentItem.char; }
-      else { qs('#qKana').style.fontSize='36px'; qs('#qKana').textContent=currentItem.romaji; buildMC_r2k(currentItem); }
-      if(state.test.mode==='mc' && qType==='k2r') buildMC_k2r(currentItem);
-      updateTestInfo(); setTimeout(()=>{ if(!qs('#typeWrap').hidden) ansEl && ansEl.focus(); }, 30);
+      
+      // Set the question prompt based on qType
+      if(qType==='seq'){
+        const seq = makeSequence(poolIdx, state.test.set);
+        currentItem = {...currentItem, seq};
+        qs('#qKana').style.fontSize='28px';
+        qs('#qKana').textContent=`Romaji: ${seq.romaji}`;
+      }
+      else if(qType==='k2r'){
+        qs('#qKana').style.fontSize='64px';
+        qs('#qKana').textContent=currentItem.char;
+      }
+      else { // qType is 'r2k'
+        qs('#qKana').style.fontSize='36px';
+        qs('#qKana').textContent=currentItem.romaji;
+        buildMC_r2k(currentItem); // Populate MC options for r2k
+      }
+
+      // If answer mode is MC and qType is k2r, build MC options
+      // This part only builds the content, visibility is handled by toggleAnswerUI
+      if(qs('#answerMode').value === 'mc' && qs('#qType').value === 'k2r') {
+        buildMC_k2r(currentItem);
+      }
+
+      updateTestInfo();
+      toggleAnswerUI(); // Call toggleAnswerUI at the very end to ensure correct visibility
+      setTimeout(()=>{ if(!qs('#typeWrap').hidden) ansEl && ansEl.focus(); }, 30);
     }
 
     function mcPick(letter){ const qType=state.test.qType; const val=mcMap[letter]; let correct=false; if(qType==='k2r'){ correct = (val===currentItem.romaji); } else if(qType==='r2k'){ correct = (val=== (state.test.set==='hira'? HIRA_MAP.get(currentItem.romaji): KATA_MAP.get(currentItem.romaji))); }
@@ -615,7 +696,29 @@
 
     function skipQ(){ clickTone('click'); if(!testPool.length){ return; } qIndex=(qIndex+1)%testPool.length; nextQ(); }
 
-    function updateTestInfo(){ const g = GROUPS.find(x=>x.key===state.test.subset) || GROUPS[0]; const label = usingRange? 'Rentang khusus' : g.label; const tlabel = state.test.qType==='k2r'? 'Kana→Romaji' : state.test.qType==='r2k'? 'Romaji→Kana' : 'Rangkaian'; qs('#testInfo').textContent = `${state.test.set==='hira'?'Hiragana':'Katakana'} • ${label} • ${tlabel} • Soal ${Math.min(state.test.total+1, state.test.target)}/${state.test.total}`; }
+    function updateTestInfo(){
+      const rangeMode = state.test.rangeMode;
+      let rangeLabel;
+      if (rangeMode === 'single') {
+        const singleKey = qs('#testSingleGroup').value;
+        const grp = GROUPS.find(x => x.key === singleKey);
+        rangeLabel = grp ? grp.label : 'Grup Tunggal';
+      } else { // range mode
+        const sKey = qs('#testFrom').value;
+        const eKey = qs('#testTo').value;
+        const grpFrom = GROUPS.find(x => x.key === sKey);
+        const grpTo = GROUPS.find(x => x.key === eKey);
+        if (grpFrom && grpTo) {
+          rangeLabel = `${grpFrom.label} - ${grpTo.label}`;
+        } else {
+          rangeLabel = 'Rentang khusus';
+        }
+      }
+
+      const tlabel = state.test.qType==='k2r'? 'Kana→Romaji' : state.test.qType==='r2k'? 'Romaji→Kana' : 'Rangkaian';
+      qs('#testInfo').textContent = `${state.test.set==='hira'?'Hiragana':'Katakana'} • ${rangeLabel} • ${tlabel} • Soal ${Math.min(state.test.total+1, state.test.target)}/${state.test.total}`;
+    }
+
     function updateProgress(){ const pct = (state.test.total/state.test.target)*100; const bar = qs('#bar'); bar.style.width = pct+'%'; const prog = qs('.progress'); prog.setAttribute('aria-valuenow', Math.round(pct)); }
 
     function finishTest(){ openCelebrate('finish'); burst(); clickTone('ok'); renderReview(); }
@@ -624,10 +727,49 @@
 
     qs('#btnReviewWrong').onclick = ()=>{ if(!wrongList.length) return; const set=state.test.set; const labels=[...new Set(wrongList.map(w=>w.romaji))]; testPool = labels.map(r=>({romaji:r, char: (set==='hira'?HIRA_MAP:KATA_MAP).get(r)})); poolIdx = labels.map(r=>ALL_ROMAJI.indexOf(r)).filter(x=>x>=0); state.test.total=0; state.test.score=0; state.test.correctStreak=0; state.test.target = Math.min(20, testPool.length); qIndex=0; closeCelebrate(); qs('#testArea').hidden=false; updateProgress(); nextQ(); };
 
-    function buildPoolLabels(){ const sKey=qs('#testFrom').value, eKey=qs('#testTo').value; const selFrom=GROUPS.findIndex(x=>x.key===sKey), selTo=GROUPS.findIndex(x=>x.key===eKey); usingRange=(selFrom>-1&&selTo>-1); if(usingRange){ const [from,to]= selFrom<=selTo? [selFrom,selTo] : [selTo,fromSel]; return GROUPS.slice(from,to+1).flatMap(g=> g.idx.map(i=> g.list[i] )); } else { const grp=GROUPS.find(x=>x.key===state.test.subset)||GROUPS[0]; return grp.idx.map(i=> grp.list[i]); } }
+    function buildPoolLabels(){
+      const rangeMode = qs('#rangeMode').value;
+      let labels = [];
+      if (rangeMode === 'single') {
+        const singleKey = qs('#testSingleGroup').value;
+        const grp = GROUPS.find(x => x.key === singleKey);
+        if (grp) {
+          labels = grp.idx.map(i => grp.list[i]);
+        }
+      } else { // range mode
+        const sKey = qs('#testFrom').value;
+        const eKey = qs('#testTo').value;
+        const selFrom=GROUPS.findIndex(x=>x.key===sKey);
+        const selTo=GROUPS.findIndex(x=>x.key===eKey);
+        if(selFrom > -1 && selTo > -1){
+          const [from,to]= selFrom<=selTo? [selFrom,selTo] : [selTo,selFrom];
+          labels = GROUPS.slice(from,to+1).flatMap(g=> g.idx.map(i=> g.list[i] ));
+        }
+      }
+      return labels;
+    }
+
     function rangeLabels(fromKey,toKey){ const a=GROUPS.findIndex(g=>g.key===fromKey); const b=GROUPS.findIndex(g=>g.key===toKey); if(a<0||b<0) return []; const [from,to] = a<=b? [a,b]:[b,a]; return GROUPS.slice(from,to+1).flatMap(g=> g.idx.map(i=> g.list[i]) ); }
     function currentPoolLabels(){ return testPool.map(x=>x.romaji); }
     function currentPoolChars(){ return testPool.map(x=>x.char); }
+
+    // Function to toggle visibility of range inputs
+    function toggleRangeInputs() {
+      const rangeMode = qs('#rangeMode').value;
+      const testFrom = qs('#testFrom');
+      const testToWrap = qs('#testToWrap');
+      const testSingleGroup = qs('#testSingleGroup');
+
+      if (rangeMode === 'single') {
+        testFrom.hidden = true;
+        testToWrap.hidden = true;
+        testSingleGroup.hidden = false;
+      } else { // 'range'
+        testFrom.hidden = false;
+        testToWrap.hidden = false;
+        testSingleGroup.hidden = true;
+      }
+    }
 
     // ---------- THEME & AUDIO ----------
     function applyTheme(){ document.documentElement.setAttribute('data-theme', state.theme==='hc'?'hc':'pastel'); qs('#tPastel').classList.toggle('active', state.theme!=='hc'); qs('#tHC').classList.toggle('active', state.theme==='hc'); }
@@ -714,8 +856,40 @@
     qs('#pPause').onclick = pausePomo;
     qs('#pReset').onclick = resetPomo;
 
+    // Range mode toggle
+    qs('#rangeMode').onchange = toggleRangeInputs;
+    // Add event listener for answerMode to update UI immediately
+    qs('#answerMode').onchange = (e) => {
+      state.test.mode = e.target.value;
+      save();
+      toggleAnswerUI(); // Update UI immediately based on new mode
+    };
+    // Add event listener for qType to update UI immediately
+    qs('#qType').onchange = (e) => {
+      state.test.qType = e.target.value;
+      save();
+      toggleAnswerUI(); // Update UI immediately based on new qType
+    };
+
+
     // ---------- RENDER ----------
-    function renderAll(){ buildKana('hiraBox','hira'); buildKana('kataBox','kata'); buildSubsetChips(); fillLearnRange(); fillTestRange(); renderStats(); applyTheme(); applyAudio(); upPomoLabel(); if(!state.pomo.remaining) state.pomo.remaining=state.pomo.work*60; drawRemain(); qs('#pomoWork').value=state.pomo.work; qs('#pomoBreak').value=state.pomo.break; qs('#testCount').value=state.test.target||10; }
+    function renderAll(){
+      buildKana('hiraBox','hira');
+      buildKana('kataBox','kata');
+      buildSubsetChips();
+      fillLearnRange();
+      fillTestRange(); // This now also calls toggleRangeInputs internally
+      renderStats();
+      applyTheme();
+      applyAudio();
+      upPomoLabel();
+      if(!state.pomo.remaining) state.pomo.remaining=state.pomo.work*60;
+      drawRemain();
+      qs('#pomoWork').value=state.pomo.work;
+      qs('#pomoBreak').value=state.pomo.break;
+      qs('#testCount').value=state.test.target||10;
+      toggleAnswerUI(); // Ensure initial answer UI is correct on load
+    }
 
     document.addEventListener('DOMContentLoaded', ()=>{
       renderAll();
