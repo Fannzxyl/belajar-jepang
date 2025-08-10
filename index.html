@@ -106,7 +106,7 @@
 
     input, select, textarea{
       width:100%;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--soft);color:var(--ink);
-      transition: border-color 0.2s ease-out, background-color 0.2s ease-out, box-shadow 0.2s ease-out; /* Added box-shadow transition */
+      transition: border-color 0.2s ease-out, background-color 0.2s ease-out, box-shadow 0.2s ease-out;
       -webkit-appearance: none;
       -moz-appearance: none;
       appearance: none;
@@ -122,8 +122,8 @@
 
     input:focus, select:focus, textarea:focus {
         border-color: var(--pri);
-        outline: none; /* Remove default outline */
-        box-shadow: var(--ring); /* Use custom ring on focus */
+        outline: none;
+        box-shadow: var(--ring);
     }
 
     .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
@@ -360,7 +360,7 @@
       animation: streakGrow 0.2s ease-out;
     }
 
-    /* Spinner for loading audio (removed from HTML, but keeping CSS in case we re-add) */
+    /* Spinner for loading audio (now removed from HTML) */
     .spinner {
       display: none !important;
     }
@@ -477,7 +477,10 @@
         <div id="testArea" class="center" hidden>
           <div id="promptWrap" style="display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap">
             <div id="qKana" style="font-size:64px;line-height:1.1;margin:6px 0">あ</div>
-            <!-- Removed audio button and spinner from HTML -->
+            <!-- Removed audio button and spinner, keeping only the visual icon if needed -->
+            <!-- <button class="btn" id="btnListen" title="Dengarkan (L)">
+              <span class="fas fa-volume-up"></span>
+            </button> -->
           </div>
           <div id="typeWrap" style="max-width:520px;margin:0 auto">
             <input id="ans" placeholder="Ketik jawaban…" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" inputmode="latin" aria-label="Jawaban" />
@@ -492,7 +495,8 @@
           </div>
           <div class="spacer"></div>
           <div class="small" id="testInfo" aria-live="polite">
-            <!-- Streak counter will be displayed here -->
+            <!-- Streak counter is now a separate span -->
+            <span id="testInfoText"></span> <!-- New span for general test info -->
             <span id="streakCounter">Streak: 0</span>
           </div>
         </div>
@@ -545,6 +549,12 @@
         <div class="row">
           <div class="tag" id="jpStats" aria-live="polite">0/46 hira • 0/46 kata</div>
         </div>
+        <div class="spacer"></div>
+        <div class="row" style="justify-content: center; font-size: 14px;">
+            <span id="totalPointsDisplay">Poin: 0</span>
+            <span style="margin: 0 10px;">•</span>
+            <span id="levelDisplay">Level: 1 (Pemula)</span>
+        </div>
       </div>
     </section>
 
@@ -577,10 +587,19 @@
       pomo:{mode:'work', work:25, break:5, remaining:25*60, running:false, last:0},
       totalPoints: 0, // New: Total points for gamification
       level: 1,       // New: User's current level
-      pointsToNextLevel: 100 // New: Points needed for next level
+      // pointsToNextLevel will be calculated dynamically based on level
     });
     let state = load();
-    function load(){ try{ const raw=localStorage.getItem(KEY); return raw? JSON.parse(raw): initState(); }catch{ return initState(); } }
+    function load(){
+      try{
+        const raw=localStorage.getItem(KEY);
+        const loadedState = raw ? JSON.parse(raw) : initState();
+        // Ensure new state properties are initialized for existing users
+        return { ...initState(), ...loadedState };
+      }catch{
+        return initState();
+      }
+    }
     function save(){ try{ localStorage.setItem(KEY, JSON.stringify(state)); }catch{} }
 
     // ---------- DATA ----------
@@ -664,7 +683,6 @@
         state.totalPoints += 5; // Add points for mastering a new Kana
         checkLevelUp();
       } else {
-        arr.splice(i,1);
         state.totalPoints = Math.max(0, state.totalPoints - 5); // Deduct points if unmastered
       }
       save();
@@ -688,7 +706,7 @@
 
     // Gamification: Leveling system
     const LEVEL_THRESHOLDS = [0, 100, 250, 500, 1000, 2000, 3500, 5000, 7500, 10000]; // Points needed for each level (index 0 is level 1)
-    const LEVEL_NAMES = ["Pemula", "Pengenal Kana", "Penyelidik Kana", "Penjelajah Kana", "Master Kana", "Sensei Kana", "Grandmaster Kana", "Kana Legendaris", "Dewa Kana", "Kana Abadi"];
+    const LEVEL_NAMES = ["Pemula Kana", "Pengenal Kana", "Penyelidik Kana", "Penjelajah Kana", "Master Kana", "Sensei Kana", "Grandmaster Kana", "Kana Legendaris", "Dewa Kana", "Kana Abadi"];
 
     function getLevelAndThreshold(points) {
         let level = 1;
@@ -708,29 +726,32 @@
     }
 
     function checkLevelUp() {
-        const { level: oldLevel } = getLevelAndThreshold(state.totalPoints - 5); // Check level before adding points
-        const { level: newLevel, nextThreshold } = getLevelAndThreshold(state.totalPoints);
+        // Calculate old level based on points before current correct answer (+1 point)
+        const { level: oldLevel } = getLevelAndThreshold(state.totalPoints - 1);
+        const { level: newLevel } = getLevelAndThreshold(state.totalPoints);
 
         if (newLevel > oldLevel) {
             state.level = newLevel;
-            state.pointsToNextLevel = nextThreshold;
             openCelebrate('levelUp', newLevel); // Show level up celebration
-        } else {
-            state.pointsToNextLevel = nextThreshold;
         }
     }
 
     function updatePointsAndLevelDisplay() {
-        const pointsDisplay = qs('#totalPointsDisplay');
+        const totalPointsDisplay = qs('#totalPointsDisplay');
         const levelDisplay = qs('#levelDisplay');
-        if (pointsDisplay) pointsDisplay.textContent = `Poin: ${state.totalPoints}`;
+        if (totalPointsDisplay) totalPointsDisplay.textContent = `Poin: ${state.totalPoints}`;
         if (levelDisplay) {
             const { level, nextThreshold } = getLevelAndThreshold(state.totalPoints);
-            levelDisplay.textContent = `Level: ${level} (${LEVEL_NAMES[level-1]})`;
-            // Optionally, show progress to next level
-            const progressToNext = nextThreshold === Infinity ? "MAX" : `${state.totalPoints - (LEVEL_THRESHOLDS[level-1] || 0)} / ${nextThreshold - (LEVEL_THRESHOLDS[level-1] || 0)}`;
-            // You can add this to the levelDisplay or a separate element
-            // console.log(`Progress to next level: ${progressToNext}`);
+            const currentLevelName = LEVEL_NAMES[level - 1] || `Level ${level}`;
+            let progressText = '';
+            if (nextThreshold !== Infinity) {
+                const pointsCurrentLevel = state.totalPoints - (LEVEL_THRESHOLDS[level - 1] || 0);
+                const pointsNeededForNext = nextThreshold - (LEVEL_THRESHOLDS[level - 1] || 0);
+                progressText = ` (${pointsCurrentLevel}/${pointsNeededForNext})`;
+            } else {
+                progressText = ` (MAX)`;
+            }
+            levelDisplay.textContent = `Level: ${level} ${currentLevelName}${progressText}`;
         }
     }
 
@@ -767,26 +788,30 @@
       const req = Math.max(1, parseInt(qs('#testCount').value,10)||10);
       
       const labels = buildPoolLabels(); // This function now handles rangeMode
-      let basePoolItems = labels.map(r=>({romaji:r, char: (set==='hira'?HIRA_MAP:KATA_MAP).get(r)}));
+      let uniquePoolItems = labels.map(r=>({romaji:r, char: (set==='hira'?HIRA_MAP:KATA_MAP).get(r)}));
 
-      // If requested count is more than available unique items, duplicate items
-      if (req > basePoolItems.length) {
-          testPool = [];
+      if(!uniquePoolItems.length){ alert('Pilih subset atau rentang yang valid.'); return; }
+
+      // Build the testPool: first all unique items (shuffled), then repeat if needed
+      testPool = [];
+      let currentUniqueItems = [...uniquePoolItems]; // Copy to shuffle for the first round
+      shuffle(currentUniqueItems);
+      testPool = testPool.concat(currentUniqueItems);
+
+      // If more questions are requested than unique items, start repeating
+      if (req > uniquePoolItems.length) {
           while (testPool.length < req) {
-              testPool = testPool.concat(basePoolItems); // Add all base items
+              let shuffledRepeat = [...uniquePoolItems]; // Get a fresh copy for repeating
+              shuffle(shuffledRepeat); // Shuffle the repeated set
+              testPool = testPool.concat(shuffledRepeat);
           }
           testPool = testPool.slice(0, req); // Trim to exact requested length
-      } else {
-          testPool = basePoolItems; // Use base items if enough
       }
       
-      // Always shuffle the final testPool
-      shuffle(testPool);
+      // poolIdx is only used for makeSequence, so it should refer to unique items
+      poolIdx = labels.map(r=> ALL_ROMAJI.indexOf(r)).filter(x=>x>=0);
 
-      if(!testPool.length){ alert('Pilih subset atau rentang yang valid.'); return; }
-      poolIdx = labels.map(r=> ALL_ROMAJI.indexOf(r)).filter(x=>x>=0); // poolIdx still refers to unique items for makeSequence
-      
-      state.test.target = req; // Directly use the requested quantity
+      state.test.target = req;
       state.test.score=0; state.test.total=0; state.test.correctStreak=0; qIndex=0; save();
       qs('#testArea').hidden=false; updateProgress();
       nextQ(); // nextQ will call toggleAnswerUI
@@ -881,7 +906,7 @@
         maybeCelebrate('streak');
         clickTone('ok');
         qKanaElement.classList.add('correct-answer');
-        streakCounterElement.classList.add('grow');
+        if (streakCounterElement) streakCounterElement.classList.add('grow');
       } else {
         state.test.correctStreak=0;
         wrongList.push({...currentItem, ...extra});
@@ -892,7 +917,7 @@
       // Remove animation classes after a short delay
       setTimeout(() => {
         qKanaElement.classList.remove('correct-answer', 'wrong-answer');
-        streakCounterElement.classList.remove('grow');
+        if (streakCounterElement) streakCounterElement.classList.remove('grow');
       }, 300); // Match animation duration
 
       updateProgress();
@@ -928,14 +953,21 @@
       }
 
       const tlabel = state.test.qType==='k2r'? 'Kana→Romaji' : state.test.qType==='r2k'? 'Romaji→Kana' : 'Rangkaian';
-      const testInfoElement = qs('#testInfo');
-      testInfoElement.innerHTML = `${state.test.set==='hira'?'Hiragana':'Katakana'} • ${rangeLabel} • ${tlabel} • Soal ${Math.min(state.test.total+1, state.test.target)}/${state.test.total} <span id="streakCounter">Streak: ${state.test.correctStreak}</span>`;
+      const testInfoTextElement = qs('#testInfoText'); // Get the new span for text
+      const streakCounterElement = qs('#streakCounter'); // Get the streak span
+
+      if (testInfoTextElement) {
+        testInfoTextElement.textContent = `${state.test.set==='hira'?'Hiragana':'Katakana'} • ${rangeLabel} • ${tlabel} • Soal ${state.test.total}/${state.test.target}`;
+      }
+      if (streakCounterElement) {
+        streakCounterElement.textContent = `Streak: ${state.test.correctStreak}`;
+      }
     }
 
     function updateProgress(){ const pct = (state.test.total/state.test.target)*100; const bar = qs('#bar'); bar.style.width = pct+'%'; const prog = qs('.progress'); prog.setAttribute('aria-valuenow', Math.round(pct)); }
 
     function finishTest(){
-      state.totalPoints += state.test.score; // Add bonus points for finishing test
+      state.totalPoints += state.test.score * 2; // Add bonus points for finishing test (e.g., 2x score)
       checkLevelUp(); // Check for level up after test bonus
       openCelebrate('finish');
       burst();
@@ -1001,7 +1033,7 @@
         try{
             if(!state.audio) return; // Only play if audio is enabled
             if(!('speechSynthesis' in window)) {
-                // console.warn("SpeechSynthesis API not supported in this browser.");
+                // console.warn("SpeechSynthesis API not supported in this browser."); // Keep console warning if needed for dev
                 return;
             }
             const u=new SpeechSynthesisUtterance(text);
@@ -1026,7 +1058,7 @@
         openCelebrate('streak'); burst(); clickTone('ok');
       } else if (type === 'levelUp') {
         qs('#celebrateTitle').textContent = `Level Up! 🎉 Level ${level}!`;
-        qs('#celebrateMsg').textContent = `Kamu sekarang seorang ${LEVEL_NAMES[level-1]}! Terus semangat! 🔥`;
+        qs('#celebrateMsg').textContent = `Kamu sekarang seorang ${LEVEL_NAMES[level-1] || `Level ${level}`}! Terus semangat! 🔥`;
         modal.style.display='flex';
         burst(); clickTone('ok');
       }
