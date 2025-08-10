@@ -16,10 +16,6 @@
       --btn:#e9eefc; --btnText:#0b101a; --border:rgba(19,32,48,.10);
       --radius:18px; --shadow:0 12px 28px rgba(15,23,34,.10);
       --ring: 0 0 0 3px rgba(122,108,255,.28);
-      /* Variabel warna latar belakang tombol OK dan WARN untuk tema pastel */
-      --okBg:#dff4ea;
-      --warnBg:#ffe5e5;
-      --iconColor: var(--muted); /* Default icon color */
     }
     [data-theme="hc"]{
       --bg:#0a0f1a; --panel:#0f1626; --soft:#0c1220; --ink:#e6efff; --muted:#9fb0cc;
@@ -358,6 +354,23 @@
       animation: streakGrow 0.2s ease-out;
     }
 
+    /* Spinner for loading audio (removed from HTML, but keeping CSS in case we re-add) */
+    .spinner {
+      border: 4px solid rgba(0, 0, 0, 0.1);
+      border-left-color: var(--pri);
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      animation: spin 1s linear infinite;
+      display: none; /* Ensure it's hidden by default */
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+
     @media (prefers-reduced-motion: reduce){
       *{animation-duration:0.01ms !important; animation-iteration-count:1 !important; transition-duration:0.01ms !important; scroll-behavior:auto !important}
       #qKana.correct-answer, #qKana.wrong-answer, #streakCounter.grow {
@@ -469,7 +482,10 @@
         <div id="testArea" class="center" hidden>
           <div id="promptWrap" style="display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap">
             <div id="qKana" style="font-size:64px;line-height:1.1;margin:6px 0">あ</div>
-            <button class="btn" id="btnListen" title="Dengarkan (L)">🎧</button>
+            <button class="btn" id="btnListen" title="Dengarkan (L)">
+              <span id="listenIcon" class="fas fa-volume-up"></span>
+              <!-- <span id="listenSpinner" class="spinner" style="display:none;"></span> Removed spinner -->
+            </button>
           </div>
           <div id="typeWrap" style="max-width:520px;margin:0 auto">
             <input id="ans" placeholder="Ketik jawaban…" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" inputmode="latin" aria-label="Jawaban" />
@@ -895,10 +911,27 @@
     function applyTheme(){ document.documentElement.setAttribute('data-theme', state.theme==='hc'?'hc':'pastel'); qs('#tPastel').classList.toggle('active', state.theme!=='hc'); qs('#tHC').classList.toggle('active', state.theme==='hc'); }
     function applyAudio(){ const ck=qs('#audToggle'); ck.checked = !!state.audio; }
 
-    // ---------- AUDIO ----------
-    function speak(text){ try{ if(!state.audio) return; if(!('speechSynthesis' in window)) return; const u=new SpeechSynthesisUtterance(text); u.lang='ja-JP'; u.rate=.9; u.pitch=1.02; u.volume=1; speechSynthesis.speak(u);}catch{} }
-    window._speak = speak;
-    function speakCurrent(){ if(currentItem){ if(state.test.qType==='r2k'){ speak(currentItem.romaji); } else if(state.test.qType==='k2r'){ const r=currentItem.romaji; speak(r); } else if(state.test.qType==='seq'){ speak(currentItem.seq.romaji); } } }
+    // Reverted speak function to use SpeechSynthesisUtterance
+    function speak(text){
+        try{
+            if(!state.audio) return;
+            if(!('speechSynthesis' in window)) {
+                console.warn("SpeechSynthesis API not supported in this browser.");
+                return;
+            }
+            const u=new SpeechSynthesisUtterance(text);
+            u.lang='ja-JP';
+            u.rate=.9;
+            u.pitch=1.02;
+            u.volume=1;
+            speechSynthesis.speak(u);
+        }catch(error){
+            console.error('Error speaking text:', error);
+        }
+    }
+
+    window._speak = speak; // Expose for inline onclick
+
     function clickTone(kind){ try{ if(!state.audio) return; const C = window.AudioContext || window.webkitAudioContext; if(!C) return; const ctx=new C(); const o=ctx.createOscillator(); const g=ctx.createGain(); o.connect(g); g.connect(ctx.destination); o.type='sine'; o.frequency.setValueAtTime(kind==='ok'? 960: kind==='bad'? 260: 520, ctx.currentTime); g.gain.setValueAtTime(0.0001, ctx.currentTime); g.gain.exponentialRampToValueAtTime(kind==='bad'?0.25:0.12, ctx.currentTime+0.01); o.start(); setTimeout(()=>{ g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime+0.2); o.stop(ctx.currentTime+0.22); ctx.close && ctx.close(); }, 150);}catch{} }
 
     // ---------- CELEBRATION ----------
