@@ -14,29 +14,26 @@
       --bg:#f8fbff; --panel:#ffffff; --soft:#f2f6ff; --ink:#132030; --muted:#76849c;
       --pri:#7a6cff; --sec:#16c6a1; --warn:#ff7b7b; --ok:#2fb875; --accent:#ffd166;
       --btn:#e9eefc; --btnText:#0b101a; --border:rgba(19,32,48,.10);
-      --radius:18px; --shadow:0 12px 28px rgba(15,23,34,.10);
+      --radius:18px; --shadow:0 0 0 0 rgba(15,23,34,.10); /* Reduced shadow for a cleaner look */
       --ring: 0 0 0 3px rgba(122,108,255,.28);
     }
     [data-theme="hc"]{
       --bg:#0a0f1a; --panel:#0f1626; --soft:#0c1220; --ink:#e6efff; --muted:#9fb0cc;
       --pri:#8fa8ff; --sec:#3dd8b5; --warn:#ff8c8c; --ok:#7be0b3; --accent:#ffd98a;
-      --btn:#18243a; /* Latar belakang tombol di HC akan gelap */
-      --btnText:#e6efff; /* Teks tombol di HC akan putih */
+      --btn:#18243a;
+      --btnText:#e6efff;
       --border:rgba(230,239,255,.12);
       --ring: 0 0 0 3px rgba(143,168,255,.35);
-      /* Variabel warna latar belakang tombol OK dan WARN untuk tema high-contrast */
-      --okBg:#1a3a2e; /* Warna hijau gelap yang kontras dengan teks terang */
-      --warnBg:#3a1a1a; /* Warna merah gelap yang kontras dengan teks terang */
-      --iconColor: var(--ink); /* Icon color in HC will be bright */
+      --iconColor: var(--ink);
     }
     *{box-sizing:border-box}
     html,body{height:100%}
     body{margin:0;font-family:'Inter', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;background:
       radial-gradient(900px 420px at -10% -20%, rgba(122,108,255,.10), transparent),
       radial-gradient(900px 420px at 110% -30%, rgba(22,198,161,.12), transparent),
-      var(--bg);color:var(--ink)} /* Warna teks utama mengikuti --ink */
+      var(--bg);color:var(--ink)}
     .wrap{
-      max-width: 720px; /* Default for mobile/tablet */
+      max-width: 720px;
       margin: auto;
       padding: 16px;
       padding-left: calc(16px + env(safe-area-inset-left));
@@ -45,35 +42,33 @@
     header{position:sticky;top:0;z-index:30;background:linear-gradient(180deg, rgba(255,255,255,.92), rgba(255,255,255,.72));backdrop-filter: blur(8px);border-bottom:1px solid var(--border); padding-top:env(safe-area-inset-top)}
     [data-theme="hc"] header{background:linear-gradient(180deg, rgba(15,22,38,.86), rgba(15,22,38,.66))}
     
-    /* Header brand and controls layout */
     .brand{
       display:flex;
       align-items:center;
       gap:12px;
-      justify-content: space-between; /* Distribute brand items and controls */
-      flex-wrap: wrap; /* Allow brand items to wrap if needed */
+      justify-content: space-between;
+      flex-wrap: wrap;
     }
 
-    /* Adjust header controls for better wrapping */
     header .header-controls-row {
-      margin-left: 0; /* Remove auto-margin, parent handles spacing */
+      margin-left: 0;
       gap: 6px;
       flex-wrap: wrap;
-      justify-content: flex-end; /* Align controls to the right */
-      margin-top: 0; /* Reset margin-top for better alignment with brand */
-      flex-basis: auto; /* Allow it to shrink/grow as needed */
+      justify-content: flex-end;
+      margin-top: 0;
+      flex-basis: auto;
     }
 
-    @media (max-width: 767px) { /* For mobile/tablet */
+    @media (max-width: 767px) {
       .brand {
-        flex-direction: column; /* Stack brand items vertically on small screens */
-        align-items: flex-start; /* Align stacked items to the start */
-        gap: 8px; /* Reduce gap when stacked */
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
       }
       header .header-controls-row {
-        width: 100%; /* Take full width */
-        justify-content: flex-start; /* Align controls to the start when stacked */
-        margin-top: 12px; /* Add space below brand title */
+        width: 100%;
+        justify-content: flex-start;
+        margin-top: 12px;
       }
       header .header-controls-row .seg,
       header .header-controls-row label,
@@ -87,65 +82,62 @@
     h1{font-size:20px;margin:0}
     .grid{display:grid;gap:14px;margin-top:16px}
     
-    /* Responsive adjustments for .wrap and grid for larger screens */
-    @media(min-width:768px){ /* Tablet breakpoint */
+    @media(min-width:768px){
       .wrap{max-width: 960px;}
       .grid{grid-template-columns:repeat(12,1fr)}
     }
-    @media(min-width:1024px){ /* Laptop breakpoint */
-      .wrap{max-width: 1200px;} /* Wider for 13-14 inch laptops and larger monitors */
-      /* Adjust sections for side-by-side layout on larger screens */
+    @media(min-width:1024px){
+      .wrap{max-width: 1200px;}
       #pomoSection, #trackerSection {
-        grid-column: span 6; /* Pomodoro and Tracker side-by-side */
+        grid-column: span 6;
       }
     }
 
     .card{grid-column:span 12;background:var(--panel);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px;border:1px solid var(--border)}
-    .card h2{font-size:16px;margin:0 0 10px 0; display: flex; align-items: center; gap: 8px;} /* Added flex for icon alignment */
-    .card h2 .icon { color: var(--iconColor); } /* Style for icons in titles */
+    .card h2{font-size:16px;margin:0 0 10px 0; display: flex; align-items: center; gap: 8px;}
+    .card h2 .icon { color: var(--iconColor); }
     .muted{color:var(--muted);font-size:13px}
 
     input, select, textarea{
       width:100%;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--soft);color:var(--ink);
-      transition: border-color 0.2s ease-out, background-color 0.2s ease-out; /* Smooth transition */
-      -webkit-appearance: none; /* Remove default select arrow on WebKit */
-      -moz-appearance: none; /* Remove default select arrow on Firefox */
-      appearance: none; /* Remove default select arrow */
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2376849c' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E"); /* Custom arrow */
+      transition: border-color 0.2s ease-out, background-color 0.2s ease-out;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2376849c' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
       background-repeat: no-repeat;
       background-position: right 12px center;
       background-size: 16px;
-      padding-right: 36px; /* Make space for the arrow */
+      padding-right: 36px;
     }
     [data-theme="hc"] input, [data-theme="hc"] select, [data-theme="hc"] textarea {
-        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23e6efff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E"); /* White arrow for HC */
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23e6efff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
     }
 
     input:focus, select:focus, textarea:focus {
-        border-color: var(--pri); /* Highlight border on focus */
+        border-color: var(--pri);
+        box-shadow: var(--ring); /* Added consistent ring on focus for inputs/selects */
     }
 
     .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
     
-    /* Universal styling for form controls within .row for better responsiveness */
     .row input[type="number"],
     .row select {
-      flex: 1; /* Allow them to grow and shrink */
-      min-width: 120px; /* Ensure a minimum readable width */
+      flex: 1;
+      min-width: 120px;
     }
 
-    @media (max-width: 480px) { /* For very small mobile screens */
+    @media (max-width: 480px) {
       .row input[type="number"],
       .row select {
-        width: 100%; /* Take full width when stacked */
-        flex: none; /* Disable flex growth to prevent stretching */
+        width: 100%;
+        flex: none;
       }
     }
 
-    /* Adjust spacer height for larger screens */
     .spacer{height:10px}
     @media(min-width:768px){
-      .spacer{height:16px} /* Slightly more vertical space on larger screens */
+      .spacer{height:16px}
     }
 
     .btn{
@@ -157,25 +149,25 @@
       font-size: 14px;
       font-weight: 500;
       transition: all 0.2s ease-out;
-      color: var(--ink); /* Default button text color from --ink, applies to "Lewati", "Pause" */
-      background: var(--btn); /* Pastikan tombol dasar menggunakan variabel background */
-      display: flex; /* For icon alignment */
+      color: var(--ink);
+      background: var(--btn);
+      display: flex;
       align-items: center;
       justify-content: center;
-      gap: 8px; /* Space between icon and text */
+      gap: 8px;
     }
     .btn:active{transform:translateY(1px)}
     .btn.primary{
       background:linear-gradient(135deg, var(--pri), var(--sec));
-      color:var(--btnText); /* Menggunakan --btnText agar adaptif */
+      color:var(--btnText);
     }
     .btn.ok{
-      background:var(--okBg); /* Menggunakan variabel latar belakang adaptif */
-      color:var(--ink); /* Menggunakan --ink agar adaptif */
+      background:var(--okBg);
+      color:var(--ink);
     }
     .btn.warn{
-      background:var(--warnBg); /* Menggunakan variabel latar belakang adaptif */
-      color:var(--ink); /* Menggunakan --ink agar adaptif */
+      background:var(--warnBg);
+      color:var(--ink);
     }
     .btn.ghost{background:transparent;outline:1px solid var(--border); color: var(--ink);}
     .btn:focus-visible{outline:none; box-shadow:var(--ring); outline-offset: 3px;}
@@ -189,7 +181,7 @@
       font-size: 14px;
       cursor: pointer;
       transition: all 0.2s ease-out;
-      color: var(--ink); /* Pastikan teks di tombol segmented menggunakan warna tinta utama */
+      color: var(--ink);
     }
     .seg button.active{background:linear-gradient(135deg, rgba(122,108,255,.18), rgba(22,198,161,.18))}
     [data-theme="hc"] .seg button.active{background:linear-gradient(135deg, rgba(143,168,255,.15), rgba(61,216,181,.15))}
@@ -210,21 +202,20 @@
       box-shadow: var(--shadow);
       cursor: pointer;
       transition: all 0.15s ease-out;
-      color: var(--ink); /* Pastikan teks kana menggunakan warna tinta utama */
+      color: var(--ink);
     }
     .kana:active{transform:scale(.98)}
     .kana .jp{font-size:clamp(24px, 6vw, 30px);line-height:1}
     .kana .ro{
       font-size:12px;
-      color:var(--muted); /* Tetap gunakan --muted untuk Romaji jika ingin sedikit berbeda dari karakter utama */
+      color:var(--muted);
     }
     .kana.checked{background:linear-gradient(135deg, rgba(122,108,255,.12), rgba(22,198,161,.12));outline:1px solid rgba(122,108,255,.25)}
     .kana:focus-visible{outline:none; box-shadow:var(--ring)}
 
-    /* Modified chips styling to allow wrapping */
     .chips{
       display:flex;
-      flex-wrap: wrap; /* Allow chips to wrap to next line */
+      flex-wrap: wrap;
       gap:8px;
       padding-bottom: 0;
     }
@@ -237,49 +228,46 @@
       min-height:36px;
       white-space:nowrap; 
       transition: all 0.2s ease-out;
-      color: var(--ink); /* Pastikan teks chip menggunakan warna tinta utama */
+      color: var(--ink);
     }
 
-    /* Remove problematic styles from subsetScroll for flex-wrapping chips */
     #subsetScroll {
       flex: 1;
-      min-width: 100%; /* Ensure it takes full available width */
-      overflow: visible; /* Allow content to overflow naturally if wrapping */
-      white-space: normal; /* Allow text wrapping within the container */
+      min-width: 100%;
+      overflow: visible;
+      white-space: normal;
     }
-    /* Ensure the direct parent of #subsetChips also allows wrapping if #subsetScroll is removed */
-    .test-controls-row { /* This class would be added to the row wrapping the subset chips */
+    .test-controls-row {
         display: flex;
         flex-wrap: wrap;
         gap: 8px;
         align-items: flex-end;
     }
-    .test-controls-row > div { /* For the subsetScroll container */
-        flex-basis: 100%; /* Take full width on small screens */
-        min-width: 0; /* Allow shrinking */
+    .test-controls-row > div {
+        flex-basis: 100%;
+        min-width: 0;
     }
     @media (min-width: 768px) {
         .test-controls-row > div {
-            flex-basis: auto; /* Revert on larger screens */
+            flex-basis: auto;
         }
     }
 
-    /* Also, the count chips row */
     .row #countChips {
-        flex-wrap: wrap; /* Ensure count chips wrap */
-        flex: 1; /* Allow them to take available space */
-        justify-content: flex-start; /* Align them to the start */
+        flex-wrap: wrap;
+        flex: 1;
+        justify-content: flex-start;
     }
     .row #testCount {
-        flex-grow: 0; /* Don't let it grow too much */
-        flex-shrink: 0; /* Don't let it shrink too much */
+        flex-grow: 0;
+        flex-shrink: 0;
     }
     @media (max-width: 767px) {
         .row #testCount {
-            width: calc(50% - 4px); /* Take roughly half width on small screens */
+            width: calc(50% - 4px);
         }
         .row .tag {
-            width: calc(50% - 4px); /* Take roughly half width on small screens */
+            width: calc(50% - 4px);
             text-align: center;
         }
     }
@@ -289,7 +277,7 @@
     .small{font-size:12px;color:var(--muted)}
     .tag{
       display:inline-block;padding:4px 8px;border-radius:999px;background:var(--soft);
-      color:var(--ink); /* Menggunakan --ink agar kontras maksimal di kedua tema */
+      color:var(--ink);
       font-size:12px;border:1px solid var(--border);
     }
 
@@ -337,9 +325,9 @@
     #streakCounter {
       font-size: 14px;
       font-weight: 600;
-      color: var(--sec); /* Use secondary color for streak */
+      color: var(--sec);
       margin-left: 10px;
-      min-width: 50px; /* Ensure space for the number */
+      min-width: 50px;
       text-align: right;
       transition: transform 0.1s ease-out;
     }
@@ -354,20 +342,9 @@
       animation: streakGrow 0.2s ease-out;
     }
 
-    /* Spinner for loading audio (removed from HTML, but keeping CSS in case we re-add) */
+    /* Spinner for loading audio (now removed from HTML) */
     .spinner {
-      border: 4px solid rgba(0, 0, 0, 0.1);
-      border-left-color: var(--pri);
-      border-radius: 50%;
-      width: 24px;
-      height: 24px;
-      animation: spin 1s linear infinite;
-      display: none; /* Ensure it's hidden by default */
-    }
-
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
+      display: none !important; /* Force hide if any JS tries to show it */
     }
 
 
@@ -482,10 +459,7 @@
         <div id="testArea" class="center" hidden>
           <div id="promptWrap" style="display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap">
             <div id="qKana" style="font-size:64px;line-height:1.1;margin:6px 0">あ</div>
-            <button class="btn" id="btnListen" title="Dengarkan (L)">
-              <span id="listenIcon" class="fas fa-volume-up"></span>
-              <!-- <span id="listenSpinner" class="spinner" style="display:none;"></span> Removed spinner -->
-            </button>
+            <!-- Removed audio button and spinner from HTML -->
           </div>
           <div id="typeWrap" style="max-width:520px;margin:0 auto">
             <input id="ans" placeholder="Ketik jawaban…" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" inputmode="latin" aria-label="Jawaban" />
@@ -576,9 +550,9 @@
     const KEY = 'kanaTrainer_v8';
     const initState = () => ({
       theme:'pastel',
-      audio:true,
+      audio:true, // Audio toggle still exists for click tones
       hiraMastered:[], kataMastered:[],
-      test:{subset:'aiueo', set:'hira', mode:'type', qType:'k2r', score:0, total:0, correctStreak:0, target:10, rangeMode:'range'}, // Added rangeMode to state
+      test:{subset:'aiueo', set:'hira', mode:'type', qType:'k2r', score:0, total:0, correctStreak:0, target:10, rangeMode:'range'},
       pomo:{mode:'work', work:25, break:5, remaining:25*60, running:false, last:0}
     });
     let state = load();
@@ -972,7 +946,9 @@
     qs('#btnEnd').onclick = endTest;
     qs('#btnSkip').onclick = skipQ;
     qs('#btnCheck').onclick = checkAns;
-    qs('#btnListen').onclick = ()=>{ speakCurrent(); clickTone('click'); };
+    // Removed btnListen event listener
+    // qs('#btnListen').onclick = ()=>{ speakCurrent(); clickTone('click'); };
+
 
     qs('#mcWrap').addEventListener('pointerup', (e)=>{ const btn=e.target.closest('.opt'); if(!btn) return; const id=(btn.id||'').slice(-1); if(!id) return; mcPick(id); }, {passive:true});
 
@@ -981,7 +957,8 @@
       if(e.key==='Enter' && !qs('#testArea').hidden && qs('#typeWrap') && !qs('#typeWrap').hidden){ e.preventDefault(); checkAns(); }
       const map={a:'A',b:'B',c:'C',d:'D'}; const k=map[e.key?.toLowerCase?.()]; if(k && !qs('#mcWrap').hidden){ e.preventDefault(); mcPick(k); }
       if(e.key==='ArrowRight' && !qs('#testArea').hidden){ e.preventDefault(); skipQ(); }
-      if(e.key?.toLowerCase?.()==='l' && !qs('#testArea').hidden){ e.preventDefault(); speakCurrent(); }
+      // Removed 'l' key for speakCurrent
+      // if(e.key?.toLowerCase?.()==='l' && !qs('#testArea').hidden){ e.preventDefault(); speakCurrent(); }
     });
 
     // Theme & audio
