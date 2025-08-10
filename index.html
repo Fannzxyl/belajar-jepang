@@ -37,7 +37,45 @@
     }
     header{position:sticky;top:0;z-index:30;background:linear-gradient(180deg, rgba(255,255,255,.92), rgba(255,255,255,.72));backdrop-filter: blur(8px);border-bottom:1px solid var(--border); padding-top:env(safe-area-inset-top)}
     [data-theme="hc"] header{background:linear-gradient(180deg, rgba(15,22,38,.86), rgba(15,22,38,.66))}
-    .brand{display:flex;align-items:center;gap:12px}
+    
+    /* Header brand and controls layout */
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      justify-content: space-between; /* Distribute brand items and controls */
+      flex-wrap: wrap; /* Allow brand items to wrap if needed */
+    }
+
+    /* Adjust header controls for better wrapping */
+    header .header-controls-row {
+      margin-left: 0; /* Remove auto-margin, parent handles spacing */
+      gap: 6px;
+      flex-wrap: wrap;
+      justify-content: flex-end; /* Align controls to the right */
+      margin-top: 0; /* Reset margin-top for better alignment with brand */
+      flex-basis: auto; /* Allow it to shrink/grow as needed */
+    }
+
+    @media (max-width: 767px) { /* For mobile/tablet */
+      .brand {
+        flex-direction: column; /* Stack brand items vertically on small screens */
+        align-items: flex-start; /* Align stacked items to the start */
+        gap: 8px; /* Reduce gap when stacked */
+      }
+      header .header-controls-row {
+        width: 100%; /* Take full width */
+        justify-content: flex-start; /* Align controls to the start when stacked */
+        margin-top: 12px; /* Add space below brand title */
+      }
+      header .header-controls-row .seg,
+      header .header-controls-row label,
+      header .header-controls-row button {
+        flex-grow: 1;
+        min-width: unset;
+      }
+    }
+
     .logo{width:36px;height:36px;border-radius:12px;background:linear-gradient(135deg,var(--pri),var(--sec));box-shadow:var(--shadow)}
     h1{font-size:20px;margin:0}
     .grid{display:grid;gap:14px;margin-top:16px}
@@ -64,28 +102,28 @@
       transition: border-color 0.2s ease-out, background-color 0.2s ease-out; /* Smooth transition */
     }
     .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-    /* Adjust specific row in header for smaller screens */
-    header .row {
-      margin-left: auto; /* Keep auto-margin for alignment on larger screens */
+    
+    /* Universal styling for form controls within .row for better responsiveness */
+    .row input[type="number"],
+    .row select {
+      flex: 1; /* Allow them to grow and shrink */
+      min-width: 120px; /* Ensure a minimum readable width */
     }
-    @media (max-width: 767px) { /* For mobile/tablet */
-      header .row {
-        flex-wrap: wrap; /* Allow items to wrap */
-        margin-left: 0; /* Remove auto-margin to center or align to start */
-        width: 100%; /* Take full width to manage wrapping */
-        justify-content: flex-end; /* Align items to the right if they wrap */
-        margin-top: 8px; /* Add some space if they wrap */
-      }
-      header .row .seg,
-      header .row label,
-      header .row button {
-        flex-grow: 1; /* Allow items to grow to fill space within the wrapped row */
-        min-width: unset; /* Remove min-width to allow shrinking */
+
+    @media (max-width: 480px) { /* For very small mobile screens */
+      .row input[type="number"],
+      .row select {
+        width: 100%; /* Take full width when stacked */
+        flex: none; /* Disable flex growth to prevent stretching */
       }
     }
 
-
+    /* Adjust spacer height for larger screens */
     .spacer{height:10px}
+    @media(min-width:768px){
+      .spacer{height:16px} /* Slightly more vertical space on larger screens */
+    }
+
     .btn{
       min-height:52px;
       padding: 0 16px;
@@ -95,7 +133,7 @@
       font-size: 14px;
       font-weight: 500;
       transition: all 0.2s ease-out;
-      color: var(--ink); /* Default button text color from --ink, applies to "Lewati", "Pause" */
+      color: var(--ink); /* Default button text color from --ink */
     }
     .btn:active{transform:translateY(1px)}
     .btn.primary{
@@ -187,6 +225,36 @@
         gap: 8px;
         align-items: flex-end;
     }
+    .test-controls-row > div { /* For the subsetScroll container */
+        flex-basis: 100%; /* Take full width on small screens */
+        min-width: 0; /* Allow shrinking */
+    }
+    @media (min-width: 768px) {
+        .test-controls-row > div {
+            flex-basis: auto; /* Revert on larger screens */
+        }
+    }
+
+    /* Also, the count chips row */
+    .row #countChips {
+        flex-wrap: wrap; /* Ensure count chips wrap */
+        flex: 1; /* Allow them to take available space */
+        justify-content: flex-start; /* Align them to the start */
+    }
+    .row #testCount {
+        flex-grow: 0; /* Don't let it grow too much */
+        flex-shrink: 0; /* Don't let it shrink too much */
+    }
+    @media (max-width: 767px) {
+        .row #testCount {
+            width: calc(50% - 4px); /* Take roughly half width on small screens */
+        }
+        .row .tag {
+            width: calc(50% - 4px); /* Take roughly half width on small screens */
+            text-align: center;
+        }
+    }
+
 
     .center{text-align:center}
     .small{font-size:12px;color:var(--muted)}
@@ -231,7 +299,7 @@
           <div class="small">Hiragana • Katakana • Dakuon/Handakuon • Youon • Tes & Review • Pomodoro • Tema</div>
         </div>
         <!-- START MODIFIED ROW FOR HEADER CONTROLS -->
-        <div class="row header-controls-row" style="margin-left:auto;gap:6px">
+        <div class="row header-controls-row" style="gap:6px">
           <div class="seg" role="tablist" aria-label="Tema">
             <button id="tPastel" class="btn" aria-selected="true" title="Tema pastel">Pastel</button>
             <button id="tHC" class="btn" title="Tema high-contrast">High-Contrast</button>
