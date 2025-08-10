@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="pastel">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Pelatih Kana Jepang — Offline (v8)</title>
+  <meta name="description" content="Belajar Hiragana & Katakana lengkap (dasar, dakuon/handakuon, youon) dengan tes ketik & pilihan ganda, review jawaban salah, Pomodoro, audio, progress bar, dan tema pastel/high-contrast. Data lokal (localStorage)." />
+  <!-- Google Fonts - Inter -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#f8fbff; --panel:#ffffff; --soft:#f2f6ff; --ink:#132030; --muted:#76849c;
+      --pri:#7a6cff; --sec:#16c6a1; --warn:#ff7b7b; --ok:#2fb875; --accent:#ffd166;
+      --btn:#e9eefc; --btnText:#0b101a; --border:rgba(19,32,48,.10);
+      --radius:18px; --shadow:0 12px 28px rgba(15,23,34,.10);
+      --ring: 0 0 0 3px rgba(122,108,255,.28);
+    }
+    [data-theme="hc"]{
+      --bg:#0a0f1a; --panel:#0f1626; --soft:#0c1220; --ink:#e6efff; --muted:#9fb0cc;
+      --pri:#8fa8ff; --sec:#3dd8b5; --warn:#ff8c8c; --ok:#7be0b3; --accent:#ffd98a;
+      --btn:#18243a; --btnText:#e6efff; /* Teks tombol di HC akan putih */
+      --border:rgba(230,239,255,.12);
+      --ring: 0 0 0 3px rgba(143,168,255,.35);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0;font-family:'Inter', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;background:
+      radial-gradient(900px 420px at -10% -20%, rgba(122,108,255,.10), transparent),
+      radial-gradient(900px 420px at 110% -30%, rgba(22,198,161,.12), transparent),
+      var(--bg);color:var(--ink)} /* Warna teks utama mengikuti --ink */
+    .wrap{
+      max-width: 720px; /* Default for mobile/tablet */
+      margin: auto;
+      padding: 16px;
+      padding-left: calc(16px + env(safe-area-inset-left));
+      padding-right: calc(16px + env(safe-area-inset-right));
+    }
+    header{position:sticky;top:0;z-index:30;background:linear-gradient(180deg, rgba(255,255,255,.92), rgba(255,255,255,.72));backdrop-filter: blur(8px);border-bottom:1px solid var(--border); padding-top:env(safe-area-inset-top)}
+    [data-theme="hc"] header{background:linear-gradient(180deg, rgba(15,22,38,.86), rgba(15,22,38,.66))}
+    .brand{display:flex;align-items:center;gap:12px}
+    .logo{width:36px;height:36px;border-radius:12px;background:linear-gradient(135deg,var(--pri),var(--sec));box-shadow:var(--shadow)}
+    h1{font-size:20px;margin:0}
+    .grid{display:grid;gap:14px;margin-top:16px}
+    
+    /* Responsive adjustments for .wrap and grid for larger screens */
+    @media(min-width:768px){ /* Tablet breakpoint */
+      .wrap{max-width: 960px;}
+      .grid{grid-template-columns:repeat(12,1fr)}
+    }
+    @media(min-width:1024px){ /* Laptop breakpoint */
+      .wrap{max-width: 1200px;} /* Wider for 13-14 inch laptops and larger monitors */
+      /* Adjust sections for side-by-side layout on larger screens */
+      #pomoSection, #trackerSection {
+        grid-column: span 6; /* Pomodoro and Tracker side-by-side */
+      }
+    }
+
+    .card{grid-column:span 12;background:var(--panel);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px;border:1px solid var(--border)}
+    .card h2{font-size:16px;margin:0 0 10px 0}
+    .muted{color:var(--muted);font-size:13px}
+
+    input, select, textarea{
+      width:100%;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--soft);color:var(--ink);
+      transition: border-color 0.2s ease-out, background-color 0.2s ease-out; /* Smooth transition */
+    }
+    .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+    /* Adjust specific row in header for smaller screens */
+    header .row {
+      margin-left: auto; /* Keep auto-margin for alignment on larger screens */
+    }
+    @media (max-width: 767px) { /* For mobile/tablet */
+      header .row {
+        flex-wrap: wrap; /* Allow items to wrap */
+        margin-left: 0; /* Remove auto-margin to center or align to start */
+        width: 100%; /* Take full width to manage wrapping */
+        justify-content: flex-end; /* Align items to the right if they wrap */
+        margin-top: 8px; /* Add some space if they wrap */
+      }
+      header .row .seg,
+      header .row label,
+      header .row button {
+        flex-grow: 1; /* Allow items to grow to fill space within the wrapped row */
+        min-width: unset; /* Remove min-width to allow shrinking */
+      }
+    }
+
+
+    .spacer{height:10px}
+    .btn{
+      min-height:52px;
+      padding: 0 16px;
+      border-radius: 12px;
+      border: none;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      transition: all 0.2s ease-out;
+      color: var(--ink); /* Default button text color from --ink, applies to "Lewati", "Pause" */
+    }
+    .btn:active{transform:translateY(1px)}
+    .btn.primary{
+      background:linear-gradient(135deg, var(--pri), var(--sec));
+      color:var(--btnText); /* Menggunakan --btnText agar adaptif */
+    }
+    .btn.ok{
+      background:#dff4ea;
+      color:var(--ink); /* Menggunakan --ink agar adaptif, sebelumnya hardcoded #0b6b3f */
+    }
+    .btn.warn{
+      background:#ffe5e5;
+      color:var(--ink); /* Menggunakan --ink agar adaptif, sebelumnya hardcoded #8f2d2d */
+    }
+    .btn.ghost{background:transparent;outline:1px solid var(--border); color: var(--ink);}
+    .btn:focus-visible{outline:none; box-shadow:var(--ring); outline-offset: 3px;}
+
+    .seg{display:flex;border:1px solid var(--border);border-radius:12px;overflow:hidden}
+    .seg button{
+      flex:1;
+      background:var(--soft);
+      border:none;
+      padding: 12px 16px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s ease-out;
+      color: var(--ink); /* Pastikan teks di tombol segmented menggunakan warna tinta utama */
+    }
+    .seg button.active{background:linear-gradient(135deg, rgba(122,108,255,.18), rgba(22,198,161,.18))}
+    [data-theme="hc"] .seg button.active{background:linear-gradient(135deg, rgba(143,168,255,.15), rgba(61,216,181,.15))}
+
+    .pillbox{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+    @media(min-width:480px){.pillbox{grid-template-columns:repeat(5,1fr)}}
+    @media(min-width:680px){.pillbox{grid-template-columns:repeat(6,1fr)}}
+    
+    .kana{
+      min-height:88px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      background: var(--btn);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      cursor: pointer;
+      transition: all 0.15s ease-out;
+      color: var(--ink); /* Pastikan teks kana menggunakan warna tinta utama */
+    }
+    .kana:active{transform:scale(.98)}
+    .kana .jp{font-size:clamp(24px, 6vw, 30px);line-height:1}
+    .kana .ro{
+      font-size:12px;
+      color:var(--muted); /* Tetap gunakan --muted untuk Romaji jika ingin sedikit berbeda dari karakter utama */
+    }
+    .kana.checked{background:linear-gradient(135deg, rgba(122,108,255,.12), rgba(22,198,161,.12));outline:1px solid rgba(122,108,255,.25)}
+    .kana:focus-visible{outline:none; box-shadow:var(--ring)}
+
+    /* Modified chips styling to allow wrapping */
+    .chips{
+      display:flex;
+      flex-wrap: wrap; /* Allow chips to wrap to next line */
+      gap:8px;
+      padding-bottom: 0;
+    }
+    .chip{
+      padding:8px 10px;
+      border-radius:999px;
+      background:var(--soft);
+      border:1px solid var(--border);
+      cursor:pointer;
+      min-height:36px;
+      white-space:nowrap; 
+      transition: all 0.2s ease-out;
+      color: var(--ink); /* Pastikan teks chip menggunakan warna tinta utama */
+    }
+
+    /* Remove problematic styles from subsetScroll for flex-wrapping chips */
+    #subsetScroll {
+      flex: 1;
+      min-width: 100%; /* Ensure it takes full available width */
+      overflow: visible; /* Allow content to overflow naturally if wrapping */
+      white-space: normal; /* Allow text wrapping within the container */
+    }
+    /* Ensure the direct parent of #subsetChips also allows wrapping if #subsetScroll is removed */
+    .test-controls-row { /* This class would be added to the row wrapping the subset chips */
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        align-items: flex-end;
+    }
+
+    .center{text-align:center}
+    .small{font-size:12px;color:var(--muted)}
+    .tag{
+      display:inline-block;padding:4px 8px;border-radius:999px;background:var(--soft);
+      color:var(--ink); /* Menggunakan --ink agar kontras maksimal di kedua tema */
+      font-size:12px;border:1px solid var(--border);
+    }
+
+
+    .progress{height:10px;background:rgba(0,0,0,.08);border-radius:999px;overflow:hidden}
+    .bar{height:100%;width:0;background:linear-gradient(90deg,var(--pri),var(--sec),var(--accent));transition:width .25s ease}
+
+    .modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.45);backdrop-filter: blur(4px);z-index:999}
+    .modal .box{background:var(--panel);padding:20px 18px;border-radius:18px;box-shadow:var(--shadow);text-align:center;max-width:620px;width:min(92vw,620px)}
+    .burst{position:fixed;inset:0;pointer-events:none}
+    .particle{position:absolute;width:8px;height:8px;border-radius:2px;opacity:.9;animation:pop 900ms ease forwards}
+    @keyframes pop{from{transform:translate(0,0) scale(1)} to{transform:translate(var(--dx), var(--dy)) rotate(360deg) scale(0.8);opacity:0}}
+
+    .optwrap{display:grid;gap:8px;grid-template-columns:repeat(2,1fr);max-width:520px;margin:0 auto}
+    @media(min-width:560px){.optwrap{grid-template-columns:repeat(4,1fr)}}
+    .optwrap .btn{font-size:16px}
+
+    .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+
+    /* Smallest mobile adjustments */
+    @media (max-width: 420px){ :root{ --radius:14px } .kana .jp{ font-size:24px } #qKana{ font-size:56px !important } }
+
+    @media (prefers-reduced-motion: reduce){
+      *{animation-duration:0.01ms !important; animation-iteration-count:1 !important; transition-duration:0.01ms !important; scroll-behavior:auto !important}
+    }
+
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap">
+      <div class="brand" style="gap:10px">
+        <div class="logo" aria-hidden="true"></div>
+        <div>
+          <h1>Pelatih Kana Jepang <span class="tag">Offline v8</span></h1>
+          <div class="small">Hiragana • Katakana • Dakuon/Handakuon • Youon • Tes & Review • Pomodoro • Tema</div>
+        </div>
+        <!-- START MODIFIED ROW FOR HEADER CONTROLS -->
+        <div class="row header-controls-row" style="margin-left:auto;gap:6px">
+          <div class="seg" role="tablist" aria-label="Tema">
+            <button id="tPastel" class="btn" aria-selected="true" title="Tema pastel">Pastel</button>
+            <button id="tHC" class="btn" title="Tema high-contrast">High-Contrast</button>
+          </div>
+          <label class="btn ghost" style="display:flex;align-items:center;gap:8px">
+            <input id="audToggle" type="checkbox" aria-label="Matikan suara" /> Suara
+          </label>
+          <button id="resetBtn" class="btn ghost" title="Reset semua progres">Reset</button>
+        </div>
+        <!-- END MODIFIED ROW FOR HEADER CONTROLS -->
+      </div>
+    </div>
+  </header>
+  <main class="wrap" id="main">
+    <!-- LEARN MODE -->
+    <section class="grid" aria-labelledby="learnTitle">
+      <div class="card" style="grid-column: span 12;">
+        <h2 id="learnTitle">Belajar (Pilih Rentang Kana)</h2>
+        <div class="small">Pilih set (Hiragana/Katakana) dan rentang fleksibel. Ketuk tile untuk dengar pelafalan.</div>
+        <div class="spacer"></div>
+        <div class="row">
+          <select id="learnSet" aria-label="Pilih set belajar">
+            <option value="hira">Hiragana</option>
+            <option value="kata">Katakana</option>
+          </select>
+          <select id="fromGrp" aria-label="Dari kelompok"></select>
+          <select id="toGrp" aria-label="Sampai kelompok"></select>
+          <button class="btn primary" id="btnShowLearn">Tampilkan</button>
+        </div>
+        <div class="spacer"></div>
+        <div id="learnTiles" class="pillbox" aria-live="polite"></div>
+      </div>
+    </section>
+    <!-- TEST MODE -->
+    <section class="grid" aria-labelledby="testTitle">
+      <div class="card" style="grid-column: span 12;">
+        <h2 id="testTitle">Tes (Subset / Rentang, Tipe Soal & Mode Jawab)</h2>
+        <div class="small">Gunakan chip untuk subset cepat atau rentang khusus. Tentukan tipe soal, mode jawab, dan jumlah soal.</div>
+        <div class="spacer"></div>
+        <!-- START MODIFIED ROW FOR SUBSET CHIPS -->
+        <div class="row test-controls-row" style="align-items:flex-end">
+          <div style="flex:1;width:100%;">
+            <div class="chips" id="subsetChips" style="display:flex"></div>
+          </div>
+          <select id="testSet" aria-label="Pilih set tes">
+            <option value="hira">Hiragana</option>
+            <option value="kata">Katakana</option>
+          </select>
+          <select id="qType" title="Tipe Soal" aria-label="Tipe soal">
+            <option value="k2r">Kana → Romaji</option>
+            <option value="r2k">Romaji → Kana (Pilihan Ganda)</option>
+            <option value="seq">Rangkaian Romaji → Kana</option>
+          </select>
+          <select id="answerMode" aria-label="Mode jawaban">
+            <option value="type">Mode Ketik</option>
+            <option value="mc">Pilihan Ganda (A–D)</option>
+          </select>
+        </div>
+        <!-- END MODIFIED ROW FOR SUBSET CHIPS -->
+        <div class="spacer"></div>
+        <div class="row">
+          <div class="tag">Atau rentang khusus:</div>
+          <select id="testFrom" aria-label="Tes dari"></select>
+          <select id="testTo" aria-label="Tes sampai"></select>
+          <div class="tag">Jumlah soal:</div>
+          <input id="testCount" type="number" min="1" value="10" style="width:100px" aria-label="Jumlah soal" />
+          <div class="chips" id="countChips">
+            <button class="chip" data-count="10">10</button>
+            <button class="chip" data-count="25">25</button>
+            <button class="chip" data-count="50">50</button>
+            <button class="chip" data-count="100">100</button>
+          </div>
+          <button class="btn primary" id="btnStart">Mulai Tes</button>
+          <button class="btn" id="btnSkip" title="Lewati soal (→)">Lewati</button>
+          <button class="btn warn" id="btnEnd">Selesai</button>
+        </div>
+        <div class="spacer"></div>
+        <div class="progress" aria-label="Progress Tes" role="progressbar" aria-valuemin="0" aria-valuemax="100"><div id="bar" class="bar"></div></div>
+        <div class="spacer"></div>
+        <div id="testArea" class="center" hidden>
+          <div id="promptWrap" style="display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap">
+            <div id="qKana" style="font-size:64px;line-height:1.1;margin:6px 0">あ</div>
+            <button class="btn" id="btnListen" title="Dengarkan (L)">🎧</button>
+          </div>
+          <div id="typeWrap" style="max-width:520px;margin:0 auto">
+            <input id="ans" placeholder="Ketik jawaban…" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" inputmode="latin" aria-label="Jawaban" />
+            <div class="spacer"></div>
+            <button class="btn" id="btnCheck">Cek (Enter)</button>
+          </div>
+          <div id="mcWrap" class="optwrap" hidden>
+            <button class="btn opt" id="optA">A</button>
+            <button class="btn opt" id="optB">B</button>
+            <button class="btn opt" id="optC">C</button>
+            <button class="btn opt" id="optD">D</button>
+          </div>
+          <div class="spacer"></div>
+          <div class="small" id="testInfo" aria-live="polite"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- POMODORO -->
+    <section class="grid" aria-labelledby="pomoTitle" id="pomoSection">
+      <div class="card">
+        <h2 id="pomoTitle">Timer Pomodoro (Opsional)</h2>
+        <div class="small">Default 25/5, bisa diubah. Status dan sisa waktu tersimpan otomatis.</div>
+        <div class="row" role="group" aria-label="Kontrol Pomodoro">
+          <label>
+            <span class="sr-only">Menit fokus</span>
+            <input id="pomoWork" type="number" min="1" value="25" style="width:90px"> menit fokus
+          </label>
+          <label>
+            <span class="sr-only">Menit istirahat</span>
+            <input id="pomoBreak" type="number" min="1" value="5" style="width:90px"> menit istirahat
+          </label>
+          <button class="btn primary" id="pStart">Mulai</button>
+          <button class="btn" id="pPause">Pause</button>
+          <button class="btn warn" id="pReset">Reset</button>
+        </div>
+        <div class="spacer"></div>
+        <div class="center">
+          <div id="pomoLabel" class="tag" aria-live="polite">Fokus</div>
+          <div id="pomoTime" style="font-size:32px;margin-top:6px">25:00</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TRACKER -->
+    <section class="grid" aria-labelledby="trackTitle" id="trackerSection">
+      <div class="card">
+        <h2 id="trackTitle">Tracker Kana</h2>
+        <div class="small">Ketuk untuk tandai sudah hafal. Tahan (long-press) untuk batal.</div>
+        <div class="spacer"></div>
+        <div class="row">
+          <div style="flex:1;min-width:280px">
+            <div class="muted">Hiragana</div>
+            <div id="hiraBox" class="pillbox"></div>
+          </div>
+          <div style="flex:1;min-width:280px">
+            <div class="muted">Katakana</div>
+            <div id="kataBox" class="pillbox"></div>
+          </div>
+        </div>
+        <div class="spacer"></div>
+        <div class="row">
+          <div class="tag" id="jpStats" aria-live="polite">0/46 hira • 0/46 kata</div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+  <!-- Celebration Modal / Review -->
+  <div id="celebrate" class="modal" aria-modal="true" role="dialog" aria-labelledby="celebrateTitle" aria-describedby="celebrateMsg">
+    <div class="box">
+      <h3 id="celebrateTitle" style="margin:0 0 6px 0">Tes selesai! 🎉</h3>
+      <div id="celebrateMsg" class="small">Skor: 0/0</div>
+      <div class="spacer"></div>
+      <div id="reviewWrap" style="text-align:left;max-height:40vh;overflow:auto;margin:8px 0" hidden></div>
+      <div class="row" style="justify-content:center">
+        <button class="btn" id="btnReviewWrong" hidden>Belajar ulang yang salah</button>
+        <button class="btn primary" id="btnCloseModal">Lanjut</button>
+      </div>
+    </div>
+    <div id="burst" class="burst" aria-hidden="true"></div>
+  </div>
+  <script>
+    // ---------- STATE ----------
+    const KEY = 'kanaTrainer_v8';
+    const initState = () => ({
+      theme:'pastel',
+      audio:true,
+      hiraMastered:[], kataMastered:[],
+      test:{subset:'aiueo', set:'hira', mode:'type', qType:'k2r', score:0, total:0, correctStreak:0, target:10},
+      pomo:{mode:'work', work:25, break:5, remaining:25*60, running:false, last:0}
+    });
+    let state = load();
+    function load(){ try{ const raw=localStorage.getItem(KEY); return raw? JSON.parse(raw): initState(); }catch{ return initState(); } }
+    function save(){ try{ localStorage.setItem(KEY, JSON.stringify(state)); }catch{} }
+
+    // ---------- DATA ----------
+    const BASE = ['a','i','u','e','o','ka','ki','ku','ke','ko','sa','shi','su','se','so','ta','chi','tsu','te','to','na','ni','nu','ne','no','ha','hi','fu','he','ho','ma','mi','mu','me','mo','ya','yu','yo','ra','ri','ru','re','ro','wa','wo','n'];
+    const DAKUON = ['ga','gi','gu','ge','go','za','ji','zu','ze','zo','da','ji','zu','de','do','ba','bi','bu','be','bo','pa','pi','pu','pe','po'];
+    const YOUON = ['kya','kyu','kyo','sha','shu','sho','cha','chu','cho','nya','nyu','nyo','hya','hyu','hyo','mya','myu','myo','rya','ryu','ryo','gya','gyu','gyo','ja','ju','jo','bya','byu','byo','pya','pyu','pyo'];
+
+    const HIRA_BASE = ['あ','い','う','え','お','か','き','く','け','こ','さ','し','す','せ','そ','た','ち','つ','て','と','な','に','ぬ','ね','の','は','ひ','ふ','へ','ほ','ま','み','む','め','も','や','ゆ','よ','ら','り','る','れ','ろ','わ','を','ん'];
+    const KATA_BASE = ['ア','イ','ウ','エ','オ','カ','キ','ク','ケ','コ','サ','シ','ス','セ','ソ','タ','チ','ツ','テ','ト','ナ','ニ','ヌ','ネ','ノ','ハ','ヒ','フ','ヘ','ホ','マ','ミ','ム','メ','モ','ヤ','ユ','ヨ','ラ','リ','ル','レ','ロ','ワ','ヲ','ン'];
+
+    const HIRA_DAKU = ['が','ぎ','ぐ','げ','ご','ざ','じ','ず','ぜ','ぞ','だ','ぢ','づ','で','ど','ば','び','ぶ','べ','ぼ','ぱ','ぴ','ぷ','ぺ','ぽ'];
+    const KATA_DAKU = ['ガ','ギ','グ','ゲ','ゴ','ザ','ジ','ズ','ゼ','ゾ','ダ','ヂ','ヅ','デ','ド','バ','ビ','ブ','ベ','ボ','パ','ピ','プ','ペ','ポ'];
+
+    const HIRA_YOU = ['きゃ','きゅ','きょ','しゃ','しゅ','しょ','ちゃ','ちゅ','ちょ','にゃ','にゅ','にょ','ひゃ','ひゅ','ひょ','miya','myu','myo','rya','ryu','ryo','gya','gyu','gyo','ja','ju','jo','bya','byu','byo','pya','pyu','pyo'];
+    const KATA_YOU = ['キャ','キュ','キョ','シャ','シュ','ショ','チャ','チュ','チョ','ニャ','ニュ','ニョ','ヒャ','ヒュ','ヒョ','ミャ','ミュ','ミョ','リャ','リュ','リョ','ギャ','ギュ','ギョ','ジャ','ジュ','ジョ','ビャ','ビュ','ビョ','ピャ','ピュ','ピョ'];
+
+    const GROUPS = [
+      {key:'aiueo', label:'a i u e o', list:BASE, idx:[0,1,2,3,4]},
+      {key:'k', label:'ka ki ku ke ko', list:BASE, idx:[5,6,7,8,9]},
+      {key:'s', label:'sa shi su se so', list:BASE, idx:[10,11,12,13,14]},
+      {key:'t', label:'ta chi tsu te to', list:BASE, idx:[15,16,17,18,19]},
+      {key:'n', label:'na ni nu ne no', list:BASE, idx:[20,21,22,23,24]},
+      {key:'h', label:'ha hi fu he ho', list:BASE, idx:[25,26,27,28,29]},
+      {key:'m', label:'ma mi mu me mo', list:BASE, idx:[30,31,32,33,34]},
+      {key:'y', label:'ya yu yo', list:BASE, idx:[35,36,37]},
+      {key:'r', label:'ra ri ru re ro', list:BASE, idx:[38,39,40,41,42]},
+      {key:'w', label:'wa wo n', list:BASE, idx:[43,44,45]},
+      {key:'g', label:'ga gi gu ge go', list:DAKUON, idx:[0,1,2,3,4]},
+      {key:'z', label:'za ji zu ze zo', list:DAKUON, idx:[5,6,7,8,9]},
+      {key:'d', label:'da ji zu de do', list:DAKUON, idx:[10,11,12,13,14]},
+      {key:'b', label:'ba bi bu be bo', list:DAKUON, idx:[15,16,17,18,19]},
+      {key:'p', label:'pa pi pu pe po', list:DAKUON, idx:[20,21,22,23,24]},
+      {key:'ky', label:'kya kyu kyo', list:YOUON, idx:[0,1,2]},
+      {key:'sh', label:'sha shu sho', list:YOUON, idx:[3,4,5]},
+      {key:'ch', label:'cha chu cho', list:YOUON, idx:[6,7,8]},
+      {key:'ny', label:'nya nyu nyo', list:YOUON, idx:[9,10,11]},
+      {key:'hy', label:'hya hyu hyo', list:YOUON, idx:[12,13,14]},
+      {key:'my', label:'mya myu myo', list:YOUON, idx:[15,16,17]},
+      {key:'ry', label:'rya ryu ryo', list:YOUON, idx:[18,19,20]},
+      {key:'gy', label:'gya gyu gyo', list:YOUON, idx:[21,22,23]},
+      {key:'j',  label:'ja ju jo', list:YOUON, idx:[24,25,26]},
+      {key:'by', label:'bya byu byo', list:YOUON, idx:[27,28,29]},
+      {key:'py', label:'pya pyu pyo', list:YOUON, idx:[30,31,32]},
+    ];
+
+    const HIRA_MAP = new Map();
+    const KATA_MAP = new Map();
+    BASE.forEach((r,i)=>{HIRA_MAP.set(r,HIRA_BASE[i]);KATA_MAP.set(r,KATA_BASE[i])});
+    DAKUON.forEach((r,i)=>{HIRA_MAP.set(r,HIRA_DAKU[i]);KATA_MAP.set(r,KATA_DAKU[i])});
+    YOUON.forEach((r,i)=>{HIRA_MAP.set(r,HIRA_YOU[i]);KATA_MAP.set(r,KATA_YOU[i])});
+
+    const ALL_ROMAJI = [...new Set([...BASE,...DAKUON,...YOUON])];
+    const ROMAJI_SORTED = [...ALL_ROMAJI].sort((a,b)=>b.length-a.length);
+
+    // ---------- UI HELPERS ----------
+    const qs = (s,el=document)=>el.querySelector(s);
+    const qsa = (s,el=document)=>[...el.querySelectorAll(s)];
+    const df = ()=>document.createDocumentFragment();
+
+    // ---------- TRACKER ----------
+    function buildKana(boxId, set){
+      const box = qs('#'+boxId); box.innerHTML='';
+      const rom = ALL_ROMAJI; const map = set==='hira'? HIRA_MAP: KATA_MAP; const mastered = set==='hira'? state.hiraMastered: state.kataMastered;
+      const frag=df();
+      rom.forEach(r=>{
+        const ch = map.get(r);
+        const b = document.createElement('button'); b.type='button'; b.className='kana'+(mastered.includes(r)?' checked':'');
+        b.innerHTML=`<div class="jp">${ch}</div><div class="ro">${r}</div>`; b.title=r; b.setAttribute('aria-pressed', mastered.includes(r));
+        attachLongPress(b, ()=>toggleMaster(r,set), ()=>uncheck(r,set));
+        frag.appendChild(b);
+      });
+      box.appendChild(frag);
+    }
+    function toggleMaster(label, set){ const arr=(set==='hira'?state.hiraMastered:state.kataMastered); const i=arr.indexOf(label); if(i<0) arr.push(label); else arr.splice(i,1); save(); renderStats(); buildKana(set==='hira'?'hiraBox':'kataBox', set); }
+    function uncheck(label,set){ const arr=(set==='hira'?state.hiraMastered:state.kataMastered); const i=arr.indexOf(label); if(i>-1){arr.splice(i,1); save(); renderStats(); buildKana(set==='hira'?'hiraBox':'kataBox', set);} }
+    function renderStats(){ qs('#jpStats').textContent = `${state.hiraMastered.length}/${ALL_ROMAJI.length} hira • ${state.kataMastered.length}/${ALL_ROMAJI.length} kata`; }
+
+    // ---------- LEARN MODE ----------
+    function fillLearnRange(){ const fromSel=qs('#fromGrp'), toSel=qs('#toGrp'); fromSel.innerHTML=''; toSel.innerHTML=''; GROUPS.forEach(g=>{ const o1=new Option(g.label,g.key); const o2=new Option(g.label,g.key); fromSel.add(o1); toSel.add(o2); }); fromSel.value='aiueo'; toSel.value='k'; }
+    function startLearn(){ const set=qs('#learnSet').value; const from=qs('#fromGrp').value, to=qs('#toGrp').value; const labels = rangeLabels(from,to); const map = set==='hira'?HIRA_MAP:KATA_MAP; const box=qs('#learnTiles'); box.innerHTML=''; if(!labels.length){ box.innerHTML='<div class="small">Pilih rentang yang valid.</div>'; return; } const frag=df(); labels.forEach(r=>{ const tile=document.createElement('button'); tile.type='button'; tile.className='kana'; tile.innerHTML=`<div class="jp">${map.get(r)}</div><div class="ro">${r}</div>`; tile.onclick=()=> speak(r); frag.appendChild(tile); }); box.appendChild(frag); }
+
+    // ---------- TEST MODE ----------
+    let testPool=[], poolIdx=[], usingRange=false, qIndex=0, currentItem=null, mcMap={}, wrongList=[];
+    function fillTestRange(){ const tf=qs('#testFrom'), tt=qs('#testTo'); tf.innerHTML=''; tt.innerHTML=''; GROUPS.forEach(g=>{ tf.add(new Option(g.label,g.key)); tt.add(new Option(g.label,g.key)); }); tf.value='aiueo'; tt.value='k'; }
+    function buildSubsetChips(){ const box=qs('#subsetChips'); box.innerHTML=''; const frag=df(); GROUPS.forEach(g=>{ const b=document.createElement('button'); b.className='chip'+(state.test.subset===g.key?' active':''); b.textContent=g.label; b.onclick=()=>{ state.test.subset=g.key; save(); buildSubsetChips(); }; frag.appendChild(b); }); box.appendChild(frag); }
+
+    function startTest(){
+      wrongList=[]; const set=qs('#testSet').value; state.test.set=set; const mode=qs('#answerMode').value; state.test.mode=mode; const qType=qs('#qType').value; state.test.qType=qType; const req = Math.max(1, parseInt(qs('#testCount').value,10)||10);
+      const labels = buildPoolLabels();
+      testPool = labels.map(r=>({romaji:r, char: (set==='hira'?HIRA_MAP:KATA_MAP).get(r)}));
+      if(!testPool.length){ alert('Pilih subset atau rentang yang valid.'); return; }
+      poolIdx = labels.map(r=> ALL_ROMAJI.indexOf(r)).filter(x=>x>=0);
+      shuffleSync(testPool, poolIdx);
+      state.test.target = Math.min(req, qType==='seq'? 60: testPool.length || req);
+      state.test.score=0; state.test.total=0; state.test.correctStreak=0; qIndex=0; save();
+      qs('#testArea').hidden=false; updateProgress();
+      toggleAnswerUI(); nextQ();
+    }
+    function toggleAnswerUI(){ const qType=state.test.qType; const mode=state.test.mode; if(qType==='r2k'){ qs('#typeWrap').hidden=true; qs('#mcWrap').hidden=false; } else if(qType==='k2r'){ qs('#typeWrap').hidden=(mode==='mc'); qs('#mcWrap').hidden=!(mode==='mc'); } else { qs('#typeWrap').hidden=false; qs('#mcWrap').hidden=true; } }
+    function endTest(){ qs('#testArea').hidden=true; updateProgress(0); }
+
+    function nextQ(){
+      if(state.test.total>=state.test.target){ finishTest(); return; }
+      if(!testPool.length){ qs('#qKana').textContent='Selesai!'; return; }
+      currentItem = testPool[qIndex % testPool.length]; const qType=state.test.qType; const ansEl=qs('#ans'); if(ansEl) ansEl.value='';
+      if(qType==='seq'){ const seq = makeSequence(poolIdx, state.test.set); currentItem = {...currentItem, seq}; qs('#qKana').style.fontSize='28px'; qs('#qKana').textContent=`Romaji: ${seq.romaji}`; }
+      else if(qType==='k2r'){ qs('#qKana').style.fontSize='64px'; qs('#qKana').textContent=currentItem.char; }
+      else { qs('#qKana').style.fontSize='36px'; qs('#qKana').textContent=currentItem.romaji; buildMC_r2k(currentItem); }
+      if(state.test.mode==='mc' && qType==='k2r') buildMC_k2r(currentItem);
+      updateTestInfo(); setTimeout(()=>{ if(!qs('#typeWrap').hidden) ansEl && ansEl.focus(); }, 30);
+    }
+
+    function mcPick(letter){ const qType=state.test.qType; const val=mcMap[letter]; let correct=false; if(qType==='k2r'){ correct = (val===currentItem.romaji); } else if(qType==='r2k'){ correct = (val=== (state.test.set==='hira'? HIRA_MAP.get(currentItem.romaji): KATA_MAP.get(currentItem.romaji))); }
+      finalizeAnswer(correct, {chosen:val}); }
+
+    function checkAns(){ const valRaw=(qs('#ans')?.value||'').trim(); const qType=state.test.qType; let correct=false; let normalized='';
+      if(qType==='k2r'){ normalized = normalizeRomaji(valRaw); correct = (normalized===currentItem.romaji); }
+      else if(qType==='seq'){ const expectedKana=currentItem.seq.kana; const userKana = hasKana(valRaw)? valRaw : romajiStringToKana(valRaw, state.test.set); normalized=userKana; correct = (userKana===expectedKana); }
+      else if(qType==='r2k'){ const expectedKana = (state.test.set==='hira'? HIRA_MAP.get(currentItem.romaji): KATA_MAP.get(currentItem.romaji)); const userKana = hasKana(valRaw)? valRaw : romajiStringToKana(valRaw, state.test.set); normalized=userKana; correct=(userKana===expectedKana); }
+      finalizeAnswer(correct, {typed:valRaw, normalized}); }
+
+    function finalizeAnswer(correct, extra){ state.test.total+=1; if(correct){ state.test.score+=1; state.test.correctStreak+=1; maybeCelebrate('streak'); clickTone('ok'); } else { state.test.correctStreak=0; wrongList.push({...currentItem, ...extra}); clickTone('bad'); }
+      updateProgress(); if(state.test.total>=state.test.target){ finishTest(); return; } qIndex=(qIndex+1)%testPool.length; save(); nextQ(); }
+
+    function buildMC_k2r(item){ const labels=currentPoolLabels(); const wrongs = labels.filter(r=>r!==item.romaji); shuffle(wrongs); const pool=[item.romaji, wrongs[0], wrongs[1], wrongs[2]].filter(Boolean).slice(0,4); while(pool.length<4) pool.push('ka'); shuffle(pool); mcMap={A:pool[0],B:pool[1],C:pool[2],D:pool[3]}; setMCText({A:`A. ${mcMap.A}`,B:`B. ${mcMap.B}`,C:`C. ${mcMap.C}`,D:`D. ${mcMap.D}`}); }
+    function buildMC_r2k(item){ const chars=currentPoolChars(); const labels=currentPoolLabels(); const idx = labels.indexOf(item.romaji); const correct = chars[idx]; const pool=[correct]; const other = chars.filter((_,i)=>i!==idx); shuffle(other); pool.push(...other.slice(0,3)); shuffle(pool); mcMap={A:pool[0],B:pool[1],C:pool[2],D:pool[3]}; setMCText({A:`A. ${mcMap.A}`,B:`B. ${mcMap.B}`,C:`C. ${mcMap.C}`,D:`D. ${mcMap.D}`}); }
+    function setMCText(map){ ['A','B','C','D'].forEach(k=>{ const el=qs('#opt'+k); el.textContent=map[k]; el.type='button'; }); }
+
+    function skipQ(){ clickTone('click'); if(!testPool.length){ return; } qIndex=(qIndex+1)%testPool.length; nextQ(); }
+
+    function updateTestInfo(){ const g = GROUPS.find(x=>x.key===state.test.subset) || GROUPS[0]; const label = usingRange? 'Rentang khusus' : g.label; const tlabel = state.test.qType==='k2r'? 'Kana→Romaji' : state.test.qType==='r2k'? 'Romaji→Kana' : 'Rangkaian'; qs('#testInfo').textContent = `${state.test.set==='hira'?'Hiragana':'Katakana'} • ${label} • ${tlabel} • Soal ${Math.min(state.test.total+1, state.test.target)}/${state.test.total}`; }
+    function updateProgress(){ const pct = (state.test.total/state.test.target)*100; const bar = qs('#bar'); bar.style.width = pct+'%'; const prog = qs('.progress'); prog.setAttribute('aria-valuenow', Math.round(pct)); }
+
+    function finishTest(){ openCelebrate('finish'); burst(); clickTone('ok'); renderReview(); }
+
+    function renderReview(){ const box=qs('#reviewWrap'); const hasWrong = wrongList.length>0; qs('#btnReviewWrong').hidden=!hasWrong; box.hidden=!hasWrong; qs('#celebrateMsg').textContent=`Skor: ${state.test.score}/${state.test.total}`; if(!hasWrong){ box.innerHTML=''; return; } const set=state.test.set; box.innerHTML = wrongList.map((w,i)=>{ const expected = (state.test.qType==='k2r')? w.romaji : (set==='hira'? HIRA_MAP.get(w.romaji): KATA_MAP.get(w.romaji)); const got = w.chosen||w.normalized||w.typed||''; const left = (state.test.qType==='k2r')? (set==='hira'? HIRA_MAP.get(w.romaji): KATA_MAP.get(w.romaji)) : w.romaji; return `<div style="padding:8px;border:1px solid var(--border);border-radius:12px;margin:6px 0;display:flex;justify-content:space-between;gap:8px"><div><div class="small">Soal ${i+1}</div><div><b>${left}</b> → <span style="color:var(--ok)">${expected}</span></div><div class="small">Jawaban kamu: ${got||'-'}</div></div><button class="btn" onclick="(function(){window._speak && window._speak('${w.romaji}')})()">🎧</button></div>`; }).join(''); }
+
+    qs('#btnReviewWrong').onclick = ()=>{ if(!wrongList.length) return; const set=state.test.set; const labels=[...new Set(wrongList.map(w=>w.romaji))]; testPool = labels.map(r=>({romaji:r, char: (set==='hira'?HIRA_MAP:KATA_MAP).get(r)})); poolIdx = labels.map(r=>ALL_ROMAJI.indexOf(r)).filter(x=>x>=0); state.test.total=0; state.test.score=0; state.test.correctStreak=0; state.test.target = Math.min(20, testPool.length); qIndex=0; closeCelebrate(); qs('#testArea').hidden=false; updateProgress(); nextQ(); };
+
+    function buildPoolLabels(){ const sKey=qs('#testFrom').value, eKey=qs('#testTo').value; const selFrom=GROUPS.findIndex(x=>x.key===sKey), selTo=GROUPS.findIndex(x=>x.key===eKey); usingRange=(selFrom>-1&&selTo>-1); if(usingRange){ const [from,to]= selFrom<=selTo? [selFrom,selTo] : [selTo,fromSel]; return GROUPS.slice(from,to+1).flatMap(g=> g.idx.map(i=> g.list[i] )); } else { const grp=GROUPS.find(x=>x.key===state.test.subset)||GROUPS[0]; return grp.idx.map(i=> grp.list[i]); } }
+    function rangeLabels(fromKey,toKey){ const a=GROUPS.findIndex(g=>g.key===fromKey); const b=GROUPS.findIndex(g=>g.key===toKey); if(a<0||b<0) return []; const [from,to] = a<=b? [a,b]:[b,a]; return GROUPS.slice(from,to+1).flatMap(g=> g.idx.map(i=> g.list[i]) ); }
+    function currentPoolLabels(){ return testPool.map(x=>x.romaji); }
+    function currentPoolChars(){ return testPool.map(x=>x.char); }
+
+    // ---------- THEME & AUDIO ----------
+    function applyTheme(){ document.documentElement.setAttribute('data-theme', state.theme==='hc'?'hc':'pastel'); qs('#tPastel').classList.toggle('active', state.theme!=='hc'); qs('#tHC').classList.toggle('active', state.theme==='hc'); }
+    function applyAudio(){ const ck=qs('#audToggle'); ck.checked = !!state.audio; }
+
+    // ---------- AUDIO ----------
+    function speak(text){ try{ if(!state.audio) return; if(!('speechSynthesis' in window)) return; const u=new SpeechSynthesisUtterance(text); u.lang='ja-JP'; u.rate=.9; u.pitch=1.02; u.volume=1; speechSynthesis.speak(u);}catch{} }
+    window._speak = speak;
+    function speakCurrent(){ if(currentItem){ if(state.test.qType==='r2k'){ speak(currentItem.romaji); } else if(state.test.qType==='k2r'){ const r=currentItem.romaji; speak(r); } else if(state.test.qType==='seq'){ speak(currentItem.seq.romaji); } } }
+    function clickTone(kind){ try{ if(!state.audio) return; const C = window.AudioContext || window.webkitAudioContext; if(!C) return; const ctx=new C(); const o=ctx.createOscillator(); const g=ctx.createGain(); o.connect(g); g.connect(ctx.destination); o.type='sine'; o.frequency.setValueAtTime(kind==='ok'? 960: kind==='bad'? 260: 520, ctx.currentTime); g.gain.setValueAtTime(0.0001, ctx.currentTime); g.gain.exponentialRampToValueAtTime(kind==='bad'?0.25:0.12, ctx.currentTime+0.01); o.start(); setTimeout(()=>{ g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime+0.2); o.stop(ctx.currentTime+0.22); ctx.close && ctx.close(); }, 150);}catch{} }
+
+    // ---------- CELEBRATION ----------
+    const modal = qs('#celebrate'); const burstBox = qs('#burst');
+    function maybeCelebrate(type){ if(type==='streak' && state.test.correctStreak>0 && state.test.correctStreak % 10 === 0){ openCelebrate('streak'); burst(); clickTone('ok'); } }
+    function openCelebrate(mode){ const title=qs('#celebrateTitle'), msg=qs('#celebrateMsg'); if(mode==='finish'){ title.textContent='Tes selesai! 🎉'; msg.textContent=`Skor: ${state.test.score}/${state.test.total}`; } else { title.textContent='Wii! Keren banget! 🎉'; msg.textContent='10 jawaban benar berturut-turut. Lanjutkan momentummu! 🔥'; } modal.style.display='flex'; }
+    function closeCelebrate(){ modal.style.display='none'; }
+    qs('#btnCloseModal').onclick = closeCelebrate;
+    function burst(){ burstBox.innerHTML=''; const colors=['#7a6cff','#16c6a1','#ffd166','#ff7b7b','#2fb875','#8acbff']; const w=window.innerWidth, h=window.innerHeight; for(let i=0;i<90;i++){ const p=document.createElement('div'); p.className='particle'; p.style.background=colors[i%colors.length]; const dx=(Math.random()*w - w/2)+'px'; const dy=(Math.random()*h/2)+'px'; p.style.setProperty('--dx',dx); p.style.setProperty('--dy',dy); p.style.left=(w/2)+'px'; p.style.top=(h/3)+'px'; burstBox.appendChild(p);} setTimeout(()=>{ burstBox.innerHTML=''; }, 1000); }
+
+    // ---------- POMODORO (drift-safe) ----------
+    let pomoHandle=null;
+    function upPomoLabel(){ qs('#pomoLabel').textContent = state.pomo.mode==='work'? 'Fokus':'Istirahat'; }
+    function drawRemain(){ const m=Math.floor(state.pomo.remaining/60).toString().padStart(2,'0'); const s=(state.pomo.remaining%60).toString().padStart(2,'0'); qs('#pomoTime').textContent=`${m}:${s}`; }
+    function startPomo(){ state.pomo.work = Math.max(1, parseInt(qs('#pomoWork').value,10)||25); state.pomo.break = Math.max(1, parseInt(qs('#pomoBreak').value,10)||5); if(!state.pomo.running){ state.pomo.running=true; state.pomo.last=Date.now(); if(state.pomo.remaining<=0) state.pomo.remaining = state.pomo.work*60; save(); } tickPomo(); if(!pomoHandle) pomoHandle=setInterval(tickPomo, 250); }
+    function pausePomo(){ state.pomo.running=false; save(); if(pomoHandle){ clearInterval(pomoHandle); pomoHandle=null; } }
+    function resetPomo(){ pausePomo(); state.pomo.mode='work'; state.pomo.remaining = state.pomo.work*60; upPomoLabel(); drawRemain(); save(); }
+    function tickPomo(){ if(!state.pomo.running) return; const now=Date.now(); const dt=Math.floor((now - state.pomo.last)/1000); if(dt<=0){ return; } state.pomo.last = now; state.pomo.remaining = Math.max(0, state.pomo.remaining - dt); if(state.pomo.remaining===0){ clickTone('ok'); if(state.pomo.mode==='work'){ state.pomo.mode='break'; state.pomo.remaining=state.pomo.break*60; } else { state.pomo.mode='work'; state.pomo.remaining=state.pomo.work*60; } upPomoLabel(); } drawRemain(); save(); }
+
+    // ---------- NORMALISASI & KONVERSI ----------
+    function hasKana(s){ return /[ぁ-んァ-ン]/.test(s); }
+    function normalizeRomaji(v){ v=(v||'').toLowerCase().trim(); const alias = { si:'shi', ti:'chi', tu:'tsu', hu:'fu', wo:'o', ji:'ji', zu:'zu' }; return alias[v] || v; }
+    function romajiStringToKana(str,set){ let s=(str||'').toLowerCase().replace(/\s+/g,''); let out=''; while(s.length){ let matched=false; // handle syllabic n
+        if(s[0]==='n'){ if(s[1]==='n'){ out += (set==='hira'? 'ん':'ン'); s=s.slice(2); matched=true; continue; } const next=s[1]||''; if(next && !'aeiouy'.includes(next)){ out += (set==='hira'? 'ん':'ン'); s=s.slice(1); matched=true; continue; } }
+        for(const r of ROMAJI_SORTED){ if(s.startsWith(r)){ out += (set==='hira'? HIRA_MAP.get(r): KATA_MAP.get(r)); s=s.slice(r.length); matched=true; break; } }
+        if(!matched){ if(/^[bcdfghjklmnpqrstvwxyz]\1/.test(s)){ out += (set==='hira'? 'っ':'ッ'); s=s.slice(1); matched=true; continue; } s=s.slice(1); }
+      } return out; }
+    function makeSequence(idxArr,set){ const src = idxArr.length? idxArr.map(i=>ALL_ROMAJI[i]) : ALL_ROMAJI; const len = 2 + Math.floor(Math.random()*2); const picks=[]; for(let i=0;i<len;i++){ const r = src[Math.floor(Math.random()*src.length)]; picks.push(r); } const romaji=picks.join(''); const kana=romajiStringToKana(romaji,set); return {romaji,kana}; }
+
+    // ---------- UTILS ----------
+    function shuffle(arr){ for(let i=arr.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [arr[i],arr[j]]=[arr[j],arr[i]]; } }
+    function shuffleSync(a,b){ for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; [b[i],b[j]]=[b[j],b[i]]; } }
+    function attachLongPress(el, onClick, onLong){ let t=null, long=false; const down=()=>{ long=false; t=setTimeout(()=>{ long=true; onLong&&onLong(); }, 500); }; const up=()=>{ clearTimeout(t); if(!long) onClick&&onClick(); }; el.addEventListener('pointerdown', down, {passive:true}); el.addEventListener('pointerup', up, {passive:true}); el.addEventListener('pointerleave', ()=>clearTimeout(t), {passive:true}); el.addEventListener('keydown', (e)=>{ if(e.key==='Enter' || e.key===' '){ e.preventDefault(); onClick&&onClick(); } }); }
+
+    // ---------- BINDINGS ----------
+    qs('#btnShowLearn').onclick = startLearn;
+    qs('#btnStart').onclick = startTest;
+    qs('#btnEnd').onclick = endTest;
+    qs('#btnSkip').onclick = skipQ;
+    qs('#btnCheck').onclick = checkAns;
+    qs('#btnListen').onclick = ()=>{ speakCurrent(); clickTone('click'); };
+
+    qs('#mcWrap').addEventListener('pointerup', (e)=>{ const btn=e.target.closest('.opt'); if(!btn) return; const id=(btn.id||'').slice(-1); if(!id) return; mcPick(id); }, {passive:true});
+
+    // Keyboard shortcuts
+    document.addEventListener('keydown', (e)=>{
+      if(e.key==='Enter' && !qs('#testArea').hidden && qs('#typeWrap') && !qs('#typeWrap').hidden){ e.preventDefault(); checkAns(); }
+      const map={a:'A',b:'B',c:'C',d:'D'}; const k=map[e.key?.toLowerCase?.()]; if(k && !qs('#mcWrap').hidden){ e.preventDefault(); mcPick(k); }
+      if(e.key==='ArrowRight' && !qs('#testArea').hidden){ e.preventDefault(); skipQ(); }
+      if(e.key?.toLowerCase?.()==='l' && !qs('#testArea').hidden){ e.preventDefault(); speakCurrent(); }
+    });
+
+    // Theme & audio
+    qs('#tPastel').onclick = ()=>{ state.theme='pastel'; save(); applyTheme(); };
+    qs('#tHC').onclick = ()=>{ state.theme='hc'; save(); applyTheme(); };
+    qs('#audToggle').onchange = (e)=>{ state.audio = e.target.checked; save(); };
+
+    // Reset
+    qs('#resetBtn').onclick = ()=>{
+      if(confirm('Hapus semua progres? Ini tidak bisa dibatalkan.')){
+        localStorage.removeItem(KEY);
+        state=initState();
+        applyTheme();
+        applyAudio();
+        renderAll();
+        save();
+      }
+    };
+
+    // Count chips
+    qs('#countChips').addEventListener('click', (e)=>{ const b=e.target.closest('.chip'); if(!b) return; const c=parseInt(b.dataset.count,10)||10; qs('#testCount').value=c; clickTone('click'); });
+
+    // Pomodoro controls
+    qs('#pStart').onclick = startPomo;
+    qs('#pPause').onclick = pausePomo;
+    qs('#pReset').onclick = resetPomo;
+
+    // ---------- RENDER ----------
+    function renderAll(){ buildKana('hiraBox','hira'); buildKana('kataBox','kata'); buildSubsetChips(); fillLearnRange(); fillTestRange(); renderStats(); applyTheme(); applyAudio(); upPomoLabel(); if(!state.pomo.remaining) state.pomo.remaining=state.pomo.work*60; drawRemain(); qs('#pomoWork').value=state.pomo.work; qs('#pomoBreak').value=state.pomo.break; qs('#testCount').value=state.test.target||10; }
+
+    document.addEventListener('DOMContentLoaded', ()=>{
+      renderAll();
+      if(state.pomo.running){ startPomo(); }
+    });
+  </script>
+</body>
+</html>
+
