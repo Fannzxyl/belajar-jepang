@@ -14,13 +14,20 @@
       --btn:#e9eefc; --btnText:#0b101a; --border:rgba(19,32,48,.10);
       --radius:18px; --shadow:0 12px 28px rgba(15,23,34,.10);
       --ring: 0 0 0 3px rgba(122,108,255,.28);
+      /* Variabel warna latar belakang tombol OK dan WARN untuk tema pastel */
+      --okBg:#dff4ea;
+      --warnBg:#ffe5e5;
     }
     [data-theme="hc"]{
       --bg:#0a0f1a; --panel:#0f1626; --soft:#0c1220; --ink:#e6efff; --muted:#9fb0cc;
       --pri:#8fa8ff; --sec:#3dd8b5; --warn:#ff8c8c; --ok:#7be0b3; --accent:#ffd98a;
-      --btn:#18243a; --btnText:#e6efff; /* Teks tombol di HC akan putih */
+      --btn:#18243a; /* Latar belakang tombol di HC akan gelap */
+      --btnText:#e6efff; /* Teks tombol di HC akan putih */
       --border:rgba(230,239,255,.12);
       --ring: 0 0 0 3px rgba(143,168,255,.35);
+      /* Variabel warna latar belakang tombol OK dan WARN untuk tema high-contrast */
+      --okBg:#1a3a2e; /* Warna hijau gelap yang kontras dengan teks terang */
+      --warnBg:#3a1a1a; /* Warna merah gelap yang kontras dengan teks terang */
     }
     *{box-sizing:border-box}
     html,body{height:100%}
@@ -133,7 +140,8 @@
       font-size: 14px;
       font-weight: 500;
       transition: all 0.2s ease-out;
-      color: var(--ink); /* Default button text color from --ink */
+      color: var(--ink); /* Default button text color from --ink, applies to "Lewati", "Pause" */
+      background: var(--btn); /* Pastikan tombol dasar menggunakan variabel background */
     }
     .btn:active{transform:translateY(1px)}
     .btn.primary{
@@ -141,12 +149,12 @@
       color:var(--btnText); /* Menggunakan --btnText agar adaptif */
     }
     .btn.ok{
-      background:#dff4ea;
-      color:var(--ink); /* Menggunakan --ink agar adaptif, sebelumnya hardcoded #0b6b3f */
+      background:var(--okBg); /* Menggunakan variabel latar belakang adaptif */
+      color:var(--ink); /* Menggunakan --ink agar adaptif */
     }
     .btn.warn{
-      background:#ffe5e5;
-      color:var(--ink); /* Menggunakan --ink agar adaptif, sebelumnya hardcoded #8f2d2d */
+      background:var(--warnBg); /* Menggunakan variabel latar belakang adaptif */
+      color:var(--ink); /* Menggunakan --ink agar adaptif */
     }
     .btn.ghost{background:transparent;outline:1px solid var(--border); color: var(--ink);}
     .btn:focus-visible{outline:none; box-shadow:var(--ring); outline-offset: 3px;}
@@ -484,10 +492,10 @@
     const DAKUON = ['ga','gi','gu','ge','go','za','ji','zu','ze','zo','da','ji','zu','de','do','ba','bi','bu','be','bo','pa','pi','pu','pe','po'];
     const YOUON = ['kya','kyu','kyo','sha','shu','sho','cha','chu','cho','nya','nyu','nyo','hya','hyu','hyo','mya','myu','myo','rya','ryu','ryo','gya','gyu','gyo','ja','ju','jo','bya','byu','byo','pya','pyu','pyo'];
 
-    const HIRA_BASE = ['あ','い','う','え','お','か','き','く','け','こ','さ','し','す','せ','そ','た','ち','つ','て','と','な','に','ぬ','ね','の','は','ひ','ふ','へ','ほ','ま','み','む','め','も','や','ゆ','よ','ら','り','る','れ','ろ','わ','を','ん'];
+    const HIRA_BASE = ['あ','い','う','え','お','か','き','く','け','こ','さ','し','す','せ','そ','た','ち','つ','て','と','な','に','ぬ','ね','の','は','ひ','ふ','へ','ほ','ま','み','む','め','も','や','ゆ','よ','ら','り','る','れ','ろ','wa','wo','n'];
     const KATA_BASE = ['ア','イ','ウ','エ','オ','カ','キ','ク','ケ','コ','サ','シ','ス','セ','ソ','タ','チ','ツ','テ','ト','ナ','ニ','ヌ','ネ','ノ','ハ','ヒ','フ','ヘ','ホ','マ','ミ','ム','メ','モ','ヤ','ユ','ヨ','ラ','リ','ル','レ','ロ','ワ','ヲ','ン'];
 
-    const HIRA_DAKU = ['が','ぎ','ぐ','げ','ご','ざ','じ','ず','ぜ','ぞ','だ','ぢ','づ','で','ど','ば','び','ぶ','べ','ぼ','ぱ','ぴ','ぷ','ぺ','ぽ'];
+    const HIRA_DAKU = ['が','ぎ','ぐ','げ','ご','ざ','じ','ず','ぜ','ぞ','だ','ぢ','づ','で','ど','ba','bi','bu','be','bo','ぱ','ぴ','ぷ','ぺ','ぽ'];
     const KATA_DAKU = ['ガ','ギ','グ','ゲ','ゴ','ザ','ジ','ズ','ゼ','ゾ','ダ','ヂ','ヅ','デ','ド','バ','ビ','ブ','ベ','ボ','パ','ピ','プ','ペ','ポ'];
 
     const HIRA_YOU = ['きゃ','きゅ','きょ','しゃ','しゅ','しょ','ちゃ','ちゅ','ちょ','にゃ','にゅ','にょ','ひゃ','ひゅ','ひょ','miya','myu','myo','rya','ryu','ryo','gya','gyu','gyo','ja','ju','jo','bya','byu','byo','pya','pyu','pyo'];
