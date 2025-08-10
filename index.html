@@ -288,8 +288,53 @@
     /* Smallest mobile adjustments */
     @media (max-width: 420px){ :root{ --radius:14px } .kana .jp{ font-size:24px } #qKana{ font-size:56px !important } }
 
+    /* Animations for correct/wrong answers */
+    @keyframes correctPop {
+      0% { transform: scale(1); background-color: transparent; }
+      50% { transform: scale(1.1); background-color: var(--ok); }
+      100% { transform: scale(1); background-color: transparent; }
+    }
+
+    @keyframes wrongShake {
+      0%, 100% { transform: translateX(0); background-color: transparent; }
+      25% { transform: translateX(-5px); background-color: var(--warn); }
+      75% { transform: translateX(5px); background-color: var(--warn); }
+    }
+
+    #qKana.correct-answer {
+      animation: correctPop 0.3s ease-out;
+    }
+
+    #qKana.wrong-answer {
+      animation: wrongShake 0.3s ease-out;
+    }
+
+    /* Streak counter styling */
+    #streakCounter {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--sec); /* Use secondary color for streak */
+      margin-left: 10px;
+      min-width: 50px; /* Ensure space for the number */
+      text-align: right;
+      transition: transform 0.1s ease-out;
+    }
+
+    @keyframes streakGrow {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.2); }
+      100% { transform: scale(1); }
+    }
+
+    #streakCounter.grow {
+      animation: streakGrow 0.2s ease-out;
+    }
+
     @media (prefers-reduced-motion: reduce){
       *{animation-duration:0.01ms !important; animation-iteration-count:1 !important; transition-duration:0.01ms !important; scroll-behavior:auto !important}
+      #qKana.correct-answer, #qKana.wrong-answer, #streakCounter.grow {
+        animation: none !important;
+      }
     }
 
   </style>
@@ -410,7 +455,10 @@
             <button class="btn opt" id="optD">D</button>
           </div>
           <div class="spacer"></div>
-          <div class="small" id="testInfo" aria-live="polite"></div>
+          <div class="small" id="testInfo" aria-live="polite">
+            <!-- Streak counter will be displayed here -->
+            <span id="streakCounter">Streak: 0</span>
+          </div>
         </div>
       </div>
     </section>
@@ -498,6 +546,7 @@
     const DAKUON = ['ga','gi','gu','ge','go','za','ji','zu','ze','zo','da','ji','zu','de','do','ba','bi','bu','be','bo','pa','pi','pu','pe','po'];
     const YOUON = ['kya','kyu','kyo','sha','shu','sho','cha','chu','cho','nya','nyu','nyo','hya','hyu','hyo','mya','myu','myo','rya','ryu','ryo','gya','gyu','gyo','ja','ju','jo','bya','byu','byo','pya','pyu','pyo'];
 
+    // Corrected Hiragana Dakuon and Youon
     const HIRA_BASE = ['あ','い','う','え','お','か','き','く','け','こ','さ','し','す','せ','そ','た','ち','つ','て','と','な','に','ぬ','ね','の','は','ひ','ふ','へ','ほ','ま','み','む','め','も','や','ゆ','よ','ら','り','る','れ','ろ','わ','を','ん'];
     const KATA_BASE = ['ア','イ','ウ','エ','オ','カ','キ','ク','ケ','コ','サ','シ','ス','セ','ソ','タ','チ','ツ','テ','ト','ナ','ニ','ヌ','ネ','ノ','ハ','ヒ','フ','ヘ','ホ','マ','ミ','ム','メ','モ','ヤ','ユ','ヨ','ラ','リ','ル','レ','ロ','ワ','ヲ','ン'];
 
@@ -701,8 +750,37 @@
       else if(qType==='r2k'){ const expectedKana = (state.test.set==='hira'? HIRA_MAP.get(currentItem.romaji): KATA_MAP.get(currentItem.romaji)); const userKana = hasKana(valRaw)? valRaw : romajiStringToKana(valRaw, state.test.set); normalized=userKana; correct=(userKana===expectedKana); }
       finalizeAnswer(correct, {typed:valRaw, normalized}); }
 
-    function finalizeAnswer(correct, extra){ state.test.total+=1; if(correct){ state.test.score+=1; state.test.correctStreak+=1; maybeCelebrate('streak'); clickTone('ok'); } else { state.test.correctStreak=0; wrongList.push({...currentItem, ...extra}); clickTone('bad'); }
-      updateProgress(); if(state.test.total>=state.test.target){ finishTest(); return; } qIndex=(qIndex+1)%testPool.length; save(); nextQ(); }
+    function finalizeAnswer(correct, extra){
+      const qKanaElement = qs('#qKana');
+      const streakCounterElement = qs('#streakCounter');
+
+      state.test.total+=1;
+      if(correct){
+        state.test.score+=1;
+        state.test.correctStreak+=1;
+        maybeCelebrate('streak');
+        clickTone('ok');
+        qKanaElement.classList.add('correct-answer');
+        streakCounterElement.classList.add('grow');
+      } else {
+        state.test.correctStreak=0;
+        wrongList.push({...currentItem, ...extra});
+        clickTone('bad');
+        qKanaElement.classList.add('wrong-answer');
+      }
+
+      // Remove animation classes after a short delay
+      setTimeout(() => {
+        qKanaElement.classList.remove('correct-answer', 'wrong-answer');
+        streakCounterElement.classList.remove('grow');
+      }, 300); // Match animation duration
+
+      updateProgress();
+      if(state.test.total>=state.test.target){ finishTest(); return; }
+      qIndex=(qIndex+1)%testPool.length;
+      save();
+      nextQ();
+    }
 
     function buildMC_k2r(item){ const labels=currentPoolLabels(); const wrongs = labels.filter(r=>r!==item.romaji); shuffle(wrongs); const pool=[item.romaji, wrongs[0], wrongs[1], wrongs[2]].filter(Boolean).slice(0,4); while(pool.length<4) pool.push('ka'); shuffle(pool); mcMap={A:pool[0],B:pool[1],C:pool[2],D:pool[3]}; setMCText({A:`A. ${mcMap.A}`,B:`B. ${mcMap.B}`,C:`C. ${mcMap.C}`,D:`D. ${mcMap.D}`}); }
     function buildMC_r2k(item){ const chars=currentPoolChars(); const labels=currentPoolLabels(); const idx = labels.indexOf(item.romaji); const correct = chars[idx]; const pool=[correct]; const other = chars.filter((_,i)=>i!==idx); shuffle(other); pool.push(...other.slice(0,3)); shuffle(pool); mcMap={A:pool[0],B:pool[1],C:pool[2],D:pool[3]}; setMCText({A:`A. ${mcMap.A}`,B:`B. ${mcMap.B}`,C:`C. ${mcMap.C}`,D:`D. ${mcMap.D}`}); }
@@ -730,7 +808,8 @@
       }
 
       const tlabel = state.test.qType==='k2r'? 'Kana→Romaji' : state.test.qType==='r2k'? 'Romaji→Kana' : 'Rangkaian';
-      qs('#testInfo').textContent = `${state.test.set==='hira'?'Hiragana':'Katakana'} • ${rangeLabel} • ${tlabel} • Soal ${Math.min(state.test.total+1, state.test.target)}/${state.test.total}`;
+      const testInfoElement = qs('#testInfo');
+      testInfoElement.innerHTML = `${state.test.set==='hira'?'Hiragana':'Katakana'} • ${rangeLabel} • ${tlabel} • Soal ${Math.min(state.test.total+1, state.test.target)}/${state.test.total} <span id="streakCounter">Streak: ${state.test.correctStreak}</span>`;
     }
 
     function updateProgress(){ const pct = (state.test.total/state.test.target)*100; const bar = qs('#bar'); bar.style.width = pct+'%'; const prog = qs('.progress'); prog.setAttribute('aria-valuenow', Math.round(pct)); }
