@@ -376,7 +376,7 @@
         </div>
     </header>
 
-    <main class="wrap" id="main">
+    <main class="wrap" id="main" style="display: none;"> <!-- MOD: Initially hidden -->
         <!-- LEARN MODE -->
         <section class="grid" aria-labelledby="learnTitle">
             <div class="card" style="grid-column: span 12;">
@@ -429,16 +429,20 @@
                 </div>
 
                 <div class="spacer"></div>
-                <div class="row">
-                    <div class="tag">Jumlah soal:</div> <!-- MOD: Moved "Jumlah soal" label -->
+                <!-- MOD: Reorganized layout for Test Mode controls -->
+                <div class="row test-control-group">
+                    <div class="tag" style="align-self: center;">Jumlah soal:</div>
                     <input id="testCount" type="number" min="1" value="10" style="width:100px" aria-label="Jumlah soal" />
                     <div class="chips" id="countChips">
-                        <button class="chip" data-count="10" type="button">10</button> <!-- MOD: Added type -->
-                        <button class="chip" data-count="25" type="button">25</button> <!-- MOD: Added type -->
-                        <button class="chip" data-count="50" type="button">50</button> <!-- MOD: Added type -->
-                        <button class="chip" data-count="100" type="button">100</button> <!-- MOD: Added type -->
+                        <button class="chip" data-count="10" type="button">10</button>
+                        <button class="chip" data-count="25" type="button">25</button>
+                        <button class="chip" data-count="50" type="button">50</button>
+                        <button class="chip" data-count="100" type="button">100</button>
                     </div>
-                    <div class="tag">Atau rentang khusus:</div> <!-- MOD: Moved "Atau rentang khusus" label -->
+                </div>
+                <div class="spacer"></div>
+                <div class="row test-control-group">
+                    <div class="tag">Atau rentang khusus:</div>
                     <select id="rangeMode" aria-label="Mode rentang">
                         <option value="range">Rentang</option>
                         <option value="single">Grup Tunggal</option>
@@ -446,10 +450,12 @@
                     <select id="testFrom" aria-label="Tes dari"></select>
                     <div id="testToWrap"><select id="testTo" aria-label="Tes sampai"></select></div>
                     <select id="testSingleGroup" aria-label="Pilih Grup" hidden></select>
-
-                    <button class="btn primary" id="btnStart" type="button"><i class="fas fa-play"></i> Mulai Tes</button> <!-- MOD: Added type -->
-                    <button class="btn" id="btnSkip" title="Lewati soal (→)" type="button"><i class="fas fa-forward"></i> Lewati</button> <!-- MOD: Added type -->
-                    <button class="btn warn" id="btnEnd" type="button"><i class="fas fa-stop"></i> Selesai</button> <!-- MOD: Added type -->
+                </div>
+                <div class="spacer"></div>
+                <div class="row" style="justify-content: center;"> <!-- MOD: Centered action buttons -->
+                    <button class="btn primary" id="btnStart" type="button"><i class="fas fa-play"></i> Mulai Tes</button>
+                    <button class="btn" id="btnSkip" title="Lewati soal (→)" type="button"><i class="fas fa-forward"></i> Lewati</button>
+                    <button class="btn warn" id="btnEnd" type="button"><i class="fas fa-stop"></i> Selesai</button>
                 </div>
 
                 <div class="spacer"></div>
@@ -462,13 +468,13 @@
                     <div id="typeWrap" style="max-width:520px;margin:0 auto">
                         <input id="ans" placeholder="Ketik jawaban kamu di sini…" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" inputmode="latin" aria-label="Jawaban" />
                         <div class="spacer"></div>
-                        <button class="btn" id="btnCheck" type="button"><i class="fas fa-check"></i> Cek (Enter)</button> <!-- MOD: Added type -->
+                        <button class="btn" id="btnCheck" type="button"><i class="fas fa-check"></i> Cek (Enter)</button>
                     </div>
                     <div id="mcWrap" class="optwrap" hidden>
-                        <button class="btn opt" id="optA" aria-label="Pilihan A" type="button">A</button> <!-- MOD: Added type -->
-                        <button class="btn opt" id="optB" aria-label="Pilihan B" type="button">B</button> <!-- MOD: Added type -->
-                        <button class="btn opt" id="optC" aria-label="Pilihan C" type="button">C</button> <!-- MOD: Added type -->
-                        <button class="btn opt" id="optD" aria-label="Pilihan D" type="button">D</button> <!-- MOD: Added type -->
+                        <button class="btn opt" id="optA" aria-label="Pilihan A" type="button">A</button>
+                        <button class="btn opt" id="optB" aria-label="Pilihan B" type="button">B</button>
+                        <button class="btn opt" id="optC" aria-label="Pilihan C" type="button">C</button>
+                        <button class="btn opt" id="optD" aria-label="Pilihan D" type="button">D</button>
                         <div class="small" style="grid-column: span 4; text-align: center; margin-top: 4px;">Ketuk atau tekan A/B/C/D</div>
                     </div>
                     <div class="spacer"></div>
@@ -496,9 +502,9 @@
                         <span class="sr-only">Menit istirahat</span>
                         <input id="pomoBreak" type="number" min="1" value="5" style="width:90px"> menit istirahat
                     </label>
-                    <button class="btn primary" id="pStart" type="button"><i class="fas fa-play"></i> Mulai</button> <!-- MOD: Added type -->
-                    <button class="btn" id="pPause" type="button"><i class="fas fa-pause"></i> Pause</button> <!-- MOD: Added type -->
-                    <button class="btn warn" id="pReset" type="button"><i class="fas fa-redo"></i> Reset</button> <!-- MOD: Added type -->
+                    <button class="btn primary" id="pStart" type="button"><i class="fas fa-play"></i> Mulai</button>
+                    <button class="btn" id="pPause" type="button"><i class="fas fa-pause"></i> Pause</button>
+                    <button class="btn warn" id="pReset" type="button"><i class="fas fa-redo"></i> Reset</button>
                 </div>
                 <div class="spacer"></div>
                 <div class="center">
@@ -526,7 +532,7 @@
                 </div>
                 <div class="spacer"></div>
                 <div class="row">
-                    <div class="tag" id="jpStats" aria-live="polite">0/103 hira • 0/103 kata</div> <!-- MOD: Updated total count -->
+                    <div class="tag" id="jpStats" aria-live="polite">0/103 hira • 0/103 kata</div>
                 </div>
                 <div class="spacer"></div>
                 <div class="row" style="justify-content: center; font-size: 14px;">
@@ -550,17 +556,17 @@
                         <option value="kata">Katakana</option>
                     </select>
                     <select id="writeKana" aria-label="Pilih kana"></select>
-                    <button class="btn" id="writePrev" title="Sebelumnya" type="button"><i class="fas fa-chevron-left"></i> Sebelumnya</button> <!-- MOD: Added type -->
-                    <button class="btn" id="writeNext" title="Berikutnya" type="button">Berikutnya <i class="fas fa-chevron-right"></i></button> <!-- MOD: Added type -->
-                    <button class="btn" id="writeRand" title="Acak" type="button"><i class="fas fa-shuffle"></i> Acak</button> <!-- MOD: Added type -->
-                    <button class="btn" id="writeSpeak" title="Dengar pelafalan kana" type="button"><i class="fas fa-volume-up"></i></button> <!-- MOD: Added type -->
+                    <button class="btn" id="writePrev" title="Sebelumnya" type="button"><i class="fas fa-chevron-left"></i> Sebelumnya</button>
+                    <button class="btn" id="writeNext" title="Berikutnya" type="button">Berikutnya <i class="fas fa-chevron-right"></i></button>
+                    <button class="btn" id="writeRand" title="Acak" type="button"><i class="fas fa-shuffle"></i> Acak</button>
+                    <button class="btn" id="writeSpeak" title="Dengar pelafalan kana" type="button"><i class="fas fa-volume-up"></i></button>
                 </div>
 
                 <div class="spacer"></div>
 
                 <div class="writer-toolbar">
-                    <button class="btn ok" id="penBtn" type="button"><i class="fas fa-pen"></i> Pena</button> <!-- MOD: Added type -->
-                    <button class="btn" id="eraserBtn" type="button"><i class="fas fa-eraser"></i> Penghapus</button> <!-- MOD: Added type -->
+                    <button class="btn ok" id="penBtn" type="button"><i class="fas fa-pen"></i> Pena</button>
+                    <button class="btn" id="eraserBtn" type="button"><i class="fas fa-eraser"></i> Penghapus</button>
                     <div class="slider">
                         <label for="penSize">Ukuran</label>
                         <input id="penSize" type="range" min="2" max="28" value="10" style="width:140px">
@@ -574,11 +580,10 @@
                     <label class="btn ghost" style="gap:8px">
                         <input id="autoSnapToggle" type="checkbox"> Auto-Snap
                     </label>
-                    <!-- MOD: Removed Snap % and Opacity sliders from HTML -->
                     <div style="flex:1"></div>
-                    <button class="btn" id="undoStroke" title="Undo (Ctrl+Z)" type="button"><i class="fas fa-undo"></i> Undo</button> <!-- MOD: Added type -->
-                    <button class="btn warn" id="clearCanvas" type="button"><i class="fas fa-redo"></i> Bersihkan</button> <!-- MOD: Added type -->
-                    <button class="btn primary" id="savePNG" type="button"><i class="fas fa-download"></i> Simpan PNG</button> <!-- MOD: Added type -->
+                    <button class="btn" id="undoStroke" title="Undo (Ctrl+Z)" type="button"><i class="fas fa-undo"></i> Undo</button>
+                    <button class="btn warn" id="clearCanvas" type="button"><i class="fas fa-redo"></i> Bersihkan</button>
+                    <button class="btn primary" id="savePNG" type="button"><i class="fas fa-download"></i> Simpan PNG</button>
                 </div>
 
                 <div class="spacer"></div>
@@ -587,7 +592,7 @@
                     <canvas id="writerCanvas" width="900" height="900" aria-label="Kanvas menulis"></canvas>
                     <div id="writerGhost" class="writer-ghost" aria-hidden="true">あ</div>
                 </div>
-                 <div class="small center" style="margin-top: 8px;">Tips: Tarik cepat untuk garis tipis, pelan untuk lebih tebal.</div>
+                <div class="small center" style="margin-top: 8px;">Tips: Tarik cepat untuk garis tipis, pelan untuk lebih tebal.</div>
             </div>
         </section>
 
@@ -601,8 +606,8 @@
             <div class="spacer"></div>
             <div id="reviewWrap" style="text-align:left;max-height:40vh;overflow:auto;margin:8px 0" hidden></div>
             <div class="row" style="justify-content:center">
-                <button class="btn" id="btnReviewWrong" hidden type="button"><i class="fas fa-redo-alt"></i> Belajar ulang yang salah</button> <!-- MOD: Added type -->
-                <button class="btn primary" id="btnCloseModal" type="button"><i class="fas fa-times"></i> Lanjut</button> <!-- MOD: Added type -->
+                <button class="btn" id="btnReviewWrong" hidden type="button"><i class="fas fa-redo-alt"></i> Belajar ulang yang salah</button>
+                <button class="btn primary" id="btnCloseModal" type="button"><i class="fas fa-times"></i> Lanjut</button>
             </div>
         </div>
         <div id="burst" class="burst" aria-hidden="true"></div>
@@ -620,10 +625,8 @@
             </div>
             <div class="spacer"></div>
             <div class="row" style="justify-content:center">
-                <label class="btn ghost" style="gap:8px">
-                    <input id="doNotShowOnboarding" type="checkbox"> Jangan tampilkan lagi
-                </label>
-                <button class="btn primary" id="btnStartLearningOnboarding" type="button">Mulai Belajar!</button> <!-- MOD: Added type -->
+                <!-- Removed "Jangan tampilkan lagi" checkbox -->
+                <button class="btn primary" id="btnStartLearningOnboarding" type="button">Mulai Belajar!</button>
             </div>
         </div>
     </div>
@@ -656,7 +659,7 @@
             level_up_title: (level)=>`Level Up! 🎉 Level ${level}!`,
             level_up_msg: (name)=>`Kamu sekarang seorang ${name}! Terus semangat! 🔥`,
             streak_title: 'Wii! Keren banget! 🎉',
-            streak_msg: '10 jawaban benar berturut-turut. Lanjutkan momentummu! ✨', // MOD: Changed  to ✨
+            streak_msg: '10 jawaban benar berturut-turut. Lanjutkan momentummu! ✨',
             pomo_focus: 'Fokus',
             pomo_break: 'Istirahat',
             pomo_start_focus: 'Fokus dimulai. {time} — semangat!',
@@ -747,6 +750,10 @@
                 if (source.hasOwnProperty(key)) {
                     if (typeof source[key] === 'object' && source[key] !== null && !Array.isArray(source[key]) && typeof target[key] === 'object' && target[key] !== null && !Array.isArray(target[key])) {
                         target[key] = deepMerge(target[key] || {}, source[key]);
+                        // Fix for specific bug where DAKUON YOUON lists were overwritten by base on deepMerge
+                        if (key === 'list' && Array.isArray(source[key])) {
+                            target[key] = source[key]; // Ensure list arrays are fully replaced, not merged deeply
+                        }
                     } else {
                         target[key] = source[key];
                     }
@@ -1323,7 +1330,7 @@
                 const selFrom=GROUPS.findIndex(x=>x.key===sKey);
                 const selTo=GROUPS.findIndex(x=>x.key===eKey);
                 if(selFrom > -1 && selTo > -1){
-                    const [from,to]= selFrom<=selTo? [selFrom,selTo] : [selTo,selFrom];
+                    const [from,to]= selFrom<=selTo? [selFrom,selTo] : [selTo,selM,];
                     labels = GROUPS.slice(from,to+1).flatMap(g=> g.idx.map(i=> g.list[i] ));
                 }
             }
@@ -1424,13 +1431,20 @@
             document.body.appendChild(toast);
 
             clearTimeout(toastTimeout);
+            // MOD: Add event listener BEFORE setting opacity to 1
+            toast.addEventListener('transitionend', function handler() {
+                if (toast.style.opacity === '0') { // Only remove if it faded out
+                    toast.remove();
+                    toast.removeEventListener('transitionend', handler); // Clean up listener
+                }
+            });
+
             setTimeout(() => {
                 toast.style.opacity = '1';
             }, 10);
 
             toastTimeout = setTimeout(() => {
                 toast.style.opacity = '0';
-                toast.addEventListener('transitionend', () => toast.remove());
             }, duration);
         }
 
@@ -1534,7 +1548,7 @@
                 <div class="box">
                     <h3 style="margin:0 0 6px 0">${message}</h3>
                     <div class="spacer"></div>
-                    <button class="btn primary" id="customAlertOk" type="button">OK</button> <!-- MOD: Added type -->
+                    <button class="btn primary" id="customAlertOk" type="button">OK</button>
                 </div>
             `;
             document.body.appendChild(tempModal);
@@ -1554,8 +1568,8 @@
                     <h3 style="margin:0 0 6px 0">${message}</h3>
                     <div class="spacer"></div>
                     <div class="row" style="justify-content:center">
-                        <button class="btn warn" id="customConfirmCancel" type="button">Batal</button> <!-- MOD: Added type -->
-                        <button class="btn primary" id="customConfirmOk" type="button">Ya</button> <!-- MOD: Added type -->
+                        <button class="btn warn" id="customConfirmCancel" type="button">Batal</button>
+                        <button class="btn primary" id="customConfirmOk" type="button">Ya</button>
                     </div>
                 </div>
             `;
@@ -1580,7 +1594,7 @@
         let pomoHandle=null;
         function upPomoLabel(){ qs('#pomoLabel').textContent = state.pomo.mode==='work'? t('pomo_focus'):t('pomo_break'); }
         function drawRemain(){ const m=String(Math.floor(state.pomo.remaining/60)).padStart(2,'0'); const s=String(state.pomo.remaining%60).padStart(2,'0'); qs('#pomoTime').textContent=`${m}:${s}`; }
-        const fmt = (sec)=>`${String(Math.floor(sec/60)).padStart(2,'0')}:${String(sec%60).padStart(2,'0')}`; // MOD: Helper for time formatting
+        const fmt = (sec)=>`${String(Math.floor(sec/60)).padStart(2,'0')}:${String(sec%60).padStart(2,'0')}`;
 
         function startPomo(){
             state.pomo.work = Math.max(1, parseInt(qs('#pomoWork').value,10)||25);
@@ -1781,8 +1795,8 @@
                 wCtx.beginPath();
                 for(let i=1;i<s.points.length;i++){
                     const a=s.points[i-1], b=s.points[i];
-                    wCtx.moveTo(a.x, a.y);
-                    wCtx.lineTo(b.x, b.y);
+                    wCtx.moveTo(a.x, a.y); // MOD: Changed to ctx.moveTo
+                    wCtx.lineTo(b.x, b.y); // MOD: Changed to ctx.lineTo
                 }
                 wCtx.stroke();
             }
@@ -1858,7 +1872,7 @@
             qs('#eraserBtn').onclick = ()=>{ state.writer.eraser=true; save(); qs('#eraserBtn').classList.add('ok'); qs('#penBtn').classList.remove('ok'); };
             qs('#undoStroke').onclick = writerUndo;
             qs('#clearCanvas').onclick = writerClear;
-            qs('#savePNG').onclick  = writerSavePNG;
+            qs('#savePNG').onclick  = writerSavePNG;
             document.addEventListener('keydown', (e)=>{ if((e.ctrlKey||e.metaKey) && e.key.toLowerCase()==='z'){ e.preventDefault(); writerUndo(); } });
             window.addEventListener('resize', ()=>{ writerSetupCanvasSize(); });
         }
@@ -1874,7 +1888,7 @@
             const ctx=c.getContext('2d'); ctx.clearRect(0,0,c.width,c.height);
             ctx.fillStyle = theme==='hc' ? '#e6efff' : '#132030';
             const s = Math.min(c.width,c.height)*0.8;
-            ctx.font = `bold ${s}px "Noto Serif JP", "Noto Sans JP", serif`; // MOD: Added Japanese fonts
+            ctx.font = `bold ${s}px "Noto Serif JP", "Noto Sans JP", serif`;
             ctx.textAlign='center'; ctx.textBaseline='middle';
             ctx.lineWidth = Math.max(2, c.width*0.02);
             ctx.strokeText(ch, c.width/2, c.height/2);
@@ -1926,16 +1940,16 @@
             const THRESH = (state.writer.snapThreshold ?? 0.52);
 
             if(iou >= THRESH){
-                writerClear();
+                // MOD: Draw perfect character and clear strokes, but don't clear the whole canvas unless needed
                 wCtx.setTransform(1,0,0,1,0,0);
-                wCtx.clearRect(0,0,wCanvas.width,wCanvas.height);
+                wCtx.clearRect(0,0,wCanvas.width,wCanvas.height); // Clear previous strokes
                 wCtx.scale(dpr,dpr);
                 const s = Math.min(wCanvas.width/dpr, wCanvas.height/dpr)*0.8;
-                wCtx.font = `bold ${s}px "Noto Serif JP", "Noto Sans JP", serif`; // MOD: Added Japanese fonts
+                wCtx.font = `bold ${s}px "Noto Serif JP", "Noto Sans JP", serif`;
                 wCtx.textAlign='center'; wCtx.textBaseline='middle';
                 wCtx.fillStyle = state.theme==='hc' ? '#e6efff' : '#132030';
                 wCtx.fillText(writerCurrentChar(), (wCanvas.width/dpr)/2, (wCanvas.height/dpr)/2);
-                wStrokes.length = 0;
+                wStrokes.length = 0; // Clear strokes array after drawing perfect char
                 showToast(t('writer_snap_success'), 'ok');
             }else{
                 const t0=Date.now(), dur=160; const snap = ()=>{
@@ -2034,6 +2048,7 @@
 
             if (state.hasSeenOnboarding) {
                 onboardingModal.style.display='none';
+                qs('#main').style.display = 'block'; // MOD: Show main content if onboarding skipped
                 return;
             }
 
@@ -2042,12 +2057,12 @@
             _trapModalOnboarding();
 
             startLearningBtn.onclick = () => {
-                if (doNotShowCheckbox.checked) {
-                    state.hasSeenOnboarding = true;
-                    save();
-                }
+                // MOD: Set hasSeenOnboarding to true when "Mulai Belajar!" is clicked
+                state.hasSeenOnboarding = true;
+                save();
                 onboardingModal.style.display = 'none';
                 onboardingModal.hidden = true;
+                qs('#main').style.display = 'block'; // MOD: Show main content after "Mulai Belajar!"
             };
         }
 
