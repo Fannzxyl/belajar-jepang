@@ -3,24 +3,27 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <title>Pelatih Kana Jepang — Offline (v9)</title>
-    <meta name="description" content="Belajar Hiragana & Katakana lengkap (dasar, dakuon/handakuon, youon) dengan tes ketik & pilihan ganda, review jawaban salah, Pomodoro, audio, progress bar, tema pastel/high-contrast, dan latihan menulis di kanvas. Data lokal (localStorage)." />
+    <title>Pelatih Kana Jepang — v9</title> <!-- MOD: Removed "Offline" from title -->
+    <meta name="description" content="Belajar Hiragana & Katakana lengkap (dasar, dakuon/handakuon, youon) dengan tes, review, Pomodoro, audio, progress bar, tema pastel/high-contrast, dan latihan menulis di kanvas. Data lokal (localStorage)." />
+    <meta name="theme-color" content="#7a6cff">
 
-    <!-- Open Graph / Facebook -->
+    <!-- Open Graph / Facebook (MOD: Updated for GitHub Pages) -->
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://your-app-url.com/"> <!-- Ganti dengan URL aplikasi Anda -->
-    <meta property="og:title" content="Pelatih Kana Jepang — Offline">
-    <meta property="og:description" content="Belajar Hiragana & Katakana lengkap dengan tes interaktif, Pomodoro, dan latihan menulis. Data tersimpan lokal.">
-    <meta property="og:image" content="https://your-app-url.com/kana-trainer-preview.png"> <!-- Ganti dengan URL gambar pratinjau Anda -->
+    <meta property="og:url" content="https://<username>.github.io/<repo>/"> <!-- Ganti dengan URL GitHub Pages Anda -->
+    <meta property="og:title" content="Pelatih Kana Jepang — v9">
+    <meta property="og:description" content="Belajar Hiragana & Katakana lengkap dengan tes interaktif, Pomodoro, dan latihan menulis.">
+    <meta property="og:image" content="https://<username>.github.io/<repo>/kana-trainer-preview.png"> <!-- Pastikan gambar ini ada di repo Anda -->
 
-    <!-- Twitter -->
+    <!-- Twitter (MOD: Updated for GitHub Pages) -->
     <meta property="twitter:card" content="summary_large_image">
-    <meta property="twitter:url" content="https://your-app-url.com/"> <!-- Ganti dengan URL aplikasi Anda -->
-    <meta property="twitter:title" content="Pelatih Kana Jepang — Offline">
-    <meta property="twitter:description" content="Belajar Hiragana & Katakana lengkap dengan tes interaktif, Pomodoro, dan latihan menulis. Data tersimpan lokal.">
-    <meta property="twitter:image" content="https://your-app-url.com/kana-trainer-preview.png"> <!-- Ganti dengan URL gambar pratinjau Anda -->
+    <meta property="twitter:url" content="https://<username>.github.io/<repo>/"> <!-- Ganti dengan URL GitHub Pages Anda -->
+    <meta property="twitter:title" content="Pelatih Kana Jepang — v9">
+    <meta property="twitter:description" content="Belajar Hiragana & Katakana lengkap dengan tes interaktif, Pomodoro, dan latihan menulis.">
+    <meta property="twitter:image" content="https://<username>.github.io/<repo>/kana-trainer-preview.png"> <!-- Pastikan gambar ini ada di repo Anda -->
 
-    <!-- Google Fonts - Inter -->
+    <!-- Google Fonts - Inter (MOD: Added preconnect for performance) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <!-- Font Awesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
@@ -345,20 +348,7 @@
         }
         .writer-ghost.hidden { display:none; }
     </style>
-    <!-- PWA Manifest & Service Worker Registration -->
-    <link rel="manifest" href="manifest.webmanifest">
-    <meta name="theme-color" content="#7a6cff">
-    <script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./sw.js').then(registration => {
-                    console.log('ServiceWorker registration successful with scope: ', registration.scope);
-                }).catch(err => {
-                    console.log('ServiceWorker registration failed: ', err);
-                });
-            });
-        }
-    </script>
+    <!-- MOD: Removed PWA Manifest & Service Worker Registration -->
 </head>
 <body>
     <header>
@@ -366,21 +356,21 @@
             <div class="brand" style="gap:10px">
                 <div class="logo" aria-hidden="true"></div>
                 <div>
-                    <h1>Pelatih Kana Jepang <span class="tag">Offline v9</span></h1>
+                    <h1>Pelatih Kana Jepang <span class="tag">v9</span></h1> <!-- MOD: Removed "Offline" -->
                     <div class="small">Hiragana • Katakana • Dakuon/Handakuon • Youon • Tes & Review • Pomodoro • Tema • Writer</div>
                 </div>
                 <div class="row header-controls-row" style="gap:6px">
                     <div class="seg" role="tablist" aria-label="Tema">
-                        <button id="tPastel" class="btn" role="tab" aria-selected="true" title="Tema pastel">Pastel</button>
-                        <button id="tHC" class="btn" role="tab" aria-selected="false" title="Tema high-contrast">Kontras Tinggi</button>
+                        <button id="tPastel" class="btn" role="tab" aria-selected="true" title="Tema pastel" type="button">Pastel</button> <!-- MOD: Added role/aria-selected/type -->
+                        <button id="tHC" class="btn" role="tab" aria-selected="false" title="Tema high-contrast" type="button">Kontras Tinggi</button> <!-- MOD: Added role/aria-selected/type -->
                     </div>
                     <label class="btn ghost" style="display:flex;align-items:center;gap:8px">
                         <input id="audToggle" type="checkbox" aria-label="Suara efek & pelafalan" /> Suara (efek & pelafalan)
                     </label>
-                    <button id="exportBtn" class="btn ghost" title="Simpan progres ke file"><i class="fas fa-download"></i> Simpan Progres ke File</button>
+                    <button id="exportBtn" class="btn ghost" title="Simpan progres ke file" type="button"><i class="fas fa-download"></i> Simpan Progres ke File</button> <!-- MOD: Added type -->
                     <input type="file" id="importFile" accept=".json" style="display:none;" aria-label="Pulihkan progres dari file">
-                    <button id="importBtn" class="btn ghost" title="Pulihkan progres dari file"><i class="fas fa-upload"></i> Pulihkan Progres dari File</button>
-                    <button id="resetBtn" class="btn ghost" title="Atur ulang semua progres">Atur Ulang Semua</button>
+                    <button id="importBtn" class="btn ghost" title="Pulihkan progres dari file" type="button"><i class="fas fa-upload"></i> Pulihkan Progres dari File</button> <!-- MOD: Added type -->
+                    <button id="resetBtn" class="btn ghost" title="Atur ulang semua progres" type="button">Atur Ulang Semua</button> <!-- MOD: Added type -->
                 </div>
             </div>
         </div>
@@ -400,7 +390,7 @@
                     </select>
                     <select id="fromGrp" aria-label="Dari kelompok"></select>
                     <select id="toGrp" aria-label="Sampai kelompok"></select>
-                    <button class="btn primary" id="btnShowLearn"><i class="fas fa-eye"></i> Tampilkan</button>
+                    <button class="btn primary" id="btnShowLearn" type="button"><i class="fas fa-eye"></i> Tampilkan</button> <!-- MOD: Added type -->
                 </div>
                 <div class="spacer"></div>
                 <div id="learnTiles" class="pillbox" aria-live="polite">
@@ -440,7 +430,15 @@
 
                 <div class="spacer"></div>
                 <div class="row">
-                    <div class="tag">Atau rentang khusus:</div>
+                    <div class="tag">Jumlah soal:</div> <!-- MOD: Moved "Jumlah soal" label -->
+                    <input id="testCount" type="number" min="1" value="10" style="width:100px" aria-label="Jumlah soal" />
+                    <div class="chips" id="countChips">
+                        <button class="chip" data-count="10" type="button">10</button> <!-- MOD: Added type -->
+                        <button class="chip" data-count="25" type="button">25</button> <!-- MOD: Added type -->
+                        <button class="chip" data-count="50" type="button">50</button> <!-- MOD: Added type -->
+                        <button class="chip" data-count="100" type="button">100</button> <!-- MOD: Added type -->
+                    </div>
+                    <div class="tag">Atau rentang khusus:</div> <!-- MOD: Moved "Atau rentang khusus" label -->
                     <select id="rangeMode" aria-label="Mode rentang">
                         <option value="range">Rentang</option>
                         <option value="single">Grup Tunggal</option>
@@ -449,17 +447,9 @@
                     <div id="testToWrap"><select id="testTo" aria-label="Tes sampai"></select></div>
                     <select id="testSingleGroup" aria-label="Pilih Grup" hidden></select>
 
-                    <div class="tag">Jumlah soal:</div>
-                    <input id="testCount" type="number" min="1" value="10" style="width:100px" aria-label="Jumlah soal" />
-                    <div class="chips" id="countChips">
-                        <button class="chip" data-count="10">10</button>
-                        <button class="chip" data-count="25">25</button>
-                        <button class="chip" data-count="50">50</button>
-                        <button class="chip" data-count="100">100</button>
-                    </div>
-                    <button class="btn primary" id="btnStart"><i class="fas fa-play"></i> Mulai Tes</button>
-                    <button class="btn" id="btnSkip" title="Lewati soal (→)"><i class="fas fa-forward"></i> Lewati</button>
-                    <button class="btn warn" id="btnEnd"><i class="fas fa-stop"></i> Selesai</button>
+                    <button class="btn primary" id="btnStart" type="button"><i class="fas fa-play"></i> Mulai Tes</button> <!-- MOD: Added type -->
+                    <button class="btn" id="btnSkip" title="Lewati soal (→)" type="button"><i class="fas fa-forward"></i> Lewati</button> <!-- MOD: Added type -->
+                    <button class="btn warn" id="btnEnd" type="button"><i class="fas fa-stop"></i> Selesai</button> <!-- MOD: Added type -->
                 </div>
 
                 <div class="spacer"></div>
@@ -472,13 +462,13 @@
                     <div id="typeWrap" style="max-width:520px;margin:0 auto">
                         <input id="ans" placeholder="Ketik jawaban kamu di sini…" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" inputmode="latin" aria-label="Jawaban" />
                         <div class="spacer"></div>
-                        <button class="btn" id="btnCheck"><i class="fas fa-check"></i> Cek (Enter)</button>
+                        <button class="btn" id="btnCheck" type="button"><i class="fas fa-check"></i> Cek (Enter)</button> <!-- MOD: Added type -->
                     </div>
                     <div id="mcWrap" class="optwrap" hidden>
-                        <button class="btn opt" id="optA" aria-label="Pilihan A">A</button>
-                        <button class="btn opt" id="optB" aria-label="Pilihan B">B</button>
-                        <button class="btn opt" id="optC" aria-label="Pilihan C">C</button>
-                        <button class="btn opt" id="optD" aria-label="Pilihan D">D</button>
+                        <button class="btn opt" id="optA" aria-label="Pilihan A" type="button">A</button> <!-- MOD: Added type -->
+                        <button class="btn opt" id="optB" aria-label="Pilihan B" type="button">B</button> <!-- MOD: Added type -->
+                        <button class="btn opt" id="optC" aria-label="Pilihan C" type="button">C</button> <!-- MOD: Added type -->
+                        <button class="btn opt" id="optD" aria-label="Pilihan D" type="button">D</button> <!-- MOD: Added type -->
                         <div class="small" style="grid-column: span 4; text-align: center; margin-top: 4px;">Ketuk atau tekan A/B/C/D</div>
                     </div>
                     <div class="spacer"></div>
@@ -506,9 +496,9 @@
                         <span class="sr-only">Menit istirahat</span>
                         <input id="pomoBreak" type="number" min="1" value="5" style="width:90px"> menit istirahat
                     </label>
-                    <button class="btn primary" id="pStart"><i class="fas fa-play"></i> Mulai</button>
-                    <button class="btn" id="pPause"><i class="fas fa-pause"></i> Pause</button>
-                    <button class="btn warn" id="pReset"><i class="fas fa-redo"></i> Reset</button>
+                    <button class="btn primary" id="pStart" type="button"><i class="fas fa-play"></i> Mulai</button> <!-- MOD: Added type -->
+                    <button class="btn" id="pPause" type="button"><i class="fas fa-pause"></i> Pause</button> <!-- MOD: Added type -->
+                    <button class="btn warn" id="pReset" type="button"><i class="fas fa-redo"></i> Reset</button> <!-- MOD: Added type -->
                 </div>
                 <div class="spacer"></div>
                 <div class="center">
@@ -536,7 +526,7 @@
                 </div>
                 <div class="spacer"></div>
                 <div class="row">
-                    <div class="tag" id="jpStats" aria-live="polite">0/103 hira • 0/103 kata</div>
+                    <div class="tag" id="jpStats" aria-live="polite">0/103 hira • 0/103 kata</div> <!-- MOD: Updated total count -->
                 </div>
                 <div class="spacer"></div>
                 <div class="row" style="justify-content: center; font-size: 14px;">
@@ -560,17 +550,17 @@
                         <option value="kata">Katakana</option>
                     </select>
                     <select id="writeKana" aria-label="Pilih kana"></select>
-                    <button class="btn" id="writePrev" title="Sebelumnya"><i class="fas fa-chevron-left"></i> Sebelumnya</button>
-                    <button class="btn" id="writeNext" title="Berikutnya">Berikutnya <i class="fas fa-chevron-right"></i></button>
-                    <button class="btn" id="writeRand" title="Acak"><i class="fas fa-shuffle"></i> Acak</button>
-                    <button class="btn" id="writeSpeak" title="Dengar pelafalan kana"><i class="fas fa-volume-up"></i></button>
+                    <button class="btn" id="writePrev" title="Sebelumnya" type="button"><i class="fas fa-chevron-left"></i> Sebelumnya</button> <!-- MOD: Added type -->
+                    <button class="btn" id="writeNext" title="Berikutnya" type="button">Berikutnya <i class="fas fa-chevron-right"></i></button> <!-- MOD: Added type -->
+                    <button class="btn" id="writeRand" title="Acak" type="button"><i class="fas fa-shuffle"></i> Acak</button> <!-- MOD: Added type -->
+                    <button class="btn" id="writeSpeak" title="Dengar pelafalan kana" type="button"><i class="fas fa-volume-up"></i></button> <!-- MOD: Added type -->
                 </div>
 
                 <div class="spacer"></div>
 
                 <div class="writer-toolbar">
-                    <button class="btn ok" id="penBtn"><i class="fas fa-pen"></i> Pena</button>
-                    <button class="btn" id="eraserBtn"><i class="fas fa-eraser"></i> Penghapus</button>
+                    <button class="btn ok" id="penBtn" type="button"><i class="fas fa-pen"></i> Pena</button> <!-- MOD: Added type -->
+                    <button class="btn" id="eraserBtn" type="button"><i class="fas fa-eraser"></i> Penghapus</button> <!-- MOD: Added type -->
                     <div class="slider">
                         <label for="penSize">Ukuran</label>
                         <input id="penSize" type="range" min="2" max="28" value="10" style="width:140px">
@@ -584,10 +574,11 @@
                     <label class="btn ghost" style="gap:8px">
                         <input id="autoSnapToggle" type="checkbox"> Auto-Snap
                     </label>
+                    <!-- MOD: Removed Snap % and Opacity sliders from HTML -->
                     <div style="flex:1"></div>
-                    <button class="btn" id="undoStroke" title="Undo (Ctrl+Z)"><i class="fas fa-undo"></i> Undo</button>
-                    <button class="btn warn" id="clearCanvas"><i class="fas fa-redo"></i> Bersihkan</button>
-                    <button class="btn primary" id="savePNG"><i class="fas fa-download"></i> Simpan PNG</button>
+                    <button class="btn" id="undoStroke" title="Undo (Ctrl+Z)" type="button"><i class="fas fa-undo"></i> Undo</button> <!-- MOD: Added type -->
+                    <button class="btn warn" id="clearCanvas" type="button"><i class="fas fa-redo"></i> Bersihkan</button> <!-- MOD: Added type -->
+                    <button class="btn primary" id="savePNG" type="button"><i class="fas fa-download"></i> Simpan PNG</button> <!-- MOD: Added type -->
                 </div>
 
                 <div class="spacer"></div>
@@ -610,8 +601,8 @@
             <div class="spacer"></div>
             <div id="reviewWrap" style="text-align:left;max-height:40vh;overflow:auto;margin:8px 0" hidden></div>
             <div class="row" style="justify-content:center">
-                <button class="btn" id="btnReviewWrong" hidden><i class="fas fa-redo-alt"></i> Belajar ulang yang salah</button>
-                <button class="btn primary" id="btnCloseModal"><i class="fas fa-times"></i> Lanjut</button>
+                <button class="btn" id="btnReviewWrong" hidden type="button"><i class="fas fa-redo-alt"></i> Belajar ulang yang salah</button> <!-- MOD: Added type -->
+                <button class="btn primary" id="btnCloseModal" type="button"><i class="fas fa-times"></i> Lanjut</button> <!-- MOD: Added type -->
             </div>
         </div>
         <div id="burst" class="burst" aria-hidden="true"></div>
@@ -632,7 +623,7 @@
                 <label class="btn ghost" style="gap:8px">
                     <input id="doNotShowOnboarding" type="checkbox"> Jangan tampilkan lagi
                 </label>
-                <button class="btn primary" id="btnStartLearningOnboarding">Mulai Belajar!</button>
+                <button class="btn primary" id="btnStartLearningOnboarding" type="button">Mulai Belajar!</button> <!-- MOD: Added type -->
             </div>
         </div>
     </div>
@@ -665,7 +656,7 @@
             level_up_title: (level)=>`Level Up! 🎉 Level ${level}!`,
             level_up_msg: (name)=>`Kamu sekarang seorang ${name}! Terus semangat! 🔥`,
             streak_title: 'Wii! Keren banget! 🎉',
-            streak_msg: '10 jawaban benar berturut-turut. Lanjutkan momentummu! 🔥',
+            streak_msg: '10 jawaban benar berturut-turut. Lanjutkan momentummu! ✨', // MOD: Changed  to ✨
             pomo_focus: 'Fokus',
             pomo_break: 'Istirahat',
             pomo_start_focus: 'Fokus dimulai. {time} — semangat!',
@@ -687,7 +678,7 @@
             feedback_wrong: (kana, romaji, user_input) => `Belum pas. ${kana} dibaca ${romaji}. Jawaban kamu: ${user_input}. Coba lagi ya.`,
             feedback_wrong_dji_dzu: (kana, romaji, user_input) => `Belum pas. ${kana} dibaca ${romaji} (boleh juga ji/zu). Jawaban kamu: ${user_input}. Coba lagi ya.`, // Specific for ぢ/づ
             feedback_skipped: 'Oke, kita lanjut dulu.',
-            writer_snap_success: 'Rapi! Bentuknya sudah pas �',
+            writer_snap_success: 'Rapi! Bentuknya sudah pas 👌',
             writer_snap_fail: 'Hampir! Coba garisnya sedikit lebih melengkung.',
         };
 
@@ -722,9 +713,8 @@
                 ghostOpacity: 0.12,
                 autoSnap: false,
                 snapThreshold: 0.52,
-                // showSnapSlider and showOpacitySlider are removed as states
             },
-            hasSeenOnboarding: false // MOD: New state for onboarding
+            hasSeenOnboarding: false
         });
         let state = load();
         let _saveTimer = null; // Debounce timer for localStorage saves
@@ -767,11 +757,10 @@
 
         // ---------- DATA ----------
         const BASE = ['a','i','u','e','o','ka','ki','ku','ke','ko','sa','shi','su','se','so','ta','chi','tsu','te','to','na','ni','nu','ne','no','ha','hi','fu','he','ho','ma','mi','mu','me','mo','ya','yu','yo','ra','ri','ru','re','ro','wa','wo','n'];
-        // FIX: Replaced duplicate 'ji' and 'zu' with 'dji' and 'dzu' for ぢ/づ
         const DAKUON = [
             'ga','gi','gu','ge','go',
             'za','ji','zu','ze','zo',
-            'da','dji','dzu','de','do', // Changed ji/zu to dji/dzu for ぢ/づ
+            'da','dji','dzu','de','do',
             'ba','bi','bu','be','bo','pa','pi','pu','pe','po'
         ];
         const YOUON = ['kya','kyu','kyo','sha','shu','sho','cha','chu','cho','nya','nyu','nyo','hya','hyu','hyo','mya','myu','myo','rya','ryu','ryo','gya','gyu','gyo','ja','ju','jo','bya','byu','byo','pya','pyu','pyo'];
@@ -798,7 +787,7 @@
             {key:'w', label:'wa wo n', list:BASE, idx:[43,44,45]},
             {key:'g', label:'ga gi gu ge go', list:DAKUON, idx:[0,1,2,3,4]},
             {key:'z', label:'za ji zu ze zo', list:DAKUON, idx:[5,6,7,8,9]},
-            {key:'d', label:'da dji dzu de do', list:DAKUON, idx:[10,11,12,13,14]}, // Use dji/dzu
+            {key:'d', label:'da dji dzu de do', list:DAKUON, idx:[10,11,12,13,14]},
             {key:'b', label:'ba bi bu be bo', list:DAKUON, idx:[15,16,17,18,19]},
             {key:'p', label:'pa pi pu pe po', list:DAKUON, idx:[20,21,22,23,24]},
             {key:'ky', label:'kya kyu kyo', list:YOUON, idx:[0,1,2]},
@@ -823,7 +812,6 @@
         const ALL_ROMAJI = [...new Set([...BASE,...DAKUON,...YOUON])];
         const ROMAJI_SORTED = [...ALL_ROMAJI].sort((a,b)=>b.length-a.length);
 
-        // MOD: Similar Katakana choices for MC questions
         const CONFUSE_KATA = [
             ['シ','ツ'], ['ソ','ン'], ['ク','ケ'], ['フ','ワ'], ['ヂ','ジ'], ['ヅ','ズ'],
             ['ノ','メ'], ['イ','リ'], ['エ','ヱ'], ['ネ','レ'], ['ア','マ'], ['ム','厶']
@@ -851,7 +839,7 @@
                 const ch = map.get(r);
                 const b = document.createElement('button'); b.type='button';
                 b.className='kana' + (mastered.includes(r) ? ' mastered' : '');
-                b.innerHTML=`<div class="jp">${ch}</div><div class="ro">${r}</div>`; b.title=t('learn_tile_tooltip'); // MOD: Use copy for tooltip
+                b.innerHTML=`<div class="jp">${ch}</div><div class="ro">${r}</div>`; b.title=t('learn_tile_tooltip');
                 b.setAttribute('aria-pressed', mastered.includes(r));
                 attachLongPress(b, ()=>toggleMaster(r,set), ()=>uncheck(r,set));
                 frag.appendChild(b);
@@ -947,7 +935,7 @@
             const box=qs('#learnTiles');
             box.innerHTML='';
             if(!labels.length){
-                box.innerHTML=`<div class="small" style="grid-column: span 4; text-align: center;">${t('empty_learn')}</div>`; // MOD: Use copy for empty state
+                box.innerHTML=`<div class="small" style="grid-column: span 4; text-align: center;">${t('empty_learn')}</div>`;
                 return;
             }
             const frag=df();
@@ -956,7 +944,7 @@
                 tile.type='button';
                 tile.className='kana';
                 tile.innerHTML=`<div class="jp">${map.get(r)}</div><div class="ro">${r}</div>`;
-                tile.title=t('learn_tile_tooltip'); // MOD: Use copy for tooltip
+                tile.title=t('learn_tile_tooltip');
                 tile.onclick=()=> speak(map.get(r));
                 frag.appendChild(tile);
             });
@@ -982,7 +970,6 @@
 
         function buildSubsetChips(){
             const box=qs('#subsetChips');
-            // MOD: Clear only chips, keep the "Pilih cepat" text
             const existingText = box.querySelector('.small');
             box.innerHTML='';
             if (existingText) {
@@ -998,6 +985,7 @@
             const frag=df();
             GROUPS.forEach(g=>{
                 const b=document.createElement('button');
+                b.type='button'; // MOD: Added type="button"
                 b.className='chip'+(state.test.subset===g.key?' active':'');
                 b.textContent=g.label;
                 b.onclick=()=>{ state.test.subset=g.key; save(); buildSubsetChips(); };
@@ -1038,7 +1026,7 @@
             state.test.target = req;
             state.test.score=0; state.test.total=0; state.test.correctStreak=0; qIndex=0; save();
             qs('#testArea').hidden=false;
-            qs('#testEmptyState').hidden = true; // Hide empty state when test starts
+            qs('#testEmptyState').hidden = true;
             updateProgress();
             nextQ();
         }
@@ -1075,8 +1063,8 @@
 
         function endTest(){
             qs('#testArea').hidden=true;
-            qs('#testEmptyState').hidden = false; // Show empty state when test ends
-            updateProgress(0);
+            qs('#testEmptyState').hidden = false;
+            updateProgress(); // MOD: Removed argument 0
         }
 
         function nextQ(){
@@ -1124,7 +1112,6 @@
             finalizeAnswer(correct, {chosen:val});
         }
 
-        // MOD: New normalization for sequences and comparison
         function normalizeRomajiSequence(s){
             return (s||'').toLowerCase()
                 .replace(/\s+/g,'')
@@ -1136,8 +1123,8 @@
             if (a === b) return true;
             if (b==='wo' && a==='o') return true; // MOD: Accept 'o' for 'wo'
             const canon = (t)=> t
-                .replace(/^ji$/,'dji')   // ji ≈ dji
-                .replace(/^zu$/,'dzu');  // zu ≈ dzu
+                .replace(/^ji$/,'dji')
+                .replace(/^zu$/,'dzu');
             return canon(a) === canon(b);
         }
 
@@ -1148,7 +1135,7 @@
             let normalized='';
 
             if(qType==='k2r'){
-                const norm = normalizeRomaji(valRaw);          // normalisasi token
+                const norm = normalizeRomaji(valRaw);
                 normalized = norm;
                 correct = romajiEquals(norm, currentItem.romaji);
             }
@@ -1157,7 +1144,6 @@
                     ? currentItem.seq.kana
                     : (state.test.set==='hira'? HIRA_MAP.get(currentItem.romaji): KATA_MAP.get(currentItem.romaji));
 
-                // normalisasi seluruh rangkaian sebelum konversi ke kana
                 const rawSeq = normalizeRomajiSequence(valRaw);
                 const userKana = hasKana(valRaw) ? valRaw : romajiStringToKana(rawSeq, state.test.set);
                 normalized = userKana;
@@ -1183,14 +1169,12 @@
                 clickTone('ok');
                 qKanaElement.classList.add('correct-answer');
                 if (streakCounterElement) streakCounterElement.classList.add('grow');
-                // MOD: Feedback for correct answer
                 showToast(t('feedback_correct', currentKanaChar, currentRomaji));
             } else {
                 state.test.correctStreak=0;
                 wrongList.push({...currentItem, ...extra});
                 clickTone('bad');
                 qKanaElement.classList.add('wrong-answer');
-                // MOD: Feedback for wrong answer
                 let feedbackMsg = t('feedback_wrong', currentKanaChar, currentRomaji, userInput);
                 if ((currentRomaji === 'dji' || currentRomaji === 'dzu') && (userInput === 'ji' || userInput === 'zu' || userInput === 'di' || userInput === 'du')) {
                     feedbackMsg = t('feedback_wrong_dji_dzu', currentKanaChar, currentRomaji, userInput);
@@ -1211,7 +1195,6 @@
         }
 
         function buildMC_k2r(item){ const labels=currentPoolLabels(); const wrongs = labels.filter(r=>r!==item.romaji); shuffle(wrongs); const pool=[item.romaji, wrongs[0], wrongs[1], wrongs[2]].filter(Boolean).slice(0,4); while(pool.length<4) pool.push('ka'); shuffle(pool); mcMap={A:pool[0],B:pool[1],C:pool[2],D:pool[3]}; setMCText({A:`A. ${mcMap.A}`,B:`B. ${mcMap.B}`,C:`C. ${mcMap.C}`,D:`D. ${mcMap.D}`}); }
-        // MOD: Updated buildMC_r2k to use similar distractors for Katakana
         function buildMC_r2k(item){
             const chars=currentPoolChars();
             const labels=currentPoolLabels();
@@ -1220,7 +1203,6 @@
 
             const pool=[correct];
 
-            // tambah opsi mirip khusus kalau set = katakana
             if (state.test.set==='kata'){
                 const sim = similarChoicesKata(correct);
                 pool.push(...sim.slice(0,2));
@@ -1238,14 +1220,14 @@
 
         function skipQ(){
             clickTone('click');
-            showToast(t('feedback_skipped')); // MOD: Feedback for skipped question
+            showToast(t('feedback_skipped'));
             if(!testPool.length){ return; }
             qIndex=(qIndex+1)%testPool.length;
             nextQ();
         }
 
         function updateTestInfo(){
-            const rangeMode = state.test.rangeMode;
+            const rangeMode = qs('#rangeMode').value;
             let rangeLabel;
             if (rangeMode === 'single') {
                 const singleKey = qs('#testSingleGroup').value;
@@ -1269,7 +1251,13 @@
             if (streakCounterElement) streakCounterElement.textContent = t('test_streak', state.test.correctStreak);
         }
 
-        function updateProgress(){ const pct = (state.test.total/state.test.target)*100; const bar = qs('#bar'); bar.style.width = pct+'%'; const prog = qs('.progress'); prog.setAttribute('aria-valuenow', Math.round(pct)); }
+        function updateProgress(value){ // MOD: Added value parameter (optional)
+            const pct = (state.test.total/state.test.target)*100;
+            const bar = qs('#bar');
+            bar.style.width = pct+'%';
+            const prog = qs('.progress');
+            prog.setAttribute('aria-valuenow', Math.round(pct));
+        }
 
         function finishTest(){
             state.totalPoints += state.test.score * 2;
@@ -1286,9 +1274,9 @@
             const hasWrong = wrongList.length>0;
             qs('#btnReviewWrong').hidden=!hasWrong;
             box.hidden=!hasWrong;
-            qs('#celebrateMsg').textContent=t('done_test_sub', state.test.score, state.test.total); // MOD: Use copy for score message
+            qs('#celebrateMsg').textContent=t('done_test_sub', state.test.score, state.test.total);
             if(!hasWrong){
-                box.innerHTML=`<div class="small" style="text-align: center; margin-top: 8px;">${t('empty_review')}</div>`; // MOD: Use copy for empty review
+                box.innerHTML=`<div class="small" style="text-align: center; margin-top: 8px;">${t('empty_review')}</div>`;
                 return;
             }
             const set=state.test.set;
@@ -1301,12 +1289,10 @@
                 let displayExpected = expectedRomaji;
                 let displayGiven = got;
 
-                // Adjust display for dji/dzu special case if the original romaji was ji/zu but the kana maps to dji/dzu romaji
                 if ((expectedRomaji === 'dji' && (got === 'ji' || got === 'di')) || (expectedRomaji === 'dzu' && (got === 'zu' || got === 'du'))) {
                     displayExpected = `${expectedRomaji} (${(set === 'hira' ? HIRA_MAP : KATA_MAP).get(expectedRomaji)})`;
                     displayGiven = `${got} (${(set === 'hira' ? HIRA_MAP : KATA_MAP).get(normalizeRomaji(got)) || ''})`;
                 } else if (state.test.qType === 'r2k' || state.test.qType === 'seq') {
-                    // If it was romaji to kana question, show romaji and then expected kana
                     displayExpected = expectedKana;
                     displayGiven = got;
                 }
@@ -1317,8 +1303,8 @@
                                 <div><b>${leftDisplay}</b> → <span style="color:var(--ok)">${expectedRomaji} (${expectedKana})</span></div>
                                 <div class="small">Jawaban kamu: ${displayGiven}</div>
                             </div>
-                            <button class="btn" onclick="speak('${expectedKana}')" aria-label="Putar pelafalan ${expectedKana}">🎧</button>
-                        </div>`; // MOD: Speak kana character + aria-label
+                            <button class="btn" onclick="speak('${expectedKana}')" aria-label="Putar pelafalan ${expectedKana}" type="button">🎧</button>
+                        </div>`;
             }).join('');
         }
 
@@ -1372,9 +1358,8 @@
             const bPastel = qs('#tPastel'), bHC = qs('#tHC');
             bPastel.classList.toggle('active', !isHC);
             bHC.classList.toggle('active', isHC);
-            bPastel.setAttribute('aria-selected', String(!isHC)); // MOD: Update aria-selected
-            bHC.setAttribute('aria-selected', String(isHC));     // MOD: Update aria-selected
-            // refresh writer visuals if already mounted
+            bPastel.setAttribute('aria-selected', String(!isHC));
+            bHC.setAttribute('aria-selected', String(isHC));
             if (typeof writerSetGhostChar === 'function') writerSetGhostChar();
             if (typeof writerRedrawAll === 'function') writerRedrawAll();
         }
@@ -1387,7 +1372,7 @@
                 if(!state.audio) return;
                 const C = window.AudioContext || window.webkitAudioContext;
                 if(!C) return;
-                _audioCtx = _audioCtx || new C(); // Reuse context
+                _audioCtx = _audioCtx || new C();
                 const ctx = _audioCtx;
                 const o=ctx.createOscillator();
                 const g=ctx.createGain();
@@ -1401,7 +1386,6 @@
                 setTimeout(()=>{
                     g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime+0.2);
                     o.stop(ctx.currentTime+0.22);
-                    // ctx.close && ctx.close(); // Do not close context to reuse
                 }, 150);
             }catch(e){ console.error('Error playing sound:', e); }
         }
@@ -1411,16 +1395,16 @@
             try{
                 if(!state.audio) return;
                 if(!('speechSynthesis' in window)) return;
-                speechSynthesis.cancel(); // MOD: Stop current speech before new one
+                speechSynthesis.cancel();
                 const u=new SpeechSynthesisUtterance(text);
                 u.lang='ja-JP';
                 u.rate=.9; u.pitch=1.02; u.volume=1;
                 speechSynthesis.speak(u);
             }catch(error){ console.error('Error speaking text:', error); }
         }
-        window._speak = speak; // Expose for review section
+        window._speak = speak;
 
-        // MOD: Toast/Snackbar for quick feedback
+        // Toast/Snackbar for quick feedback
         let toastTimeout = null;
         function showToast(message, type = 'info', duration = 2500) {
             const toast = document.createElement('div');
@@ -1442,7 +1426,7 @@
             clearTimeout(toastTimeout);
             setTimeout(() => {
                 toast.style.opacity = '1';
-            }, 10); // Small delay to trigger transition
+            }, 10);
 
             toastTimeout = setTimeout(() => {
                 toast.style.opacity = '0';
@@ -1452,8 +1436,8 @@
 
         // ---------- CELEBRATION ----------
         const modal = qs('#celebrate'); const burstBox = qs('#burst');
-        let _escCloseListener = null; // Store listener to remove it
-        let _modalKeydownListener = null; // MOD: Store modal keydown listener
+        let _escCloseListener = null;
+        let _modalKeydownListener = null;
 
         function maybeCelebrate(type, level = 0){
             if(type==='streak' && state.test.correctStreak>0 && state.test.correctStreak % 10 === 0){
@@ -1463,7 +1447,7 @@
                 qs('#celebrateMsg').textContent = t('level_up_msg', LEVEL_NAMES[level-1] || `Level ${level}`);
                 modal.style.display='flex';
                 burst(); clickTone('ok');
-                _trapModal(); // MOD: Trap focus on modal open
+                _trapModal();
             }
         }
         function openCelebrate(mode){
@@ -1478,7 +1462,7 @@
                 msg.textContent=t('streak_msg');
             }
             modal.style.display='flex';
-            _trapModal(); // MOD: Trap focus on modal open
+            _trapModal();
         }
 
         function closeCelebrate(){
@@ -1487,19 +1471,16 @@
                 document.removeEventListener('keydown', _escCloseListener);
                 _escCloseListener = null;
             }
-            if (_modalKeydownListener) { // MOD: Remove modal specific keydown listener
+            if (_modalKeydownListener) {
                 modal.removeEventListener('keydown', _modalKeydownListener);
                 _modalKeydownListener = null;
             }
-            // Return focus to where it was before opening modal, if possible
-            // For simplicity, we just won't trap focus after close, leaving it to browser.
         }
         qs('#btnCloseModal').onclick = closeCelebrate;
 
-        function _escClose(e){ // MOD: ESC key to close modal
+        function _escClose(e){
             if(e.key==='Escape') {
                 closeCelebrate();
-                // If there's an input field active outside, re-focus it.
                 const ansEl = qs('#ans');
                 if (ansEl && !qs('#testArea').hidden && qs('#typeWrap') && getComputedStyle(qs('#typeWrap')).display !== 'none') {
                     ansEl.focus();
@@ -1507,18 +1488,17 @@
             }
         }
 
-        function _trapModal(){ // MOD: Focus trap for modal
+        function _trapModal(){
             const focusableElements = 'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
             const focusables = modal.querySelectorAll(focusableElements);
             const firstFocusable = focusables[0];
             const lastFocusable = focusables[focusables.length - 1];
 
-            if (!_escCloseListener) { // Ensure listener is only added once
+            if (!_escCloseListener) {
                 _escCloseListener = _escClose;
                 document.addEventListener('keydown', _escCloseListener);
             }
             
-            // MOD: Add/remove modal keydown listener properly
             if (!_modalKeydownListener) {
                 _modalKeydownListener = (e) => {
                     const isTabPressed = (e.key === 'Tab' || e.keyCode === 9);
@@ -1527,14 +1507,14 @@
                         return;
                     }
 
-                    if (e.shiftKey) { // if shift key pressed for shift + tab
+                    if (e.shiftKey) {
                         if (document.activeElement === firstFocusable) {
-                            lastFocusable.focus(); // move focus to the last focusable element
+                            lastFocusable.focus();
                             e.preventDefault();
                         }
-                    } else { // if tab key is pressed
+                    } else {
                         if (document.activeElement === lastFocusable) {
-                            firstFocusable.focus(); // move focus to the first focusable element
+                            firstFocusable.focus();
                             e.preventDefault();
                         }
                     }
@@ -1542,13 +1522,11 @@
                 modal.addEventListener('keydown', _modalKeydownListener);
             }
 
-            // Focus the first focusable element when the modal opens
             firstFocusable?.focus();
         }
 
         function burst(){ burstBox.innerHTML=''; const colors=['#7a6cff','#16c6a1','#ffd166','#ff7b7b','#2fb875','#8acbff']; const w=window.innerWidth, h=window.innerHeight; for(let i=0;i<90;i++){ const p=document.createElement('div'); p.className='particle'; p.style.background=colors[i%colors.length]; const dx=(Math.random()*w - w/2)+'px'; const dy=(Math.random()*h/2)+'px'; p.style.setProperty('--dx',dx); p.style.setProperty('--dy',dy); p.style.left=(w/2)+'px'; p.style.top=(h/3)+'px'; burstBox.appendChild(p);} setTimeout(()=>{ burstBox.innerHTML=''; }, 1000); }
 
-        // MOD: Custom alert/confirmation
         function showCustomAlert(message) {
             const tempModal = document.createElement('div');
             tempModal.className = 'modal';
@@ -1556,7 +1534,7 @@
                 <div class="box">
                     <h3 style="margin:0 0 6px 0">${message}</h3>
                     <div class="spacer"></div>
-                    <button class="btn primary" id="customAlertOk">OK</button>
+                    <button class="btn primary" id="customAlertOk" type="button">OK</button> <!-- MOD: Added type -->
                 </div>
             `;
             document.body.appendChild(tempModal);
@@ -1576,8 +1554,8 @@
                     <h3 style="margin:0 0 6px 0">${message}</h3>
                     <div class="spacer"></div>
                     <div class="row" style="justify-content:center">
-                        <button class="btn warn" id="customConfirmCancel">Batal</button>
-                        <button class="btn primary" id="customConfirmOk">Ya</button>
+                        <button class="btn warn" id="customConfirmCancel" type="button">Batal</button> <!-- MOD: Added type -->
+                        <button class="btn primary" id="customConfirmOk" type="button">Ya</button> <!-- MOD: Added type -->
                     </div>
                 </div>
             `;
@@ -1600,10 +1578,9 @@
 
         // ---------- POMODORO ----------
         let pomoHandle=null;
-        function upPomoLabel(){ qs('#pomoLabel').textContent = state.pomo.mode==='work'? t('pomo_focus'):t('pomo_break'); } // MOD: Use copy
-        function drawRemain(){ const m=String(Math.floor(state.pomo.remaining/60)).padStart(2,'0'); const s=String(state.pomo.remaining%60).padStart(2,'0'); qs('#pomoTime').textContent=`${m}:${s}`; } // MOD: Use String() for padStart
-        // MOD: Helper for time formatting
-        const fmt = (sec)=>`${String(Math.floor(sec/60)).padStart(2,'0')}:${String(sec%60).padStart(2,'0')}`;
+        function upPomoLabel(){ qs('#pomoLabel').textContent = state.pomo.mode==='work'? t('pomo_focus'):t('pomo_break'); }
+        function drawRemain(){ const m=String(Math.floor(state.pomo.remaining/60)).padStart(2,'0'); const s=String(state.pomo.remaining%60).padStart(2,'0'); qs('#pomoTime').textContent=`${m}:${s}`; }
+        const fmt = (sec)=>`${String(Math.floor(sec/60)).padStart(2,'0')}:${String(sec%60).padStart(2,'0')}`; // MOD: Helper for time formatting
 
         function startPomo(){
             state.pomo.work = Math.max(1, parseInt(qs('#pomoWork').value,10)||25);
@@ -1612,7 +1589,7 @@
                 state.pomo.running=true;
                 state.pomo.last=Date.now();
                 if(state.pomo.remaining<=0) state.pomo.remaining = state.pomo.work*60;
-                showToast(t('pomo_start_focus', fmt(state.pomo.work * 60)), 'info', 3000); // MOD: Toast on start with formatted time
+                showToast(t('pomo_start_focus', fmt(state.pomo.work * 60)), 'info', 3000);
                 save();
             }
             tickPomo();
@@ -1632,11 +1609,11 @@
                 if(state.pomo.mode==='work'){
                     state.pomo.mode='break';
                     state.pomo.remaining=state.pomo.break*60;
-                    showToast(t('pomo_time_break'), 'info', 3000); // MOD: Toast on break
+                    showToast(t('pomo_time_break'), 'info', 3000);
                 } else {
                     state.pomo.mode='work';
                     state.pomo.remaining=state.pomo.work*60;
-                    showToast(t('pomo_start_focus', fmt(state.pomo.work * 60)), 'info', 3000); // MOD: Toast on new focus with formatted time
+                    showToast(t('pomo_start_focus', fmt(state.pomo.work * 60)), 'info', 3000);
                 }
                 upPomoLabel();
             }
@@ -1650,8 +1627,7 @@
             v=(v||'').toLowerCase().trim();
             const alias = {
                 si:'shi', ti:'chi', tu:'tsu', hu:'fu', wo:'o',
-                di:'dji', du:'dzu',           // Alias for ぢ/づ
-                // 'dji':'dji', 'dzu':'dzu' // Self-aliases, already handled
+                di:'dji', du:'dzu',
             };
             return alias[v] || v;
         }
@@ -1667,7 +1643,6 @@
                     if(next && !'aeiouy'.includes(next)){ out += (set==='hira'? 'ん':'ン'); s=s.slice(1); matched=true; continue; }
                 }
                 for(const r of ROMAJI_SORTED){
-                    // MOD: Handle "nn" vs "n" (already done above, but keep an eye for potential conflict)
                     if(s.startsWith(r)){
                         out += (set==='hira'? HIRA_MAP.get(r): KATA_MAP.get(r));
                         s=s.slice(r.length);
@@ -1729,7 +1704,6 @@
             if (!wGhost) return;
             const ch = writerCurrentChar() || 'あ';
             wGhost.textContent = ch;
-            // MOD: Use ghost state directly for opacity and hidden class
             wGhost.style.opacity = state.writer.ghost ? state.writer.ghostOpacity : 0;
             wGhost.classList.toggle('hidden', !state.writer.ghost);
         }
@@ -1743,7 +1717,6 @@
         }
         function writerPointerPos(e) {
             const rect = wCanvas.getBoundingClientRect();
-            // Use clientX/Y for consistency with touch events
             const x = (e.clientX || (e.touches && e.touches[0] ? e.touches[0].clientX : 0)) - rect.left;
             const y = (e.clientY || (e.touches && e.touches[0] ? e.touches[0].clientY : 0)) - rect.top;
             return { x: Math.max(0, Math.min(rect.width, x)), y: Math.max(0, Math.min(rect.height, y)) };
@@ -1756,14 +1729,13 @@
             wStrokes.push({ ops: state.writer.eraser ? 'destination-out' : 'source-over', size: state.writer.penSize, points: [{x:lastX, y:lastY}] });
         }
 
-        // Throttle pointermove with requestAnimationFrame
         let _raf = null, _lastMove = null;
         function writerMove(e) {
             if(!isDrawing) return;
             _lastMove = e;
-            if(_raf) return; // If a frame is already scheduled, skip this one
+            if(_raf) return;
             _raf = requestAnimationFrame(() => {
-                _raf = null; // Reset for next frame
+                _raf = null;
                 const p = writerPointerPos(_lastMove);
                 const s = wStrokes[wStrokes.length-1];
                 s.points.push({x:p.x, y:p.y});
@@ -1778,12 +1750,12 @@
 
         function writerEnd() {
             isDrawing=false;
-            if (_raf) { // Ensure last frame is processed if movement stopped during a throttled request
+            if (_raf) {
                 cancelAnimationFrame(_raf);
                 _raf = null;
                 const p = writerPointerPos(_lastMove);
                 const s = wStrokes[wStrokes.length-1];
-                s.points.push({x:p.x, y:p.y}); // Add the very last point
+                s.points.push({x:p.x, y:p.y});
                 writerStrokeStyle();
                 wCtx.beginPath();
                 wCtx.moveTo(lastX, lastY);
@@ -1791,7 +1763,6 @@
                 wCtx.stroke();
                 lastX = p.x; lastY = p.y;
             }
-            // MOD: Only evaluate and snap if autoSnap is enabled
             if (state.writer.autoSnap) {
                 writerEvaluateAndSnap();
             }
@@ -1847,9 +1818,7 @@
             qs('#gridToggle').checked = state.writer.grid;
             qs('#ghostToggle').checked = state.writer.ghost;
             qs('#autoSnapToggle').checked = state.writer.autoSnap;
-            // Removed references to showSnapSlider and showOpacitySlider as they are no longer states
             
-            // Re-apply ghost opacity based on toggle state
             writerSetGhostChar();
             writerFillKanaOptions();
             writerSetGrid(state.writer.grid);
@@ -1877,16 +1846,14 @@
             window.addEventListener('pointerup', writerEnd);
             qs('#writeSet').onchange = (e)=>{ state.writer.set=e.target.value; save(); writerFillKanaOptions(); writerSetGhostChar(); };
             qs('#writeKana').onchange = (e)=>{ state.writer.kana=e.target.value; save(); writerSetGhostChar(); };
-            qs('#writePrev').onclick = ()=>{ writerPick(-1); writerClear(); }; // MOD: Clear canvas on nav
-            qs('#writeNext').onclick = ()=>{ writerPick(1); writerClear(); }; // MOD: Clear canvas on nav
-            qs('#writeRand').onclick = ()=>{ writerRandom(); writerClear(); }; // MOD: Clear canvas on nav
-            qs('#writeSpeak').onclick = ()=>{ speak(writerCurrentChar()); clickTone('click'); }; // MOD: Speak kana character
+            qs('#writePrev').onclick = ()=>{ writerPick(-1); writerClear(); };
+            qs('#writeNext').onclick = ()=>{ writerPick(1); writerClear(); };
+            qs('#writeRand').onclick = ()=>{ writerRandom(); writerClear(); };
+            qs('#writeSpeak').onclick = ()=>{ speak(writerCurrentChar()); clickTone('click'); };
             qs('#penSize').oninput = (e)=>{ state.writer.penSize = parseInt(e.target.value,10)||10; save(); };
             qs('#gridToggle').onchange = (e)=>{ state.writer.grid = e.target.checked; save(); writerSetGrid(state.writer.grid); };
-            qs('#ghostToggle').onchange = (e)=>{ state.writer.ghost = e.target.checked; save(); writerSetGhostChar(); }; // Directly controls ghost visibility
-            // Removed qs('#opacityFeatureToggle').onchange and qs('#ghostOpacity').oninput
-            qs('#autoSnapToggle').onchange = (e)=>{ state.writer.autoSnap = e.target.checked; save(); }; // Directly controls autoSnap functionality
-            // Removed qs('#snapFeatureToggle').onchange and qs('#snapThresh').oninput
+            qs('#ghostToggle').onchange = (e)=>{ state.writer.ghost = e.target.checked; save(); writerSetGhostChar(); };
+            qs('#autoSnapToggle').onchange = (e)=>{ state.writer.autoSnap = e.target.checked; save(); };
             qs('#penBtn').onclick = ()=>{ state.writer.eraser=false; save(); qs('#penBtn').classList.add('ok'); qs('#eraserBtn').classList.remove('ok'); };
             qs('#eraserBtn').onclick = ()=>{ state.writer.eraser=true; save(); qs('#eraserBtn').classList.add('ok'); qs('#penBtn').classList.remove('ok'); };
             qs('#undoStroke').onclick = writerUndo;
@@ -1901,17 +1868,14 @@
             writerApplyUIFromState();
         }
 
-        // --- Snap helper (kanvas kecil 128x128) ---
         function _makeOffscreen(w=128,h=128){ const c=document.createElement('canvas'); c.width=w; c.height=h; return c; }
 
         function _drawTemplateToCanvas(c, ch, theme){
             const ctx=c.getContext('2d'); ctx.clearRect(0,0,c.width,c.height);
             ctx.fillStyle = theme==='hc' ? '#e6efff' : '#132030';
-            // use large font + slight stroke for "thickening"
             const s = Math.min(c.width,c.height)*0.8;
-            ctx.font = `bold ${s}px serif`;
+            ctx.font = `bold ${s}px "Noto Serif JP", "Noto Sans JP", serif`; // MOD: Added Japanese fonts
             ctx.textAlign='center'; ctx.textBaseline='middle';
-            // thin stroke + fill for simple "dilate" effect
             ctx.lineWidth = Math.max(2, c.width*0.02);
             ctx.strokeText(ch, c.width/2, c.height/2);
             ctx.fillText(ch, c.width/2, c.height/2);
@@ -1921,7 +1885,6 @@
             const ctx=c.getContext('2d'); ctx.clearRect(0,0,c.width,c.height);
             ctx.strokeStyle = theme==='hc' ? '#e6efff' : '#132030';
             ctx.lineCap='round'; ctx.lineJoin='round';
-            // scale from writerCanvas -> 128x128
             const src = wCanvas.getBoundingClientRect();
             const sx = c.width / src.width, sy = c.height / src.height;
             for(const s of strokes){
@@ -1942,7 +1905,7 @@
             const b = cB.getContext('2d').getImageData(0,0,cB.width,cB.height).data;
             let inter=0, uni=0;
             for(let i=3;i<a.length;i+=4){
-                const A = a[i]>0, B = b[i]>0; // check alpha channel
+                const A = a[i]>0, B = b[i]>0;
                 if(A||B) uni++;
                 if(A&&B) inter++;
             }
@@ -1950,7 +1913,6 @@
         }
 
         function writerEvaluateAndSnap(){
-            // Skip if no strokes or if eraser was used on last stroke
             if(!wStrokes.length || wStrokes[wStrokes.length - 1].ops === 'destination-out') return;
 
             const offUser = _makeOffscreen(128,128);
@@ -1960,26 +1922,22 @@
             _drawTemplateToCanvas(offTemp, writerCurrentChar(), state.theme);
 
             const iou = _computeIoU(offUser, offTemp);
-            // console.log('IoU:', iou.toFixed(3));
 
-            const THRESH = (state.writer.snapThreshold ?? 0.52); // MOD: Use snapThreshold from state
+            const THRESH = (state.writer.snapThreshold ?? 0.52);
 
             if(iou >= THRESH){
-                // SNAP: clear canvas and draw clean template
-                writerClear(); // Clear all user strokes
+                writerClear();
                 wCtx.setTransform(1,0,0,1,0,0);
                 wCtx.clearRect(0,0,wCanvas.width,wCanvas.height);
                 wCtx.scale(dpr,dpr);
                 const s = Math.min(wCanvas.width/dpr, wCanvas.height/dpr)*0.8;
-                wCtx.font = `bold ${s}px serif`;
+                wCtx.font = `bold ${s}px "Noto Serif JP", "Noto Sans JP", serif`; // MOD: Added Japanese fonts
                 wCtx.textAlign='center'; wCtx.textBaseline='middle';
                 wCtx.fillStyle = state.theme==='hc' ? '#e6efff' : '#132030';
                 wCtx.fillText(writerCurrentChar(), (wCanvas.width/dpr)/2, (wCanvas.height/dpr)/2);
-                // Optionally, store this "snapped" state as a single stroke for undo functionality
-                wStrokes.length = 0; // Clear strokes, could add a single "template" stroke for undoing the snap
-                showToast(t('writer_snap_success'), 'ok'); // MOD: Snap success feedback
+                wStrokes.length = 0;
+                showToast(t('writer_snap_success'), 'ok');
             }else{
-                // Fail: fade out animation
                 const t0=Date.now(), dur=160; const snap = ()=>{
                     const t=Date.now()-t0, k=Math.min(1,t/dur);
                     wCtx.save(); wCtx.globalAlpha = 1-k;
@@ -1987,12 +1945,11 @@
                     wCtx.restore();
                     if(k<1) requestAnimationFrame(snap); else writerClear();
                 }; requestAnimationFrame(snap);
-                showToast(t('writer_snap_fail'), 'warn'); // MOD: Snap fail feedback
+                showToast(t('writer_snap_fail'), 'warn');
             }
         }
 
         // ---------- EXPORT / IMPORT PROGRESS ----------
-        // MOD: Sanitize state before saving to localStorage
         function sanitizeState(s){
             const clamp = (n,min,max)=> Math.min(max, Math.max(min, Number(n)||0));
             const onlyRomaji = arr => (Array.isArray(arr)? arr.filter(x=>ALL_ROMAJI.includes(x)) : []);
@@ -2000,33 +1957,30 @@
             const safe = {...s};
             safe.hiraMastered = onlyRomaji(safe.hiraMastered);
             safe.kataMastered = onlyRomaji(safe.kataMastered);
-            safe.totalPoints = clamp(safe.totalPoints, 0, 1_000_000); // Cap points to prevent overflow
-            safe.level = clamp(safe.level, 1, 99); // Cap level
+            safe.totalPoints = clamp(safe.totalPoints, 0, 1_000_000);
+            safe.level = clamp(safe.level, 1, 99);
             
             if (!safe.test) safe.test = {};
-            safe.test.target = clamp(safe.test.target, 1, 1000); // Cap test target
+            safe.test.target = clamp(safe.test.target, 1, 1000);
             
             if (!safe.pomo) safe.pomo = {};
-            safe.pomo.work = clamp(safe.pomo.work, 1, 60); // Cap pomo work time
-            safe.pomo.break = clamp(safe.pomo.break, 1, 30); // Cap pomo break time
-            safe.pomo.remaining = clamp(safe.pomo.remaining, 0, (safe.pomo.work || 25) * 60); // Cap remaining time
+            safe.pomo.work = clamp(safe.pomo.work, 1, 60);
+            safe.pomo.break = clamp(safe.pomo.break, 1, 30);
+            safe.pomo.remaining = clamp(safe.pomo.remaining, 0, (safe.pomo.work || 25) * 60);
             
             if (!safe.writer) safe.writer = {};
-            safe.writer.penSize = clamp(safe.writer.penSize, 2, 28); // Cap pen size
-            safe.writer.ghostOpacity = clamp(safe.writer.ghostOpacity, 0.05, 0.40); // Cap ghost opacity
-            safe.writer.snapThreshold = clamp(safe.writer.snapThreshold, 0.35, 0.80); // Cap snap threshold
-            // Removed showSnapSlider and showOpacitySlider from sanitization as they are no longer states
+            safe.writer.penSize = clamp(safe.writer.penSize, 2, 28);
+            safe.writer.ghostOpacity = clamp(safe.writer.ghostOpacity, 0.05, 0.40);
+            safe.writer.snapThreshold = clamp(safe.writer.snapThreshold, 0.35, 0.80);
 
-            // Ensure booleans are actually booleans
             safe.audio = !!safe.audio;
             safe.writer.eraser = !!safe.writer.eraser;
             safe.writer.grid = !!safe.writer.grid;
             safe.writer.ghost = !!safe.writer.ghost;
             safe.writer.autoSnap = !!safe.writer.autoSnap;
             safe.pomo.running = !!safe.pomo.running;
-            safe.hasSeenOnboarding = !!safe.hasSeenOnboarding; // MOD: Sanitize new state
+            safe.hasSeenOnboarding = !!safe.hasSeenOnboarding;
 
-            // Ensure strings are strings and valid options
             safe.theme = ['pastel', 'hc'].includes(safe.theme) ? safe.theme : 'pastel';
             safe.test.set = ['hira', 'kata'].includes(safe.test.set) ? safe.test.set : 'hira';
             safe.test.mode = ['type', 'mc'].includes(safe.test.mode) ? safe.test.mode : 'type';
@@ -2043,7 +1997,7 @@
             const blob = new Blob([localStorage.getItem(KEY)||'{}'], {type:'application/json'});
             const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
             a.download='kana-progress.json'; a.click(); URL.revokeObjectURL(a.href);
-            showToast(t('export_ok')); // MOD: Use copy for toast
+            showToast(t('export_ok'));
         }
 
         function importProgress(file){
@@ -2052,22 +2006,22 @@
                 try{
                     const raw = JSON.parse(r.result);
                     if (raw && typeof raw === 'object') {
-                        const s = sanitizeState(raw); // MOD: Sanitize imported data
+                        const s = sanitizeState(raw);
                         localStorage.setItem(KEY, JSON.stringify(s));
                         state = load();
                         renderAll();
-                        showToast(t('import_ok')); // MOD: Use copy for toast
+                        showToast(t('import_ok'));
                     } else {
-                        showToast(t('import_fail'), 'warn'); // MOD: Use copy for toast
+                        showToast(t('import_fail'), 'warn');
                     }
                 }catch(e){
                     console.error("Error parsing imported file:", e);
-                    showToast(t('import_fail'), 'warn'); // MOD: Use copy for toast
+                    showToast(t('import_fail'), 'warn');
                 }
             };
             r.onerror = (e) => {
                 console.error("FileReader error:", e);
-                showToast(t('import_fail'), 'warn'); // MOD: Use copy for toast
+                showToast(t('import_fail'), 'warn');
             };
             r.readAsText(file);
         }
@@ -2079,25 +2033,25 @@
             const startLearningBtn = qs('#btnStartLearningOnboarding');
 
             if (state.hasSeenOnboarding) {
-                onboardingModal.style.display='none'; // MOD: Set display to none
+                onboardingModal.style.display='none';
                 return;
             }
 
             onboardingModal.hidden = false;
-            onboardingModal.style.display = 'flex'; // MOD: Set display to flex
-            _trapModalOnboarding(); // Trap focus for onboarding modal
+            onboardingModal.style.display = 'flex';
+            _trapModalOnboarding();
 
             startLearningBtn.onclick = () => {
                 if (doNotShowCheckbox.checked) {
                     state.hasSeenOnboarding = true;
                     save();
                 }
-                onboardingModal.style.display = 'none'; // MOD: Set display to none
+                onboardingModal.style.display = 'none';
                 onboardingModal.hidden = true;
             };
         }
 
-        function _trapModalOnboarding(){ // Separate trap for onboarding if needed, or reuse _trapModal
+        function _trapModalOnboarding(){
             const onboardingModal = qs('#onboardingModal');
             const focusableElements = 'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
             const focusables = onboardingModal.querySelectorAll(focusableElements);
@@ -2108,12 +2062,12 @@
                 const isTabPressed = (e.key === 'Tab' || e.keyCode === 9);
                 if (!isTabPressed) return;
 
-                if (e.shiftKey) { // if shift key pressed for shift + tab
+                if (e.shiftKey) {
                     if (document.activeElement === firstFocusable) {
                         lastFocusable.focus();
                         e.preventDefault();
                     }
-                } else { // if tab key is pressed
+                } else {
                     if (document.activeElement === lastFocusable) {
                         firstFocusable.focus();
                         e.preventDefault();
@@ -2132,7 +2086,6 @@
 
         qs('#mcWrap').addEventListener('pointerup', (e)=>{ const btn=e.target.closest('.opt'); if(!btn) return; const id=(btn.id||'').slice(-1); if(!id) return; mcPick(id); }, {passive:true});
 
-        // MOD: Specific keydown listener for #ans input
         const ansEl = qs('#ans');
         if (ansEl) {
             ansEl.addEventListener('keydown', (e) => {
@@ -2144,15 +2097,11 @@
         }
 
         document.addEventListener('keydown', (e)=>{
-            // Only process shortcuts if not typing in an input/textarea (except for Enter on #ans, handled above)
-            if(e.target.matches('input,textarea') && e.target.id !== 'ans') return; // MOD: Allow global shortcuts if not ans input
-
-            // Removed the global Enter key check as it's now handled specifically for #ans
+            if(e.target.matches('input,textarea') && e.target.id !== 'ans') return;
 
             const map={a:'A',b:'B',c:'C',d:'D'}; const k=map[e.key?.toLowerCase?.()]; if(k && getComputedStyle(qs('#mcWrap')).display!=='none'){ e.preventDefault(); mcPick(k); }
             if(e.key==='ArrowRight' && !qs('#testArea').hidden){ e.preventDefault(); skipQ(); }
 
-            // MOD: Keyboard shortcuts for writer tools
             if (e.key === 'g') {
                 const el = qs('#gridToggle');
                 if (el) { el.checked = !el.checked; el.onchange({target:el}); }
@@ -2161,9 +2110,9 @@
                 const penBtn = qs('#penBtn');
                 const eraserBtn = qs('#eraserBtn');
                 if (penBtn && eraserBtn) {
-                    if (state.writer.eraser) { // If currently eraser, switch to pen
+                    if (state.writer.eraser) {
                         penBtn.click();
-                    } else { // If currently pen, switch to eraser
+                    } else {
                         eraserBtn.click();
                     }
                 }
@@ -2184,7 +2133,6 @@
                     save();
                 }
             }
-            // MOD: Ctrl+Z for undo is already implemented in writerBindEvents
         });
 
         qs('#tPastel').onclick = ()=>{ state.theme='pastel'; save(); applyTheme(); };
@@ -2192,7 +2140,7 @@
         qs('#audToggle').onchange = (e)=>{ state.audio = e.target.checked; save(); };
 
         qs('#resetBtn').onclick = ()=>{
-            showCustomConfirm(t('confirm_reset_title'), (confirmed) => { // MOD: Use copy for confirmation
+            showCustomConfirm(t('confirm_reset_title'), (confirmed) => {
                 if(confirmed){
                     localStorage.removeItem(KEY);
                     state=initState();
@@ -2201,7 +2149,7 @@
                     renderAll();
                     if (typeof writerClear==='function') writerClear();
                     save();
-                    showToast('Semua progres telah direset.'); // MOD: Use toast for reset confirmation
+                    showToast('Semua progres telah direset.');
                 }
             });
         };
@@ -2216,13 +2164,12 @@
         qs('#answerMode').onchange = (e) => { state.test.mode = e.target.value; save(); toggleAnswerUI(); };
         qs('#qType').onchange = (e) => { state.test.qType = e.target.value; save(); toggleAnswerUI(); };
 
-        // MOD: Export/Import buttons
         qs('#exportBtn').onclick = exportProgress;
         qs('#importBtn').onclick = () => { qs('#importFile').click(); };
         qs('#importFile').onchange = (e) => {
             if (e.target.files.length > 0) {
                 importProgress(e.target.files[0]);
-                e.target.value = null; // Clear the input so same file can be selected again
+                e.target.value = null;
             }
         };
 
@@ -2245,13 +2192,13 @@
             qs('#testCount').value=state.test.target||10;
             toggleAnswerUI();
             updatePointsAndLevelDisplay();
-            writerInit(); // init writer last
+            writerInit();
         }
 
         document.addEventListener('DOMContentLoaded', ()=>{
             renderAll();
             if(state.pomo.running){ startPomo(); }
-            showOnboarding(); // MOD: Show onboarding on first load
+            showOnboarding();
         });
     </script>
 </body>
