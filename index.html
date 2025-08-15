@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>Pelatih Kana Jepang — Offline (v8)</title>
-  <meta name="description" content="Belajar Hiragana & Katakana lengkap (dasar, dakuon/handakuon, youon) dengan tes ketik & pilihan ganda, review jawaban salah, Pomodoro, audio, progress bar, dan tema pastel/high-contrast. Data lokal (localStorage)." />
+  <title>Pelatih Kana Jepang — Offline (v9)</title>
+  <meta name="description" content="Belajar Hiragana & Katakana lengkap (dasar, dakuon/handakuon, youon) dengan tes ketik & pilihan ganda, review jawaban salah, Pomodoro, audio, progress bar, tema pastel/high-contrast, dan latihan menulis di kanvas. Data lokal (localStorage)." />
   <!-- Google Fonts - Inter -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <!-- Font Awesome for Icons -->
@@ -14,12 +14,11 @@
       --bg:#f8fbff; --panel:#ffffff; --soft:#f2f6ff; --ink:#132030; --muted:#76849c;
       --pri:#7a6cff; --sec:#16c6a1; --warn:#ff7b7b; --ok:#2fb875; --accent:#ffd166;
       --btn:#e9eefc; --btnText:#0b101a; --border:rgba(19,32,48,.10);
-      --radius:18px; --shadow:0 6px 18px rgba(15,23,34,.08); /* Adjusted shadow for a softer look */
+      --radius:18px; --shadow:0 6px 18px rgba(15,23,34,.08);
       --ring: 0 0 0 3px rgba(122,108,255,.28);
-      /* Variabel warna latar belakang tombol OK dan WARN untuk tema pastel */
       --okBg:#dff4ea;
       --warnBg:#ffe5e5;
-      --iconColor: var(--muted); /* Default icon color */
+      --iconColor: var(--muted);
     }
     [data-theme="hc"]{
       --bg:#0a0f1a; --panel:#0f1626; --soft:#0c1220; --ink:#e6efff; --muted:#9fb0cc;
@@ -217,17 +216,15 @@
       font-size:12px;
       color:var(--muted);
     }
-    /* Visual for mastered Kana */
     .kana.mastered {
-      background: linear-gradient(135deg, var(--okBg), rgba(47,184,117,.2)); /* Greenish background */
+      background: linear-gradient(135deg, var(--okBg), rgba(47,184,117,.2));
       border-color: var(--ok);
-      box-shadow: 0 0 0 2px var(--ok); /* Green ring */
+      box-shadow: 0 0 0 2px var(--ok);
     }
     [data-theme="hc"] .kana.mastered {
         background: linear-gradient(135deg, var(--okBg), rgba(61,216,181,.1));
         box-shadow: 0 0 0 2px var(--ok);
     }
-
 
     .kana:focus-visible{outline:none; box-shadow:var(--ring)}
 
@@ -249,47 +246,17 @@
       color: var(--ink);
     }
 
-    #subsetScroll {
-      flex: 1;
-      min-width: 100%;
-      overflow: visible;
-      white-space: normal;
-    }
-    .test-controls-row {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 8px;
-        align-items: flex-end;
-    }
-    .test-controls-row > div {
-        flex-basis: 100%;
-        min-width: 0;
-    }
-    @media (min-width: 768px) {
-        .test-controls-row > div {
-            flex-basis: auto;
-        }
-    }
+    #subsetScroll { flex: 1; min-width: 100%; overflow: visible; white-space: normal; }
+    .test-controls-row { display:flex; flex-wrap:wrap; gap:8px; align-items:flex-end }
+    .test-controls-row > div { flex-basis:100%; min-width:0 }
+    @media (min-width: 768px) { .test-controls-row > div { flex-basis:auto } }
 
-    .row #countChips {
-        flex-wrap: wrap;
-        flex: 1;
-        justify-content: flex-start;
-    }
-    .row #testCount {
-        flex-grow: 0;
-        flex-shrink: 0;
-    }
+    .row #countChips { flex-wrap:wrap; flex:1; justify-content:flex-start }
+    .row #testCount { flex-grow:0; flex-shrink:0 }
     @media (max-width: 767px) {
-        .row #testCount {
-            width: calc(50% - 4px);
-        }
-        .row .tag {
-            width: calc(50% - 4px);
-            text-align: center;
-        }
+      .row #testCount { width: calc(50% - 4px) }
+      .row .tag { width: calc(50% - 4px); text-align:center }
     }
-
 
     .center{text-align:center}
     .small{font-size:12px;color:var(--muted)}
@@ -298,7 +265,6 @@
       color:var(--ink);
       font-size:12px;border:1px solid var(--border);
     }
-
 
     .progress{height:10px;background:rgba(0,0,0,.08);border-radius:999px;overflow:hidden}
     .bar{height:100%;width:0;background:linear-gradient(90deg,var(--pri),var(--sec),var(--accent));transition:width .25s ease}
@@ -315,64 +281,49 @@
 
     .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 
-    /* Smallest mobile adjustments */
     @media (max-width: 420px){ :root{ --radius:14px } .kana .jp{ font-size:24px } #qKana{ font-size:56px !important } }
 
-    /* Animations for correct/wrong answers */
-    @keyframes correctPop {
-      0% { transform: scale(1); background-color: transparent; }
-      50% { transform: scale(1.1); background-color: var(--ok); }
-      100% { transform: scale(1); background-color: transparent; }
-    }
+    @keyframes correctPop { 0%{transform:scale(1);background-color:transparent} 50%{transform:scale(1.1);background-color:var(--ok)} 100%{transform:scale(1);background-color:transparent} }
+    @keyframes wrongShake { 0%,100%{transform:translateX(0);background-color:transparent} 25%{transform:translateX(-5px);background-color:var(--warn)} 75%{transform:translateX(5px);background-color:var(--warn)} }
 
-    @keyframes wrongShake {
-      0%, 100% { transform: translateX(0); background-color: transparent; }
-      25% { transform: translateX(-5px); background-color: var(--warn); }
-      75% { transform: translateX(5px); background-color: var(--warn); }
-    }
+    #qKana.correct-answer { animation: correctPop 0.3s ease-out }
+    #qKana.wrong-answer { animation: wrongShake 0.3s ease-out }
 
-    #qKana.correct-answer {
-      animation: correctPop 0.3s ease-out;
-    }
+    #streakCounter { font-size:14px; font-weight:600; color:var(--sec); margin-left:10px; min-width:50px; text-align:right; transition: transform 0.1s ease-out }
+    @keyframes streakGrow { 0%{transform:scale(1)} 50%{transform:scale(1.2)} 100%{transform:scale(1)} }
+    #streakCounter.grow { animation: streakGrow 0.2s ease-out }
 
-    #qKana.wrong-answer {
-      animation: wrongShake 0.3s ease-out;
-    }
-
-    /* Streak counter styling */
-    #streakCounter {
-      font-size: 14px;
-      font-weight: 600;
-      color: var(--sec);
-      margin-left: 10px;
-      min-width: 50px;
-      text-align: right;
-      transition: transform 0.1s ease-out;
-    }
-
-    @keyframes streakGrow {
-      0% { transform: scale(1); }
-      50% { transform: scale(1.2); }
-      100% { transform: scale(1); }
-    }
-
-    #streakCounter.grow {
-      animation: streakGrow 0.2s ease-out;
-    }
-
-    /* Spinner for loading audio (now removed from HTML) */
-    .spinner {
-      display: none !important;
-    }
-
+    .spinner { display:none !important }
 
     @media (prefers-reduced-motion: reduce){
       *{animation-duration:0.01ms !important; animation-iteration-count:1 !important; transition-duration:0.01ms !important; scroll-behavior:auto !important}
-      #qKana.correct-answer, #qKana.wrong-answer, #streakCounter.grow {
-        animation: none !important;
-      }
+      #qKana.correct-answer, #qKana.wrong-answer, #streakCounter.grow { animation:none !important }
     }
 
+    /* === Writer (Latihan Menulis) === */
+    .writer-toolbar { display:flex; gap:8px; flex-wrap:wrap; align-items:center }
+    .writer-toolbar .slider { display:flex; align-items:center; gap:6px; font-size:13px; color:var(--muted) }
+    .writer-wrap { position: relative; width: 100%; border:1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); background: var(--soft); overflow: hidden; }
+    #writerCanvas { width: 100%; height: auto; display:block; touch-action: none; }
+    .writer-wrap.grid {
+      background-image:
+        repeating-linear-gradient(0deg, rgba(0,0,0,.06) 0, rgba(0,0,0,.06) 1px, transparent 1px, transparent 24px),
+        repeating-linear-gradient(90deg, rgba(0,0,0,.06) 0, rgba(0,0,0,.06) 1px, transparent 1px, transparent 24px);
+    }
+    [data-theme="hc"] .writer-wrap.grid {
+      background-image:
+        repeating-linear-gradient(0deg, rgba(230,239,255,.15) 0, rgba(230,239,255,.15) 1px, transparent 1px, transparent 24px),
+        repeating-linear-gradient(90deg, rgba(230,239,255,.15) 0, rgba(230,239,255,.15) 1px, transparent 1px, transparent 24px);
+    }
+    .writer-ghost {
+      position:absolute; inset:0; pointer-events:none; display:flex; align-items:center; justify-content:center;
+      font-size: clamp(200px, 55vw, 380px);
+      line-height:1; user-select:none;
+      color: var(--muted);
+      opacity: .12;
+      filter: saturate(70%);
+    }
+    .writer-ghost.hidden { display:none; }
   </style>
 </head>
 <body>
@@ -381,10 +332,9 @@
       <div class="brand" style="gap:10px">
         <div class="logo" aria-hidden="true"></div>
         <div>
-          <h1>Pelatih Kana Jepang <span class="tag">Offline v8</span></h1>
-          <div class="small">Hiragana • Katakana • Dakuon/Handakuon • Youon • Tes & Review • Pomodoro • Tema</div>
+          <h1>Pelatih Kana Jepang <span class="tag">Offline v9</span></h1>
+          <div class="small">Hiragana • Katakana • Dakuon/Handakuon • Youon • Tes & Review • Pomodoro • Tema • Writer</div>
         </div>
-        <!-- START MODIFIED ROW FOR HEADER CONTROLS -->
         <div class="row header-controls-row" style="gap:6px">
           <div class="seg" role="tablist" aria-label="Tema">
             <button id="tPastel" class="btn" aria-selected="true" title="Tema pastel">Pastel</button>
@@ -395,10 +345,10 @@
           </label>
           <button id="resetBtn" class="btn ghost" title="Reset semua progres">Reset</button>
         </div>
-        <!-- END MODIFIED ROW FOR HEADER CONTROLS -->
       </div>
     </div>
   </header>
+
   <main class="wrap" id="main">
     <!-- LEARN MODE -->
     <section class="grid" aria-labelledby="learnTitle">
@@ -419,13 +369,14 @@
         <div id="learnTiles" class="pillbox" aria-live="polite"></div>
       </div>
     </section>
+
     <!-- TEST MODE -->
     <section class="grid" aria-labelledby="testTitle">
       <div class="card" style="grid-column: span 12;">
         <h2 id="testTitle"><i class="fas fa-pencil-alt icon"></i> Tes (Subset / Rentang, Tipe Soal & Mode Jawab)</h2>
         <div class="small">Gunakan chip untuk subset cepat atau rentang khusus. Tentukan tipe soal, mode jawab, dan jumlah soal.</div>
         <div class="spacer"></div>
-        <!-- START MODIFIED ROW FOR SUBSET CHIPS -->
+
         <div class="row test-controls-row" style="align-items:flex-end">
           <div style="flex:1;width:100%;">
             <div class="chips" id="subsetChips" style="display:flex"></div>
@@ -444,20 +395,17 @@
             <option value="mc">Pilihan Ganda (A–D)</option>
           </select>
         </div>
-        <!-- END MODIFIED ROW FOR SUBSET CHIPS -->
+
         <div class="spacer"></div>
         <div class="row">
           <div class="tag">Atau rentang khusus:</div>
-          <!-- New select for range mode -->
           <select id="rangeMode" aria-label="Mode rentang">
             <option value="range">Rentang</option>
             <option value="single">Grup Tunggal</option>
           </select>
           <select id="testFrom" aria-label="Tes dari"></select>
-          <div id="testToWrap"> <!-- Wrapper for testTo to be hidden/shown -->
-            <select id="testTo" aria-label="Tes sampai"></select>
-          </div>
-          <select id="testSingleGroup" aria-label="Pilih Grup" hidden></select> <!-- New select for single group mode -->
+          <div id="testToWrap"><select id="testTo" aria-label="Tes sampai"></select></div>
+          <select id="testSingleGroup" aria-label="Pilih Grup" hidden></select>
 
           <div class="tag">Jumlah soal:</div>
           <input id="testCount" type="number" min="1" value="10" style="width:100px" aria-label="Jumlah soal" />
@@ -471,16 +419,13 @@
           <button class="btn" id="btnSkip" title="Lewati soal (→)"><i class="fas fa-forward"></i> Lewati</button>
           <button class="btn warn" id="btnEnd"><i class="fas fa-stop"></i> Selesai</button>
         </div>
+
         <div class="spacer"></div>
         <div class="progress" aria-label="Progress Tes" role="progressbar" aria-valuemin="0" aria-valuemax="100"><div id="bar" class="bar"></div></div>
         <div class="spacer"></div>
         <div id="testArea" class="center" hidden>
           <div id="promptWrap" style="display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap">
             <div id="qKana" style="font-size:64px;line-height:1.1;margin:6px 0">あ</div>
-            <!-- Removed audio button and spinner, keeping only the visual icon if needed -->
-            <!-- <button class="btn" id="btnListen" title="Dengarkan (L)">
-              <span class="fas fa-volume-up"></span>
-            </button> -->
           </div>
           <div id="typeWrap" style="max-width:520px;margin:0 auto">
             <input id="ans" placeholder="Ketik jawaban…" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" inputmode="latin" aria-label="Jawaban" />
@@ -495,8 +440,7 @@
           </div>
           <div class="spacer"></div>
           <div class="small" id="testInfo" aria-live="polite">
-            <!-- Streak counter is now a separate span -->
-            <span id="testInfoText"></span> <!-- New span for general test info -->
+            <span id="testInfoText"></span>
             <span id="streakCounter">Streak: 0</span>
           </div>
         </div>
@@ -558,7 +502,61 @@
       </div>
     </section>
 
+    <!-- WRITER / LATIHAN MENULIS -->
+    <section class="grid" aria-labelledby="writerTitle" id="writerSection">
+      <div class="card" style="grid-column: span 12;">
+        <h2 id="writerTitle"><i class="fas fa-pen-fancy icon"></i> Latihan Menulis (Hiragana/Katakana)</h2>
+        <div class="small">Gambar huruf dengan jari/mouse. Nyalakan <b>Panduan</b> untuk meniru bentuk.</div>
+        <div class="spacer"></div>
+
+        <div class="row" style="align-items:flex-end">
+          <select id="writeSet" aria-label="Pilih set tulis">
+            <option value="hira">Hiragana</option>
+            <option value="kata">Katakana</option>
+          </select>
+          <select id="writeKana" aria-label="Pilih kana"></select>
+          <button class="btn" id="writePrev"><i class="fas fa-chevron-left"></i> Prev</button>
+          <button class="btn" id="writeNext">Next <i class="fas fa-chevron-right"></i></button>
+          <button class="btn" id="writeRand"><i class="fas fa-shuffle"></i> Acak</button>
+          <button class="btn" id="writeSpeak" title="Dengar romaji"><i class="fas fa-volume-up"></i></button>
+        </div>
+
+        <div class="spacer"></div>
+
+        <div class="writer-toolbar">
+          <button class="btn ok" id="penBtn"><i class="fas fa-pen"></i> Pena</button>
+          <button class="btn" id="eraserBtn"><i class="fas fa-eraser"></i> Penghapus</button>
+          <div class="slider">
+            <label for="penSize">Ukuran</label>
+            <input id="penSize" type="range" min="2" max="28" value="10" style="width:140px">
+          </div>
+          <label class="btn ghost" style="gap:8px">
+            <input id="gridToggle" type="checkbox" checked> Grid
+          </label>
+          <label class="btn ghost" style="gap:8px">
+            <input id="ghostToggle" type="checkbox" checked> Panduan
+          </label>
+          <div class="slider">
+            <label for="ghostOpacity">Opacity</label>
+            <input id="ghostOpacity" type="range" min="5" max="40" value="12" style="width:120px">
+          </div>
+          <div style="flex:1"></div>
+          <button class="btn" id="undoStroke" title="Undo (Ctrl+Z)"><i class="fas fa-undo"></i> Undo</button>
+          <button class="btn warn" id="clearCanvas"><i class="fas fa-redo"></i> Bersihkan</button>
+          <button class="btn primary" id="savePNG"><i class="fas fa-download"></i> Simpan PNG</button>
+        </div>
+
+        <div class="spacer"></div>
+
+        <div id="writerWrap" class="writer-wrap grid">
+          <canvas id="writerCanvas" width="900" height="900" aria-label="Kanvas menulis"></canvas>
+          <div id="writerGhost" class="writer-ghost" aria-hidden="true">あ</div>
+        </div>
+      </div>
+    </section>
+
   </main>
+
   <!-- Celebration Modal / Review -->
   <div id="celebrate" class="modal" aria-modal="true" role="dialog" aria-labelledby="celebrateTitle" aria-describedby="celebrateMsg">
     <div class="box">
@@ -573,28 +571,36 @@
     </div>
     <div id="burst" class="burst" aria-hidden="true"></div>
   </div>
+
   <script>
     // ---------- STATE ----------
-    const KEY = 'kanaTrainer_v8';
+    const KEY = 'kanaTrainer_v9';
     const initState = () => ({
       theme:'pastel',
-      audio:false, // Audio is now explicitly false as TTS API is removed
+      audio:false,
       hiraMastered:[], kataMastered:[],
       test:{
         subset:'aiueo', set:'hira', mode:'type', qType:'k2r',
         score:0, total:0, correctStreak:0, target:10, rangeMode:'range'
       },
       pomo:{mode:'work', work:25, break:5, remaining:25*60, running:false, last:0},
-      totalPoints: 0, // New: Total points for gamification
-      level: 1,       // New: User's current level
-      // pointsToNextLevel will be calculated dynamically based on level
+      totalPoints: 0,
+      level: 1,
+      writer: {
+        set: 'hira',
+        kana: 'a',
+        penSize: 10,
+        eraser: false,
+        grid: true,
+        ghost: true,
+        ghostOpacity: 0.12
+      }
     });
     let state = load();
     function load(){
       try{
         const raw=localStorage.getItem(KEY);
         const loadedState = raw ? JSON.parse(raw) : initState();
-        // Ensure new state properties are initialized for existing users
         return { ...initState(), ...loadedState };
       }catch{
         return initState();
@@ -667,7 +673,6 @@
       rom.forEach(r=>{
         const ch = map.get(r);
         const b = document.createElement('button'); b.type='button';
-        // Add 'mastered' class if applicable
         b.className='kana' + (mastered.includes(r) ? ' mastered' : '');
         b.innerHTML=`<div class="jp">${ch}</div><div class="ro">${r}</div>`; b.title=r; b.setAttribute('aria-pressed', mastered.includes(r));
         attachLongPress(b, ()=>toggleMaster(r,set), ()=>uncheck(r,set));
@@ -680,32 +685,32 @@
       const i=arr.indexOf(label);
       if(i<0) {
         arr.push(label);
-        state.totalPoints += 5; // Add points for mastering a new Kana
+        state.totalPoints += 5;
         checkLevelUp();
       } else {
-        state.totalPoints = Math.max(0, state.totalPoints - 5); // Deduct points if unmastered
+        state.totalPoints = Math.max(0, state.totalPoints - 5);
       }
       save();
       renderStats();
       buildKana(set==='hira'?'hiraBox':'kataBox', set);
-      updatePointsAndLevelDisplay(); // Update display immediately
+      updatePointsAndLevelDisplay();
     }
     function uncheck(label,set){
       const arr=(set==='hira'?state.hiraMastered:state.kataMastered);
       const i=arr.indexOf(label);
       if(i>-1){
         arr.splice(i,1);
-        state.totalPoints = Math.max(0, state.totalPoints - 5); // Deduct points if unmastered
+        state.totalPoints = Math.max(0, state.totalPoints - 5);
         save();
         renderStats();
         buildKana(set==='hira'?'hiraBox':'kataBox', set);
-        updatePointsAndLevelDisplay(); // Update display immediately
+        updatePointsAndLevelDisplay();
       }
     }
     function renderStats(){ qs('#jpStats').textContent = `${state.hiraMastered.length}/${ALL_ROMAJI.length} hira • ${state.kataMastered.length}/${ALL_ROMAJI.length} kata`; }
 
     // Gamification: Leveling system
-    const LEVEL_THRESHOLDS = [0, 100, 250, 500, 1000, 2000, 3500, 5000, 7500, 10000]; // Points needed for each level (index 0 is level 1)
+    const LEVEL_THRESHOLDS = [0, 100, 250, 500, 1000, 2000, 3500, 5000, 7500, 10000];
     const LEVEL_NAMES = ["Pemula Kana", "Pengenal Kana", "Penyelidik Kana", "Penjelajah Kana", "Master Kana", "Sensei Kana", "Grandmaster Kana", "Kana Legendaris", "Dewa Kana", "Kana Abadi"];
 
     function getLevelAndThreshold(points) {
@@ -726,13 +731,12 @@
     }
 
     function checkLevelUp() {
-        // Calculate old level based on points before current correct answer (+1 point)
         const { level: oldLevel } = getLevelAndThreshold(state.totalPoints - 1);
         const { level: newLevel } = getLevelAndThreshold(state.totalPoints);
 
         if (newLevel > oldLevel) {
             state.level = newLevel;
-            openCelebrate('levelUp', newLevel); // Show level up celebration
+            openCelebrate('levelUp', newLevel);
         }
     }
 
@@ -755,7 +759,6 @@
         }
     }
 
-
     // ---------- LEARN MODE ----------
     function fillLearnRange(){ const fromSel=qs('#fromGrp'), toSel=qs('#toGrp'); fromSel.innerHTML=''; toSel.innerHTML=''; GROUPS.forEach(g=>{ const o1=new Option(g.label,g.key); const o2=new Option(g.label,g.key); fromSel.add(o1); toSel.add(o2); }); fromSel.value='aiueo'; toSel.value='k'; }
     function startLearn(){ const set=qs('#learnSet').value; const from=qs('#fromGrp').value, to=qs('#toGrp').value; const labels = rangeLabels(from,to); const map = set==='hira'?HIRA_MAP:KATA_MAP; const box=qs('#learnTiles'); box.innerHTML=''; if(!labels.length){ box.innerHTML='<div class="small">Pilih rentang yang valid.</div>'; return; } const frag=df(); labels.forEach(r=>{ const tile=document.createElement('button'); tile.type='button'; tile.className='kana'; tile.innerHTML=`<div class="jp">${map.get(r)}</div><div class="ro">${r}</div>`; tile.onclick=()=> speak(r); frag.appendChild(tile); }); box.appendChild(frag); }
@@ -772,9 +775,9 @@
       });
       tf.value='aiueo';
       tt.value='k';
-      ts.value='aiueo'; // Default single group selection
-      qs('#rangeMode').value = state.test.rangeMode; // Set initial value from state
-      toggleRangeInputs(); // Call to set initial visibility
+      ts.value='aiueo';
+      qs('#rangeMode').value = state.test.rangeMode;
+      toggleRangeInputs();
     }
 
     function buildSubsetChips(){ const box=qs('#subsetChips'); box.innerHTML=''; const frag=df(); GROUPS.forEach(g=>{ const b=document.createElement('button'); b.className='chip'+(state.test.subset===g.key?' active':''); b.textContent=g.label; b.onclick=()=>{ state.test.subset=g.key; save(); buildSubsetChips(); }; frag.appendChild(b); }); box.appendChild(frag); }
@@ -784,40 +787,36 @@
       const set=qs('#testSet').value; state.test.set=set;
       const mode=qs('#answerMode').value; state.test.mode=mode;
       const qType=qs('#qType').value; state.test.qType=qType;
-      const rangeMode = qs('#rangeMode').value; state.test.rangeMode = rangeMode; // Save range mode to state
+      const rangeMode = qs('#rangeMode').value; state.test.rangeMode = rangeMode;
       const req = Math.max(1, parseInt(qs('#testCount').value,10)||10);
       
-      const labels = buildPoolLabels(); // This function now handles rangeMode
+      const labels = buildPoolLabels();
       let uniquePoolItems = labels.map(r=>({romaji:r, char: (set==='hira'?HIRA_MAP:KATA_MAP).get(r)}));
 
       if(!uniquePoolItems.length){ alert('Pilih subset atau rentang yang valid.'); return; }
 
-      // Build the testPool: first all unique items (shuffled), then repeat if needed
       testPool = [];
-      let currentUniqueItems = [...uniquePoolItems]; // Copy to shuffle for the first round
+      let currentUniqueItems = [...uniquePoolItems];
       shuffle(currentUniqueItems);
       testPool = testPool.concat(currentUniqueItems);
 
-      // If more questions are requested than unique items, start repeating
       if (req > uniquePoolItems.length) {
           while (testPool.length < req) {
-              let shuffledRepeat = [...uniquePoolItems]; // Get a fresh copy for repeating
-              shuffle(shuffledRepeat); // Shuffle the repeated set
+              let shuffledRepeat = [...uniquePoolItems];
+              shuffle(shuffledRepeat);
               testPool = testPool.concat(shuffledRepeat);
           }
-          testPool = testPool.slice(0, req); // Trim to exact requested length
+          testPool = testPool.slice(0, req);
       }
       
-      // poolIdx is only used for makeSequence, so it should refer to unique items
       poolIdx = labels.map(r=> ALL_ROMAJI.indexOf(r)).filter(x=>x>=0);
 
       state.test.target = req;
       state.test.score=0; state.test.total=0; state.test.correctStreak=0; qIndex=0; save();
       qs('#testArea').hidden=false; updateProgress();
-      nextQ(); // nextQ will call toggleAnswerUI
+      nextQ();
     }
 
-    // Corrected toggleAnswerUI logic
     function toggleAnswerUI(){
       const typeWrap = qs('#typeWrap');
       const mcWrap = qs('#mcWrap');
@@ -827,10 +826,9 @@
       const mode = answerModeSelect.value;
       const qType = qTypeSelect.value;
 
-      // Explicitly set display to none for both, overriding any other styles
       typeWrap.style.display = 'none';
       mcWrap.style.display = 'none';
-      answerModeSelect.disabled = false; // Enable by default, then disable if needed
+      answerModeSelect.disabled = false;
 
       if (qType === 'seq') {
         typeWrap.style.display = 'block';
@@ -840,10 +838,10 @@
         mcWrap.style.display = 'grid';
         answerModeSelect.value = 'mc';
         answerModeSelect.disabled = true;
-      } else { // qType is 'k2r' (Kana -> Romaji)
+      } else {
         if (mode === 'type') {
           typeWrap.style.display = 'block';
-        } else { // mode === 'mc'
+        } else {
           mcWrap.style.display = 'grid';
         }
       }
@@ -856,7 +854,6 @@
       if(!testPool.length){ qs('#qKana').textContent='Selesai!'; return; }
       currentItem = testPool[qIndex % testPool.length]; const qType=state.test.qType; const ansEl=qs('#ans'); if(ansEl) ansEl.value='';
       
-      // Set the question prompt based on qType
       if(qType==='seq'){
         const seq = makeSequence(poolIdx, state.test.set);
         currentItem = {...currentItem, seq};
@@ -867,21 +864,22 @@
         qs('#qKana').style.fontSize='64px';
         qs('#qKana').textContent=currentItem.char;
       }
-      else { // qType is 'r2k'
+      else {
         qs('#qKana').style.fontSize='36px';
         qs('#qKana').textContent=currentItem.romaji;
-        buildMC_r2k(currentItem); // Populate MC options for r2k
+        buildMC_r2k(currentItem);
       }
 
-      // If answer mode is MC and qType is k2r, build MC options
-      // This part only builds the content, visibility is handled by toggleAnswerUI
       if(qs('#answerMode').value === 'mc' && qs('#qType').value === 'k2r') {
         buildMC_k2r(currentItem);
       }
 
       updateTestInfo();
-      toggleAnswerUI(); // Call toggleAnswerUI at the very end to ensure correct visibility
-      setTimeout(()=>{ if(!qs('#typeWrap').hidden) ansEl && ansEl.focus(); }, 30);
+      toggleAnswerUI();
+      setTimeout(()=>{
+        const tw = qs('#typeWrap');
+        if (tw && getComputedStyle(tw).display !== 'none') ansEl && ansEl.focus();
+      }, 30);
     }
 
     function mcPick(letter){ const qType=state.test.qType; const val=mcMap[letter]; let correct=false; if(qType==='k2r'){ correct = (val===currentItem.romaji); } else if(qType==='r2k'){ correct = (val=== (state.test.set==='hira'? HIRA_MAP.get(currentItem.romaji): KATA_MAP.get(currentItem.romaji))); }
@@ -901,8 +899,8 @@
       if(correct){
         state.test.score+=1;
         state.test.correctStreak+=1;
-        state.totalPoints += 1; // Add 1 point for each correct answer
-        checkLevelUp(); // Check for level up
+        state.totalPoints += 1;
+        checkLevelUp();
         maybeCelebrate('streak');
         clickTone('ok');
         qKanaElement.classList.add('correct-answer');
@@ -914,11 +912,10 @@
         qKanaElement.classList.add('wrong-answer');
       }
 
-      // Remove animation classes after a short delay
       setTimeout(() => {
         qKanaElement.classList.remove('correct-answer', 'wrong-answer');
         if (streakCounterElement) streakCounterElement.classList.remove('grow');
-      }, 300); // Match animation duration
+      }, 300);
 
       updateProgress();
       if(state.test.total>=state.test.target){ finishTest(); return; }
@@ -940,40 +937,34 @@
         const singleKey = qs('#testSingleGroup').value;
         const grp = GROUPS.find(x => x.key === singleKey);
         rangeLabel = grp ? grp.label : 'Grup Tunggal';
-      } else { // range mode
+      } else {
         const sKey = qs('#testFrom').value;
         const eKey = qs('#testTo').value;
         const grpFrom = GROUPS.find(x => x.key === sKey);
         const grpTo = GROUPS.find(x => x.key === eKey);
-        if (grpFrom && grpTo) {
-          rangeLabel = `${grpFrom.label} - ${grpTo.label}`;
-        } else {
-          rangeLabel = 'Rentang khusus';
-        }
+        rangeLabel = (grpFrom && grpTo) ? `${grpFrom.label} - ${grpTo.label}` : 'Rentang khusus';
       }
 
       const tlabel = state.test.qType==='k2r'? 'Kana→Romaji' : state.test.qType==='r2k'? 'Romaji→Kana' : 'Rangkaian';
-      const testInfoTextElement = qs('#testInfoText'); // Get the new span for text
-      const streakCounterElement = qs('#streakCounter'); // Get the streak span
+      const testInfoTextElement = qs('#testInfoText');
+      const streakCounterElement = qs('#streakCounter');
 
       if (testInfoTextElement) {
         testInfoTextElement.textContent = `${state.test.set==='hira'?'Hiragana':'Katakana'} • ${rangeLabel} • ${tlabel} • Soal ${state.test.total}/${state.test.target}`;
       }
-      if (streakCounterElement) {
-        streakCounterElement.textContent = `Streak: ${state.test.correctStreak}`;
-      }
+      if (streakCounterElement) streakCounterElement.textContent = `Streak: ${state.test.correctStreak}`;
     }
 
     function updateProgress(){ const pct = (state.test.total/state.test.target)*100; const bar = qs('#bar'); bar.style.width = pct+'%'; const prog = qs('.progress'); prog.setAttribute('aria-valuenow', Math.round(pct)); }
 
     function finishTest(){
-      state.totalPoints += state.test.score * 2; // Add bonus points for finishing test (e.g., 2x score)
-      checkLevelUp(); // Check for level up after test bonus
+      state.totalPoints += state.test.score * 2;
+      checkLevelUp();
       openCelebrate('finish');
       burst();
       clickTone('ok');
       renderReview();
-      updatePointsAndLevelDisplay(); // Update after test completion
+      updatePointsAndLevelDisplay();
     }
 
     function renderReview(){ const box=qs('#reviewWrap'); const hasWrong = wrongList.length>0; qs('#btnReviewWrong').hidden=!hasWrong; box.hidden=!hasWrong; qs('#celebrateMsg').textContent=`Skor: ${state.test.score}/${state.test.total}`; if(!hasWrong){ box.innerHTML=''; return; } const set=state.test.set; box.innerHTML = wrongList.map((w,i)=>{ const expected = (state.test.qType==='k2r')? w.romaji : (set==='hira'? HIRA_MAP.get(w.romaji): KATA_MAP.get(w.romaji)); const got = w.chosen||w.normalized||w.typed||''; const left = (state.test.qType==='k2r')? (set==='hira'? HIRA_MAP.get(w.romaji): KATA_MAP.get(w.romaji)) : w.romaji; return `<div style="padding:8px;border:1px solid var(--border);border-radius:12px;margin:6px 0;display:flex;justify-content:space-between;gap:8px"><div><div class="small">Soal ${i+1}</div><div><b>${left}</b> → <span style="color:var(--ok)">${expected}</span></div><div class="small">Jawaban kamu: ${got||'-'}</div></div><button class="btn" onclick="(function(){window._speak && window._speak('${w.romaji}')})()">🎧</button></div>`; }).join(''); }
@@ -986,10 +977,8 @@
       if (rangeMode === 'single') {
         const singleKey = qs('#testSingleGroup').value;
         const grp = GROUPS.find(x => x.key === singleKey);
-        if (grp) {
-          labels = grp.idx.map(i => grp.list[i]);
-        }
-      } else { // range mode
+        if (grp) labels = grp.idx.map(i => grp.list[i]);
+      } else {
         const sKey = qs('#testFrom').value;
         const eKey = qs('#testTo').value;
         const selFrom=GROUPS.findIndex(x=>x.key===sKey);
@@ -1006,7 +995,6 @@
     function currentPoolLabels(){ return testPool.map(x=>x.romaji); }
     function currentPoolChars(){ return testPool.map(x=>x.char); }
 
-    // Function to toggle visibility of range inputs
     function toggleRangeInputs() {
       const rangeMode = qs('#rangeMode').value;
       const testFrom = qs('#testFrom');
@@ -1017,7 +1005,7 @@
         testFrom.hidden = true;
         testToWrap.hidden = true;
         testSingleGroup.hidden = false;
-      } else { // 'range'
+      } else {
         testFrom.hidden = false;
         testToWrap.hidden = false;
         testSingleGroup.hidden = true;
@@ -1025,29 +1013,27 @@
     }
 
     // ---------- THEME & AUDIO ----------
-    function applyTheme(){ document.documentElement.setAttribute('data-theme', state.theme==='hc'?'hc':'pastel'); qs('#tPastel').classList.toggle('active', state.theme!=='hc'); qs('#tHC').classList.toggle('active', state.theme==='hc'); }
+    function applyTheme(){
+      document.documentElement.setAttribute('data-theme', state.theme==='hc'?'hc':'pastel');
+      qs('#tPastel').classList.toggle('active', state.theme!=='hc');
+      qs('#tHC').classList.toggle('active', state.theme==='hc');
+      // refresh writer visuals if already mounted
+      if (typeof writerSetGhostChar === 'function') writerSetGhostChar();
+      if (typeof writerRedrawAll === 'function') writerRedrawAll();
+    }
     function applyAudio(){ const ck=qs('#audToggle'); ck.checked = !!state.audio; }
 
-    // Reverted speak function to use SpeechSynthesisUtterance (or no-op if unsupported/disabled)
     function speak(text){
         try{
-            if(!state.audio) return; // Only play if audio is enabled
-            if(!('speechSynthesis' in window)) {
-                // console.warn("SpeechSynthesis API not supported in this browser."); // Keep console warning if needed for dev
-                return;
-            }
+            if(!state.audio) return;
+            if(!('speechSynthesis' in window)) return;
             const u=new SpeechSynthesisUtterance(text);
             u.lang='ja-JP';
-            u.rate=.9;
-            u.pitch=1.02;
-            u.volume=1;
+            u.rate=.9; u.pitch=1.02; u.volume=1;
             speechSynthesis.speak(u);
-        }catch(error){
-            console.error('Error speaking text:', error);
-        }
+        }catch(error){ console.error('Error speaking text:', error); }
     }
-
-    window._speak = speak; // Expose for inline onclick
+    window._speak = speak;
 
     function clickTone(kind){ try{ if(!state.audio) return; const C = window.AudioContext || window.webkitAudioContext; if(!C) return; const ctx=new C(); const o=ctx.createOscillator(); const g=ctx.createGain(); o.connect(g); g.connect(ctx.destination); o.type='sine'; o.frequency.setValueAtTime(kind==='ok'? 960: kind==='bad'? 260: 520, ctx.currentTime); g.gain.setValueAtTime(0.0001, ctx.currentTime); g.gain.exponentialRampToValueAtTime(kind==='bad'?0.25:0.12, ctx.currentTime+0.01); o.start(); setTimeout(()=>{ g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime+0.2); o.stop(ctx.currentTime+0.22); ctx.close && ctx.close(); }, 150);}catch{} }
 
@@ -1069,8 +1055,8 @@
         title.textContent='Tes selesai! 🎉';
         msg.textContent=`Skor: ${state.test.score}/${state.test.total}`;
       } else if (mode === 'levelUp') {
-        // Handled by maybeCelebrate directly
-      } else { // streak
+        // handled above
+      } else {
         title.textContent='Wii! Keren banget! 🎉';
         msg.textContent='10 jawaban benar berturut-turut. Lanjutkan momentummu! 🔥';
       }
@@ -1080,7 +1066,7 @@
     qs('#btnCloseModal').onclick = closeCelebrate;
     function burst(){ burstBox.innerHTML=''; const colors=['#7a6cff','#16c6a1','#ffd166','#ff7b7b','#2fb875','#8acbff']; const w=window.innerWidth, h=window.innerHeight; for(let i=0;i<90;i++){ const p=document.createElement('div'); p.className='particle'; p.style.background=colors[i%colors.length]; const dx=(Math.random()*w - w/2)+'px'; const dy=(Math.random()*h/2)+'px'; p.style.setProperty('--dx',dx); p.style.setProperty('--dy',dy); p.style.left=(w/2)+'px'; p.style.top=(h/3)+'px'; burstBox.appendChild(p);} setTimeout(()=>{ burstBox.innerHTML=''; }, 1000); }
 
-    // ---------- POMODORO (drift-safe) ----------
+    // ---------- POMODORO ----------
     let pomoHandle=null;
     function upPomoLabel(){ qs('#pomoLabel').textContent = state.pomo.mode==='work'? 'Fokus':'Istirahat'; }
     function drawRemain(){ const m=Math.floor(state.pomo.remaining/60).toString().padStart(2,'0'); const s=(state.pomo.remaining%60).toString().padStart(2,'0'); qs('#pomoTime').textContent=`${m}:${s}`; }
@@ -1092,7 +1078,7 @@
     // ---------- NORMALISASI & KONVERSI ----------
     function hasKana(s){ return /[ぁ-んァ-ン]/.test(s); }
     function normalizeRomaji(v){ v=(v||'').toLowerCase().trim(); const alias = { si:'shi', ti:'chi', tu:'tsu', hu:'fu', wo:'o', ji:'ji', zu:'zu' }; return alias[v] || v; }
-    function romajiStringToKana(str,set){ let s=(str||'').toLowerCase().replace(/\s+/g,''); let out=''; while(s.length){ let matched=false; // handle syllabic n
+    function romajiStringToKana(str,set){ let s=(str||'').toLowerCase().replace(/\s+/g,''); let out=''; while(s.length){ let matched=false;
         if(s[0]==='n'){ if(s[1]==='n'){ out += (set==='hira'? 'ん':'ン'); s=s.slice(2); matched=true; continue; } const next=s[1]||''; if(next && !'aeiouy'.includes(next)){ out += (set==='hira'? 'ん':'ン'); s=s.slice(1); matched=true; continue; } }
         for(const r of ROMAJI_SORTED){ if(s.startsWith(r)){ out += (set==='hira'? HIRA_MAP.get(r): KATA_MAP.get(r)); s=s.slice(r.length); matched=true; break; } }
         if(!matched){ if(/^[bcdfghjklmnpqrstvwxyz]\1/.test(s)){ out += (set==='hira'? 'っ':'ッ'); s=s.slice(1); matched=true; continue; } s=s.slice(1); }
@@ -1101,8 +1087,174 @@
 
     // ---------- UTILS ----------
     function shuffle(arr){ for(let i=arr.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [arr[i],arr[j]]=[arr[j],arr[i]]; } }
-    function shuffleSync(a,b){ for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; [b[i],b[j]]=[b[j],b[i]]; } }
     function attachLongPress(el, onClick, onLong){ let t=null, long=false; const down=()=>{ long=false; t=setTimeout(()=>{ long=true; onLong&&onLong(); }, 500); }; const up=()=>{ clearTimeout(t); if(!long) onClick&&onClick(); }; el.addEventListener('pointerdown', down, {passive:true}); el.addEventListener('pointerup', up, {passive:true}); el.addEventListener('pointerleave', ()=>clearTimeout(t), {passive:true}); el.addEventListener('keydown', (e)=>{ if(e.key==='Enter' || e.key===' '){ e.preventDefault(); onClick&&onClick(); } }); }
+
+    // ---------- WRITER (Latihan Menulis) ----------
+    let wCanvas, wCtx, wWrap, wGhost, isDrawing=false, lastX=0, lastY=0, dpr=1;
+    const wStrokes = [];
+    let _writerBound = false;
+
+    function writerInitDOMRefs() {
+      wCanvas = qs('#writerCanvas');
+      wWrap   = qs('#writerWrap');
+      wGhost  = qs('#writerGhost');
+      wCtx    = wCanvas.getContext('2d');
+    }
+    function writerSetupCanvasSize() {
+      const rect = wWrap.getBoundingClientRect();
+      dpr = Math.max(1, window.devicePixelRatio || 1);
+      const size = Math.floor(rect.width);
+      wCanvas.style.width = size + 'px';
+      wCanvas.style.height = size + 'px';
+      wCanvas.width  = Math.floor(size * dpr);
+      wCanvas.height = Math.floor(size * dpr);
+      wCtx.setTransform(1,0,0,1,0,0);
+      wCtx.scale(dpr, dpr);
+      writerRedrawAll();
+    }
+    function writerCurrentChar() {
+      const r = state.writer.kana;
+      return state.writer.set==='hira' ? HIRA_MAP.get(r) : KATA_MAP.get(r);
+    }
+    function writerSetGhostChar() {
+      if (!wGhost) return;
+      const ch = writerCurrentChar() || 'あ';
+      wGhost.textContent = ch;
+      wGhost.style.opacity = state.writer.ghost ? state.writer.ghostOpacity : 0;
+      wGhost.classList.toggle('hidden', !state.writer.ghost);
+    }
+    function writerSetGrid(on) { if (wWrap) wWrap.classList.toggle('grid', !!on); }
+    function writerStrokeStyle() {
+      wCtx.lineCap = 'round';
+      wCtx.lineJoin = 'round';
+      wCtx.strokeStyle = state.theme==='hc' ? '#e6efff' : '#132030';
+      wCtx.globalCompositeOperation = state.writer.eraser ? 'destination-out' : 'source-over';
+      wCtx.lineWidth = state.writer.penSize;
+    }
+    function writerPointerPos(e) {
+      const rect = wCanvas.getBoundingClientRect();
+      const x = (e.clientX ?? 0) - rect.left;
+      const y = (e.clientY ?? 0) - rect.top;
+      return { x: Math.max(0, Math.min(rect.width, x)), y: Math.max(0, Math.min(rect.height, y)) };
+    }
+    function writerStart(e) {
+      e.preventDefault();
+      const p = writerPointerPos(e);
+      isDrawing = true;
+      lastX = p.x; lastY = p.y;
+      wStrokes.push({ ops: state.writer.eraser ? 'destination-out' : 'source-over', size: state.writer.penSize, points: [{x:lastX, y:lastY}] });
+    }
+    function writerMove(e) {
+      if(!isDrawing) return;
+      const p = writerPointerPos(e);
+      const s = wStrokes[wStrokes.length-1];
+      s.points.push({x:p.x, y:p.y});
+      writerStrokeStyle();
+      wCtx.beginPath();
+      wCtx.moveTo(lastX, lastY);
+      wCtx.lineTo(p.x, p.y);
+      wCtx.stroke();
+      lastX = p.x; lastY = p.y;
+    }
+    function writerEnd() { isDrawing=false; }
+    function writerRedrawAll() {
+      if(!wCtx) return;
+      wCtx.setTransform(1,0,0,1,0,0);
+      wCtx.clearRect(0,0,wCanvas.width,wCanvas.height);
+      wCtx.scale(dpr, dpr);
+      for(const s of wStrokes){
+        wCtx.globalCompositeOperation = s.ops;
+        wCtx.lineWidth = s.size;
+        wCtx.lineCap='round'; wCtx.lineJoin='round';
+        wCtx.strokeStyle = state.theme==='hc' ? '#e6efff' : '#132030';
+        wCtx.beginPath();
+        for(let i=1;i<s.points.length;i++){
+          const a=s.points[i-1], b=s.points[i];
+          wCtx.moveTo(a.x, a.y);
+          wCtx.lineTo(b.x, b.y);
+        }
+        wCtx.stroke();
+      }
+    }
+    function writerUndo() { if(!wStrokes.length) return; wStrokes.pop(); writerRedrawAll(); }
+    function writerClear() { wStrokes.length = 0; writerRedrawAll(); }
+    function writerSavePNG() {
+      const tmp = document.createElement('canvas');
+      tmp.width = wCanvas.width; tmp.height = wCanvas.height;
+      const tctx = tmp.getContext('2d');
+      const panel = getComputedStyle(document.documentElement).getPropertyValue('--panel') || '#fff';
+      tctx.fillStyle = panel.trim() || '#fff';
+      tctx.fillRect(0,0,tmp.width,tmp.height);
+      tctx.drawImage(wCanvas, 0, 0);
+      const url = tmp.toDataURL('image/png');
+      const a = document.createElement('a');
+      const fileName = `kana-${state.writer.kana}-${state.writer.set}.png`;
+      a.href = url; a.download = fileName; a.click();
+    }
+    function writerFillKanaOptions() {
+      const sel = qs('#writeKana');
+      sel.innerHTML = '';
+      ALL_ROMAJI.forEach(r=>{
+        const o = new Option(`${r.toUpperCase()} — ${(state.writer.set==='hira'? HIRA_MAP.get(r): KATA_MAP.get(r))}`, r);
+        sel.add(o);
+      });
+      sel.value = state.writer.kana;
+    }
+    function writerApplyUIFromState() {
+      if (!wCanvas) return;
+      qs('#writeSet').value = state.writer.set;
+      qs('#penSize').value = state.writer.penSize;
+      qs('#gridToggle').checked = state.writer.grid;
+      qs('#ghostToggle').checked = state.writer.ghost;
+      qs('#ghostOpacity').value = Math.round(state.writer.ghostOpacity * 100);
+      writerFillKanaOptions();
+      writerSetGhostChar();
+      writerSetGrid(state.writer.grid);
+      writerSetupCanvasSize();
+    }
+    function writerPick(offset) {
+      const idx = ALL_ROMAJI.indexOf(state.writer.kana);
+      const next = (idx + offset + ALL_ROMAJI.length) % ALL_ROMAJI.length;
+      state.writer.kana = ALL_ROMAJI[next];
+      save();
+      writerFillKanaOptions();
+      writerSetGhostChar();
+    }
+    function writerRandom() {
+      state.writer.kana = ALL_ROMAJI[Math.floor(Math.random()*ALL_ROMAJI.length)];
+      save();
+      writerFillKanaOptions();
+      writerSetGhostChar();
+    }
+    function writerBindEvents() {
+      if (!wCanvas || _writerBound) return;
+      _writerBound = true;
+      wCanvas.addEventListener('pointerdown', writerStart);
+      wCanvas.addEventListener('pointermove', writerMove);
+      window.addEventListener('pointerup', writerEnd);
+      qs('#writeSet').onchange = (e)=>{ state.writer.set=e.target.value; save(); writerFillKanaOptions(); writerSetGhostChar(); };
+      qs('#writeKana').onchange = (e)=>{ state.writer.kana=e.target.value; save(); writerSetGhostChar(); };
+      qs('#writePrev').onclick = ()=>{ writerPick(-1); };
+      qs('#writeNext').onclick = ()=>{ writerPick(1); };
+      qs('#writeRand').onclick = ()=>{ writerRandom(); };
+      qs('#writeSpeak').onclick = ()=>{ speak(state.writer.kana); clickTone('click'); };
+      qs('#penSize').oninput = (e)=>{ state.writer.penSize = parseInt(e.target.value,10)||10; save(); };
+      qs('#gridToggle').onchange = (e)=>{ state.writer.grid = e.target.checked; save(); writerSetGrid(state.writer.grid); };
+      qs('#ghostToggle').onchange = (e)=>{ state.writer.ghost = e.target.checked; save(); writerSetGhostChar(); };
+      qs('#ghostOpacity').oninput = (e)=>{ const v = Math.max(5, Math.min(40, parseInt(e.target.value,10)||12))/100; state.writer.ghostOpacity = v; save(); writerSetGhostChar(); };
+      qs('#penBtn').onclick = ()=>{ state.writer.eraser=false; save(); qs('#penBtn').classList.add('ok'); qs('#eraserBtn').classList.remove('ok'); };
+      qs('#eraserBtn').onclick = ()=>{ state.writer.eraser=true; save(); qs('#eraserBtn').classList.add('ok'); qs('#penBtn').classList.remove('ok'); };
+      qs('#undoStroke').onclick = writerUndo;
+      qs('#clearCanvas').onclick = writerClear;
+      qs('#savePNG').onclick  = writerSavePNG;
+      document.addEventListener('keydown', (e)=>{ if((e.ctrlKey||e.metaKey) && e.key.toLowerCase()==='z'){ e.preventDefault(); writerUndo(); } });
+      window.addEventListener('resize', ()=>{ writerSetupCanvasSize(); });
+    }
+    function writerInit() {
+      writerInitDOMRefs();
+      writerBindEvents();
+      writerApplyUIFromState();
+    }
 
     // ---------- BINDINGS ----------
     qs('#btnShowLearn').onclick = startLearn;
@@ -1110,27 +1262,19 @@
     qs('#btnEnd').onclick = endTest;
     qs('#btnSkip').onclick = skipQ;
     qs('#btnCheck').onclick = checkAns;
-    // Removed btnListen event listener as TTS API is removed
-    // qs('#btnListen').onclick = ()=>{ speakCurrent(); clickTone('click'); };
-
 
     qs('#mcWrap').addEventListener('pointerup', (e)=>{ const btn=e.target.closest('.opt'); if(!btn) return; const id=(btn.id||'').slice(-1); if(!id) return; mcPick(id); }, {passive:true});
 
-    // Keyboard shortcuts
     document.addEventListener('keydown', (e)=>{
-      if(e.key==='Enter' && !qs('#testArea').hidden && qs('#typeWrap') && !qs('#typeWrap').hidden){ e.preventDefault(); checkAns(); }
-      const map={a:'A',b:'B',c:'C',d:'D'}; const k=map[e.key?.toLowerCase?.()]; if(k && !qs('#mcWrap').hidden){ e.preventDefault(); mcPick(k); }
+      if(e.key==='Enter' && !qs('#testArea').hidden && qs('#typeWrap') && getComputedStyle(qs('#typeWrap')).display!=='none'){ e.preventDefault(); checkAns(); }
+      const map={a:'A',b:'B',c:'C',d:'D'}; const k=map[e.key?.toLowerCase?.()]; if(k && getComputedStyle(qs('#mcWrap')).display!=='none'){ e.preventDefault(); mcPick(k); }
       if(e.key==='ArrowRight' && !qs('#testArea').hidden){ e.preventDefault(); skipQ(); }
-      // Removed 'l' key for speakCurrent
-      // if(e.key?.toLowerCase?.()==='l' && !qs('#testArea').hidden){ e.preventDefault(); speakCurrent(); }
     });
 
-    // Theme & audio
     qs('#tPastel').onclick = ()=>{ state.theme='pastel'; save(); applyTheme(); };
     qs('#tHC').onclick = ()=>{ state.theme='hc'; save(); applyTheme(); };
     qs('#audToggle').onchange = (e)=>{ state.audio = e.target.checked; save(); };
 
-    // Reset
     qs('#resetBtn').onclick = ()=>{
       if(confirm('Hapus semua progres? Ini tidak bisa dibatalkan.')){
         localStorage.removeItem(KEY);
@@ -1138,33 +1282,20 @@
         applyTheme();
         applyAudio();
         renderAll();
+        if (typeof writerClear==='function') writerClear();
         save();
       }
     };
 
-    // Count chips
     qs('#countChips').addEventListener('click', (e)=>{ const b=e.target.closest('.chip'); if(!b) return; const c=parseInt(b.dataset.count,10)||10; qs('#testCount').value=c; clickTone('click'); });
 
-    // Pomodoro controls
     qs('#pStart').onclick = startPomo;
     qs('#pPause').onclick = pausePomo;
     qs('#pReset').onclick = resetPomo;
 
-    // Range mode toggle
     qs('#rangeMode').onchange = toggleRangeInputs;
-    // Add event listener for answerMode to update UI immediately
-    qs('#answerMode').onchange = (e) => {
-      state.test.mode = e.target.value;
-      save();
-      toggleAnswerUI(); // Update UI immediately based on new mode
-    };
-    // Add event listener for qType to update UI immediately
-    qs('#qType').onchange = (e) => {
-      state.test.qType = e.target.value;
-      save();
-      toggleAnswerUI(); // Update UI immediately based on new qType
-    };
-
+    qs('#answerMode').onchange = (e) => { state.test.mode = e.target.value; save(); toggleAnswerUI(); };
+    qs('#qType').onchange = (e) => { state.test.qType = e.target.value; save(); toggleAnswerUI(); };
 
     // ---------- RENDER ----------
     function renderAll(){
@@ -1172,7 +1303,7 @@
       buildKana('kataBox','kata');
       buildSubsetChips();
       fillLearnRange();
-      fillTestRange(); // This now also calls toggleRangeInputs internally
+      fillTestRange();
       renderStats();
       applyTheme();
       applyAudio();
@@ -1182,8 +1313,9 @@
       qs('#pomoWork').value=state.pomo.work;
       qs('#pomoBreak').value=state.pomo.break;
       qs('#testCount').value=state.test.target||10;
-      toggleAnswerUI(); // Ensure initial answer UI is correct on load
-      updatePointsAndLevelDisplay(); // Initial display of points and level
+      toggleAnswerUI();
+      updatePointsAndLevelDisplay();
+      writerInit(); // init writer last
     }
 
     document.addEventListener('DOMContentLoaded', ()=>{
@@ -1193,4 +1325,3 @@
   </script>
 </body>
 </html>
-
