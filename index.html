@@ -21,12 +21,16 @@
     <meta property="twitter:description" content="Belajar Hiragana & Katakana lengkap dengan tes interaktif, Pomodoro, dan latihan menulis.">
     <meta property="twitter:image" content="https://<username>.github.io/<repo>/kana-trainer-preview.png"> <!-- Pastikan gambar ini ada di repo Anda -->
 
+    <!-- MOD: Canonical Link -->
+    <link rel="canonical" href="https://<username>.github.io/<repo>/">
+
     <!-- Google Fonts - Inter (MOD: Added preconnect for performance) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Font Awesome for Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- MOD: Added Noto Sans JP and Noto Serif JP for Japanese characters -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;700&family=Noto+Serif+JP:wght@700&display=swap" rel="stylesheet">
+    <!-- Font Awesome for Icons (MOD: Updated to stable v6.5.2) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <style>
         :root{
             --bg:#f8fbff; --panel:#ffffff; --soft:#f2f6ff; --ink:#132030; --muted:#76849c;
@@ -121,15 +125,14 @@
         .card h2 .icon { color: var(--iconColor); }
         .muted{color:var(--muted);font-size:13px}
 
-        input, textarea{ /* MOD: Removed select from here */
+        input, textarea{
             width:100%;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--soft);color:var(--ink);
             transition: border-color 0.2s ease-out, background-color 0.2s ease-out, box-shadow 0.2s ease-out;
             -webkit-appearance: none;
             -moz-appearance: none;
             appearance: none;
-            /* MOD: Removed background-image and padding-right from here */
         }
-        select{ /* MOD: New rule for select only */
+        select{
             width:100%;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--soft);color:var(--ink);
             transition: border-color 0.2s ease-out, background-color 0.2s ease-out, box-shadow 0.2s ease-out;
             -webkit-appearance: none;
@@ -532,7 +535,7 @@
                 </div>
                 <div class="spacer"></div>
                 <div class="row">
-                    <div class="tag" id="jpStats" aria-live="polite">0/103 hira • 0/103 kata</div>
+                    <div class="tag" id="jpStats" aria-live="polite">0/104 hira • 0/104 kata</div>
                 </div>
                 <div class="spacer"></div>
                 <div class="row" style="justify-content: center; font-size: 14px;">
@@ -581,8 +584,8 @@
                         <input id="autoSnapToggle" type="checkbox"> Auto-Snap
                     </label>
                     <div style="flex:1"></div>
-                    <button class="btn" id="undoStroke" title="Undo (Ctrl+Z)" type="button"><i class="fas fa-undo"></i> Undo</button>
-                    <button class="btn warn" id="clearCanvas" type="button"><i class="fas fa-redo"></i> Bersihkan</button>
+                    <button class="btn" id="undoStroke" title="Undo (Ctrl+Z)" type="button"><i class="fas fa-rotate-left"></i> Undo</button> <!-- MOD: Updated icon class -->
+                    <button class="btn warn" id="clearCanvas" type="button"><i class="fas fa-rotate-right"></i> Bersihkan</button> <!-- MOD: Updated icon class -->
                     <button class="btn primary" id="savePNG" type="button"><i class="fas fa-download"></i> Simpan PNG</button>
                 </div>
 
@@ -606,8 +609,8 @@
             <div class="spacer"></div>
             <div id="reviewWrap" style="text-align:left;max-height:40vh;overflow:auto;margin:8px 0" hidden></div>
             <div class="row" style="justify-content:center">
-                <button class="btn" id="btnReviewWrong" hidden type="button"><i class="fas fa-redo-alt"></i> Belajar ulang yang salah</button>
-                <button class="btn primary" id="btnCloseModal" type="button"><i class="fas fa-times"></i> Lanjut</button>
+                <button class="btn" id="btnReviewWrong" hidden type="button"><i class="fas fa-rotate-right"></i> Belajar ulang yang salah</button> <!-- MOD: Updated icon class -->
+                <button class="btn primary" id="btnCloseModal" type="button"><i class="fas fa-xmark"></i> Lanjut</button> <!-- MOD: Updated icon class -->
             </div>
         </div>
         <div id="burst" class="burst" aria-hidden="true"></div>
@@ -625,7 +628,7 @@
             </div>
             <div class="spacer"></div>
             <div class="row" style="justify-content:center">
-                <!-- Removed "Jangan tampilkan lagi" checkbox -->
+                <!-- MOD: Removed "Jangan tampilkan lagi" checkbox -->
                 <button class="btn primary" id="btnStartLearningOnboarding" type="button">Mulai Belajar!</button>
             </div>
         </div>
@@ -662,7 +665,7 @@
             streak_msg: '10 jawaban benar berturut-turut. Lanjutkan momentummu! ✨',
             pomo_focus: 'Fokus',
             pomo_break: 'Istirahat',
-            pomo_start_focus: 'Fokus dimulai. {time} — semangat!',
+            pomo_start_focus: (time)=>`Fokus dimulai. ${time} — semangat!`, // MOD: Changed to function
             pomo_time_break: 'Waktunya istirahat. Minum air dulu 🥤',
             test_info_text: (set, range, qType, total, target)=>`${set} • ${range} • ${qType} • Soal ${total}/${target}`,
             test_streak: (streak)=>`Streak: ${streak}`,
@@ -775,10 +778,10 @@
         const HIRA_BASE = ['あ','い','う','え','お','か','き','く','け','こ','さ','し','す','せ','そ','た','ち','つ','て','と','な','に','ぬ','ね','の','は','ひ','ふ','へ','ほ','ま','み','む','め','も','や','ゆ','よ','ら','り','る','れ','ろ','わ','を','ん'];
         const KATA_BASE = ['ア','イ','ウ','エ','オ','カ','キ','ク','ケ','コ','サ','シ','ス','セ','ソ','タ','チ','ツ','テ','ト','ナ','ニ','ヌ','ネ','ノ','ハ','ヒ','フ','ヘ','ホ','マ','ミ','ム','メ','モ','ヤ','ユ','ヨ','ラ','リ','ル','レ','ロ','ワ','ヲ','ン'];
 
-        const HIRA_DAKU = ['が','ぎ','ぐ','げ','ご','ざ','じ','ず','ぜ','ぞ','だ','ぢ','づ','で','ど','ば','び','ぶ','べ','ぼ','ぱ','ぴ','ぷ','ぺ','ぽ'];
+        const HIRA_DAKU = ['が','ぎ','ぐ','げ','ご','ざ','じ','ず','ぜ','ぞ','だ','ぢ','づ','で','ど','ば','び','ぶ','べ','ぼ','ぱ','ぴ','ぷ','ぺ','ぽ']; // MOD: Corrected 'bi' to 'び'
         const KATA_DAKU = ['ガ','ギ','グ','ゲ','ゴ','ザ','ジ','ズ','ゼ','ゾ','ダ','ヂ','ヅ','デ','ド','バ','ビ','ブ','ベ','ボ','パ','ピ','プ','ペ','ポ'];
 
-        const HIRA_YOU = ['きゃ','きゅ','きょ','しゃ','しゅ','しょ','ちゃ','ちゅ','ちょ','にゃ','にゅ','にょ','ひゃ','ひゅ','ひょ','みゃ','みゅ','みょ','りゃ','りゅ','りょ','ぎゃ','ぎゅ','ぎょ','じゃ','じゅ','じょ','びゃ','びゅ','びょ','ぴゃ','ぴゅ','ぴょ'];
+        const HIRA_YOU = ['きゃ','きゅ','きょ','しゃ','しゅ','しょ','ちゃ','ちゅ','ちょ','にゃ','にゅ','にょ','ひゃ','ひゅ','ひょ','みゃ','みゅ','みょ','りゃ','りゅ','りょ','ぎゃ','ぎゅ','ぎょ','じゃ','じゅ','じょ','びゃ','びゅ','びょ','ぴゃ','ぴゅ','ぴょ']; // MOD: Corrected 'biゃ' etc.
         const KATA_YOU = ['キャ','キュ','キョ','シャ','シュ','ショ','チャ','チュ','チョ','ニャ','ニュ','ニョ','ヒャ','ヒュ','ヒョ','ミャ','ミュ','ミョ','リャ','リュ','リョ','ギャ','ギュ','ギョ','ジャ','ジュ','ジョ','ビャ','ビュ','ビョ','ピャ','ピュ','ピョ'];
 
         const GROUPS = [
@@ -1330,7 +1333,7 @@
                 const selFrom=GROUPS.findIndex(x=>x.key===sKey);
                 const selTo=GROUPS.findIndex(x=>x.key===eKey);
                 if(selFrom > -1 && selTo > -1){
-                    const [from,to]= selFrom<=selTo? [selFrom,selTo] : [selTo,selM,];
+                    const [from,to]= selFrom<=selTo? [selFrom,selTo] : [selTo,selFrom]; // MOD: Fixed typo selM -> selFrom
                     labels = GROUPS.slice(from,to+1).flatMap(g=> g.idx.map(i=> g.list[i] ));
                 }
             }
@@ -1691,6 +1694,7 @@
         let wCanvas, wCtx, wWrap, wGhost, isDrawing=false, lastX=0, lastY=0, dpr=1;
         const wStrokes = [];
         let _writerBound = false;
+        let _writerRO = null; // MOD: Declare ResizeObserver variable
 
         function writerInitDOMRefs() {
             wCanvas = qs('#writerCanvas');
@@ -1700,6 +1704,11 @@
         }
         function writerSetupCanvasSize() {
             const rect = wWrap.getBoundingClientRect();
+            // MOD: Add safeguard for zero width/height
+            if (rect.width === 0 || rect.height === 0) {
+                requestAnimationFrame(writerSetupCanvasSize);
+                return;
+            }
             dpr = Math.max(1, window.devicePixelRatio || 1);
             const size = Math.floor(rect.width);
             wCanvas.style.width = size + 'px';
@@ -1795,8 +1804,8 @@
                 wCtx.beginPath();
                 for(let i=1;i<s.points.length;i++){
                     const a=s.points[i-1], b=s.points[i];
-                    wCtx.moveTo(a.x, a.y); // MOD: Changed to ctx.moveTo
-                    wCtx.lineTo(b.x, b.y); // MOD: Changed to ctx.lineTo
+                    wCtx.moveTo(a.x, a.y);
+                    wCtx.lineTo(b.x, b.y);
                 }
                 wCtx.stroke();
             }
@@ -1872,7 +1881,7 @@
             qs('#eraserBtn').onclick = ()=>{ state.writer.eraser=true; save(); qs('#eraserBtn').classList.add('ok'); qs('#penBtn').classList.remove('ok'); };
             qs('#undoStroke').onclick = writerUndo;
             qs('#clearCanvas').onclick = writerClear;
-            qs('#savePNG').onclick  = writerSavePNG;
+            qs('#savePNG').onclick  = writerSavePNG;
             document.addEventListener('keydown', (e)=>{ if((e.ctrlKey||e.metaKey) && e.key.toLowerCase()==='z'){ e.preventDefault(); writerUndo(); } });
             window.addEventListener('resize', ()=>{ writerSetupCanvasSize(); });
         }
@@ -1880,6 +1889,12 @@
             writerInitDOMRefs();
             writerBindEvents();
             writerApplyUIFromState();
+
+            // MOD: Initialize ResizeObserver for canvas wrapper
+            if (wWrap && !_writerRO) {
+                _writerRO = new ResizeObserver(() => writerSetupCanvasSize());
+                _writerRO.observe(wWrap);
+            }
         }
 
         function _makeOffscreen(w=128,h=128){ const c=document.createElement('canvas'); c.width=w; c.height=h; return c; }
@@ -2049,6 +2064,7 @@
             if (state.hasSeenOnboarding) {
                 onboardingModal.style.display='none';
                 qs('#main').style.display = 'block'; // MOD: Show main content if onboarding skipped
+                requestAnimationFrame(() => writerSetupCanvasSize()); // MOD: Call after main is visible
                 return;
             }
 
@@ -2063,6 +2079,7 @@
                 onboardingModal.style.display = 'none';
                 onboardingModal.hidden = true;
                 qs('#main').style.display = 'block'; // MOD: Show main content after "Mulai Belajar!"
+                requestAnimationFrame(() => writerSetupCanvasSize()); // MOD: Call after main is visible
             };
         }
 
