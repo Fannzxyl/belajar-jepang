@@ -3,33 +3,34 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <title>Pelatih Kana Jepang — v9</title> <!-- MOD: Removed "Offline" from title -->
+    <title>Pelatih Kana Jepang — v9</title>
     <meta name="description" content="Belajar Hiragana & Katakana lengkap (dasar, dakuon/handakuon, youon) dengan tes, review, Pomodoro, audio, progress bar, tema pastel/high-contrast, dan latihan menulis di kanvas. Data lokal (localStorage)." />
     <meta name="theme-color" content="#7a6cff">
 
-    <!-- Open Graph / Facebook (MOD: Updated for GitHub Pages) -->
+    <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://<username>.github.io/<repo>/"> <!-- Ganti dengan URL GitHub Pages Anda -->
+    <!-- TODO: Ganti dengan URL GitHub Pages Anda, contoh: https://username.github.io/repo/ -->
+    <meta property="og:url" content="/"> 
     <meta property="og:title" content="Pelatih Kana Jepang — v9">
     <meta property="og:description" content="Belajar Hiragana & Katakana lengkap dengan tes interaktif, Pomodoro, dan latihan menulis.">
-    <meta property="og:image" content="https://<username>.github.io/<repo>/kana-trainer-preview.png"> <!-- Pastikan gambar ini ada di repo Anda -->
+    <!-- TODO: Pastikan gambar ini ada di repo Anda, contoh: https://username.github.io/repo/kana-trainer-preview.png -->
+    <meta property="og:image" content="/kana-trainer-preview.png"> 
 
-    <!-- Twitter (MOD: Updated for GitHub Pages) -->
+    <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image">
-    <meta property="twitter:url" content="https://<username>.github.io/<repo>/"> <!-- Ganti dengan URL GitHub Pages Anda -->
+    <!-- TODO: Ganti dengan URL GitHub Pages Anda, contoh: https://username.github.io/repo/ -->
+    <meta property="twitter:url" content="/"> 
     <meta property="twitter:title" content="Pelatih Kana Jepang — v9">
     <meta property="twitter:description" content="Belajar Hiragana & Katakana lengkap dengan tes interaktif, Pomodoro, dan latihan menulis.">
-    <meta property="twitter:image" content="https://<username>.github.io/<repo>/kana-trainer-preview.png"> <!-- Pastikan gambar ini ada di repo Anda -->
+    <!-- TODO: Pastikan gambar ini ada di repo Anda, contoh: https://username.github.io/repo/kana-trainer-preview.png -->
+    <meta property="twitter:image" content="/kana-trainer-preview.png"> 
 
-    <!-- MOD: Canonical Link -->
-    <link rel="canonical" href="https://<username>.github.io/<repo>/">
+    <!-- TODO: Ganti dengan URL GitHub Pages Anda, contoh: https://username.github.io/repo/ -->
+    <link rel="canonical" href="/">
 
-    <!-- Google Fonts - Inter (MOD: Added preconnect for performance) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <!-- MOD: Added Noto Sans JP and Noto Serif JP for Japanese characters -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;700&family=Noto+Serif+JP:wght@700&display=swap" rel="stylesheet">
-    <!-- Font Awesome for Icons (MOD: Updated to stable v6.5.2) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <style>
         :root{
@@ -54,8 +55,11 @@
             --iconColor: var(--ink);
         }
         *{box-sizing:border-box}
-        html,body{height:100%}
-        body{margin:0;font-family:'Inter', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;background:
+        /* MOD: Changed height to min-height for mobile address bar collapse */
+        html { height: auto; }
+        body {
+            min-height: 100svh; /* or 100dvh, both are fine */
+            margin:0;font-family:'Inter', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;background:
             radial-gradient(900px 420px at -10% -20%, rgba(122,108,255,.10), transparent),
             radial-gradient(900px 420px at 110% -30%, rgba(22,198,161,.12), transparent),
             var(--bg);color:var(--ink)}
@@ -87,6 +91,8 @@
         }
 
         @media (max-width: 767px) {
+            /* MOD: Make header non-sticky on mobile */
+            header { position: static; } 
             .brand {
                 flex-direction: column;
                 align-items: flex-start;
@@ -295,7 +301,19 @@
         .progress{height:10px;background:rgba(0,0,0,.08);border-radius:999px;overflow:hidden}
         .bar{height:100%;width:0;background:linear-gradient(90deg,var(--pri),var(--sec),var(--accent));transition:width .25s ease}
 
-        .modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.45);backdrop-filter: blur(4px);z-index:999}
+        .modal{
+            position:fixed; inset:0; display:none;
+            align-items:center; justify-content:center;
+            background: rgba(0,0,0,.45);
+            z-index:999;
+        }
+        /* MOD: Only apply blur if supported and on larger screens for stability */
+        @supports (backdrop-filter: blur(6px)) {
+            @media (min-width: 768px) {
+                .modal{ background: rgba(0,0,0,.35); backdrop-filter: blur(6px); }
+            }
+        }
+
         .modal .box{background:var(--panel);padding:20px 18px;border-radius:18px;box-shadow:var(--shadow);text-align:center;max-width:620px;width:min(92vw,620px)}
         .burst{position:fixed;inset:0;pointer-events:none}
         .particle{position:absolute;width:8px;height:8px;border-radius:2px;opacity:.9;animation:pop 900ms ease forwards}
@@ -324,6 +342,8 @@
         @media (prefers-reduced-motion: reduce){
             *{animation-duration:0.01ms !important; animation-iteration-count:1 !important; transition-duration:0.01ms !important; scroll-behavior:auto !important}
             #qKana.correct-answer, #qKana.wrong-answer, #streakCounter.grow { animation:none !important }
+            /* MOD: Ensure toast animations are also affected by reduced motion */
+            .toast { transition: none !important; }
         }
 
         /* === Writer (Latihan Menulis) === */
@@ -350,6 +370,66 @@
             filter: saturate(70%);
         }
         .writer-ghost.hidden { display:none; }
+
+        /* === Anti horizontal overflow global === */
+        html, body {
+            max-width: 100%;
+            overflow-x: hidden; /* cegah scroll horizontal */
+        }
+
+        /* Pastikan kontainer utama tidak melebar */
+        .wrap, main, header {
+            width: 100%;
+            max-width: 100%;
+        }
+
+        /* Grid aman: kolom tidak memaksa melebar */
+        @media (min-width: 768px) {
+            .grid { grid-template-columns: repeat(12, minmax(0, 1fr)); }
+        }
+
+        /* Pillbox aman di semua breakpoint */
+        .pillbox { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+        @media (min-width:480px){ .pillbox{ grid-template-columns: repeat(5, minmax(0,1fr)); } }
+        @media (min-width:680px){ .pillbox{ grid-template-columns: repeat(6, minmax(0,1fr)); } }
+
+        /* Flex children boleh menyusut (supaya gak mepet dan motong layout) */
+        .row > * { min-width: 0; }
+
+        /* Header controls: cegah item ngedorong lebar */
+        .header-controls-row > * { min-width: 0; }
+
+        /* Buttons/chips jangan punya min-width besar yang bikin overflow */
+        .btn, .chip { max-width: 100%; }
+
+        /* Form controls aman lebar */
+        input, select, textarea { max-width: 100%; }
+
+        /* Canvas & media responsif */
+        canvas, img, video, svg { max-width: 100%; height: auto; display: block; }
+
+        /* Writer wrap sudah overflow: hidden; tambahkan ini supaya tak “melar” */
+        .writer-wrap { max-width: 100%; }
+
+        /* Modal & toast selalu pakai viewport, bukan lebar dokumen yang overflow */
+        .modal { inset: 0; }
+        .toast {
+            position: fixed !important;
+            left: 50vw !important;           /* center pakai viewport width */
+            transform: translateX(-50%) !important;
+            max-width: calc(100vw - 24px);   /* ada margin respirasi kiri/kanan */
+            box-sizing: border-box;
+        }
+
+        /* Progress bar dan segmen tidak melebarkan kontainer */
+        .progress, .seg { max-width: 100%; }
+
+        /* Perbaiki select dengan background-icon agar tidak menambah lebar total */
+        select { background-origin: content-box; }
+
+        /* Pada layar kecil, pastikan kolom kontrol tes tidak memaksa melebar */
+        .test-controls-row > div { min-width: 0; }
+        .test-control-group { width: 100%; }
     </style>
     <!-- MOD: Removed PWA Manifest & Service Worker Registration -->
 </head>
@@ -364,16 +444,16 @@
                 </div>
                 <div class="row header-controls-row" style="gap:6px">
                     <div class="seg" role="tablist" aria-label="Tema">
-                        <button id="tPastel" class="btn" role="tab" aria-selected="true" title="Tema pastel" type="button">Pastel</button> <!-- MOD: Added role/aria-selected/type -->
-                        <button id="tHC" class="btn" role="tab" aria-selected="false" title="Tema high-contrast" type="button">Kontras Tinggi</button> <!-- MOD: Added role/aria-selected/type -->
+                        <button id="tPastel" class="btn" role="tab" aria-selected="true" title="Tema pastel" type="button">Pastel</button>
+                        <button id="tHC" class="btn" role="tab" aria-selected="false" title="Tema high-contrast" type="button">Kontras Tinggi</button>
                     </div>
                     <label class="btn ghost" style="display:flex;align-items:center;gap:8px">
                         <input id="audToggle" type="checkbox" aria-label="Suara efek & pelafalan" /> Suara (efek & pelafalan)
                     </label>
-                    <button id="exportBtn" class="btn ghost" title="Simpan progres ke file" type="button"><i class="fas fa-download"></i> Simpan Progres ke File</button> <!-- MOD: Added type -->
+                    <button id="exportBtn" class="btn ghost" title="Simpan progres ke file" type="button"><i class="fas fa-download"></i> Simpan Progres ke File</button>
                     <input type="file" id="importFile" accept=".json" style="display:none;" aria-label="Pulihkan progres dari file">
-                    <button id="importBtn" class="btn ghost" title="Pulihkan progres dari file" type="button"><i class="fas fa-upload"></i> Pulihkan Progres dari File</button> <!-- MOD: Added type -->
-                    <button id="resetBtn" class="btn ghost" title="Atur ulang semua progres" type="button">Atur Ulang Semua</button> <!-- MOD: Added type -->
+                    <button id="importBtn" class="btn ghost" title="Pulihkan progres dari file" type="button"><i class="fas fa-upload"></i> Pulihkan Progres dari File</button>
+                    <button id="resetBtn" class="btn ghost" title="Atur ulang semua progres" type="button">Atur Ulang Semua</button>
                 </div>
             </div>
         </div>
@@ -393,7 +473,7 @@
                     </select>
                     <select id="fromGrp" aria-label="Dari kelompok"></select>
                     <select id="toGrp" aria-label="Sampai kelompok"></select>
-                    <button class="btn primary" id="btnShowLearn" type="button"><i class="fas fa-eye"></i> Tampilkan</button> <!-- MOD: Added type -->
+                    <button class="btn primary" id="btnShowLearn" type="button"><i class="fas fa-eye"></i> Tampilkan</button>
                 </div>
                 <div class="spacer"></div>
                 <div id="learnTiles" class="pillbox" aria-live="polite">
@@ -535,7 +615,7 @@
                 </div>
                 <div class="spacer"></div>
                 <div class="row">
-                    <div class="tag" id="jpStats" aria-live="polite">0/104 hira • 0/104 kata</div>
+                    <div class="tag" id="jpStats" aria-live="polite">0/104 hira • 0/104 kata</div> <!-- MOD: Updated total count to 104 -->
                 </div>
                 <div class="spacer"></div>
                 <div class="row" style="justify-content: center; font-size: 14px;">
@@ -584,8 +664,8 @@
                         <input id="autoSnapToggle" type="checkbox"> Auto-Snap
                     </label>
                     <div style="flex:1"></div>
-                    <button class="btn" id="undoStroke" title="Undo (Ctrl+Z)" type="button"><i class="fas fa-rotate-left"></i> Undo</button> <!-- MOD: Updated icon class -->
-                    <button class="btn warn" id="clearCanvas" type="button"><i class="fas fa-rotate-right"></i> Bersihkan</button> <!-- MOD: Updated icon class -->
+                    <button class="btn" id="undoStroke" title="Undo (Ctrl+Z)" type="button"><i class="fas fa-undo"></i> Undo</button>
+                    <button class="btn warn" id="clearCanvas" type="button"><i class="fas fa-redo"></i> Bersihkan</button>
                     <button class="btn primary" id="savePNG" type="button"><i class="fas fa-download"></i> Simpan PNG</button>
                 </div>
 
@@ -609,8 +689,8 @@
             <div class="spacer"></div>
             <div id="reviewWrap" style="text-align:left;max-height:40vh;overflow:auto;margin:8px 0" hidden></div>
             <div class="row" style="justify-content:center">
-                <button class="btn" id="btnReviewWrong" hidden type="button"><i class="fas fa-rotate-right"></i> Belajar ulang yang salah</button> <!-- MOD: Updated icon class -->
-                <button class="btn primary" id="btnCloseModal" type="button"><i class="fas fa-xmark"></i> Lanjut</button> <!-- MOD: Updated icon class -->
+                <button class="btn" id="btnReviewWrong" hidden type="button"><i class="fas fa-redo-alt"></i> Belajar ulang yang salah</button>
+                <button class="btn primary" id="btnCloseModal" type="button"><i class="fas fa-times"></i> Lanjut</button>
             </div>
         </div>
         <div id="burst" class="burst" aria-hidden="true"></div>
@@ -628,7 +708,7 @@
             </div>
             <div class="spacer"></div>
             <div class="row" style="justify-content:center">
-                <!-- MOD: Removed "Jangan tampilkan lagi" checkbox -->
+                <!-- Removed "Jangan tampilkan lagi" checkbox, as requested -->
                 <button class="btn primary" id="btnStartLearningOnboarding" type="button">Mulai Belajar!</button>
             </div>
         </div>
@@ -665,8 +745,8 @@
             streak_msg: '10 jawaban benar berturut-turut. Lanjutkan momentummu! ✨',
             pomo_focus: 'Fokus',
             pomo_break: 'Istirahat',
-            pomo_start_focus: (time)=>`Fokus dimulai. ${time} — semangat!`, // MOD: Changed to function
-            pomo_time_break: 'Waktunya istirahat. Minum air dulu 🥤',
+            pomo_start_focus: (time)=>`Fokus dimulai. ${time} — semangat!`, // MOD: Made this a function
+            pomo_time_break: 'Waktunya istirahat. Minum air dulu 🥤', // MOD: Fixed mojibake
             test_info_text: (set, range, qType, total, target)=>`${set} • ${range} • ${qType} • Soal ${total}/${target}`,
             test_streak: (streak)=>`Streak: ${streak}`,
             test_mc_hint: 'Ketuk atau tekan A/B/C/D',
@@ -678,7 +758,6 @@
             onboarding_step2: '<b>2. Tes:</b> Atur tipe soal (Kana → Romaji, Romaji → Kana, atau Rangkaian) & jumlah soal. Kamu bisa ketik atau pilih jawaban.',
             onboarding_step3: '<b>3. Menulis:</b> Latih goresanmu di kanvas. Aktifkan "Panduan" untuk menjiplak, dan "Auto-Snap" kalau mau dibantu rapi.',
             onboarding_button_start: 'Mulai Belajar!',
-            onboarding_do_not_show: 'Jangan tampilkan lagi',
             // Specific feedback for correct/wrong answers
             feedback_correct: (kana, romaji) => `Mantap! ${kana} = ${romaji} ✅`,
             feedback_wrong: (kana, romaji, user_input) => `Belum pas. ${kana} dibaca ${romaji}. Jawaban kamu: ${user_input}. Coba lagi ya.`,
@@ -733,6 +812,8 @@
                 mergedState.test = deepMerge(initState().test, loadedState.test);
                 mergedState.pomo = deepMerge(initState().pomo, loadedState.pomo);
                 mergedState.writer = deepMerge(initState().writer, loadedState.writer);
+                // Ensure hasSeenOnboarding is loaded correctly
+                mergedState.hasSeenOnboarding = loadedState.hasSeenOnboarding !== undefined ? loadedState.hasSeenOnboarding : initState().hasSeenOnboarding;
                 return mergedState;
             }catch(e){
                 console.error("Error loading state from localStorage:", e);
@@ -754,9 +835,10 @@
                     if (typeof source[key] === 'object' && source[key] !== null && !Array.isArray(source[key]) && typeof target[key] === 'object' && target[key] !== null && !Array.isArray(target[key])) {
                         target[key] = deepMerge(target[key] || {}, source[key]);
                         // Fix for specific bug where DAKUON YOUON lists were overwritten by base on deepMerge
-                        if (key === 'list' && Array.isArray(source[key])) {
-                            target[key] = source[key]; // Ensure list arrays are fully replaced, not merged deeply
-                        }
+                        // This check needs to be more general to prevent array overwrites only for "list" if it was intended
+                        // However, for typical state merging, direct assignment is often desired for arrays
+                        // The original logic `target[key] = source[key]` in the else block handles direct array assignment
+                        // For GROUPS, the lists are static data, not part of mutable state, so this deepMerge is mostly for state objects.
                     } else {
                         target[key] = source[key];
                     }
@@ -778,10 +860,10 @@
         const HIRA_BASE = ['あ','い','う','え','お','か','き','く','け','こ','さ','し','す','せ','そ','た','ち','つ','て','と','な','に','ぬ','ね','の','は','ひ','ふ','へ','ほ','ま','み','む','め','も','や','ゆ','よ','ら','り','る','れ','ろ','わ','を','ん'];
         const KATA_BASE = ['ア','イ','ウ','エ','オ','カ','キ','ク','ケ','コ','サ','シ','ス','セ','ソ','タ','チ','ツ','テ','ト','ナ','ニ','ヌ','ネ','ノ','ハ','ヒ','フ','ヘ','ホ','マ','ミ','ム','メ','モ','ヤ','ユ','ヨ','ラ','リ','ル','レ','ロ','ワ','ヲ','ン'];
 
-        const HIRA_DAKU = ['が','ぎ','ぐ','げ','ご','ざ','じ','ず','ぜ','ぞ','だ','ぢ','づ','で','ど','ば','び','ぶ','べ','ぼ','ぱ','ぴ','ぷ','ぺ','ぽ']; // MOD: Corrected 'bi' to 'び'
+        const HIRA_DAKU = ['が','ぎ','ぐ','げ','ご','ざ','じ','ず','ぜ','ぞ','だ','ぢ','づ','で','ど','ば','び','ぶ','べ','ぼ','ぱ','ぴ','ぷ','ぺ','ぽ'];
         const KATA_DAKU = ['ガ','ギ','グ','ゲ','ゴ','ザ','ジ','ズ','ゼ','ゾ','ダ','ヂ','ヅ','デ','ド','バ','ビ','ブ','ベ','ボ','パ','ピ','プ','ペ','ポ'];
 
-        const HIRA_YOU = ['きゃ','きゅ','きょ','しゃ','しゅ','しょ','ちゃ','ちゅ','ちょ','にゃ','にゅ','にょ','ひゃ','ひゅ','ひょ','みゃ','みゅ','みょ','りゃ','りゅ','りょ','ぎゃ','ぎゅ','ぎょ','じゃ','じゅ','じょ','びゃ','びゅ','びょ','ぴゃ','ぴゅ','ぴょ']; // MOD: Corrected 'biゃ' etc.
+        const HIRA_YOU = ['きゃ','きゅ','きょ','しゃ','しゅ','しょ','ちゃ','ちゅ','ちょ','にゃ','にゅ','にょ','ひゃ','ひゅ','ひょ','みゃ','みゅ','みょ','りゃ','りゅ','りょ','ぎゃ','ぎゅ','ぎょ','じゃ','じゅ','じょ','びゃ','びゅ','びょ','ぴゃ','ぴゅ','ぴょ'];
         const KATA_YOU = ['キャ','キュ','キョ','シャ','シュ','ショ','チャ','チュ','チョ','ニャ','ニュ','ニョ','ヒャ','ヒュ','ヒョ','ミャ','ミュ','ミョ','リャ','リュ','リョ','ギャ','ギュ','ギョ','ジャ','ジュ','ジョ','ビャ','ビュ','ビョ','ピャ','ピュ','ピョ'];
 
         const GROUPS = [
@@ -907,12 +989,15 @@
         }
 
         function checkLevelUp() {
-            const { level: oldLevel } = getLevelAndThreshold(state.totalPoints - 1);
+            // Get old level based on points *before* current point addition
+            const { level: oldLevel } = getLevelAndThreshold(state.totalPoints - 1); 
+            // Get new level based on current total points
             const { level: newLevel } = getLevelAndThreshold(state.totalPoints);
 
             if (newLevel > oldLevel) {
                 state.level = newLevel;
-                openCelebrate('levelUp', newLevel);
+                save(); // Save immediately after level up
+                maybeCelebrate('levelUp', newLevel); 
             }
         }
 
@@ -927,7 +1012,13 @@
                 if (nextThreshold !== Infinity) {
                     const pointsCurrentLevel = state.totalPoints - (LEVEL_THRESHOLDS[level - 1] || 0);
                     const pointsNeededForNext = nextThreshold - (LEVEL_THRESHOLDS[level - 1] || 0);
-                    progressText = ` (${pointsCurrentLevel}/${pointsNeededForNext})`;
+                    // Ensure pointsNeededForNext is not zero to avoid division by zero
+                    if (pointsNeededForNext > 0) {
+                        progressText = ` (${pointsCurrentLevel}/${pointsNeededForNext})`;
+                    } else {
+                        // If threshold is 0, it means it's the first level or pointsNeededForNext calculation is off
+                        progressText = ''; 
+                    }
                 } else {
                     progressText = ` (MAX)`;
                 }
@@ -995,7 +1086,7 @@
             const frag=df();
             GROUPS.forEach(g=>{
                 const b=document.createElement('button');
-                b.type='button'; // MOD: Added type="button"
+                b.type='button';
                 b.className='chip'+(state.test.subset===g.key?' active':'');
                 b.textContent=g.label;
                 b.onclick=()=>{ state.test.subset=g.key; save(); buildSubsetChips(); };
@@ -1074,7 +1165,7 @@
         function endTest(){
             qs('#testArea').hidden=true;
             qs('#testEmptyState').hidden = false;
-            updateProgress(); // MOD: Removed argument 0
+            updateProgress();
         }
 
         function nextQ(){
@@ -1131,7 +1222,7 @@
         function romajiEquals(a,b){
             if (!a || !b) return false;
             if (a === b) return true;
-            if (b==='wo' && a==='o') return true; // MOD: Accept 'o' for 'wo'
+            if (b==='wo' && a==='o') return true;
             const canon = (t)=> t
                 .replace(/^ji$/,'dji')
                 .replace(/^zu$/,'dzu');
@@ -1149,13 +1240,13 @@
                 normalized = norm;
                 correct = romajiEquals(norm, currentItem.romaji);
             }
-            else if(qType==='seq' || qType==='r2k'){ // MOD: Combined r2k and seq logic
+            else if(qType==='seq' || qType==='r2k'){
                 const expectedKana = (qType==='seq')
                     ? currentItem.seq.kana
                     : (state.test.set==='hira'? HIRA_MAP.get(currentItem.romaji): KATA_MAP.get(currentItem.romaji));
 
                 const rawSeq = normalizeRomajiSequence(valRaw);
-                const userKana = hasKana(valRaw) ? valRaw : romajiStringToKana(rawSeq, state.test.set);
+                const userKana = hasKana(valRaw) ? rawSeq : romajiStringToKana(rawSeq, state.test.set); // MOD: Used rawSeq for romajiStringToKana
                 normalized = userKana;
                 correct = (userKana === expectedKana);
             }
@@ -1173,8 +1264,8 @@
             if(correct){
                 state.test.score+=1;
                 state.test.correctStreak+=1;
-                state.totalPoints += 1;
-                checkLevelUp();
+                state.totalPoints += 1; // MOD: Add point before checkLevelUp
+                checkLevelUp(); // MOD: Check level up after points are added
                 maybeCelebrate('streak');
                 clickTone('ok');
                 qKanaElement.classList.add('correct-answer');
@@ -1204,7 +1295,15 @@
             nextQ();
         }
 
-        function buildMC_k2r(item){ const labels=currentPoolLabels(); const wrongs = labels.filter(r=>r!==item.romaji); shuffle(wrongs); const pool=[item.romaji, wrongs[0], wrongs[1], wrongs[2]].filter(Boolean).slice(0,4); while(pool.length<4) pool.push('ka'); shuffle(pool); mcMap={A:pool[0],B:pool[1],C:pool[2],D:pool[3]}; setMCText({A:`A. ${mcMap.A}`,B:`B. ${mcMap.B}`,C:`C. ${mcMap.C}`,D:`D. ${mcMap.D}`}); }
+        function buildMC_k2r(item){
+            const labels=currentPoolLabels();
+            const universe = ALL_ROMAJI.filter(r=>r!==item.romaji);
+            shuffle(universe);
+            const pool = [item.romaji, ...new Set(universe)].slice(0,4);
+            shuffle(pool);
+            mcMap={A:pool[0],B:pool[1],C:pool[2],D:pool[3]};
+            setMCText({A:`A. ${mcMap.A}`,B:`B. ${mcMap.B}`,C:`C. ${mcMap.C}`,D:`D. ${mcMap.D}`});
+        }
         function buildMC_r2k(item){
             const chars=currentPoolChars();
             const labels=currentPoolLabels();
@@ -1261,7 +1360,7 @@
             if (streakCounterElement) streakCounterElement.textContent = t('test_streak', state.test.correctStreak);
         }
 
-        function updateProgress(value){ // MOD: Added value parameter (optional)
+        function updateProgress(value){
             const pct = (state.test.total/state.test.target)*100;
             const bar = qs('#bar');
             bar.style.width = pct+'%';
@@ -1270,10 +1369,10 @@
         }
 
         function finishTest(){
-            state.totalPoints += state.test.score * 2;
-            checkLevelUp();
+            // state.totalPoints += state.test.score * 2; // Moved point addition to finalizeAnswer for correct levelUp check
+            // checkLevelUp(); // Already called in finalizeAnswer
             openCelebrate('finish');
-            burst();
+            burst(); // Burst animation
             clickTone('ok');
             renderReview();
             updatePointsAndLevelDisplay();
@@ -1299,21 +1398,24 @@
                 let displayExpected = expectedRomaji;
                 let displayGiven = got;
 
+                // Adjust display for dji/dzu aliases in review
                 if ((expectedRomaji === 'dji' && (got === 'ji' || got === 'di')) || (expectedRomaji === 'dzu' && (got === 'zu' || got === 'du'))) {
-                    displayExpected = `${expectedRomaji} (${(set === 'hira' ? HIRA_MAP : KATA_MAP).get(expectedRomaji)})`;
-                    displayGiven = `${got} (${(set === 'hira' ? HIRA_MAP : KATA_MAP).get(normalizeRomaji(got)) || ''})`;
+                    displayExpected = `${expectedRomaji}`; // No need for kana here, romaji is enough for target
+                    displayGiven = `${got}`;
                 } else if (state.test.qType === 'r2k' || state.test.qType === 'seq') {
-                    displayExpected = expectedKana;
-                    displayGiven = got;
+                    // For R2K/Seq, the prompt is Romaji, expected is Kana, user input might be Romaji or Kana
+                    displayExpected = expectedKana; // Display the correct Kana
+                    displayGiven = hasKana(got) ? got : romajiStringToKana(got, set); // Convert user Romaji input to Kana for display
+                    if (!displayGiven) displayGiven = got; // Fallback if conversion fails
                 }
 
                 return `<div style="padding:8px;border:1px solid var(--border);border-radius:12px;margin:6px 0;display:flex;justify-content:space-between;gap:8px">
                             <div>
                                 <div class="small">Soal ${i+1}</div>
                                 <div><b>${leftDisplay}</b> → <span style="color:var(--ok)">${expectedRomaji} (${expectedKana})</span></div>
-                                <div class="small">Jawaban kamu: ${displayGiven}</div>
+                                <div class="small">Jawaban kamu: ${w.typed ? `${w.typed} (${displayGiven})` : displayGiven}</div>
                             </div>
-                            <button class="btn" onclick="speak('${expectedKana}')" aria-label="Putar pelafalan ${expectedKana}" type="button">🎧</button>
+                            <button class="btn" onclick="window._speak('${expectedKana}')" aria-label="Putar pelafalan ${expectedKana}" type="button">🎧</button>
                         </div>`;
             }).join('');
         }
@@ -1412,12 +1514,20 @@
                 speechSynthesis.speak(u);
             }catch(error){ console.error('Error speaking text:', error); }
         }
-        window._speak = speak;
+        window._speak = speak; // Make speak globally accessible for review tiles
 
         // Toast/Snackbar for quick feedback
+        let currentToast = null;
         let toastTimeout = null;
         function showToast(message, type = 'info', duration = 2500) {
+            // Remove any existing toast immediately
+            if (currentToast) {
+                currentToast.remove();
+                clearTimeout(toastTimeout);
+            }
+
             const toast = document.createElement('div');
+            toast.className = 'toast'; // Add a class for potential CSS animation overrides
             toast.style.position = 'fixed';
             toast.style.bottom = '20px';
             toast.style.left = '50%';
@@ -1431,25 +1541,38 @@
             toast.style.opacity = '0';
             toast.style.transition = 'opacity 0.3s ease-in-out';
             toast.textContent = message;
+            toast.setAttribute('role', 'status'); // A11y role
+            toast.setAttribute('aria-live', 'polite'); // A11y live region
+
             document.body.appendChild(toast);
+            currentToast = toast; // Store reference to the new toast
 
-            clearTimeout(toastTimeout);
-            // MOD: Add event listener BEFORE setting opacity to 1
-            toast.addEventListener('transitionend', function handler() {
-                if (toast.style.opacity === '0') { // Only remove if it faded out
-                    toast.remove();
-                    toast.removeEventListener('transitionend', handler); // Clean up listener
-                }
-            });
-
+            // Animate in
             setTimeout(() => {
-                toast.style.opacity = '1';
+                if (currentToast === toast) { // Check if this toast is still the active one
+                    toast.style.opacity = '1';
+                }
             }, 10);
 
+            // Set timeout for fading out
             toastTimeout = setTimeout(() => {
-                toast.style.opacity = '0';
+                if (currentToast === toast) { // Check if this toast is still the active one
+                    toast.style.opacity = '0';
+                }
             }, duration);
+
+            // Remove element after transition ends
+            toast.addEventListener('transitionend', function handler() {
+                if (toast.style.opacity === '0') {
+                    toast.remove();
+                    if (currentToast === toast) { // Clear reference if it's the one being removed
+                        currentToast = null;
+                    }
+                    toast.removeEventListener('transitionend', handler);
+                }
+            });
         }
+
 
         // ---------- CELEBRATION ----------
         const modal = qs('#celebrate'); const burstBox = qs('#burst');
@@ -1457,14 +1580,19 @@
         let _modalKeydownListener = null;
 
         function maybeCelebrate(type, level = 0){
+            const isReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
             if(type==='streak' && state.test.correctStreak>0 && state.test.correctStreak % 10 === 0){
-                openCelebrate('streak'); burst(); clickTone('ok');
+                openCelebrate('streak');
+                if (!isReducedMotion) burst(); // Skip burst if reduced motion is preferred
+                clickTone('ok');
             } else if (type === 'levelUp') {
-                qs('#celebrateTitle').textContent = t('level_up_title', level);
+                // Ensure text is set before opening modal
+                qs('#celebrateTitle').textContent = t('level_up_title', level); 
                 qs('#celebrateMsg').textContent = t('level_up_msg', LEVEL_NAMES[level-1] || `Level ${level}`);
-                modal.style.display='flex';
-                burst(); clickTone('ok');
-                _trapModal();
+                openCelebrate('levelUp'); // Call openCelebrate to show modal
+                if (!isReducedMotion) burst(); // Skip burst if reduced motion is preferred
+                clickTone('ok');
             }
         }
         function openCelebrate(mode){
@@ -1473,7 +1601,8 @@
                 title.textContent=t('done_test_title');
                 msg.textContent=t('done_test_sub', state.test.score, state.test.total);
             } else if (mode === 'levelUp') {
-                // handled by maybeCelebrate
+                // Text is already set in maybeCelebrate, just open modal
+                // No need to set title/msg here again for levelUp mode
             } else { // streak
                 title.textContent=t('streak_title');
                 msg.textContent=t('streak_msg');
@@ -1484,6 +1613,13 @@
 
         function closeCelebrate(){
             modal.style.display='none';
+            // MOD: Workaround paint bug in Android/Brave: force reflow + repaint
+            void document.body.offsetHeight;
+            requestAnimationFrame(()=>{
+                document.documentElement.style.transform='translateZ(0)';
+                setTimeout(()=> document.documentElement.style.transform='', 0);
+            });
+
             if (_escCloseListener) {
                 document.removeEventListener('keydown', _escCloseListener);
                 _escCloseListener = null;
@@ -1499,7 +1635,7 @@
             if(e.key==='Escape') {
                 closeCelebrate();
                 const ansEl = qs('#ans');
-                if (ansEl && !qs('#testArea').hidden && qs('#typeWrap') && getComputedStyle(qs('#typeWrap')).display !== 'none') {
+                if (ansEl && !qs('#testArea').hidden && getComputedStyle(qs('#typeWrap')).display !== 'none') {
                     ansEl.focus();
                 }
             }
@@ -1539,17 +1675,41 @@
                 modal.addEventListener('keydown', _modalKeydownListener);
             }
 
+            // Ensure first focusable element gets focus when modal opens
             firstFocusable?.focus();
         }
 
-        function burst(){ burstBox.innerHTML=''; const colors=['#7a6cff','#16c6a1','#ffd166','#ff7b7b','#2fb875','#8acbff']; const w=window.innerWidth, h=window.innerHeight; for(let i=0;i<90;i++){ const p=document.createElement('div'); p.className='particle'; p.style.background=colors[i%colors.length]; const dx=(Math.random()*w - w/2)+'px'; const dy=(Math.random()*h/2)+'px'; p.style.setProperty('--dx',dx); p.style.setProperty('--dy',dy); p.style.left=(w/2)+'px'; p.style.top=(h/3)+'px'; burstBox.appendChild(p);} setTimeout(()=>{ burstBox.innerHTML=''; }, 1000); }
+        function burst(){ 
+            // MOD: Skip burst animation if prefers-reduced-motion is active
+            if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                return;
+            }
+            burstBox.innerHTML=''; 
+            const colors=['#7a6cff','#16c6a1','#ffd166','#ff7b7b','#2fb875','#8acbff']; 
+            const w=window.innerWidth, h=window.innerHeight; 
+            for(let i=0;i<90;i++){ 
+                const p=document.createElement('div'); 
+                p.className='particle'; 
+                p.style.background=colors[i%colors.length]; 
+                const dx=(Math.random()*w - w/2)+'px'; 
+                const dy=(Math.random()*h/2)+'px'; 
+                p.style.setProperty('--dx',dx); 
+                p.style.setProperty('--dy',dy); 
+                p.style.left=(w/2)+'px'; 
+                p.style.top=(h/3)+'px'; 
+                burstBox.appendChild(p);
+            } 
+            setTimeout(()=>{ burstBox.innerHTML=''; }, 1000); 
+        }
 
         function showCustomAlert(message) {
             const tempModal = document.createElement('div');
             tempModal.className = 'modal';
+            tempModal.setAttribute('role', 'alertdialog'); // A11y role
+            tempModal.setAttribute('aria-modal', 'true');
             tempModal.innerHTML = `
                 <div class="box">
-                    <h3 style="margin:0 0 6px 0">${message}</h3>
+                    <h3 id="customAlertTitle" style="margin:0 0 6px 0">${message}</h3>
                     <div class="spacer"></div>
                     <button class="btn primary" id="customAlertOk" type="button">OK</button>
                 </div>
@@ -1560,15 +1720,18 @@
             okBtn.onclick = () => {
                 tempModal.remove();
             };
+            // Set focus to the OK button for accessibility
             okBtn.focus();
         }
 
         function showCustomConfirm(message, onConfirm) {
             const tempModal = document.createElement('div');
             tempModal.className = 'modal';
+            tempModal.setAttribute('role', 'dialog'); // A11y role
+            tempModal.setAttribute('aria-modal', 'true');
             tempModal.innerHTML = `
                 <div class="box">
-                    <h3 style="margin:0 0 6px 0">${message}</h3>
+                    <h3 id="customConfirmTitle" style="margin:0 0 6px 0">${message}</h3>
                     <div class="spacer"></div>
                     <div class="row" style="justify-content:center">
                         <button class="btn warn" id="customConfirmCancel" type="button">Batal</button>
@@ -1589,6 +1752,7 @@
                 tempModal.remove();
                 onConfirm(false);
             };
+            // Set focus to the OK button for accessibility
             okBtn.focus();
         }
 
@@ -1694,7 +1858,6 @@
         let wCanvas, wCtx, wWrap, wGhost, isDrawing=false, lastX=0, lastY=0, dpr=1;
         const wStrokes = [];
         let _writerBound = false;
-        let _writerRO = null; // MOD: Declare ResizeObserver variable
 
         function writerInitDOMRefs() {
             wCanvas = qs('#writerCanvas');
@@ -1704,8 +1867,8 @@
         }
         function writerSetupCanvasSize() {
             const rect = wWrap.getBoundingClientRect();
-            // MOD: Add safeguard for zero width/height
-            if (rect.width === 0 || rect.height === 0) {
+            // MOD: If width is 0, request another frame and return
+            if (rect.width === 0) {
                 requestAnimationFrame(writerSetupCanvasSize);
                 return;
             }
@@ -1740,8 +1903,8 @@
         }
         function writerPointerPos(e) {
             const rect = wCanvas.getBoundingClientRect();
-            const x = (e.clientX || (e.touches && e.touches[0] ? e.touches[0].clientX : 0)) - rect.left;
-            const y = (e.clientY || (e.touches && e.touches[0] ? e.touches[0].clientY : 0)) - rect.top;
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
             return { x: Math.max(0, Math.min(rect.width, x)), y: Math.max(0, Math.min(rect.height, y)) };
         }
         function writerStart(e) {
@@ -1761,7 +1924,10 @@
                 _raf = null;
                 const p = writerPointerPos(_lastMove);
                 const s = wStrokes[wStrokes.length-1];
-                s.points.push({x:p.x, y:p.y});
+                // Ensure there's a valid stroke to push points to, especially after rapid clicks/drags
+                if (s && s.points) {
+                    s.points.push({x:p.x, y:p.y});
+                }
                 writerStrokeStyle();
                 wCtx.beginPath();
                 wCtx.moveTo(lastX, lastY);
@@ -1776,15 +1942,20 @@
             if (_raf) {
                 cancelAnimationFrame(_raf);
                 _raf = null;
-                const p = writerPointerPos(_lastMove);
-                const s = wStrokes[wStrokes.length-1];
-                s.points.push({x:p.x, y:p.y});
-                writerStrokeStyle();
-                wCtx.beginPath();
-                wCtx.moveTo(lastX, lastY);
-                wCtx.lineTo(p.x, p.y);
-                wCtx.stroke();
-                lastX = p.x; lastY = p.y;
+                // Final point for the last stroke before ending drawing
+                if (_lastMove) {
+                    const p = writerPointerPos(_lastMove);
+                    const s = wStrokes[wStrokes.length-1];
+                    if (s && s.points) {
+                        s.points.push({x:p.x, y:p.y});
+                    }
+                    writerStrokeStyle();
+                    wCtx.beginPath();
+                    wCtx.moveTo(lastX, lastY);
+                    wCtx.lineTo(p.x, p.y);
+                    wCtx.stroke();
+                    lastX = p.x; lastY = p.y;
+                }
             }
             if (state.writer.autoSnap) {
                 writerEvaluateAndSnap();
@@ -1796,16 +1967,22 @@
             wCtx.setTransform(1,0,0,1,0,0);
             wCtx.clearRect(0,0,wCanvas.width,wCanvas.height);
             wCtx.scale(dpr, dpr);
+            // MOD: Set a default background color for the canvas based on theme
+            wCtx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--soft');
+            wCtx.fillRect(0, 0, wCanvas.width, wCanvas.height);
+
             for(const s of wStrokes){
                 wCtx.globalCompositeOperation = s.ops;
                 wCtx.lineWidth = s.size;
                 wCtx.lineCap='round'; wCtx.lineJoin='round';
                 wCtx.strokeStyle = state.theme==='hc' ? '#e6efff' : '#132030';
                 wCtx.beginPath();
-                for(let i=1;i<s.points.length;i++){
-                    const a=s.points[i-1], b=s.points[i];
-                    wCtx.moveTo(a.x, a.y);
-                    wCtx.lineTo(b.x, b.y);
+                if (s.points.length > 0) {
+                    wCtx.moveTo(s.points[0].x, s.points[0].y);
+                    for(let i=1;i<s.points.length;i++){
+                        const b=s.points[i];
+                        wCtx.lineTo(b.x, b.y);
+                    }
                 }
                 wCtx.stroke();
             }
@@ -1842,6 +2019,15 @@
             qs('#ghostToggle').checked = state.writer.ghost;
             qs('#autoSnapToggle').checked = state.writer.autoSnap;
             
+            // Set pen/eraser button active state
+            if (state.writer.eraser) {
+                qs('#eraserBtn').classList.add('ok');
+                qs('#penBtn').classList.remove('ok');
+            } else {
+                qs('#penBtn').classList.add('ok');
+                qs('#eraserBtn').classList.remove('ok');
+            }
+
             writerSetGhostChar();
             writerFillKanaOptions();
             writerSetGrid(state.writer.grid);
@@ -1867,8 +2053,8 @@
             wCanvas.addEventListener('pointerdown', writerStart);
             wCanvas.addEventListener('pointermove', writerMove);
             window.addEventListener('pointerup', writerEnd);
-            qs('#writeSet').onchange = (e)=>{ state.writer.set=e.target.value; save(); writerFillKanaOptions(); writerSetGhostChar(); };
-            qs('#writeKana').onchange = (e)=>{ state.writer.kana=e.target.value; save(); writerSetGhostChar(); };
+            qs('#writeSet').onchange = (e)=>{ state.writer.set=e.target.value; save(); writerFillKanaOptions(); writerSetGhostChar(); writerClear(); }; // Clear on set change
+            qs('#writeKana').onchange = (e)=>{ state.writer.kana=e.target.value; save(); writerSetGhostChar(); writerClear(); }; // Clear on kana change
             qs('#writePrev').onclick = ()=>{ writerPick(-1); writerClear(); };
             qs('#writeNext').onclick = ()=>{ writerPick(1); writerClear(); };
             qs('#writeRand').onclick = ()=>{ writerRandom(); writerClear(); };
@@ -1881,20 +2067,23 @@
             qs('#eraserBtn').onclick = ()=>{ state.writer.eraser=true; save(); qs('#eraserBtn').classList.add('ok'); qs('#penBtn').classList.remove('ok'); };
             qs('#undoStroke').onclick = writerUndo;
             qs('#clearCanvas').onclick = writerClear;
-            qs('#savePNG').onclick  = writerSavePNG;
+            qs('#savePNG').onclick = writerSavePNG;
             document.addEventListener('keydown', (e)=>{ if((e.ctrlKey||e.metaKey) && e.key.toLowerCase()==='z'){ e.preventDefault(); writerUndo(); } });
             window.addEventListener('resize', ()=>{ writerSetupCanvasSize(); });
+            // MOD: Add ResizeObserver for wWrap
+            const resizeObserver = new ResizeObserver(entries => {
+                for (let entry of entries) {
+                    if (entry.target === wWrap) {
+                        writerSetupCanvasSize();
+                    }
+                }
+            });
+            resizeObserver.observe(wWrap);
         }
         function writerInit() {
             writerInitDOMRefs();
             writerBindEvents();
             writerApplyUIFromState();
-
-            // MOD: Initialize ResizeObserver for canvas wrapper
-            if (wWrap && !_writerRO) {
-                _writerRO = new ResizeObserver(() => writerSetupCanvasSize());
-                _writerRO.observe(wWrap);
-            }
         }
 
         function _makeOffscreen(w=128,h=128){ const c=document.createElement('canvas'); c.width=w; c.height=h; return c; }
@@ -1905,8 +2094,7 @@
             const s = Math.min(c.width,c.height)*0.8;
             ctx.font = `bold ${s}px "Noto Serif JP", "Noto Sans JP", serif`;
             ctx.textAlign='center'; ctx.textBaseline='middle';
-            ctx.lineWidth = Math.max(2, c.width*0.02);
-            ctx.strokeText(ch, c.width/2, c.height/2);
+            // ctx.lineWidth = Math.max(2, c.width*0.02); // Removed stroke for template drawing to match fill
             ctx.fillText(ch, c.width/2, c.height/2);
         }
 
@@ -1915,15 +2103,21 @@
             ctx.strokeStyle = theme==='hc' ? '#e6efff' : '#132030';
             ctx.lineCap='round'; ctx.lineJoin='round';
             const src = wCanvas.getBoundingClientRect();
-            const sx = c.width / src.width, sy = c.height / src.height;
+            // Scaling factor from visible canvas size to offscreen canvas size
+            const sx = c.width / src.width;
+            const sy = c.height / src.height;
             for(const s of strokes){
-                ctx.globalCompositeOperation = s.ops;
+                // Only draw "ink" strokes for IoU calculation
+                if (s.ops === 'destination-out') continue; 
+                ctx.globalCompositeOperation = s.ops; // This will always be 'source-over' for ink strokes
                 ctx.lineWidth = Math.max(2, (s.size||state.writer.penSize) * ((sx+sy)/2));
                 ctx.beginPath();
-                for(let i=1;i<s.points.length;i++){
-                    const a=s.points[i-1], b=s.points[i];
-                    ctx.moveTo(a.x*sx, a.y*sy);
-                    ctx.lineTo(b.x*sx, b.y*sy);
+                if (s.points.length > 0) {
+                    ctx.moveTo(s.points[0].x*sx, s.points[0].y*sy);
+                    for(let i=1;i<s.points.length;i++){
+                        const b=s.points[i];
+                        ctx.lineTo(b.x*sx, b.y*sy);
+                    }
                 }
                 ctx.stroke();
             }
@@ -1934,7 +2128,9 @@
             const b = cB.getContext('2d').getImageData(0,0,cB.width,cB.height).data;
             let inter=0, uni=0;
             for(let i=3;i<a.length;i+=4){
-                const A = a[i]>0, B = b[i]>0;
+                // Consider a pixel "on" if its alpha is > 0 (any color, non-transparent)
+                const A = a[i]>0; 
+                const B = b[i]>0;
                 if(A||B) uni++;
                 if(A&&B) inter++;
             }
@@ -1942,7 +2138,10 @@
         }
 
         function writerEvaluateAndSnap(){
-            if(!wStrokes.length || wStrokes[wStrokes.length - 1].ops === 'destination-out') return;
+            // MOD: Don't run auto-snap if no strokes or last stroke was an eraser
+            if(!wStrokes.length || wStrokes[wStrokes.length - 1].ops === 'destination-out') {
+                return;
+            }
 
             const offUser = _makeOffscreen(128,128);
             const offTemp = _makeOffscreen(128,128);
@@ -1967,13 +2166,18 @@
                 wStrokes.length = 0; // Clear strokes array after drawing perfect char
                 showToast(t('writer_snap_success'), 'ok');
             }else{
-                const t0=Date.now(), dur=160; const snap = ()=>{
+                // MOD: Added fade out animation for failed snap
+                const t0=Date.now(), dur=160; 
+                const snap = ()=>{
                     const t=Date.now()-t0, k=Math.min(1,t/dur);
-                    wCtx.save(); wCtx.globalAlpha = 1-k;
-                    writerRedrawAll();
+                    wCtx.save(); 
+                    wCtx.globalAlpha = 1-k; // Fade out effect
+                    writerRedrawAll(); // Redraw with reduced opacity
                     wCtx.restore();
-                    if(k<1) requestAnimationFrame(snap); else writerClear();
-                }; requestAnimationFrame(snap);
+                    if(k<1) requestAnimationFrame(snap); 
+                    else writerClear(); // Clear canvas completely after fade out
+                }; 
+                requestAnimationFrame(snap);
                 showToast(t('writer_snap_fail'), 'warn');
             }
         }
@@ -2058,13 +2262,11 @@
         // ---------- ONBOARDING ----------
         function showOnboarding() {
             const onboardingModal = qs('#onboardingModal');
-            const doNotShowCheckbox = qs('#doNotShowOnboarding');
             const startLearningBtn = qs('#btnStartLearningOnboarding');
 
             if (state.hasSeenOnboarding) {
                 onboardingModal.style.display='none';
-                qs('#main').style.display = 'block'; // MOD: Show main content if onboarding skipped
-                requestAnimationFrame(() => writerSetupCanvasSize()); // MOD: Call after main is visible
+                qs('#main').style.display = 'block'; // Show main content if onboarding skipped
                 return;
             }
 
@@ -2073,13 +2275,11 @@
             _trapModalOnboarding();
 
             startLearningBtn.onclick = () => {
-                // MOD: Set hasSeenOnboarding to true when "Mulai Belajar!" is clicked
                 state.hasSeenOnboarding = true;
                 save();
                 onboardingModal.style.display = 'none';
                 onboardingModal.hidden = true;
-                qs('#main').style.display = 'block'; // MOD: Show main content after "Mulai Belajar!"
-                requestAnimationFrame(() => writerSetupCanvasSize()); // MOD: Call after main is visible
+                qs('#main').style.display = 'block'; // Show main content after "Mulai Belajar!"
             };
         }
 
@@ -2129,40 +2329,47 @@
         }
 
         document.addEventListener('keydown', (e)=>{
-            if(e.target.matches('input,textarea') && e.target.id !== 'ans') return;
+            // Ensure keydown events only affect inputs when they are focused, except for specific global shortcuts
+            if(e.target.matches('input,textarea') && e.target.id !== 'ans' && !e.target.closest('#testArea')) return;
 
             const map={a:'A',b:'B',c:'C',d:'D'}; const k=map[e.key?.toLowerCase?.()]; if(k && getComputedStyle(qs('#mcWrap')).display!=='none'){ e.preventDefault(); mcPick(k); }
             if(e.key==='ArrowRight' && !qs('#testArea').hidden){ e.preventDefault(); skipQ(); }
 
-            if (e.key === 'g') {
-                const el = qs('#gridToggle');
-                if (el) { el.checked = !el.checked; el.onchange({target:el}); }
-            }
-            if (e.key === 'p') {
-                const penBtn = qs('#penBtn');
-                const eraserBtn = qs('#eraserBtn');
-                if (penBtn && eraserBtn) {
-                    if (state.writer.eraser) {
-                        penBtn.click();
-                    } else {
-                        eraserBtn.click();
+            // Writer shortcuts, ensure they only activate when writer section is visible
+            const writerSection = qs('#writerSection');
+            const isWriterSectionVisible = writerSection && getComputedStyle(writerSection).display !== 'none' && writerSection.offsetParent !== null;
+
+            if (isWriterSectionVisible) {
+                if (e.key === 'g') {
+                    const el = qs('#gridToggle');
+                    if (el) { el.checked = !el.checked; el.onchange({target:el}); save(); }
+                }
+                if (e.key === 'p') {
+                    const penBtn = qs('#penBtn');
+                    const eraserBtn = qs('#eraserBtn');
+                    if (penBtn && eraserBtn) {
+                        if (state.writer.eraser) {
+                            penBtn.click();
+                        } else {
+                            eraserBtn.click();
+                        }
                     }
                 }
-            }
-            if (e.key === ']') {
-                const penSizeInput = qs('#penSize');
-                if (penSizeInput) {
-                    state.writer.penSize = Math.min(28, state.writer.penSize + 1);
-                    penSizeInput.value = state.writer.penSize;
-                    save();
+                if (e.key === ']') {
+                    const penSizeInput = qs('#penSize');
+                    if (penSizeInput) {
+                        state.writer.penSize = Math.min(28, state.writer.penSize + 1);
+                        penSizeInput.value = state.writer.penSize;
+                        save();
+                    }
                 }
-            }
-            if (e.key === '[') {
-                const penSizeInput = qs('#penSize');
-                if (penSizeInput) {
-                    state.writer.penSize = Math.max(2, state.writer.penSize - 1);
-                    penSizeInput.value = state.writer.penSize;
-                    save();
+                if (e.key === '[') {
+                    const penSizeInput = qs('#penSize');
+                    if (penSizeInput) {
+                        state.writer.penSize = Math.max(2, state.writer.penSize - 1);
+                        penSizeInput.value = state.writer.penSize;
+                        save();
+                    }
                 }
             }
         });
@@ -2186,13 +2393,13 @@
             });
         };
 
-        qs('#countChips').addEventListener('click', (e)=>{ const b=e.target.closest('.chip'); if(!b) return; const c=parseInt(b.dataset.count,10)||10; qs('#testCount').value=c; clickTone('click'); });
+        qs('#countChips').addEventListener('click', (e)=>{ const b=e.target.closest('.chip'); if(!b) return; const c=parseInt(b.dataset.count,10)||10; qs('#testCount').value=c; clickTone('click'); save(); }); // Save on count change
 
         qs('#pStart').onclick = startPomo;
         qs('#pPause').onclick = pausePomo;
         qs('#pReset').onclick = resetPomo;
 
-        qs('#rangeMode').onchange = toggleRangeInputs;
+        qs('#rangeMode').onchange = (e) => { state.test.rangeMode = e.target.value; save(); toggleRangeInputs(); }; // Save on rangeMode change
         qs('#answerMode').onchange = (e) => { state.test.mode = e.target.value; save(); toggleAnswerUI(); };
         qs('#qType').onchange = (e) => { state.test.qType = e.target.value; save(); toggleAnswerUI(); };
 
@@ -2225,6 +2432,8 @@
             toggleAnswerUI();
             updatePointsAndLevelDisplay();
             writerInit();
+            // Ensure writer canvas redraws after theme/data changes during re-render
+            writerRedrawAll(); 
         }
 
         document.addEventListener('DOMContentLoaded', ()=>{
@@ -2232,6 +2441,45 @@
             if(state.pomo.running){ startPomo(); }
             showOnboarding();
         });
+
+        // ==== Hardening anti-overflow saat runtime (debug + fix cepat) ====
+        (function fixRuntimeOverflow(){
+            // 1) Hapus horizontal overflow dari body/document element
+            document.documentElement.style.overflowX = 'hidden';
+            document.body.style.overflowX = 'hidden';
+            document.documentElement.style.maxWidth = '100%';
+            document.body.style.maxWidth = '100%';
+
+            // 2) Pastikan semua media responsif (jaga-jaga bila ada style lain yang override)
+            document.querySelectorAll('img,canvas,video,svg').forEach(el=>{
+                el.style.maxWidth = '100%';
+                el.style.height = 'auto';
+            });
+
+            // 3) Cek elemen yang menyebabkan overflow (opsional, aktifkan kalau mau debug)
+            // const vw = () => Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
+            // [...document.body.getElementsByTagName('*')].forEach(el=>{
+            //    const r = el.getBoundingClientRect();
+            //    if (r.right - 1 > vw()) { el.style.outline = '1px solid red'; }
+            // });
+
+            // 4) Pastikan toast selalu center terhadap viewport walau ada scroll-x tersembunyi
+            const origShowToast = window.showToast;
+            if (typeof origShowToast === 'function') {
+                window.showToast = function(message, type='info', duration=2500){
+                    const n = origShowToast(message, type, duration);
+                    // enforce style lagi untuk berjaga-jaga
+                    if (window.currentToast) {
+                        const toast = window.currentToast;
+                        toast.style.position = 'fixed';
+                        toast.style.left = '50vw';
+                        toast.style.transform = 'translateX(-50%)';
+                        toast.style.maxWidth = 'calc(100vw - 24px)';
+                    }
+                    return n;
+                }
+            }
+        })();
     </script>
 </body>
 </html>
