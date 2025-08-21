@@ -21,7 +21,8 @@
     <!-- Diperbarui: URL Github Pages asli -->
     <meta name="twitter:url" content="https://alfan.github.io/kana-trainer/"> 
     <meta name="twitter:title" content="Pelatih Kana Jepang — v9">
-    <meta property="twitter:description" content="Pelatih Kana Jepang v9 — latihan interaktif, audio pelafalan, tes adaptif, Pomodoro, dan kanvas menulis. Progres tersimpan lokal. Mulai gratis sekarang.">
+    <!-- PATCH: Tag twitter:description pakai name, bukan property -->
+    <meta name="twitter:description" content="Pelatih Kana Kana Jepang v9 — latihan interaktif, audio pelafalan, tes adaptif, Pomodoro, dan kanvas menulis. Progres tersimpan lokal. Mulai gratis sekarang.">
     <!-- Diperbarui: URL Github Pages asli -->
     <meta name="twitter:image" content="https://alfan.github.io/kana-trainer/kana-trainer-preview.png"> 
 
@@ -458,36 +459,73 @@
         header .brand h1{ margin-bottom: 4px; }
         header .brand .small{ display:block; }
 
-        /* PATCH: Grid rapi untuk chip subset */
+        /* ========== Subset chips: HP vertikal, Laptop horizontal scroll ========== */
+
+        /* HP / default: vertikal satu per baris */
         #subsetChips{
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+          display: grid !important;          /* pastikan override dari .chips */
+          grid-template-columns: 1fr;        /* satu kolom penuh */
           gap: 8px;
           align-items: stretch;
         }
         #subsetChips .chip{
-          width: 100%;
+          width: 100%;                       /* biar tombol melebar penuh di HP */
           text-align: center;
         }
-
-        /* Pastikan label 'Pilih cepat:' span satu baris di atas grid */
         #subsetChips > .small{
           grid-column: 1 / -1;
-          text-align: center;      /* biar labelnya ikut center */
+          text-align: center;
           margin-bottom: 2px;
         }
+
+        /* Laptop/desktop (>=1024px): horizontal, tidak membungkus, bisa di-scroll ke kanan */
         @media (min-width:1024px){
           #subsetChips{
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            display: flex !important;
+            flex-wrap: nowrap;               /* satu baris saja */
+            overflow-x: auto;                /* scroll ke kanan */
+            gap: 8px;
+            padding-bottom: 6px;
+            scroll-snap-type: x proximity;   /* scroll lebih halus */
+            -webkit-overflow-scrolling: touch;
+          }
+          #subsetChips .chip{
+            width: auto;                     /* lebar sesuai konten */
+            flex: 0 0 auto;                  /* jangan melebar */
+            white-space: nowrap;             /* tetap satu baris */
+            scroll-snap-align: start;
+          }
+          /* Biar label "Pilih cepat:" tetap di atas, bukan ikut geser */
+          #subsetChips > .small{
+            flex: 0 0 100%;
+            order: -1;
+            margin-bottom: 4px;
+            text-align: left;                /* opsional: kiri di desktop */
           }
         }
+
+        /* (Opsional) sembunyikan scrollbar yang kasar di WebKit tanpa mematikan scroll */
+        #subsetChips::-webkit-scrollbar{ height: 8px; }
+        #subsetChips::-webkit-scrollbar-thumb{ background: var(--border); border-radius: 999px; }
     </style>
 </head>
 <body>
     <header>
         <div class="wrap">
             <div class="brand" style="gap:10px">
-                <div class="logo" aria-hidden="true"></div>
+                <!-- PATCH: Ganti div.logo dengan SVG logo -->
+                <svg class="logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="36" height="36">
+                    <defs>
+                        <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+                            <stop stop-color="#7a6cff"/><stop offset="1" stop-color="#16c6a1"/>
+                        </linearGradient>
+                    </defs>
+                    <rect width="64" height="64" rx="14" fill="url(#g)"/>
+                    <!-- Naik ~2px: pakai dominant-baseline + dy negatif -->
+                    <text x="50%" y="50%" text-anchor="middle" dominant-baseline="middle"
+                          font-family="Noto Sans JP, 'Noto Serif JP', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif"
+                          font-size="38" fill="white" dy="-2">あ</text>
+                </svg>
                 <div>
                     <h1>Pelatih Kana Jepang <span class="tag">v9</span></h1>
                     <div class="small">Dasar • Dakuon/Handakuon • Youon • Tes & Review • Pomodoro • Tema • Writer</div>
@@ -544,8 +582,9 @@
                 <div class="spacer"></div>
 
                 <div class="row test-controls-row" style="align-items:flex-end">
-                    <div style="flex:1;width:100%;">
-                        <div class="chips" id="subsetChips" style="display:flex">
+                    <div style="flex:1;"> <!-- PATCH: Menghapus width:100% dari inline style -->
+                        <!-- PATCH: Hapus inline style display:flex di #subsetChips -->
+                        <div class="chips" id="subsetChips">
                             <div class="small" style="margin-bottom: 4px;">Pilih cepat:</div>
                         </div>
                     </div>
@@ -761,6 +800,7 @@
             <div class="row" style="justify-content:center">
                 <button class="btn primary" id="btnStartLearningOnboarding" type="button">Mulai Belajar!</button>
             </div>
+            </div>
         </div>
     </div>
 
@@ -797,7 +837,7 @@
             empty_review: 'Bersih! Nggak ada jawaban keliru. 👍',
             done_test_title: 'Tes selesai! 🎉',
             done_test_sub: (s,t)=>`Skor kamu ${s}/${t}. Bagus!`,
-            wrong_tip_dzu: 'Ingat: ぢ = dji (ji), づ = dzu (zu).', // Specific tip for dji/dzu
+            wrong_tip_dzu: 'Ingat:ぢ = dji (ji), づ = dzu (zu).', // Specific tip for dji/dzu
             confirm_reset_title: 'Atur ulang semua progres?',
             confirm_reset_sub: 'Tindakan ini tidak bisa dibatalkan.',
             import_ok: 'Impor progres berhasil!',
@@ -805,7 +845,8 @@
             export_ok: 'Progres berhasil diekspor sebagai kana-progress.json!',
             level_up_title: (level)=>`Level Up! 🎉 Level ${level}!`,
             level_up_msg: (name)=>`Kamu sekarang seorang ${name}! Terus semangat! 🔥`,
-            streak_title: 'Wii! Keren banget!',
+            // PATCH: Perbaikan karakter di streak_title
+            streak_title: 'Wii! Keren banget! ✨',
             streak_msg: '10 jawaban benar berturut-turut. Lanjutkan momentummu! ✨',
             pomo_focus: 'Fokus',
             pomo_break: 'Istirahat',
@@ -914,7 +955,7 @@
         const HIRA_BASE = ['あ','い','う','え','お','か','き','く','け','こ','さ','し','す','せ','そ','た','ち','つ','て','と','な','に','ぬ','ね','の','は','ひ','ふ','へ','ほ','ま','み','む','め','も','や','ゆ','よ','ら','り','る','れ','ろ','わ','を','ん'];
         const KATA_BASE = ['ア','イ','ウ','エ','オ','カ','キ','ク','ケ','コ','サ','シ','ス','セ','ソ','タ','チ','ツ','テ','ト','ナ','ニ','ヌ','ネ','ノ','ハ','ヒ','フ','ヘ','ホ','マ','ミ','ム','メ','モ','ヤ','ユ','ヨ','ラ','リ','ル','レ','ロ','ワ','ヲ','ン'];
 
-        const HIRA_DAKU = ['が','ぎ','ぐ','げ','ご','ざ','じ','ず','ぜ','ぞ','だ','ぢ','づ','で','ど','ば','び','ぶ','べ','ぼ','ぱ','ぴ','ぷ','ぺ','ぽ'];
+        const HIRA_DAKU = ['가','기','구','게','고','자','지','즈','제','조','다','디','두','데','도','바','비','부','베','보','파','피','푸','페','포'];
         const KATA_DAKU = ['ガ','ギ','グ','ゲ','ゴ','ザ','ジ','ズ','ゼ','ゾ','ダ','ヂ','ヅ','デ','ド','バ','ビ','ブ','ベ','ボ','パ','ピ','プ','ペ','ポ'];
 
         const HIRA_YOU = ['きゃ','きゅ','きょ','しゃ','しゅ','しょ','ちゃ','ちゅ','ちょ','にゃ','にゅ','にょ','ひゃ','ひゅ','ひょ','みゃ','みゅ','みょ','りゃ','りゅ','りょ','ぎゃ','ぎゅ','ぎょ','じゃ','じゅ','じょ','びゃ','びゅ','びょ','ぴゃ','ぴゅ','ぴょ'];
@@ -960,7 +1001,7 @@
 
         const CONFUSE_KATA = [
             ['シ','ツ'], ['ソ','ン'], ['ク','ケ'], ['フ','ワ'], ['ヂ','ジ'], ['ヅ','ズ'],
-            ['ノ','메'], ['イ','リ'], ['エ','ヱ'], ['ネ','レ'], ['ア','マ'], ['ム','厶']
+            ['ノ','メ'], ['이','리'], ['エ','ヱ'], ['ネ','レ'], ['ア','マ'], ['ム','厶']
         ];
         function similarChoicesKata(correct){
             for(const g of CONFUSE_KATA) {
@@ -1101,6 +1142,8 @@
             const from=qs('#fromGrp').value, to=qs('#toGrp').value;
             const labels = rangeLabels(from,to);
             const map = set==='hira'?HIRA_MAP:KATA_MAP;
+            // PATCH: Mendefinisikan 'mastered' di sini
+            const mastered = set==='hira'? state.hiraMastered: state.kataMastered;
             const box=qs('#learnTiles');
             box.innerHTML='';
             if(!labels.length){
@@ -1112,7 +1155,7 @@
                 const ch = map.get(r);
                 const tile=document.createElement('button');
                 tile.type='button';
-                tile.className='kana';
+                tile.className='kana' + (mastered.includes(r) ? ' mastered' : '');
                 tile.innerHTML=`<div class="jp">${escapeHTML(ch)}</div><div class="ro">${escapeHTML(r)}</div>`; // Escape kana/romaji
                 tile.title=t('learn_tile_tooltip');
                 tile.onclick=()=> speak(ch); // Use escaped char for speak
@@ -2079,7 +2122,8 @@
                     wCtx.moveTo(s.points[0].x, s.points[0].y);
                     for(let i=1;i<s.points.length;i++){
                         const b=s.points[i];
-                        ctx.lineTo(b.x, b.y);
+                        // PATCH: Perbaikan ReferenceError di writerRedrawAll()
+                        wCtx.lineTo(b.x, b.y);
                     }
                 }
                 wCtx.stroke();
