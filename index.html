@@ -4,33 +4,37 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>Pelatih Kana Jepang — v9</title>
-    <meta name="description" content="Belajar Hiragana & Katakana lengkap (dasar, dakuon/handakuon, youon) dengan tes, review, Pomodoro, audio, progress bar, tema pastel/high-contrast, dan latihan menulis di kanvas. Data lokal (localStorage)." />
+    <meta name="description" content="Pelajari Hiragana & Katakana lengkap (dasar, dakuon/handakuon, youon) dengan tes & review, audio, Pomodoro, progress, tema pastel/kontras, dan kanvas menulis." />
     <meta name="theme-color" content="#7a6cff">
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
-    <!-- TODO: GANTI DENGAN URL GITHUB PAGES KAMU -->
-    <meta property="og:url" content="https://YOUR_GHPAGES_URL/"> 
+    <!-- Diperbarui: URL Github Pages asli -->
+    <meta property="og:url" content="https://alfan.github.io/kana-trainer/"> 
     <meta property="og:title" content="Pelatih Kana Jepang — v9">
-    <meta property="og:description" content="Belajar Hiragana & Katakana lengkap dengan tes interaktif, Pomodoro, dan latihan menulis.">
-    <!-- TODO: GANTI DENGAN URL GITHUB PAGES KAMU (PASTIKAN GAMBAR ADA DI REPO) -->
-    <meta property="og:image" content="https://YOUR_GHPAGES_URL/kana-trainer-preview.png"> 
+    <meta property="og:description" content="Pelatih Kana Jepang v9 — latihan interaktif, audio pelafalan, tes adaptif, Pomodoro, dan kanvas menulis. Progres tersimpan lokal. Mulai gratis sekarang.">
+    <!-- Diperbarui: URL Github Pages asli -->
+    <meta property="og:image" content="https://alfan.github.io/kana-trainer/kana-trainer-preview.png"> 
 
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image">
-    <!-- TODO: GANTI DENGAN URL GITHUB PAGES KAMU -->
-    <meta name="twitter:url" content="https://YOUR_GHPAGES_URL/"> 
+    <!-- Diperbarui: URL Github Pages asli -->
+    <meta name="twitter:url" content="https://alfan.github.io/kana-trainer/"> 
     <meta name="twitter:title" content="Pelatih Kana Jepang — v9">
-    <meta name="twitter:description" content="Belajar Hiragana & Katakana lengkap dengan tes interaktif, Pomodoro, dan latihan menulis.">
-    <!-- TODO: GANTI DENGAN URL GITHUB PAGES KAMU (PASTIKAN GAMBAR ADA DI REPO) -->
-    <meta name="twitter:image" content="https://YOUR_GHPAGES_URL/kana-trainer-preview.png"> 
+    <meta property="twitter:description" content="Pelatih Kana Jepang v9 — latihan interaktif, audio pelafalan, tes adaptif, Pomodoro, dan kanvas menulis. Progres tersimpan lokal. Mulai gratis sekarang.">
+    <!-- Diperbarui: URL Github Pages asli -->
+    <meta name="twitter:image" content="https://alfan.github.io/kana-trainer/kana-trainer-preview.png"> 
 
-    <!-- TODO: GANTI DENGAN URL GITHUB PAGES KAMU -->
-    <link rel="canonical" href="https://YOUR_GHPAGES_URL/">
+    <!-- Diperbarui: URL Github Pages asli -->
+    <link rel="canonical" href="https://alfan.github.io/kana-trainer/">
 
     <!-- Favicon -->
-    <link rel="icon" href="/favicon.ico">
-    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+    <!-- Diperbarui: Path relatif untuk GitHub Pages -->
+    <link rel="icon" href="favicon.ico">
+    <!-- PATCH: Fallback SVG inline favicon -->
+    <link rel="icon" type="image/svg+xml"
+      href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop stop-color='%237a6cff'/><stop offset='1' stop-color='%2316c6a1'/></linearGradient></defs><rect width='64' height='64' rx='14' fill='url(%23g)'/><text x='50%' y='54%' text-anchor='middle' font-family='Noto Sans JP,Arial' font-size='38' fill='white'>あ</text></svg>">
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -123,9 +127,6 @@
         }
         @media(min-width:1024px){
             .wrap{max-width: 1200px;}
-            #pomoSection, #trackerSection {
-                grid-column: span 6;
-            }
         }
 
         .card{grid-column:span 12;background:var(--panel);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px;border:1px solid var(--border)}
@@ -349,8 +350,9 @@
         /* === Writer (Latihan Menulis) === */
         .writer-toolbar { display:flex; gap:8px; flex-wrap:wrap; align-items:center }
         .writer-toolbar .slider { display:flex; align-items:center; gap:6px; font-size:13px; color:var(--muted) }
+        /* PATCH: Writer layering fix: pastikan kanvas di atas ghost */
         .writer-wrap { position: relative; width: 100%; border:1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); background: var(--soft); overflow: hidden; }
-        #writerCanvas { width: 100%; height: auto; display:block; touch-action: none; }
+        #writerCanvas { position: relative; z-index: 1; background: transparent; width: 100%; height: auto; display:block; touch-action: none; }
         .writer-wrap.grid {
             background-image:
                 repeating-linear-gradient(0deg, rgba(0,0,0,.06) 0, rgba(0,0,0,.06) 1px, transparent 1px, transparent 24px),
@@ -368,6 +370,9 @@
             color: var(--muted);
             opacity: .12;
             filter: saturate(70%);
+            /* PATCH: Writer layering fix */
+            z-index: 0; 
+            pointer-events: none;
         }
         .writer-ghost.hidden { display:none; }
 
@@ -406,19 +411,19 @@
         input, select, textarea { max-width: 100%; }
 
         /* Canvas & media responsif */
-        canvas, img, video, svg { max-width: 100%; height: auto; display: block; }
+        img, video, svg { max-width: 100%; height: auto; display: block; }
+
 
         /* Writer wrap sudah overflow: hidden; tambahkan ini supaya tak “melar” */
         .writer-wrap { max-width: 100%; }
 
         /* Modal & toast selalu pakai viewport, bukan lebar dokumen yang overflow */
         .modal { inset: 0; }
-        .toast {
-            position: fixed !important;
-            left: 50vw !important;           /* center pakai viewport width */
-            transform: translateX(-50%) !important;
-            max-width: calc(100vw - 24px);   /* ada margin respirasi kiri/kanan */
-            box-sizing: border-box;
+        /* PATCH: Biar toast selalu center lebar-aman */
+        .toast{
+          left:50%;
+          transform:translateX(-50%);
+          max-width:calc(100vw - 24px);
         }
 
         /* Progress bar dan segmen tidak melebarkan kontainer */
@@ -430,6 +435,52 @@
         /* Pada layar kecil, pastikan kolom kontrol tes tidak memaksa melebar */
         .test-controls-row > div { min-width: 0; }
         .test-control-group { width: 100%; }
+
+        /* PATCH: Desktop layout (≥1024px): Pomodoro & Tracker berdampingan */
+        @media (min-width: 1024px) {
+            main.wrap {
+                display: grid;
+                grid-template-columns: repeat(12, minmax(0, 1fr));
+                gap: 14px;
+            }
+            /* Default: setiap section full-width */
+            main.wrap > section { grid-column: span 12; }
+            /* Khusus: Pomodoro & Tracker 50:50 */
+            #pomoSection { grid-column: span 6; }
+            #trackerSection { grid-column: span 6; }
+        }
+
+        /* PATCH: Center subjudul “Hiragana • Katakana … Writer” */
+        header .brand > div:nth-child(2){
+          flex: 1 1 auto;
+          text-align: center;
+        }
+        header .brand h1{ margin-bottom: 4px; }
+        header .brand .small{ display:block; }
+
+        /* PATCH: Grid rapi untuk chip subset */
+        #subsetChips{
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+          gap: 8px;
+          align-items: stretch;
+        }
+        #subsetChips .chip{
+          width: 100%;
+          text-align: center;
+        }
+
+        /* Pastikan label 'Pilih cepat:' span satu baris di atas grid */
+        #subsetChips > .small{
+          grid-column: 1 / -1;
+          text-align: center;      /* biar labelnya ikut center */
+          margin-bottom: 2px;
+        }
+        @media (min-width:1024px){
+          #subsetChips{
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+          }
+        }
     </style>
 </head>
 <body>
@@ -439,7 +490,7 @@
                 <div class="logo" aria-hidden="true"></div>
                 <div>
                     <h1>Pelatih Kana Jepang <span class="tag">v9</span></h1>
-                    <div class="small">Hiragana • Katakana • Dakuon/Handakuon • Youon • Tes & Review • Pomodoro • Tema • Writer</div>
+                    <div class="small">Dasar • Dakuon/Handakuon • Youon • Tes & Review • Pomodoro • Tema • Writer</div>
                 </div>
                 <div class="row header-controls-row" style="gap:6px">
                     <div class="seg" role="tablist" aria-label="Tema">
@@ -485,8 +536,11 @@
         <!-- TEST MODE -->
         <section class="grid" aria-labelledby="testTitle">
             <div class="card" style="grid-column: span 12;">
-                <h2 id="testTitle"><i class="fas fa-pencil-alt icon"></i> Tes (Subset / Rentang, Tipe Soal & Mode Jawab)</h2>
-                <div class="small">Gunakan chip untuk subset cepat atau rentang khusus. Tentukan tipe soal, mode jawab, dan jumlah soal.</div>
+                <!-- PATCH: Ganti heading & deskripsi bagian Tes jadi lebih pendek -->
+                <h2 id="testTitle"><i class="fas fa-pencil-alt icon"></i> Tes</h2>
+                <div class="small">
+                  Pilih subset atau rentang. Tentukan tipe & mode, lalu jumlah soal.
+                </div>
                 <div class="spacer"></div>
 
                 <div class="row test-controls-row" style="align-items:flex-end">
@@ -751,7 +805,7 @@
             export_ok: 'Progres berhasil diekspor sebagai kana-progress.json!',
             level_up_title: (level)=>`Level Up! 🎉 Level ${level}!`,
             level_up_msg: (name)=>`Kamu sekarang seorang ${name}! Terus semangat! 🔥`,
-            streak_title: 'Wii! Keren banget! 🎉',
+            streak_title: 'Wii! Keren banget! �',
             streak_msg: '10 jawaban benar berturut-turut. Lanjutkan momentummu! ✨',
             pomo_focus: 'Fokus',
             pomo_break: 'Istirahat',
@@ -906,7 +960,7 @@
 
         const CONFUSE_KATA = [
             ['シ','ツ'], ['ソ','ン'], ['ク','ケ'], ['フ','ワ'], ['ヂ','ジ'], ['ヅ','ズ'],
-            ['ノ','メ'], ['イ','リ'], ['エ','ヱ'], ['ネ','レ'], ['ア','マ'], ['ム','厶']
+            ['ノ','메'], ['イ','リ'], ['エ','ヱ'], ['ネ','レ'], ['ア','マ'], ['ム','厶']
         ];
         function similarChoicesKata(correct){
             for(const g of CONFUSE_KATA) {
@@ -1178,8 +1232,12 @@
             }
         }
 
+        // PATCH: Panggil finishTest() di endTest()
         function endTest(){
-            qs('#testArea').hidden=true;
+            // Tampilkan hasil dan review dulu
+            finishTest();
+            // Lalu sembunyikan area tes (opsional)
+            qs('#testArea').hidden = true;
             qs('#testEmptyState').hidden = false;
             updateProgress();
         }
@@ -1286,7 +1344,13 @@
                 clickTone('ok');
                 qKanaElement.classList.add('correct-answer');
                 if (streakCounterElement) streakCounterElement.classList.add('grow');
-                showToast(t('feedback_correct', escapeHTML(currentKanaChar), escapeHTML(currentRomaji)));
+                // PATCH: Konsistensi penerimaan jawaban dji/dzu
+                let okMsg = t('feedback_correct', escapeHTML(currentKanaChar), escapeHTML(currentRomaji));
+                const ui = (extra.typed || extra.normalized || '').toLowerCase();
+                if ((currentRomaji === 'dji' && ['ji','di'].includes(ui)) || (currentRomaji === 'dzu' && ['zu','du'].includes(ui))) {
+                    okMsg += ` (jawaban kamu "${escapeHTML(ui)}" diterima)`;
+                }
+                showToast(okMsg);
             } else {
                 state.test.correctStreak=0;
                 wrongList.push({...currentItem, ...extra});
@@ -1311,13 +1375,25 @@
             nextQ();
         }
 
+        function shuffleReturn(arr){ const a=[...arr]; shuffle(a); return a; }
+
+        // PATCH: Pilihan ganda K->R kadang ngambil opsi dari luar rentang
         function buildMC_k2r(item){
-            const labels=currentPoolLabels();
-            const universe = ALL_ROMAJI.filter(r=>r!==item.romaji);
-            shuffle(universe);
-            const pool = [item.romaji, ...new Set(universe)].slice(0,4);
-            shuffle(pool);
-            mcMap={A:pool[0],B:pool[1],C:pool[2],D:pool[3]};
+            const labels = currentPoolLabels().filter(r => r !== item.romaji);
+            const sameLen = labels.filter(r => r.length === item.romaji.length);
+            let decoys = shuffleReturn(sameLen).slice(0,3);
+            if (decoys.length < 3) {
+                decoys = [...decoys, ...shuffleReturn(labels).slice(0, 3 - decoys.length)];
+            }
+            const pool = [item.romaji, ...decoys].slice(0,4);
+            const uniq = [...new Set(pool)];
+            while (uniq.length < 4) {
+                const fallback = labels.find(r => !uniq.includes(r));
+                if (!fallback) break;
+                uniq.push(fallback);
+            }
+            shuffle(uniq);
+            mcMap = {A:uniq[0], B:uniq[1], C:uniq[2], D:uniq[3]};
             setMCText({A:`A. ${escapeHTML(mcMap.A)}`,B:`B. ${escapeHTML(mcMap.B)}`,C:`C. ${escapeHTML(mcMap.C)}`,D:`D. ${escapeHTML(mcMap.D)}`});
         }
         function buildMC_r2k(item){
@@ -1491,6 +1567,12 @@
             }
             if (typeof writerSetGhostChar === 'function') writerSetGhostChar();
             if (typeof writerRedrawAll === 'function') writerRedrawAll();
+            // PATCH: Meta “theme-color” tidak ikut berubah saat ganti tema
+            const metaTheme = document.querySelector('meta[name="theme-color"]');
+            if (metaTheme) {
+              const bg = getComputedStyle(document.documentElement).getPropertyValue('--panel').trim() || (isHC ? '#0f1626' : '#ffffff');
+              metaTheme.setAttribute('content', bg);
+            }
         }
         function applyAudio(){ const ck=qs('#audToggle'); if (ck) ck.checked = !!state.audio; }
 
@@ -1560,6 +1642,8 @@
 
             document.body.appendChild(toast);
             currentToast = toast;
+            // PATCH: Ekspor currentToast ke window agar override tidak bentrok
+            window.currentToast = toast; 
 
             setTimeout(() => {
                 if (currentToast === toast) {
@@ -1578,6 +1662,7 @@
                     toast.remove();
                     if (currentToast === toast) {
                         currentToast = null;
+                        window.currentToast = null; // Clear global reference
                     }
                     toast.removeEventListener('transitionend', handler);
                 }
@@ -1904,8 +1989,10 @@
             wGhost.classList.toggle('hidden', !state.writer.ghost);
         }
         function writerSetGrid(on) { if (wWrap) wWrap.classList.toggle('grid', !!on); }
+        // PATCH: Ganti fungsi writerStrokeStyle() (supaya selalu solid & nggak “ketahan” state lama)
         function writerStrokeStyle() {
-            if (!wCtx) return; // Guard against null
+            if (!wCtx) return;
+            wCtx.globalAlpha = 1; // pastikan selalu terlihat
             wCtx.lineCap = 'round';
             wCtx.lineJoin = 'round';
             wCtx.strokeStyle = state.theme==='hc' ? '#e6efff' : '#132030';
@@ -1992,7 +2079,7 @@
                     wCtx.moveTo(s.points[0].x, s.points[0].y);
                     for(let i=1;i<s.points.length;i++){
                         const b=s.points[i];
-                        wCtx.lineTo(b.x, b.y);
+                        ctx.lineTo(b.x, b.y);
                     }
                 }
                 wCtx.stroke();
@@ -2013,7 +2100,8 @@
             const url = tmp.toDataURL('image/png');
             const a = document.createElement('a');
             const fileName = `kana-${state.writer.kana}-${state.writer.set}.png`;
-            a.href = url; a.download = fileName; a.click();
+            a.href = url; a.download = fileName; a.click(); URL.revokeObjectURL(a.href);
+            showToast(t('export_ok'));
         }
         function writerFillKanaOptions() {
             const sel = qs('#writeKana');
@@ -2075,7 +2163,13 @@
             bind('#writeRand', 'click', ()=>{ writerRandom(); writerClear(); });
             bind('#writeSpeak', 'click', ()=>{ speak(writerCurrentChar()); clickTone('click'); });
             bind('#penSize', 'input', (e)=>{ state.writer.penSize = parseInt(e.target.value,10)||10; save(); });
-            bind('#gridToggle', 'change', (e)=>{ state.writer.grid = e.target.checked; save(); writerSetGrid(state.writer.grid); });
+            // PATCH: Perbaiki handler toggle Grid (biar redraw setelah ganti latar)
+            bind('#gridToggle', 'change', (e)=>{ 
+                state.writer.grid = e.target.checked; 
+                save(); 
+                writerSetGrid(state.writer.grid); 
+                writerRedrawAll(); // penting: redraw setelah ubah grid
+            });
             bind('#ghostToggle', 'change', (e)=>{ state.writer.ghost = e.target.checked; save(); writerSetGhostChar(); });
             bind('#autoSnapToggle', 'change', (e)=>{ state.writer.autoSnap = e.target.checked; save(); });
             bind('#penBtn', 'click', ()=>{ state.writer.eraser=false; save(); qs('#penBtn')?.classList.add('ok'); qs('#eraserBtn')?.classList.remove('ok'); });
@@ -2085,14 +2179,20 @@
             bind('#savePNG', 'click', writerSavePNG);
             document.addEventListener('keydown', (e)=>{ if((e.ctrlKey||e.metaKey) && e.key.toLowerCase()==='z'){ e.preventDefault(); writerUndo(); } });
             window.addEventListener('resize', ()=>{ writerSetupCanvasSize(); });
-            const resizeObserver = new ResizeObserver(entries => {
-                for (let entry of entries) {
-                    if (entry.target === wWrap) {
-                        writerSetupCanvasSize();
-                    }
-                }
-            });
-            if (wWrap) resizeObserver.observe(wWrap); // Guard against null
+            // PATCH: Guard sebelum pakai ResizeObserver
+            if ('ResizeObserver' in window) {
+              const resizeObserver = new ResizeObserver(entries => {
+                  for (let entry of entries) {
+                      if (entry.target === wWrap) {
+                          writerSetupCanvasSize();
+                      }
+                  }
+              });
+              if (wWrap) resizeObserver.observe(wWrap); // Guard against null
+            } else {
+              console.warn("ResizeObserver not supported in this browser.");
+              // Fallback for older browsers if needed, e.g., using window.onresize
+            }
         }
         function writerInit() {
             writerInitDOMRefs();
@@ -2121,7 +2221,7 @@
             const src = wCanvas.getBoundingClientRect();
             const sx = c.width / src.width;
             const sy = c.height / src.height;
-            for(const s of strokes){
+            for(const s of wStrokes){
                 if (s.ops === 'destination-out') continue; 
                 ctx.globalCompositeOperation = s.ops;
                 ctx.lineWidth = Math.max(2, (s.size||state.writer.penSize) * ((sx+sy)/2));
@@ -2292,9 +2392,15 @@
                 if (onboardingModal) onboardingModal.style.display = 'none';
                 if (onboardingModal) onboardingModal.hidden = true;
                 if (mainContent) mainContent.style.display = 'block';
+                // PATCH: Dukungan Escape key untuk modal onboarding
+                if (_escCloseListenerOnboarding) {
+                    document.removeEventListener('keydown', _escCloseListenerOnboarding);
+                    _escCloseListenerOnboarding = null;
+                }
             });
         }
 
+        let _escCloseListenerOnboarding = null;
         function _trapModalOnboarding(){
             const onboardingModal = qs('#onboardingModal');
             if (!onboardingModal) return; // Guard against null
@@ -2319,13 +2425,25 @@
                     }
                 }
             });
+            // PATCH: Dukungan Escape key untuk modal onboarding
+            if (!_escCloseListenerOnboarding) {
+                _escCloseListenerOnboarding = (e) => {
+                    if (e.key === 'Escape') {
+                        const btnStartLearning = qs('#btnStartLearningOnboarding');
+                        if (btnStartLearning) {
+                            btnStartLearning.click(); // Simulate click to close and mark as seen
+                        }
+                    }
+                };
+                document.addEventListener('keydown', _escCloseListenerOnboarding);
+            }
             firstFocusable?.focus();
         }
 
         // ---------- BINDINGS ----------
         bind('#btnShowLearn', 'click', startLearn);
         bind('#btnStart', 'click', startTest);
-        bind('#btnEnd', 'click', endTest);
+        bind('#btnEnd', 'click', endTest); // Menggunakan fungsi endTest yang sudah diperbaiki
         bind('#btnSkip', 'click', skipQ);
         bind('#btnCheck', 'click', checkAns);
 
@@ -2452,6 +2570,8 @@
         });
 
         // ==== Hardening anti-overflow saat runtime (debug + fix cepat) ====
+        // PATCH: Menghapus seluruh IIFE ini karena override window.showToast bentrok dan tidak diperlukan
+        /*
         (function fixRuntimeOverflow(){
             document.documentElement.style.overflowX = 'hidden';
             document.body.style.overflowX = 'hidden';
@@ -2478,6 +2598,7 @@
                 }
             }
         })();
+        */
     </script>
 </body>
 </html>
