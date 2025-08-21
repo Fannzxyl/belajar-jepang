@@ -3,36 +3,28 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <title>Pelatih Kana Jepang — v9</title>
-    <meta name="description" content="Pelajari Hiragana & Katakana lengkap (dasar, dakuon/handakuon, youon) dengan tes & review, audio, Pomodoro, progress, tema pastel/kontras, dan kanvas menulis." />
+    <title>Pelatih Kana Jepang — v10</title>
+    <meta name="description" content="Belajar Hiragana & Katakana dari nol sampai lancar — tes adaptif, audio, Pomodoro, dan latihan menulis." />
     <meta name="theme-color" content="#7a6cff">
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
-    <!-- Diperbarui: URL Github Pages asli -->
     <meta property="og:url" content="https://alfan.github.io/kana-trainer/"> 
-    <meta property="og:title" content="Pelatih Kana Jepang — v9">
-    <meta property="og:description" content="Pelatih Kana Jepang v9 — latihan interaktif, audio pelafalan, tes adaptif, Pomodoro, dan kanvas menulis. Progres tersimpan lokal. Mulai gratis sekarang.">
-    <!-- Diperbarui: URL Github Pages asli -->
+    <meta property="og:title" content="Pelatih Kana Jepang — v10">
+    <meta property="og:description" content="Pelatih Kana Jepang v10 — latihan interaktif, audio pelafalan, tes adaptif, Pomodoro, dan kanvas menulis. Progres tersimpan lokal. Mulai gratis sekarang.">
     <meta property="og:image" content="https://alfan.github.io/kana-trainer/kana-trainer-preview.png"> 
 
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image">
-    <!-- Diperbarui: URL Github Pages asli -->
     <meta name="twitter:url" content="https://alfan.github.io/kana-trainer/"> 
-    <meta name="twitter:title" content="Pelatih Kana Jepang — v9">
-    <!-- PATCH: Tag twitter:description pakai name, bukan property -->
-    <meta name="twitter:description" content="Pelatih Kana Kana Jepang v9 — latihan interaktif, audio pelafalan, tes adaptif, Pomodoro, dan kanvas menulis. Progres tersimpan lokal. Mulai gratis sekarang.">
-    <!-- Diperbarui: URL Github Pages asli -->
+    <meta name="twitter:title" content="Pelatih Kana Jepang — v10">
+    <meta name="twitter:description" content="Pelatih Kana Jepang v10 — latihan interaktif, audio pelafalan, tes adaptif, Pomodoro, dan kanvas menulis. Progres tersimpan lokal. Mulai gratis sekarang.">
     <meta name="twitter:image" content="https://alfan.github.io/kana-trainer/kana-trainer-preview.png"> 
 
-    <!-- Diperbarui: URL Github Pages asli -->
     <link rel="canonical" href="https://alfan.github.io/kana-trainer/">
 
     <!-- Favicon -->
-    <!-- Diperbarui: Path relatif untuk GitHub Pages -->
     <link rel="icon" href="favicon.ico">
-    <!-- PATCH: Fallback SVG inline favicon -->
     <link rel="icon" type="image/svg+xml"
       href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop stop-color='%237a6cff'/><stop offset='1' stop-color='%2316c6a1'/></linearGradient></defs><rect width='64' height='64' rx='14' fill='url(%23g)'/><text x='50%' y='54%' text-anchor='middle' font-family='Noto Sans JP,Arial' font-size='38' fill='white'>あ</text></svg>">
     <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -527,7 +519,7 @@
                           font-size="38" fill="white" dy="-2">あ</text>
                 </svg>
                 <div>
-                    <h1>Pelatih Kana Jepang <span class="tag">v9</span></h1>
+                    <h1>Pelatih Kana Jepang <span class="tag">v10</span></h1>
                     <div class="small">Dasar • Dakuon/Handakuon • Youon • Tes & Review • Pomodoro • Tema • Writer</div>
                 </div>
                 <div class="row header-controls-row" style="gap:6px">
@@ -574,7 +566,6 @@
         <!-- TEST MODE -->
         <section class="grid" aria-labelledby="testTitle">
             <div class="card" style="grid-column: span 12;">
-                <!-- PATCH: Ganti heading & deskripsi bagian Tes jadi lebih pendek -->
                 <h2 id="testTitle"><i class="fas fa-pencil-alt icon"></i> Tes</h2>
                 <div class="small">
                   Pilih subset atau rentang. Tentukan tipe & mode, lalu jumlah soal.
@@ -582,8 +573,7 @@
                 <div class="spacer"></div>
 
                 <div class="row test-controls-row" style="align-items:flex-end">
-                    <div style="flex:1;"> <!-- PATCH: Menghapus width:100% dari inline style -->
-                        <!-- PATCH: Hapus inline style display:flex di #subsetChips -->
+                    <div style="flex:1;">
                         <div class="chips" id="subsetChips">
                             <div class="small" style="margin-bottom: 4px;">Pilih cepat:</div>
                         </div>
@@ -595,7 +585,9 @@
                     <select id="qType" title="Tipe Soal" aria-label="Tipe soal">
                         <option value="k2r">Kana → Romaji</option>
                         <option value="r2k">Romaji → Kana (Pilihan Ganda)</option>
+                        <option value="audio">Listening (Dengar & Jawab)</option>
                         <option value="seq">Rangkaian Romaji → Kana</option>
+                        <option value="kseq">Kana → Romaji Rangkaian</option>
                     </select>
                     <select id="answerMode" aria-label="Mode jawaban">
                         <option value="type">Mode Ketik</option>
@@ -613,6 +605,9 @@
                         <button class="chip" data-count="50" type="button">50</button>
                         <button class="chip" data-count="100" type="button">100</button>
                     </div>
+                    <!-- PATCH: kontrol jumlah suku kata (HTML) — di panel Tes, dekat “Jumlah soal” -->
+                    <label class="tag" id="sylLabel" hidden>Suku kata/soal:</label>
+                    <input id="sylPerItem" type="number" min="2" max="6" value="3" style="width:100px" hidden />
                 </div>
                 <div class="spacer"></div>
                 <div class="row test-control-group">
@@ -638,10 +633,14 @@
                 <div id="testArea" class="center" hidden>
                     <div id="promptWrap" style="display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap">
                         <div id="qKana" style="font-size:64px;line-height:1.1;margin:6px 0">あ</div>
+                        <!-- PATCH: tombol replay (HTML) — taruh di dekat #qKana -->
+                        <button id="btnReplayAudio" class="btn" type="button" title="Putar lagi" aria-label="Putar lagi" hidden>🔊</button>
                     </div>
                     <div id="typeWrap" style="max-width:520px;margin:0 auto">
                         <input id="ans" placeholder="Ketik jawaban kamu di sini…" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" inputmode="latin" aria-label="Jawaban" />
                         <div class="spacer"></div>
+                        <!-- PATCH: preview konversi (HTML) — taruh di dalam #typeWrap, di bawah input #ans -->
+                        <div id="seqPreview" class="small" style="margin-top:6px" hidden>Romaji → Kana: <b id="seqPrevKana">—</b></div>
                         <button class="btn" id="btnCheck" type="button"><i class="fas fa-check"></i> Cek (Enter)</button>
                     </div>
                     <div id="mcWrap" class="optwrap" hidden>
@@ -845,7 +844,6 @@
             export_ok: 'Progres berhasil diekspor sebagai kana-progress.json!',
             level_up_title: (level)=>`Level Up! 🎉 Level ${level}!`,
             level_up_msg: (name)=>`Kamu sekarang seorang ${name}! Terus semangat! 🔥`,
-            // PATCH: Perbaikan karakter di streak_title
             streak_title: 'Wii! Keren banget! ✨',
             streak_msg: '10 jawaban benar berturut-turut. Lanjutkan momentummu! ✨',
             pomo_focus: 'Fokus',
@@ -857,7 +855,7 @@
             test_mc_hint: 'Ketuk atau tekan A/B/C/D',
             learn_tile_tooltip: 'Ketuk untuk dengar, tahan untuk batal',
             writer_guide_hint: 'Tips: Tarik cepat untuk garis tipis, pelan untuk lebih tebal.',
-            onboarding_title: 'Selamat Datang di Pelatih Kana Jepang! 👋',
+            onboarding_title: 'Selamat Datang di Pelatih Kana Jepang! �',
             onboarding_step1: '<b>1. Belajar:</b> Pilih set & rentang, ketuk huruf buat dengar pelafalan.',
             onboarding_step2: '<b>2. Tes:</b> Atur tipe soal (Kana → Romaji, Romaji → Kana, atau Rangkaian) & jumlah soal. Kamu bisa ketik atau pilih jawaban.',
             onboarding_step3: '<b>3. Menulis:</b> Latih goresanmu di kanvas. Aktifkan "Panduan" untuk menjiplak, dan "Auto-Snap" kalau mau dibantu rapi.',
@@ -868,6 +866,10 @@
             feedback_skipped: 'Oke, kita lanjut dulu.',
             writer_snap_success: 'Rapi! Bentuknya sudah pas 👌',
             writer_snap_fail: 'Hampir! Coba garisnya sedikit lebih melengkung.',
+            // PATCH: TEKS LOKALISASI
+            replay_audio: 'Putar lagi',
+            syl_per_item: 'Suku kata/soal',
+            listening_label: 'Dengar & jawab',
         };
 
         const t = (key, ...args) => {
@@ -886,7 +888,9 @@
             hiraMastered:[], kataMastered:[],
             test:{
                 subset:'aiueo', set:'hira', mode:'type', qType:'k2r',
-                score:0, total:0, correctStreak:0, target:10, rangeMode:'range'
+                score:0, total:0, correctStreak:0, target:10, rangeMode:'range',
+                // PATCH: Tambah state default sylPerItem
+                sylPerItem: 3
             },
             pomo:{mode:'work', work:25, break:5, remaining:25*60, running:false, last:0},
             totalPoints: 0,
@@ -955,7 +959,6 @@
         const HIRA_BASE = ['あ','い','う','え','お','か','き','く','け','こ','さ','し','す','せ','そ','た','ち','つ','て','と','な','に','ぬ','ね','の','は','ひ','ふ','へ','ほ','ま','み','む','め','も','や','ゆ','よ','ら','り','る','れ','ろ','わ','を','ん'];
         const KATA_BASE = ['ア','イ','ウ','エ','オ','カ','キ','ク','ケ','コ','サ','シ','ス','セ','ソ','タ','チ','ツ','テ','ト','ナ','ニ','ヌ','ネ','ノ','ハ','ヒ','フ','ヘ','ホ','マ','ミ','ム','メ','モ','ヤ','ユ','ヨ','ラ','リ','ル','レ','ロ','ワ','ヲ','ン'];
 
-        // FIX: Karakter Hiragana Dakuon dan Handakuten yang benar
         const HIRA_DAKU = ['が','ぎ','ぐ','げ','ご','ざ','じ','ず','ぜ','ぞ','だ','ぢ','づ','で','ど','ば','び','ぶ','べ','ぼ','ぱ','ぴ','ぷ','ぺ','ぽ'];
         const KATA_DAKU = ['ガ','ギ','グ','ゲ','ゴ','ザ','ジ','ズ','ゼ','ゾ','ダ','ヂ','ヅ','デ','ド','バ','ビ','ブ','ベ','ボ','パ','ピ','プ','ペ','ポ'];
 
@@ -1143,7 +1146,6 @@
             const from=qs('#fromGrp').value, to=qs('#toGrp').value;
             const labels = rangeLabels(from,to);
             const map = set==='hira'?HIRA_MAP:KATA_MAP;
-            // PATCH: Mendefinisikan 'mastered' di sini
             const mastered = set==='hira'? state.hiraMastered: state.kataMastered;
             const box=qs('#learnTiles');
             box.innerHTML='';
@@ -1154,13 +1156,12 @@
             const frag=df();
             labels.forEach(r=>{
                 const ch = map.get(r);
-                const tile=document.createElement('button');
-                tile.type='button';
-                tile.className='kana' + (mastered.includes(r) ? ' mastered' : '');
-                tile.innerHTML=`<div class="jp">${escapeHTML(ch)}</div><div class="ro">${escapeHTML(r)}</div>`; // Escape kana/romaji
-                tile.title=t('learn_tile_tooltip');
-                tile.onclick=()=> speak(ch); // Use escaped char for speak
-                frag.appendChild(tile);
+                const b = document.createElement('button'); b.type='button';
+                b.className='kana' + (mastered.includes(r) ? ' mastered' : '');
+                b.innerHTML=`<div class="jp">${escapeHTML(ch)}</div><div class="ro">${escapeHTML(r)}</div>`; // Escape kana/romaji
+                b.title=t('learn_tile_tooltip');
+                b.onclick=()=> speak(ch); // Use escaped char for speak
+                frag.appendChild(b);
             });
             box.appendChild(frag);
         }
@@ -1259,37 +1260,105 @@
             mcWrap.style.display = 'none';
             answerModeSelect.disabled = false;
 
-            if (qType === 'seq') {
+            // PATCH: toggleAnswerUI — tambahkan cabang berikut
+            const sylL = qs('#sylLabel'); const sylI = qs('#sylPerItem');
+            const replay = qs('#btnReplayAudio');
+
+            const showSyl = (qType==='seq' || qType==='kseq');
+            if(sylL) sylL.hidden = !showSyl; 
+            if(sylI){ sylI.hidden = !showSyl; sylI.value = state.test.sylPerItem ?? 3; }
+
+            if(qType==='kseq'){
+              if(ansSel){ ansSel.value='type'; ansSel.disabled=true; }
+            } else if (qType === 'seq') { // Existing logic for 'seq'
                 typeWrap.style.display = 'block';
                 answerModeSelect.value = 'type';
                 answerModeSelect.disabled = true;
-            } else if (qType === 'r2k') {
+            } else if (qType === 'r2k') { // Existing logic for 'r2k'
                 mcWrap.style.display = 'grid';
                 answerModeSelect.value = 'mc';
                 answerModeSelect.disabled = true;
-            } else {
+            } else { // Default for k2r and audio
                 if (mode === 'type') {
                     typeWrap.style.display = 'block';
                 } else {
                     mcWrap.style.display = 'grid';
                 }
+                if(ansSel) ansSel.disabled=false; // Ensure not disabled by kseq/seq
             }
+
+            if(replay) replay.hidden = !(qType==='audio');
         }
 
-        // PATCH: Panggil finishTest() di endTest()
         function endTest(){
-            // Tampilkan hasil dan review dulu
-            finishTest();
-            // Lalu sembunyikan area tes (opsional)
-            qs('#testArea').hidden = true;
+            qs('#testArea').hidden=true;
             qs('#testEmptyState').hidden = false;
             updateProgress();
+            finishTest(); // Pastikan finishTest dipanggil
         }
 
         function nextQ(){
             if(state.test.total>=state.test.target){ finishTest(); return; }
             if(!testPool.length){ qs('#qKana').textContent='Selesai!'; return; }
-            currentItem = testPool[qIndex % testPool.length]; const qType=state.test.qType; const ansEl=qs('#ans'); if(ansEl) ansEl.value='';
+            
+            // PATCH: nextQ — tambahkan handling 'audio' dan 'kseq'
+            const qType = state.test.qType;
+            const set   = state.test.set;
+
+            // AUDIO
+            if(qType==='audio'){
+                currentItem = testPool[qIndex % testPool.length];
+                const replay = qs('#btnReplayAudio'); if(replay) replay.hidden=false;
+                const el = qs('#qKana'); if(el){ el.textContent='🔊 Dengar & jawab'; el.style.fontSize='24px'; }
+                if(currentItem.char) speakForce(currentItem.char);
+                if(state.test.mode==='mc'){
+                    buildMC_r2k(currentItem); // opsi KANA
+                }
+                _updateSeqPreview(); // Update preview untuk mode ketik
+                updateTestInfo();
+                toggleAnswerUI();
+                setTimeout(()=>{
+                    const ansEl=qs('#ans');
+                    const tw = qs('#typeWrap');
+                    if (tw && getComputedStyle(tw).display !== 'none') ansEl && ansEl.focus();
+                }, 30);
+                return;
+            }
+
+            // KSEQ
+            if(qType==='kseq'){
+                const labels = currentPoolLabels(); // hormati rentang
+                const N = Math.max(2, Math.min(6, state.test.sylPerItem||3));
+                const picks=[]; 
+                for(let i=0;i<N;i++){ 
+                    // Pastikan labels tidak kosong untuk menghindari infinite loop atau error
+                    if (labels.length > 0) {
+                        picks.push(labels[Math.floor(Math.random()*labels.length)]); 
+                    } else {
+                        // Handle case where labels is empty, e.g., break or show error
+                        console.warn("KSEQ: No labels available in the current pool.");
+                        break; 
+                    }
+                }
+                const romajiSeq = picks.join('');
+                const kanaSeq   = romajiStringToKana(romajiSeq, set);
+                currentItem = {romaji: romajiSeq, char: kanaSeq, seq:{romaji:romajiSeq, kana:kanaSeq}}; // Pastikan currentItem punya .romaji dan .char
+                const el = qs('#qKana'); if(el){ el.textContent=kanaSeq; el.style.fontSize='56px'; }
+                const ansEl=qs('#ans'); if(ansEl) ansEl.value='';
+                const ansSel = qs('#answerMode'); if(ansSel){ ansSel.value='type'; ansSel.disabled=true; }
+                _updateSeqPreview();
+                updateTestInfo();
+                toggleAnswerUI();
+                setTimeout(()=>{
+                    const tw = qs('#typeWrap');
+                    if (tw && getComputedStyle(tw).display !== 'none') ansEl && ansEl.focus();
+                }, 30);
+                return;
+            }
+
+            // Original logic for k2r, r2k, seq
+            currentItem = testPool[qIndex % testPool.length]; 
+            const ansEl=qs('#ans'); if(ansEl) ansEl.value='';
             
             if(qType==='seq'){
                 const seq = makeSequence(poolIdx, state.test.set);
@@ -1301,7 +1370,7 @@
                 qs('#qKana').textContent=escapeHTML(currentItem.char);
                 qs('#qKana').style.fontSize='64px';
             }
-            else {
+            else { // r2k
                 qs('#qKana').textContent=escapeHTML(currentItem.romaji);
                 qs('#qKana').style.fontSize='36px';
                 buildMC_r2k(currentItem);
@@ -1311,6 +1380,7 @@
                 buildMC_k2r(currentItem);
             }
 
+            _updateSeqPreview(); // Panggil juga untuk mode lain agar preview tersembunyi
             updateTestInfo();
             toggleAnswerUI();
             setTimeout(()=>{
@@ -1323,6 +1393,14 @@
             const qType=state.test.qType;
             const val=mcMap[letter];
             let correct=false;
+
+            // PATCH: mcPick — nilai KANA untuk audio mc
+            if(qType==='audio'){
+                const correctKana = (state.test.set==='hira'? HIRA_MAP.get(currentItem.romaji): KATA_MAP.get(currentItem.romaji));
+                correct = (val===correctKana);
+                return finalizeAnswer(correct,{chosen:val});
+            }
+
             if(qType==='k2r'){
                 correct = (val===currentItem.romaji);
             } else if(qType==='r2k'){
@@ -1352,6 +1430,20 @@
             const qType=state.test.qType;
             let correct=false;
             let normalized='';
+
+            // PATCH: checkAns — tambahkan cabang audio & kseq
+            if(qType==='audio'){
+                const norm = normalizeRomaji(valRaw);
+                correct = romajiEquals(norm, currentItem.romaji);
+                return finalizeAnswer(correct,{typed:valRaw, normalized:norm});
+            }
+            if(qType==='kseq'){
+                const norm = normalizeRomajiSequence(valRaw);
+                // banding romaji (kanon)
+                const canon = (t)=> t.replace(/ji/g,'dji').replace(/zu/g,'dzu').replace(/wo/g,'o'); // Apply canonicalization
+                const ok = (canon(norm)===canon(currentItem.seq.romaji));
+                return finalizeAnswer(ok,{typed:valRaw, normalized:norm});
+            }
 
             if(qType==='k2r'){
                 const norm = normalizeRomaji(valRaw);
@@ -1421,7 +1513,6 @@
 
         function shuffleReturn(arr){ const a=[...arr]; shuffle(a); return a; }
 
-        // PATCH: Pilihan ganda K->R kadang ngambil opsi dari luar rentang
         function buildMC_k2r(item){
             const labels = currentPoolLabels().filter(r => r !== item.romaji);
             const sameLen = labels.filter(r => r.length === item.romaji.length);
@@ -1486,7 +1577,15 @@
                 rangeLabel = (grpFrom && grpTo) ? `${grpFrom.label} - ${grpTo.label}` : 'Rentang khusus';
             }
 
-            const tlabel = state.test.qType==='k2r'? 'Kana→Romaji' : state.test.qType==='r2k'? 'Romaji→Kana' : 'Rangkaian';
+            const tlabelMap = {
+                'k2r': 'Kana→Romaji',
+                'r2k': 'Romaji→Kana',
+                'audio': 'Listening',
+                'seq': 'Rangkaian R→K',
+                'kseq': 'Rangkaian K→R'
+            };
+            const tlabel = tlabelMap[state.test.qType] || state.test.qType;
+
             const testInfoTextElement = qs('#testInfoText');
             const streakCounterElement = qs('#streakCounter');
 
@@ -1528,7 +1627,14 @@
                     const expectedKana = (set==='hira'? HIRA_MAP.get(w.romaji): KATA_MAP.get(w.romaji));
                     const expectedRomaji = w.romaji;
                     const got = w.chosen||w.normalized||w.typed||'-';
-                    const leftDisplay = (state.test.qType==='k2r') ? (set==='hira'? HIRA_MAP.get(w.romaji): KATA_MAP.get(w.romaji)) : w.romaji;
+                    const leftDisplay = (state.test.qType==='k2r' || state.test.qType==='audio') ? (set==='hira'? HIRA_MAP.get(w.romaji): KATA_MAP.get(w.romaji)) : w.romaji;
+                    
+                    // For kseq, the 'prompt' is Kana, and the 'answer' is Romaji sequence
+                    if (state.test.qType === 'kseq' && w.seq) {
+                        leftDisplay = w.seq.kana; // The Kana sequence displayed as question
+                        expectedRomaji = w.seq.romaji; // The correct Romaji sequence
+                    }
+
 
                     let displayExpected = expectedRomaji;
                     let displayGiven = got;
@@ -1536,21 +1642,27 @@
                     if ((expectedRomaji === 'dji' && (got === 'ji' || got === 'di')) || (expectedRomaji === 'dzu' && (got === 'zu' || got === 'du'))) {
                         displayExpected = `${expectedRomaji}`;
                         displayGiven = `${got}`;
-                    } else if (state.test.qType === 'r2k' || state.test.qType === 'seq') {
+                    } else if (state.test.qType === 'r2k' || state.test.qType === 'seq' || state.test.qType === 'audio') {
+                        // If it's R2K, SEQ, or AUDIO (MC mode), the expected is Kana
                         displayExpected = expectedKana;
                         displayGiven = hasKana(got) ? got : romajiStringToKana(got, set);
                         if (!displayGiven) displayGiven = got;
+                    } else if (state.test.qType === 'kseq') {
+                        // For kseq, the expected is Romaji sequence, given is user's Romaji
+                        displayExpected = w.seq.romaji;
+                        displayGiven = w.typed;
                     }
+
 
                     const safeLeft = escapeHTML(leftDisplay);
                     const safeExpRomaji = escapeHTML(displayExpected);
-                    const safeExpKana = escapeHTML(expectedKana);
+                    const safeExpKana = escapeHTML(expectedKana); // This might be redundant for kseq, but harmless
                     const safeGiven = escapeHTML(w.typed ? `${w.typed} (${displayGiven})` : displayGiven);
 
                     return `<div style="padding:8px;border:1px solid var(--border);border-radius:12px;margin:6px 0;display:flex;justify-content:space-between;gap:8px">
                                 <div>
                                     <div class="small">Soal ${i+1}</div>
-                                    <div><b>${safeLeft}</b> → <span style="color:var(--ok)">${safeExpRomaji} (${safeExpKana})</span></div>
+                                    <div><b>${safeLeft}</b> → <span style="color:var(--ok)">${safeExpRomaji}</span></div>
                                     <div class="small">Jawaban kamu: ${safeGiven}</div>
                                 </div>
                                 <button class="btn" onclick="window._speak('${escapeHTML(expectedKana)}')" type="button" aria-label="Putar pelafalan ${escapeHTML(expectedKana)}">🎧</button>
@@ -1567,7 +1679,7 @@
             if (rangeMode === 'single') {
                 const singleKey = qs('#testSingleGroup').value;
                 const grp = GROUPS.find(x => x.key === singleKey);
-                if (grp) labels = grp.idx.map(i => grp.list[i]);
+                if (grp) labels = grp.idx.map(i => g.list[i]);
             } else {
                 const sKey = qs('#testFrom').value;
                 const eKey = qs('#testTo').value;
@@ -1658,6 +1770,17 @@
             }catch(error){ console.error('Error speaking text:', error); }
         }
         window._speak = speak;
+
+        // PATCH: helper audio force
+        function speakForce(text){
+          try{
+            if(!('speechSynthesis' in window)) return;
+            speechSynthesis.cancel();
+            const u=new SpeechSynthesisUtterance(text);
+            u.lang='ja-JP'; u.rate=.9; u.pitch=1.02; u.volume=1;
+            speechSynthesis.speak(u);
+          }catch{}
+        }
 
         let currentToast = null;
         let toastTimeout = null;
@@ -2033,7 +2156,6 @@
             wGhost.classList.toggle('hidden', !state.writer.ghost);
         }
         function writerSetGrid(on) { if (wWrap) wWrap.classList.toggle('grid', !!on); }
-        // PATCH: Ganti fungsi writerStrokeStyle() (supaya selalu solid & nggak “ketahan” state lama)
         function writerStrokeStyle() {
             if (!wCtx) return;
             wCtx.globalAlpha = 1; // pastikan selalu terlihat
@@ -2123,7 +2245,6 @@
                     wCtx.moveTo(s.points[0].x, s.points[0].y);
                     for(let i=1;i<s.points.length;i++){
                         const b=s.points[i];
-                        // PATCH: Perbaikan ReferenceError di writerRedrawAll()
                         wCtx.lineTo(b.x, b.y);
                     }
                 }
@@ -2160,7 +2281,6 @@
         }
         function writerApplyUIFromState() {
             if (!wCanvas) return;
-            // Bindings are now handled in writerBindEvents to prevent double binding
             
             if (qs('#writeSet')) qs('#writeSet').value = state.writer.set;
             if (qs('#penSize')) qs('#penSize').value = state.writer.penSize;
@@ -2196,7 +2316,7 @@
             writerSetGhostChar();
         }
         function writerBindEvents() {
-            if (_writerBound) return; // Prevent double binding
+            if (_writerBound) return;
             _writerBound = true;
             if (wCanvas) wCanvas.addEventListener('pointerdown', writerStart);
             if (wCanvas) wCanvas.addEventListener('pointermove', writerMove);
@@ -2208,12 +2328,11 @@
             bind('#writeRand', 'click', ()=>{ writerRandom(); writerClear(); });
             bind('#writeSpeak', 'click', ()=>{ speak(writerCurrentChar()); clickTone('click'); });
             bind('#penSize', 'input', (e)=>{ state.writer.penSize = parseInt(e.target.value,10)||10; save(); });
-            // PATCH: Perbaiki handler toggle Grid (biar redraw setelah ganti latar)
             bind('#gridToggle', 'change', (e)=>{ 
                 state.writer.grid = e.target.checked; 
                 save(); 
                 writerSetGrid(state.writer.grid); 
-                writerRedrawAll(); // penting: redraw setelah ubah grid
+                writerRedrawAll();
             });
             bind('#ghostToggle', 'change', (e)=>{ state.writer.ghost = e.target.checked; save(); writerSetGhostChar(); });
             bind('#autoSnapToggle', 'change', (e)=>{ state.writer.autoSnap = e.target.checked; save(); });
@@ -2224,7 +2343,6 @@
             bind('#savePNG', 'click', writerSavePNG);
             document.addEventListener('keydown', (e)=>{ if((e.ctrlKey||e.metaKey) && e.key.toLowerCase()==='z'){ e.preventDefault(); writerUndo(); } });
             window.addEventListener('resize', ()=>{ writerSetupCanvasSize(); });
-            // PATCH: Guard sebelum pakai ResizeObserver
             if ('ResizeObserver' in window) {
               const resizeObserver = new ResizeObserver(entries => {
                   for (let entry of entries) {
@@ -2233,10 +2351,9 @@
                       }
                   }
               });
-              if (wWrap) resizeObserver.observe(wWrap); // Guard against null
+              if (wWrap) resizeObserver.observe(wWrap);
             } else {
               console.warn("ResizeObserver not supported in this browser.");
-              // Fallback for older browsers if needed, e.g., using window.onresize
             }
         }
         function writerInit() {
@@ -2248,7 +2365,7 @@
         function _makeOffscreen(w=128,h=128){ const c=document.createElement('canvas'); c.width=w; c.height=h; return c; }
 
         function _drawTemplateToCanvas(c, ch, theme){
-            const ctx=c.getContext('2d'); if (!ctx) return; // Guard against null
+            const ctx=c.getContext('2d'); if (!ctx) return;
             ctx.clearRect(0,0,c.width,c.height);
             ctx.fillStyle = theme==='hc' ? '#e6efff' : '#132030';
             const s = Math.min(c.width,c.height)*0.8;
@@ -2258,11 +2375,11 @@
         }
 
         function _drawUserToCanvas(c, strokes, theme){
-            const ctx=c.getContext('2d'); if (!ctx) return; // Guard against null
+            const ctx=c.getContext('2d'); if (!ctx) return;
             ctx.clearRect(0,0,c.width,c.height);
             ctx.strokeStyle = theme==='hc' ? '#e6efff' : '#132030';
             ctx.lineCap='round'; ctx.lineJoin='round';
-            if (!wCanvas) return; // Guard against null
+            if (!wCanvas) return;
             const src = wCanvas.getBoundingClientRect();
             const sx = c.width / src.width;
             const sy = c.height / src.height;
@@ -2285,7 +2402,7 @@
         function _computeIoU(cA, cB){
             const a = cA.getContext('2d')?.getImageData(0,0,cA.width,cA.height).data;
             const b = cB.getContext('2d')?.getImageData(0,0,cB.width,cB.height).data;
-            if (!a || !b) return 0; // Guard against null context
+            if (!a || !b) return 0;
             let inter=0, uni=0;
             for(let i=3;i<a.length;i+=4){
                 const A = a[i]>0; 
@@ -2312,7 +2429,7 @@
             const THRESH = (state.writer.snapThreshold ?? 0.52);
 
             if(iou >= THRESH){
-                if (!wCtx || !wCanvas) return; // Guard against null
+                if (!wCtx || !wCanvas) return;
                 wCtx.setTransform(1,0,0,1,0,0);
                 wCtx.clearRect(0,0,wCanvas.width,wCanvas.height);
                 wCtx.scale(dpr,dpr);
@@ -2327,7 +2444,7 @@
                 const t0=Date.now(), dur=160; 
                 const snap = ()=>{
                     const t=Date.now()-t0, k=Math.min(1,t/dur);
-                    if (wCtx) wCtx.save(); // Guard against null
+                    if (wCtx) wCtx.save();
                     if (wCtx) wCtx.globalAlpha = 1-k;
                     writerRedrawAll();
                     if (wCtx) wCtx.restore();
@@ -2352,6 +2469,7 @@
             
             if (!safe.test) safe.test = {};
             safe.test.target = clamp(safe.test.target, 1, 1000);
+            safe.test.sylPerItem = clamp(safe.test.sylPerItem, 2, 6); // Sanitize new sylPerItem
             
             if (!safe.pomo) safe.pomo = {};
             safe.pomo.work = clamp(safe.pomo.work, 1, 60);
@@ -2374,7 +2492,7 @@
             safe.theme = ['pastel', 'hc'].includes(safe.theme) ? safe.theme : 'pastel';
             safe.test.set = ['hira', 'kata'].includes(safe.test.set) ? safe.test.set : 'hira';
             safe.test.mode = ['type', 'mc'].includes(safe.test.mode) ? safe.test.mode : 'type';
-            safe.test.qType = ['k2r', 'r2k', 'seq'].includes(safe.test.qType) ? safe.test.qType : 'k2r';
+            safe.test.qType = ['k2r', 'r2k', 'audio', 'seq', 'kseq'].includes(safe.test.qType) ? safe.test.qType : 'k2r'; // Add new qTypes
             safe.test.rangeMode = ['range', 'single'].includes(safe.test.rangeMode) ? safe.test.rangeMode : 'range';
             safe.writer.set = ['hira', 'kata'].includes(safe.writer.set) ? safe.writer.set : 'hira';
             safe.writer.kana = ALL_ROMAJI.includes(safe.writer.kana) ? safe.writer.kana : 'a';
@@ -2437,7 +2555,6 @@
                 if (onboardingModal) onboardingModal.style.display = 'none';
                 if (onboardingModal) onboardingModal.hidden = true;
                 if (mainContent) mainContent.style.display = 'block';
-                // PATCH: Dukungan Escape key untuk modal onboarding
                 if (_escCloseListenerOnboarding) {
                     document.removeEventListener('keydown', _escCloseListenerOnboarding);
                     _escCloseListenerOnboarding = null;
@@ -2448,7 +2565,7 @@
         let _escCloseListenerOnboarding = null;
         function _trapModalOnboarding(){
             const onboardingModal = qs('#onboardingModal');
-            if (!onboardingModal) return; // Guard against null
+            if (!onboardingModal) return;
             const focusableElements = 'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
             const focusables = onboardingModal.querySelectorAll(focusableElements);
             const firstFocusable = focusables[0];
@@ -2470,13 +2587,12 @@
                     }
                 }
             });
-            // PATCH: Dukungan Escape key untuk modal onboarding
             if (!_escCloseListenerOnboarding) {
                 _escCloseListenerOnboarding = (e) => {
                     if (e.key === 'Escape') {
                         const btnStartLearning = qs('#btnStartLearningOnboarding');
                         if (btnStartLearning) {
-                            btnStartLearning.click(); // Simulate click to close and mark as seen
+                            btnStartLearning.click();
                         }
                     }
                 };
@@ -2488,7 +2604,7 @@
         // ---------- BINDINGS ----------
         bind('#btnShowLearn', 'click', startLearn);
         bind('#btnStart', 'click', startTest);
-        bind('#btnEnd', 'click', endTest); // Menggunakan fungsi endTest yang sudah diperbaiki
+        bind('#btnEnd', 'click', endTest);
         bind('#btnSkip', 'click', skipQ);
         bind('#btnCheck', 'click', checkAns);
 
@@ -2513,7 +2629,7 @@
             if (isWriterSectionVisible) {
                 if (e.key === 'g') {
                     const el = qs('#gridToggle');
-                    if (el) { el.checked = !el.checked; el.dispatchEvent(new Event('change')); save(); } // Trigger change event
+                    if (el) { el.checked = !el.checked; el.dispatchEvent(new Event('change')); save(); }
                 }
                 if (e.key === 'p') {
                     const penBtn = qs('#penBtn');
@@ -2531,7 +2647,7 @@
                     if (penSizeInput) {
                         state.writer.penSize = Math.min(28, state.writer.penSize + 1);
                         penSizeInput.value = state.writer.penSize;
-                        penSizeInput.dispatchEvent(new Event('input')); // Trigger input event
+                        penSizeInput.dispatchEvent(new Event('input'));
                         save();
                     }
                 }
@@ -2540,7 +2656,7 @@
                     if (penSizeInput) {
                         state.writer.penSize = Math.max(2, state.writer.penSize - 1);
                         penSizeInput.value = state.writer.penSize;
-                        penSizeInput.dispatchEvent(new Event('input')); // Trigger input event
+                        penSizeInput.dispatchEvent(new Event('input'));
                         save();
                     }
                 }
@@ -2585,6 +2701,15 @@
             }
         });
 
+        // PATCH: binding jumlah suku kata
+        bind('#sylPerItem','change',(e)=>{ 
+          let v = parseInt(e.target.value,10)||3; v=Math.max(2,Math.min(6,v));
+          state.test.sylPerItem = v; save();
+        });
+
+        // PATCH: bind tombol replay
+        bind('#btnReplayAudio','click',()=>{ if(currentItem?.char) speakForce(currentItem.char); });
+
 
         // ---------- RENDER ----------
         function renderAll(){
@@ -2615,7 +2740,6 @@
         });
 
         // ==== Hardening anti-overflow saat runtime (debug + fix cepat) ====
-        // PATCH: Menghapus seluruh IIFE ini karena override window.showToast bentrok dan tidak diperlukan
         /*
         (function fixRuntimeOverflow(){
             document.documentElement.style.overflowX = 'hidden';
