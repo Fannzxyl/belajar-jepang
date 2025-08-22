@@ -51,6 +51,7 @@
             --okBg:#dff4ea;
             --warnBg:#ffe5e5;
             --iconColor: var(--muted);
+            --transition-duration: 0.2s; /* New: Default transition duration */
         }
         [data-theme="hc"]{
             --bg:#0a0f1a; --panel:#0f1626; --soft:#0c1220; --ink:#e6efff; --muted:#9fb0cc;
@@ -63,6 +64,29 @@
             --warnBg:#3a1a1a;
             --iconColor: var(--ink);
         }
+        /* PATCH: Lite Mode styles */
+        [data-lite="1"] {
+            /* Disable heavy CSS */
+            background: var(--bg) !important; /* Override radial gradients */
+            /* backdrop-filter: none !important; */ /* Controlled explicitly on header */
+            
+            /* Reduce/disable box-shadow */
+            --shadow: none !important; 
+            box-shadow: none !important; /* Apply directly to elements if needed */
+
+            /* Reduce transitions */
+            --transition-duration: 0.05s !important;
+            transition-duration: 0.05s !important;
+        }
+
+        [data-lite="1"] header {
+            backdrop-filter: none !important;
+        }
+
+        [data-lite="1"] .card, [data-lite="1"] .kana, [data-lite="1"] .btn, [data-lite="1"] .seg {
+            box-shadow: none !important;
+        }
+        
         *{box-sizing:border-box}
         html { height: auto; }
         body {
@@ -70,7 +94,15 @@
             margin:0;font-family:'Inter', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;background:
             radial-gradient(900px 420px at -10% -20%, rgba(122,108,255,.10), transparent),
             radial-gradient(900px 420px at 110% -30%, rgba(22,198,161,.12), transparent),
-            var(--bg);color:var(--ink)}
+            var(--bg);color:var(--ink);
+            /* PATCH: Smooth transitions for overall UI */
+            transition: background-color var(--transition-duration) ease-out, color var(--transition-duration) ease-out;
+        }
+        /* Override gradients if lite mode is active */
+        [data-lite="1"] body {
+            background: var(--bg) !important;
+        }
+
         .wrap{
             max-width: 720px;
             margin: auto;
@@ -78,7 +110,8 @@
             padding-left: calc(16px + env(safe-area-inset-left));
             padding-right: calc(16px + env(safe-area-inset-right));
         }
-        header{position:sticky;top:0;z-index:30;background:linear-gradient(180deg, rgba(255,255,255,.92), rgba(255,255,255,.72));backdrop-filter: blur(8px);border-bottom:1px solid var(--border); padding-top:env(safe-area-inset-top)}
+        header{position:sticky;top:0;z-index:30;background:linear-gradient(180deg, rgba(255,255,255,.92), rgba(255,255,255,.72));backdrop-filter: blur(8px);border-bottom:1px solid var(--border); padding-top:env(safe-area-inset-top);
+        transition: background var(--transition-duration) ease-out, backdrop-filter var(--transition-duration) ease-out, border-bottom-color var(--transition-duration) ease-out;}
         [data-theme="hc"] header{background:linear-gradient(180deg, rgba(15,22,38,.86), rgba(15,22,38,.66))}
         
         .brand{
@@ -118,7 +151,8 @@
             }
         }
 
-        .logo{width:36px;height:36px;border-radius:12px;background:linear-gradient(135deg,var(--pri),var(--sec));box-shadow:var(--shadow)}
+        .logo{width:36px;height:36px;border-radius:12px;background:linear-gradient(135deg,var(--pri),var(--sec));box-shadow:var(--shadow);
+        transition: box-shadow var(--transition-duration) ease-out, background var(--transition-duration) ease-out;}
         h1{font-size:20px;margin:0}
         .grid{display:grid;gap:14px;margin-top:16px}
         
@@ -130,21 +164,22 @@
             .wrap{max-width: 1200px;}
         }
 
-        .card{grid-column:span 12;background:var(--panel);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px;border:1px solid var(--border)}
+        .card{grid-column:span 12;background:var(--panel);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px;border:1px solid var(--border);
+        transition: background-color var(--transition-duration) ease-out, border-color var(--transition-duration) ease-out, box-shadow var(--transition-duration) ease-out;}
         .card h2{font-size:16px;margin:0 0 10px 0; display: flex; align-items: center; gap: 8px;}
-        .card h2 .icon { color: var(--iconColor); }
-        .muted{color:var(--muted);font-size:13px}
+        .card h2 .icon { color: var(--iconColor); transition: color var(--transition-duration) ease-out;}
+        .muted{color:var(--muted);font-size:13px; transition: color var(--transition-duration) ease-out;}
 
         input, textarea{
             width:100%;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--soft);color:var(--ink);
-            transition: border-color 0.2s ease-out, background-color 0.2s ease-out, box-shadow 0.2s ease-out;
+            transition: border-color var(--transition-duration) ease-out, background-color var(--transition-duration) ease-out, box-shadow var(--transition-duration) ease-out;
             -webkit-appearance: none;
             -moz-appearance: none;
             appearance: none;
         }
         select{
             width:100%;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--soft);color:var(--ink);
-            transition: border-color 0.2s ease-out, background-color 0.2s ease-out, box-shadow 0.2s ease-out;
+            transition: border-color var(--transition-duration) ease-out, background-color var(--transition-duration) ease-out, box-shadow var(--transition-duration) ease-out;
             -webkit-appearance: none;
             -moz-appearance: none;
             appearance: none;
@@ -190,7 +225,7 @@
             cursor: pointer;
             font-size: 14px;
             font-weight: 500;
-            transition: all 0.2s ease-out;
+            transition: all var(--transition-duration) ease-out;
             color: var(--ink);
             background: var(--btn);
             display: flex;
@@ -214,7 +249,7 @@
         .btn.ghost{background:transparent;outline:1px solid var(--border); color: var(--ink);}
         .btn:focus-visible{outline:none; box-shadow:var(--ring); outline-offset: 3px;}
 
-        .seg{display:flex;border:1px solid var(--border);border-radius:12px;overflow:hidden}
+        .seg{display:flex;border:1px solid var(--border);border-radius:12px;overflow:hidden; transition: border-color var(--transition-duration) ease-out;}
         .seg button{
             flex:1;
             background:var(--soft);
@@ -222,7 +257,7 @@
             padding: 12px 16px;
             font-size: 14px;
             cursor: pointer;
-            transition: all 0.2s ease-out;
+            transition: all var(--transition-duration) ease-out;
             color: var(--ink);
         }
         .seg button.active{background:linear-gradient(135deg, rgba(122,108,255,.18), rgba(22,198,161,.18))}
@@ -243,7 +278,7 @@
             border-radius: var(--radius);
             box-shadow: var(--shadow);
             cursor: pointer;
-            transition: all 0.15s ease-out;
+            transition: all var(--transition-duration) ease-out;
             color: var(--ink);
         }
         .kana:active{transform:scale(.98)}
@@ -278,7 +313,7 @@
             cursor:pointer;
             min-height:36px;
             white-space:nowrap; 
-            transition: all 0.2s ease-out;
+            transition: all var(--transition-duration) ease-out;
             color: var(--ink);
         }
 
@@ -300,24 +335,37 @@
             display:inline-block;padding:4px 8px;border-radius:999px;background:var(--soft);
             color:var(--ink);
             font-size:12px;border:1px solid var(--border);
+            transition: background-color var(--transition-duration) ease-out, border-color var(--transition-duration) ease-out, color var(--transition-duration) ease-out;
         }
 
         .progress{height:10px;background:rgba(0,0,0,.08);border-radius:999px;overflow:hidden}
-        .bar{height:100%;width:0;background:linear-gradient(90deg,var(--pri),var(--sec),var(--accent));transition:width .25s ease}
+        .bar{height:100%;width:0;background:linear-gradient(90deg,var(--pri),var(--sec),var(--accent));transition:width var(--transition-duration) ease}
 
         .modal{
             position:fixed; inset:0; display:none;
             align-items:center; justify-content:center;
             background: rgba(0,0,0,.45);
             z-index:999;
+            /* PATCH: Transition for modal */
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity var(--transition-duration) ease-out;
         }
+        .modal.is-open {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
         @supports (backdrop-filter: blur(6px)) {
             @media (min-width: 768px) {
                 .modal{ background: rgba(0,0,0,.35); backdrop-filter: blur(6px); }
+                /* PATCH: Lite Mode disables backdrop-filter */
+                [data-lite="1"] .modal { backdrop-filter: none; }
             }
         }
 
-        .modal .box{background:var(--panel);padding:20px 18px;border-radius:18px;box-shadow:var(--shadow);text-align:center;max-width:620px;width:min(92vw,620px)}
+        .modal .box{background:var(--panel);padding:20px 18px;border-radius:18px;box-shadow:var(--shadow);text-align:center;max-width:620px;width:min(92vw,620px);
+        transition: background-color var(--transition-duration) ease-out, box-shadow var(--transition-duration) ease-out;}
         .burst{position:fixed;inset:0;pointer-events:none}
         .particle{position:absolute;width:8px;height:8px;border-radius:2px;opacity:.9;animation:pop 900ms ease forwards}
         @keyframes pop{from{transform:translate(0,0) scale(1)} to{transform:translate(var(--dx), var(--dy)) rotate(360deg) scale(0.8);opacity:0}}
@@ -336,7 +384,7 @@
         #qKana.correct-answer { animation: correctPop 0.3s ease-out }
         #qKana.wrong-answer { animation: wrongShake 0.3s ease-out }
 
-        #streakCounter { font-size:14px; font-weight:600; color:var(--sec); margin-left:10px; min-width:50px; text-align:right; transition: transform 0.1s ease-out }
+        #streakCounter { font-size:14px; font-weight:600; color:var(--sec); margin-left:10px; min-width:50px; text-align:right; transition: transform var(--transition-duration) ease-out }
         @keyframes streakGrow { 0%{transform:scale(1)} 50%{transform:scale(1.2)} 100%{transform:scale(1)} }
         #streakCounter.grow { animation: streakGrow 0.2s ease-out }
 
@@ -346,6 +394,10 @@
             *{animation-duration:0.01ms !important; animation-iteration-count:1 !important; transition-duration:0.01ms !important; scroll-behavior:auto !important}
             #qKana.correct-answer, #qKana.wrong-answer, #streakCounter.grow { animation:none !important }
             .toast { transition: none !important; }
+            /* PATCH: Lite mode will also disable animations */
+            [data-lite="1"] * {animation-duration:0.01ms !important; animation-iteration-count:1 !important; transition-duration:0.01ms !important; scroll-behavior:auto !important}
+            [data-lite="1"] #qKana.correct-answer, [data-lite="1"] #qKana.wrong-answer, [data-lite="1"] #streakCounter.grow { animation:none !important }
+            [data-lite="1"] .toast { transition: none !important; }
         }
 
         /* === Writer (Latihan Menulis) === */
@@ -374,6 +426,7 @@
             /* PATCH: Writer layering fix */
             z-index: 0; 
             pointer-events: none;
+            transition: opacity var(--transition-duration) ease-out;
         }
         .writer-ghost.hidden { display:none; }
 
@@ -422,10 +475,22 @@
         .modal { inset: 0; }
         /* PATCH: Biar toast selalu center lebar-aman */
         .toast{
+          position: fixed; /* Ensure it's fixed */
           left:50%;
           transform:translateX(-50%);
           max-width:calc(100vw - 24px);
+          bottom: 20px; /* Consistent bottom position */
+          padding: 10px 15px;
+          border-radius: 8px;
+          background-color: var(--okBg); /* Default info */
+          color: var(--ink);
+          box-shadow: var(--shadow);
+          z-index: 1000;
+          opacity: 0;
+          transition: opacity var(--transition-duration) ease-in-out;
         }
+        .toast.warn { background-color: var(--warnBg); } /* Warning specific color */
+
 
         /* Progress bar dan segmen tidak melebarkan kontainer */
         .progress, .seg { max-width: 100%; }
@@ -538,6 +603,10 @@
                     <label class="btn ghost" style="display:flex;align-items:center;gap:8px">
                         <input id="audToggle" type="checkbox" aria-label="Suara efek & pelafalan" /> Suara (efek & pelafalan)
                     </label>
+                    <!-- PATCH: Tambah tombol Lite Mode -->
+                    <label class="btn ghost" id="liteModeToggleBtn" style="display:flex;align-items:center;gap:8px">
+                        <input id="liteToggle" type="checkbox" aria-label="Mode Ringan" /> Lite Mode
+                    </label>
                     <button id="exportBtn" class="btn ghost" type="button" title="Simpan progres ke file"><i class="fas fa-download"></i> Simpan Progres ke File</button>
                     <input type="file" id="importFile" accept=".json" style="display:none;" aria-label="Pulihkan progres dari file">
                     <button id="importBtn" class="btn ghost" type="button" title="Pulihkan progres dari file"><i class="fas fa-upload"></i> Pulihkan Progres dari File</button>
@@ -577,7 +646,7 @@
                 <!-- PATCH: Ganti heading & deskripsi bagian Tes jadi lebih pendek -->
                 <h2 id="testTitle"><i class="fas fa-pencil-alt icon"></i> Tes</h2>
                 <div class="small">
-                  Pilih subset atau rentang. Tentukan tipe & mode, lalu jumlah soal.
+                    Pilih subset atau rentang. Tentukan tipe & mode, lalu jumlah soal.
                 </div>
                 <div class="spacer"></div>
 
@@ -597,7 +666,8 @@
                         <option value="r2k">Romaji → Kana (Pilihan Ganda)</option>
                         <option value="seq">Rangkaian Romaji → Kana</option>
                         <!-- PATCH: Tambah qType 'audio' dan 'kseq' -->
-                        <option value="audio">Listening (Dengar → Romaji)</option>
+                        <option value="audio_k2r">Listening (Dengar Kana → Romaji)</option>
+                        <option value="audio_r2k">Listening (Dengar Romaji → Kana)</option>
                         <option value="kseq">Kana Sequence (Ketik Romaji)</option>
                     </select>
                     <select id="answerMode" aria-label="Mode jawaban">
@@ -893,6 +963,14 @@
             syl_per_item: 'Suku kata/soal',
             reset_confusion: 'Reset Confusion',
             review_due_count: (count) => `Review due: ${count}`,
+            test_type_k2r: 'Kana → Romaji',
+            test_type_r2k: 'Romaji → Kana',
+            test_type_seq: 'Rangkaian Romaji → Kana',
+            test_type_audio_k2r: 'Listening (Dengar Kana → Romaji)',
+            test_type_audio_r2k: 'Listening (Dengar Romaji → Kana)',
+            test_type_kseq: 'Kana Sequence (Ketik Romaji)',
+            lite_mode_on: 'Mode Ringan AKTIF!',
+            lite_mode_off: 'Mode Ringan NONAKTIF!',
         };
 
         const t = (key, ...args) => {
@@ -912,7 +990,7 @@
             test:{
                 subset:'aiueo', set:'hira', mode:'type', qType:'k2r',
                 score:0, total:0, correctStreak:0, target:10, rangeMode:'range',
-                // PATCH: Tambah sylPerItem untuk kseq
+                // PATCH: Tambah sylPerItem untuk kseq dan seq
                 sylPerItem: 3 
             },
             pomo:{mode:'work', work:25, break:5, remaining:25*60, running:false, last:0},
@@ -934,6 +1012,8 @@
             confusionLog:{ hira:{}, kata:{} },
             // PATCH: State untuk Leitner SRS
             srs:{ boxes:{}, due:{} },
+            // PATCH: State untuk Lite Mode
+            lite: false,
         });
         let state = load();
         let _saveTimer = null;
@@ -949,6 +1029,8 @@
                 // PATCH: Merge confusionLog dan srs
                 mergedState.confusionLog = deepMerge(initState().confusionLog, loadedState.confusionLog);
                 mergedState.srs = deepMerge(initState().srs, loadedState.srs);
+                // PATCH: Merge lite state
+                mergedState.lite = loadedState.lite !== undefined ? loadedState.lite : initState().lite;
                 return mergedState;
             }catch(e){
                 console.error("Error loading state from localStorage:", e);
@@ -1038,6 +1120,11 @@
             ['シ','ツ'], ['ソ','ン'], ['ク','ケ'], ['フ','ワ'], ['ヂ','ジ'], ['ヅ','ズ'],
             ['ノ','メ'], ['イ','リ'], ['エ','ヱ'], ['ネ','レ'], ['ア','マ'], ['ム','厶']
         ];
+        // PATCH: Tambah pasangan Hiragana yang membingungkan
+        const CONFUSE_HIRA = [
+            ['ぬ','め'], ['れ','ね'], ['う','ら'], ['ち','さ'], ['つ','て'], ['を','わ']
+        ];
+        
         function similarChoicesKata(correct){
             for(const g of CONFUSE_KATA) {
                 if(g.includes(correct)) {
@@ -1047,13 +1134,23 @@
             return [];
         }
 
+        // PATCH: Fungsi untuk mendapatkan pilihan serupa Hiragana
+        function similarChoicesHira(correct) {
+            for(const g of CONFUSE_HIRA) {
+                if(g.includes(correct)) {
+                    return g.filter(x=>x!==correct);
+                }
+            }
+            return [];
+        }
+
         // PATCH: Leitner SRS Intervals (in seconds)
         const SRS_INTERVAL = {
-            1: 0,           // Box 1: Immediate repeat
-            2: 86400,       // Box 2: 1 day
-            3: 3 * 86400,   // Box 3: 3 days
-            4: 7 * 86400,   // Box 4: 7 days
-            5: 14 * 86400   // Box 5: 14 days
+            1: 0,         // Box 1: Immediate repeat
+            2: 86400,     // Box 2: 1 day
+            3: 3 * 86400, // Box 3: 3 days
+            4: 7 * 86400, // Box 4: 7 days
+            5: 14 * 86400 // Box 5: 14 days
         };
 
         // ---------- UI HELPERS ----------
@@ -1074,7 +1171,7 @@
             if (element) {
                 element.addEventListener(eventType, handler, options);
             } else {
-                console.warn(`Element with selector "${selector}" not found for event binding.`);
+                // console.warn(`Element with selector "${selector}" not found for event binding.`);
             }
         }
 
@@ -1177,8 +1274,8 @@
                     const pointsCurrentLevel = state.totalPoints - (LEVEL_THRESHOLDS[level - 1] || 0);
                     const pointsNeededForNext = nextThreshold - (LEVEL_THRESHOLDS[level - 1] || 0);
                     if (pointsNeededForNext > 0) {
-                        progressText = ` (${pointsCurrentLevel}/${pointsNeededForNext})`;
-                    } else {
+                        progressText = ` (${pointsCurrentLevel}/${pointsNeededForNext})`;    
+                    } else { // Should not happen if thresholds are well-defined
                         progressText = ``; 
                     }
                 } else {
@@ -1211,7 +1308,7 @@
                 tile.className='kana' + (mastered.includes(r) ? ' mastered' : '');
                 tile.innerHTML=`<div class="jp">${escapeHTML(ch)}</div><div class="ro">${escapeHTML(r)}</div>`; // Escape kana/romaji
                 tile.title=t('learn_tile_tooltip');
-                tile.onclick=()=> speak(ch); // Use escaped char for speak
+                tile.onclick=()=> speakKanaOrRomaji(ch); // Use new speak function
                 frag.appendChild(tile);
             });
             box.appendChild(frag);
@@ -1219,6 +1316,8 @@
 
         // ---------- TEST MODE ----------
         let testPool=[], poolIdx=[], usingRange=false, qIndex=0, currentItem=null, mcMap={}, wrongList=[];
+        let lastSpeakTime = 0;
+        const SPEAK_COOLDOWN = 600; // ms
 
         // PATCH: Utility untuk Confusion Trainer
         function _pairKey(a, b) {
@@ -1322,7 +1421,7 @@
             const req = Math.max(1, parseInt(qs('#testCount').value,10)||10);
             
             let labels;
-            // PATCH: Logika pool soal untuk chip baru
+            // PATCH: Logika pool soal untuk chip baru (confusion, srs_due)
             if (state.test.subset === 'confusion') {
                 labels = _confuseTopPairs(state.test.set);
                 if (labels.length === 0) {
@@ -1363,7 +1462,16 @@
             state.test.target = req;
             state.test.score=0; state.test.total=0; state.test.correctStreak=0; qIndex=0; save();
             qs('#testArea').hidden=false;
+            qs('#testArea').style.opacity = '0'; // Start invisible
+            qs('#testArea').style.pointerEvents = 'none'; // Disable interaction during transition
+            qs('#testArea').style.transition = 'opacity var(--transition-duration) ease-out'; // Transition for opacity
             qs('#testEmptyState').hidden = true;
+            
+            setTimeout(() => {
+                qs('#testArea').style.opacity = '1';
+                qs('#testArea').style.pointerEvents = 'auto';
+            }, 10); // Small delay to trigger transition
+
             updateProgress();
             nextQ();
         }
@@ -1374,6 +1482,7 @@
             const answerModeSelect = qs('#answerMode');
             const qTypeSelect = qs('#qType');
             const sylPerItemControl = qs('#sylPerItemControl'); // PATCH: Kontrol suku kata
+            const btnReplayAudio = qs('#btnReplayAudio');
 
             const mode = answerModeSelect.value;
             const qType = qTypeSelect.value;
@@ -1382,6 +1491,7 @@
             mcWrap.style.display = 'none';
             answerModeSelect.disabled = false;
             sylPerItemControl.hidden = true; // PATCH: Sembunyikan default
+            btnReplayAudio.hidden = !(qType.startsWith('audio') || qType === 'kseq'); // Show for audio types and kseq
 
             if (qType === 'seq') {
                 typeWrap.style.display = 'block';
@@ -1397,7 +1507,7 @@
                 mcWrap.style.display = 'grid';
                 answerModeSelect.value = 'mc';
                 answerModeSelect.disabled = true;
-            } else if (qType === 'audio') { // PATCH: qType audio
+            } else if (qType === 'audio_k2r' || qType === 'audio_r2k') { // PATCH: qType audio
                 // Audio can be type or MC, so don't disable answerModeSelect
                 if (mode === 'type') {
                     typeWrap.style.display = 'block';
@@ -1415,11 +1525,15 @@
 
         // PATCH: Panggil finishTest() di endTest()
         function endTest(){
-            // Tampilkan hasil dan review dulu
+            qs('#testArea').style.opacity = '0';
+            qs('#testArea').style.pointerEvents = 'none';
+            qs('#testArea').addEventListener('transitionend', function handler() {
+                qs('#testArea').hidden = true;
+                qs('#testEmptyState').hidden = false;
+                qs('#testArea').removeEventListener('transitionend', handler);
+            }, { once: true });
+            
             finishTest();
-            // Lalu sembunyikan area tes (opsional)
-            qs('#testArea').hidden = true;
-            qs('#testEmptyState').hidden = false;
             updateProgress();
         }
 
@@ -1432,17 +1546,29 @@
             if(ansEl) ansEl.value='';
             
             // PATCH: Sembunyikan tombol replay audio default
-            qs('#btnReplayAudio').hidden = true; 
+            // Handled by toggleAnswerUI now, ensuring it's shown for audio/kseq types
 
-            if(qType==='seq'){
-                const seq = makeSequence(poolIdx, state.test.set);
-                currentItem = {...currentItem, seq};
-                qs('#qKana').textContent=`Romaji: ${escapeHTML(seq.romaji)}`;
+            if (qType.startsWith('audio')) {
+                qs('#qKana').textContent='Dengar & jawab';
+                qs('#qKana').style.fontSize='24px';
+                if (qType === 'audio_k2r') {
+                    speakKanaOrRomaji(currentItem.char); // Speak Kana
+                } else { // audio_r2k
+                    speakKanaOrRomaji(currentItem.romaji); // Speak Romaji (as Japanese)
+                }
+                // btnReplayAudio visibility is handled by toggleAnswerUI
+            } else if(qType==='seq'){
+                // For 'seq', currentItem.char is undefined, currentItem.romaji is the original romaji for the single item
+                // makeSequence will generate a sequence from the general pool
+                // FIX: Pass buildPoolLabels() directly
+                const seqData = makeSequence(buildPoolLabels(), state.test.set, state.test.sylPerItem);
+                currentItem = { ...currentItem, romaji: seqData.romaji, char: seqData.kana, qType: qType }; // Store sequence info in currentItem
+                qs('#qKana').textContent=`Romaji: ${escapeHTML(seqData.romaji)}`;
                 qs('#qKana').style.fontSize='28px';
             }
             else if(qType==='kseq'){ // PATCH: qType kseq
-                const seqData = makeKanaSequence(state.test.sylPerItem, state.test.set);
-                currentItem = { ...currentItem, kanaSeq: seqData.kana, romajiSeq: seqData.romaji };
+                const seqData = makeKanaSequence(state.test.sylPerItem, state.test.set, buildPoolLabels()); // Pass labels to restrict pool
+                currentItem = { ...currentItem, kanaSeq: seqData.kana, romajiSeq: seqData.romaji, qType: qType };
                 qs('#qKana').textContent = escapeHTML(seqData.kana);
                 qs('#qKana').style.fontSize = '48px'; // Adjust font size for sequences
             }
@@ -1450,27 +1576,25 @@
                 qs('#qKana').textContent=escapeHTML(currentItem.char);
                 qs('#qKana').style.fontSize='64px';
             }
-            else if(qType==='audio'){ // PATCH: qType audio
-                qs('#qKana').textContent='🔊 Dengar & jawab';
-                qs('#qKana').style.fontSize='24px';
-                speakForce(currentItem.char); // Auto-play audio
-                qs('#btnReplayAudio').hidden = false; // Tampilkan tombol replay
-            }
             else { // r2k
                 qs('#qKana').textContent=escapeHTML(currentItem.romaji);
                 qs('#qKana').style.fontSize='36px';
                 buildMC_r2k(currentItem);
             }
 
-            if(qs('#answerMode').value === 'mc' && (qs('#qType').value === 'k2r' || qs('#qType').value === 'audio')) { // PATCH: MC untuk audio
+            if(qs('#answerMode').value === 'mc' && (qType==='k2r' || qType === 'audio_k2r')) { // PATCH: MC for audio_k2r
                 buildMC_k2r(currentItem);
+            } else if (qs('#answerMode').value === 'mc' && qType === 'audio_r2k') { // PATCH: MC for audio_r2k
+                buildMC_r2k(currentItem); // This will render Kana options from Romaji prompt
             }
 
             updateTestInfo();
             toggleAnswerUI();
             setTimeout(()=>{
                 const tw = qs('#typeWrap');
+                const mcw = qs('#mcWrap');
                 if (tw && getComputedStyle(tw).display !== 'none') ansEl && ansEl.focus();
+                else if (mcw && getComputedStyle(mcw).display !== 'none') qs('#optA')?.focus(); // Focus first MC option
             }, 30);
         }
 
@@ -1478,37 +1602,33 @@
             const qType=state.test.qType;
             const val=mcMap[letter];
             let correct=false;
-            if(qType==='k2r' || qType==='audio'){ // PATCH: mcPick untuk audio
+
+            if(qType==='k2r' || qType==='audio_k2r'){ // PATCH: mcPick for audio_k2r
                 correct = (val===currentItem.romaji);
-            } else if(qType==='r2k'){
-                correct = (val=== (state.test.set==='hira'? HIRA_MAP.get(currentItem.romaji): KATA_MAP.get(currentItem.romaji)));
+            } else if(qType==='r2k' || qType==='audio_r2k'){ // PATCH: mcPick for audio_r2k
+                // For R2K/Audio_R2K, MC options are Kana. So we compare the selected Kana with the target Kana.
+                const targetKana = (state.test.set==='hira'? HIRA_MAP.get(currentItem.romaji): KATA_MAP.get(currentItem.romaji));
+                correct = (val===targetKana);
             }
             finalizeAnswer(correct, {chosen:val});
         }
 
         function normalizeRomajiSequence(s){
-            // PATCH: Tambah normalisasi untuk 'n' ganda dan 'っ' geminate
-            let normalized = (s||'').toLowerCase()
-                .replace(/\s+/g,'')
-                .replace(/di/g,'dji')
-                .replace(/du/g,'dzu');
-            
-            // Handle geminate consonants (e.g., attsu -> atsu) and double 'n' (nn)
-            // This is a simplified approach; full IME logic is complex.
-            normalized = normalized.replace(/([bcdfghjklmnpqrstvwxyz])\1/g, '$1'); // Geminate (e.g., ttsu -> tsu)
-            normalized = normalized.replace(/nn/g, 'n'); // Double n (e.g. kanna -> kana)
-            
-            return normalized;
+            // PATCH: Normalisasi sequence hanya hapus spasi
+            return (s||'').toLowerCase().replace(/\s+/g,''); 
         }
 
         function romajiEquals(a,b){
             if (!a || !b) return false;
             if (a === b) return true;
-            if (b==='wo' && a==='o') return true;
-            const canon = (t)=> t
-                .replace(/^ji$/,'dji')
-                .replace(/^zu$/,'dzu')
-                .replace(/^wo$/,'o'); // PATCH: Tambah normalisasi wo -> o
+            // PATCH: Normalisasi for wo->o, dji/ji/di, dzu/zu/du
+            const canon = (t)=> {
+                let text = t.toLowerCase();
+                text = text.replace(/wo/g,'o');
+                text = text.replace(/ji|di/g,'dji'); // Normalize ji/di to dji
+                text = text.replace(/zu|du/g,'dzu'); // Normalize zu/du to dzu
+                return text;
+            };
             return canon(a) === canon(b);
         }
 
@@ -1517,26 +1637,36 @@
             const qType=state.test.qType;
             let correct=false;
             let normalizedInput='';
+            let userKanaForReview = ''; // To store converted kana for review display
 
-            if(qType==='k2r' || qType==='audio'){ // PATCH: checkAns untuk audio
+            if(qType==='k2r' || qType==='audio_k2r'){ // PATCH: checkAns for audio_k2r
                 const norm = normalizeRomaji(valRaw);
                 normalizedInput = norm;
                 correct = romajiEquals(norm, currentItem.romaji);
+                if (qType === 'audio_k2r') userKanaForReview = romajiStringToKana(norm, state.test.set);
             }
-            else if(qType==='seq'){
-                const expectedKana = currentItem.seq.kana;
-                const rawSeq = normalizeRomajiSequence(valRaw);
-                const userKana = hasKana(valRaw) ? rawSeq : romajiStringToKana(rawSeq, state.test.set);
-                normalizedInput = userKana;
-                correct = (userKana === expectedKana);
+            else if(qType==='seq' || qType==='audio_r2k'){ // PATCH: checkAns for audio_r2k
+                // For seq and audio_r2k (type mode), prompt is Romaji, answer is Kana (user types Romaji, converted to Kana)
+                const expectedKana = currentItem.char; // This will be the actual Kana sequence for 'seq'
+                if (qType === 'audio_r2k') { // If it's audio_r2k, expectedKana is single Kana character
+                     // `currentItem.romaji` is the romaji for `audio_r2k` prompt, and `currentItem.char` is the target kana.
+                    const romajiToConvert = normalizeRomaji(valRaw);
+                    userKanaForReview = romajiStringToKana(romajiToConvert, state.test.set);
+                    correct = (userKanaForReview === (state.test.set==='hira'? HIRA_MAP.get(currentItem.romaji): KATA_MAP.get(currentItem.romaji)));
+                } else { // qType === 'seq'
+                    const rawSeq = normalizeRomajiSequence(valRaw);
+                    userKanaForReview = romajiStringToKana(rawSeq, state.test.set); // Convert user's romaji sequence to kana
+                    correct = (userKanaForReview === expectedKana);
+                }
+                normalizedInput = userKanaForReview;
             }
-            else if(qType==='kseq'){ // PATCH: checkAns untuk kseq
+            else if(qType==='kseq'){ // PATCH: checkAns for kseq
                 const expectedRomajiSeq = currentItem.romajiSeq;
                 const userRomajiSeq = normalizeRomajiSequence(valRaw);
                 normalizedInput = userRomajiSeq;
                 correct = (userRomajiSeq === expectedRomajiSeq);
             }
-            finalizeAnswer(correct, {typed:valRaw, normalized: normalizedInput});
+            finalizeAnswer(correct, {typed:valRaw, normalized: normalizedInput, userKana: userKanaForReview});
         }
 
         function finalizeAnswer(correct, extra){
@@ -1586,25 +1716,33 @@
                 // PATCH: Update Confusion Log (wrong)
                 const currentSet = state.test.set;
                 let wrongKanaChar = '';
-                let correctKanaChar = currentKanaChar;
+                let correctKanaCharToLog = currentKanaChar; // Use the actual kana char for logging
 
-                if (qType === 'r2k') { // Romaji -> Kana
+                if (state.test.qType === 'r2k' || state.test.qType === 'audio_r2k') { // Romaji -> Kana, or Audio Romaji -> Kana
                     wrongKanaChar = extra.chosen; // User picked a kana
-                } else if (qType === 'k2r' || qType === 'audio') { // Kana -> Romaji or Audio -> Romaji
+                } else if (state.test.qType === 'k2r' || state.test.qType === 'audio_k2r') { // Kana -> Romaji or Audio Kana -> Romaji
+                    // The user input is romaji, we need to convert it to kana to find a confused pair
                     const userRomajiNormalized = normalizeRomaji(extra.typed || extra.chosen);
-                    // Try to map user's romaji to a kana in the current set
-                    const userMappedKana = (currentSet === 'hira' ? HIRA_MAP : KATA_MAP).get(userRomajiNormalized);
-                    if (userMappedKana) {
-                        wrongKanaChar = userMappedKana;
+                    wrongKanaChar = romajiStringToKana(userRomajiNormalized, currentSet); // Convert user's input romaji to kana
+                } else if (state.test.qType === 'seq') { // Sequence Romaji -> Kana
+                    wrongKanaChar = extra.userKana; // This is the converted kana sequence from user's input
+                    correctKanaCharToLog = currentItem.char; // This is the correct kana sequence
+                    // For sequence, pinpointing single confusion pair is hard. Can skip or simplify.
+                    // For now, let's try to log confusion for the first differing character if sequences are simple.
+                    // Simplified: if both are single-char kana and wrong, log them.
+                    if (wrongKanaChar.length === 1 && correctKanaCharToLog.length === 1 && wrongKanaChar !== correctKanaCharToLog) {
+                        const pair = _pairKey(correctKanaCharToLog, wrongKanaChar);
+                        state.confusionLog[currentSet][pair] = (state.confusionLog[currentSet][pair] || 0) + 1;
+                    } else { // Complex sequences, skip for now.
+                        wrongKanaChar = null;
                     }
-                } else if (qType === 'seq' || qType === 'kseq') { // Sequence types
-                    // For sequences, it's harder to pinpoint one confused pair.
-                    // For simplicity, we can skip confusion logging or try to find the first differing char.
-                    // Let's skip for now or make it more robust later if needed.
+                } else if (state.test.qType === 'kseq') { // Kana Sequence (Ketik Romaji)
+                    // Skip confusion logging for romaji sequence typing, as it's about sequence conversion not kana confusion.
+                    wrongKanaChar = null;
                 }
 
-                if (wrongKanaChar && correctKanaChar && wrongKanaChar !== correctKanaChar) {
-                    const pair = _pairKey(correctKanaChar, wrongKanaChar);
+                if (wrongKanaChar && correctKanaCharToLog && wrongKanaChar !== correctKanaCharToLog) {
+                    const pair = _pairKey(correctKanaCharToLog, wrongKanaChar);
                     state.confusionLog[currentSet][pair] = (state.confusionLog[currentSet][pair] || 0) + 1;
                 }
 
@@ -1633,13 +1771,31 @@
 
         // PATCH: Pilihan ganda K->R kadang ngambil opsi dari luar rentang + Confusion Trainer decoys
         function buildMC_k2r(item){
-            const labels=currentPoolLabels();
+            const poolLabels = buildPoolLabels(); // Get current active pool labels
             const currentSet = state.test.set;
-            const targetKanaChar = (currentSet === 'hira' ? HIRA_MAP : KATA_MAP).get(item.romaji);
+            const targetRomaji = item.romaji;
+            const targetKanaChar = (currentSet === 'hira' ? HIRA_MAP.get(targetRomaji) : KATA_MAP.get(targetRomaji));
 
             let decoys = [];
 
-            // 1. Ambil decoy dari confusionLog
+            // 1. Ambil decoy dari confusionLog (kana yang sering tertukar dengan target)
+            const confusionMaps = currentSet === 'hira' ? HIRA_MAP : KATA_MAP;
+            const romajiToKanaKey = (r) => {
+                let char = confusionMaps.get(r);
+                if (!char) { // Fallback for special romaji that might not be directly mapped (e.g., dji/dzu)
+                    if (r === 'dji') char = currentSet === 'hira' ? 'ぢ' : 'ヂ';
+                    else if (r === 'dzu') char = currentSet === 'hira' ? 'づ' : 'ヅ';
+                }
+                return char;
+            }
+            const kanaToRomajiKey = (kana) => { // Helper to get a romaji for a given kana
+                for (const r of ALL_ROMAJI) {
+                    if (romajiToKanaKey(r) === kana) return r;
+                }
+                return null;
+            }
+
+
             const confusionPairs = Object.entries(state.confusionLog[currentSet] || {})
                 .filter(([pairStr]) => pairStr.includes(targetKanaChar))
                 .sort(([, countA], [, countB]) => countB - countA)
@@ -1650,32 +1806,23 @@
                 .filter(confusedKana => confusedKana !== targetKanaChar); // Ensure it's not the target itself
 
             // Convert confused kana back to romaji for decoys
-            const confusedRomajiDecoys = confusionPairs.map(kana => {
-                // Find romaji for this kana (can be multiple, pick one or primary)
-                for (const r of ALL_ROMAJI) {
-                    if ((currentSet === 'hira' ? HIRA_MAP : KATA_MAP).get(r) === kana) {
-                        return r;
-                    }
-                }
-                return null;
-            }).filter(r => r !== null && r !== item.romaji);
-
+            const confusedRomajiDecoys = confusionPairs.map(kanaToRomajiKey).filter(r => r !== null && r !== targetRomaji);
             decoys.push(...shuffleReturn(confusedRomajiDecoys).slice(0, 2)); // Ambil maks 2 dari confusion
 
             // 2. Lengkapi dengan romaji dari pool saat ini (prefer same length)
-            const availableLabels = labels.filter(r => r !== item.romaji && !decoys.includes(r));
-            const sameLen = availableLabels.filter(r => r.length === item.romaji.length);
+            const availablePoolRomaji = poolLabels.filter(r => r !== targetRomaji && !decoys.includes(r));
+            const sameLen = availablePoolRomaji.filter(r => r.length === targetRomaji.length);
             
-            decoys.push(...shuffleReturn(sameLen).slice(0, 3 - decoys.length)); // Lengkapi same length
+            decoys.push(...shuffleReturn(sameLen).slice(0, Math.max(0, 3 - decoys.length))); // Lengkapi same length
             
             if (decoys.length < 3) {
-                decoys.push(...shuffleReturn(availableLabels).slice(0, 3 - decoys.length)); // Lengkapi dari sisa pool
+                decoys.push(...shuffleReturn(availablePoolRomaji).slice(0, Math.max(0, 3 - decoys.length))); // Lengkapi dari sisa pool
             }
 
-            const pool = [item.romaji, ...decoys].slice(0,4);
-            const uniq = [...new Set(pool)];
+            const finalOptions = [targetRomaji, ...decoys].slice(0,4);
+            const uniq = [...new Set(finalOptions)];
             while (uniq.length < 4) {
-                const fallback = ALL_ROMAJI.find(r => !uniq.includes(r) && r !== item.romaji); // Fallback dari semua romaji
+                const fallback = ALL_ROMAJI.find(r => !uniq.includes(r) && r !== targetRomaji); // Fallback dari semua romaji
                 if (!fallback) break;
                 uniq.push(fallback);
             }
@@ -1686,50 +1833,63 @@
 
         // PATCH: buildMC_r2k dengan prioritas confusionLog
         function buildMC_r2k(item){
-            const chars=currentPoolChars();
-            const labels=currentPoolLabels();
-            const idx = labels.indexOf(item.romaji);
-            const correct = chars[idx];
+            const poolLabels = buildPoolLabels(); // Get current active pool labels
             const currentSet = state.test.set;
+            const map = currentSet === 'hira' ? HIRA_MAP : KATA_MAP;
 
-            const pool=[correct];
+            const correctRomaji = item.romaji;
+            const correctKana = map.get(correctRomaji);
+
+            if (!correctKana) {
+                console.warn(`Cannot find kana for romaji: ${correctRomaji} in set: ${currentSet}`);
+                // Fallback: use empty options or generic ones if correct kana isn't found
+                mcMap={A:'-',B:'-',C:'-',D:'-'};
+                setMCText({A:`A. ${escapeHTML(mcMap.A)}`,B:`B. ${escapeHTML(mcMap.B)}`,C:`C. ${escapeHTML(mcMap.C)}`,D:`D. ${escapeHTML(mcMap.D)}`});
+                return;
+            }
+            
+            let decoys = [];
 
             // 1. Ambil decoy dari confusionLog
             const confusionPairs = Object.entries(state.confusionLog[currentSet] || {})
-                .filter(([pairStr]) => pairStr.includes(correct))
+                .filter(([pairStr]) => pairStr.includes(correctKana))
                 .sort(([, countA], [, countB]) => countB - countA)
                 .map(([pairStr]) => {
                     const [k1, k2] = pairStr.split('|');
-                    return k1 === correct ? k2 : k1;
+                    return k1 === correctKana ? k2 : k1;
                 })
-                .filter(confusedKana => confusedKana !== correct);
+                .filter(confusedKana => confusedKana !== correctKana);
 
             decoys.push(...shuffleReturn(confusionPairs).slice(0, 2)); // Ambil maks 2 dari confusion
 
-            // 2. Lengkapi dengan similarChoicesKata jika Katakana
-            if (currentSet === 'kata' && decoys.length < 3) {
-                const sim = similarChoicesKata(correct).filter(kana => !decoys.includes(kana));
-                decoys.push(...shuffleReturn(sim).slice(0, 3 - decoys.length));
+            // 2. Lengkapi dengan similarChoicesKata/Hira
+            const similarChoicesFunc = currentSet === 'hira' ? similarChoicesHira : similarChoicesKata;
+            if (decoys.length < 3) {
+                const sim = similarChoicesFunc(correctKana).filter(kana => !decoys.includes(kana));
+                decoys.push(...shuffleReturn(sim).slice(0, Math.max(0, 3 - decoys.length)));
             }
+            
+            // 3. Lengkapi dari sisa pool (konversi romaji di pool menjadi kana)
+            const allAvailableKanaInPool = poolLabels
+                .map(r => map.get(r))
+                .filter(c => c && c !== correctKana && !decoys.includes(c));
+            
+            decoys.push(...shuffleReturn(allAvailableKanaInPool).slice(0, Math.max(0, 3 - decoys.length)));
 
-            // 3. Lengkapi dari sisa pool
-            const other = chars.filter((c)=>c!==correct && !pool.includes(c) && !decoys.includes(c));
-            shuffle(other);
-            decoys.push(...other.slice(0, 3 - decoys.length));
-
-            pool.push(...decoys);
-            const uniq = [...new Set(pool)]; // Ensure uniqueness
+            const finalOptions = [correctKana, ...decoys].slice(0,4);
+            const uniq = [...new Set(finalOptions)]; // Ensure uniqueness
             while (uniq.length < 4) { // Fallback if not enough unique decoys
-                const fallback = ALL_ROMAJI.map(r => (currentSet === 'hira' ? HIRA_MAP : KATA_MAP).get(r))
-                                            .find(c => c && !uniq.includes(c));
-                if (!fallback) break;
-                uniq.push(fallback);
+                const fallbackKana = ALL_ROMAJI.map(r => map.get(r))
+                                                    .find(c => c && !uniq.includes(c));
+                if (!fallbackKana) break;
+                uniq.push(fallbackKana);
             }
             shuffle(uniq);
 
             mcMap={A:uniq[0],B:uniq[1],C:uniq[2],D:uniq[3]};
             setMCText({A:`A. ${escapeHTML(mcMap.A)}`,B:`B. ${escapeHTML(mcMap.B)}`,C:`C. ${escapeHTML(mcMap.C)}`,D:`D. ${escapeHTML(mcMap.D)}`});
         }
+
         function setMCText(map){ ['A','B','C','D'].forEach(k=>{ const el=qs('#opt'+k); if(el) el.textContent=map[k]; }); }
 
         function skipQ(){
@@ -1742,8 +1902,12 @@
 
         function updateTestInfo(){
             const rangeMode = qs('#rangeMode').value;
-            let rangeLabel;
-            if (rangeMode === 'single') {
+            let rangeLabel = '';
+            if (state.test.subset === 'confusion') {
+                rangeLabel = t('confuse_train_label');
+            } else if (state.test.subset === 'srs_due') {
+                rangeLabel = t('review_today_label');
+            } else if (rangeMode === 'single') {
                 const singleKey = qs('#testSingleGroup').value;
                 const grp = GROUPS.find(x => x.key === singleKey);
                 rangeLabel = grp ? grp.label : 'Grup Tunggal';
@@ -1756,11 +1920,12 @@
             }
 
             const tlabel = {
-                'k2r': 'Kana→Romaji', 
-                'r2k': 'Romaji→Kana', 
-                'seq': 'Rangkaian Romaji→Kana',
-                'audio': 'Listening', // PATCH: Label untuk audio
-                'kseq': 'Kana Sequence' // PATCH: Label untuk kseq
+                'k2r': t('test_type_k2r'), 
+                'r2k': t('test_type_r2k'), 
+                'seq': t('test_type_seq'),
+                'audio_k2r': t('test_type_audio_k2r'), // PATCH: Label untuk audio_k2r
+                'audio_r2k': t('test_type_audio_r2k'), // PATCH: Label untuk audio_r2k
+                'kseq': t('test_type_kseq') // PATCH: Label untuk kseq
             }[state.test.qType] || 'Tes'; // Default if not found
 
             const testInfoTextElement = qs('#testInfoText');
@@ -1782,7 +1947,9 @@
 
         function finishTest(){
             openCelebrate('finish');
-            burst();
+            if (!state.lite && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) { // Disable burst in lite mode
+                burst();
+            }
             clickTone('ok');
             renderReview();
             updatePointsAndLevelDisplay();
@@ -1802,55 +1969,92 @@
             const set=state.test.set;
             if (box) {
                 box.innerHTML = wrongList.map((w,i)=>{
-                    const expectedKana = (w.kanaSeq || (set==='hira'? HIRA_MAP.get(w.romaji): KATA_MAP.get(w.romaji))); // PATCH: Ambil kana dari kanaSeq
-                    const expectedRomaji = w.romaji || w.romajiSeq; // PATCH: Ambil romaji dari romajiSeq
-                    const got = w.chosen||w.normalized||w.typed||'-';
-                    const leftDisplay = (state.test.qType==='k2r' || state.test.qType === 'audio') ? (set==='hira'? HIRA_MAP.get(w.romaji): KATA_MAP.get(w.romaji)) : (w.romaji || w.kanaSeq); // PATCH: Tampilkan kana untuk audio/k2r, romaji/kanaSeq untuk lainnya
+                    const expectedKanaChar = w.char; // Single kana char or sequence of kana
+                    const expectedRomaji = w.romaji; // Single romaji or sequence of romaji
+                    const givenInput = w.typed || w.chosen || w.normalized || '-';
+                    let displayedKana = ''; // The kana character to show as "question"
+                    let displayedExpectedAnswer = ''; // The correct answer to display
+                    let displayedGivenAnswer = ''; // The user's answer to display
 
-                    let displayExpected = expectedRomaji;
-                    let displayGiven = got;
-
-                    if ((expectedRomaji === 'dji' && (got === 'ji' || got === 'di')) || (expectedRomaji === 'dzu' && (got === 'zu' || got === 'du'))) {
-                        displayExpected = `${expectedRomaji}`;
-                        displayGiven = `${got}`;
-                    } else if (state.test.qType === 'r2k' || state.test.qType === 'seq' || state.test.qType === 'kseq') { // PATCH: Tambah kseq
-                        displayExpected = expectedKana;
-                        displayGiven = hasKana(got) ? got : romajiStringToKana(got, set);
-                        if (!displayGiven) displayGiven = got;
+                    // Determine what to display for the prompt (left side)
+                    if (w.qType === 'k2r' || w.qType === 'audio_k2r') {
+                        displayedKana = expectedKanaChar; // Kana character is the prompt
+                    } else if (w.qType === 'r2k' || w.qType === 'audio_r2k') {
+                        displayedKana = expectedRomaji; // Romaji is the prompt
+                    } else if (w.qType === 'seq') {
+                        displayedKana = `Romaji: ${expectedRomaji}`; // Romaji sequence is the prompt
+                    } else if (w.qType === 'kseq') {
+                        displayedKana = expectedKanaChar; // Kana sequence is the prompt
                     }
 
-                    const safeLeft = escapeHTML(leftDisplay);
-                    const safeExpRomaji = escapeHTML(displayExpected);
-                    const safeExpKana = escapeHTML(expectedKana);
-                    const safeGiven = escapeHTML(w.typed ? `${w.typed} (${displayGiven})` : displayGiven);
+                    // Determine what to display for the expected answer (right side)
+                    if (w.qType === 'k2r' || w.qType === 'audio_k2r' || w.qType === 'kseq') {
+                        // Expected is Romaji (or romaji sequence)
+                        displayedExpectedAnswer = expectedRomaji;
+                    } else { // r2k, audio_r2k, seq
+                        // Expected is Kana (or kana sequence)
+                        displayedExpectedAnswer = expectedKanaChar;
+                    }
 
-                    return `<div style="padding:8px;border:1px solid var(--border);border-radius:12px;margin:6px 0;display:flex;justify-content:space-between;gap:8px">
+                    // Determine what to display for the user's given answer
+                    if (w.qType === 'r2k' || w.qType === 'audio_r2k' || w.qType === 'seq') {
+                        // User typed romaji, converted to kana, or chose kana
+                        displayedGivenAnswer = givenInput; // The raw input
+                        if (w.userKana && w.userKana !== givenInput) { // If there's a converted kana and it's different from raw input
+                             displayedGivenAnswer += ` (${w.userKana})`;
+                        }
+                    } else { // k2r, audio_k2r, kseq
+                        // User typed romaji, or chose romaji
+                        displayedGivenAnswer = givenInput;
+                    }
+
+                    // Special feedback for dji/dzu variants
+                    let specialNote = '';
+                    if ((expectedRomaji === 'dji' && (givenInput.toLowerCase() === 'ji' || givenInput.toLowerCase() === 'di')) ||
+                        (expectedRomaji === 'dzu' && (givenInput.toLowerCase() === 'zu' || givenInput.toLowerCase() === 'du'))) {
+                        specialNote = `<span class="small" style="color:var(--muted)"> (diterima sebagai ${escapeHTML(expectedRomaji)})</span>`;
+                    }
+
+
+                    return `<div style="padding:8px;border:1px solid var(--border);border-radius:12px;margin:6px 0;display:flex;justify-content:space-between;align-items:center;gap:8px">
                                 <div>
                                     <div class="small">Soal ${i+1}</div>
-                                    <div><b>${safeLeft}</b> → <span style="color:var(--ok)">${safeExpRomaji} (${safeExpKana})</span></div>
-                                    <div class="small">Jawaban kamu: ${safeGiven}</div>
+                                    <div><b>${escapeHTML(displayedKana)}</b> → <span style="color:var(--ok)">${escapeHTML(displayedExpectedAnswer)}</span></div>
+                                    <div class="small">Jawaban kamu: ${escapeHTML(displayedGivenAnswer)}${specialNote}</div>
                                 </div>
-                                <button class="btn" onclick="window._speak('${escapeHTML(expectedKana)}')" type="button" aria-label="Putar pelafalan ${escapeHTML(expectedKana)}">🎧</button>
+                                <button class="btn" onclick="window._speak('${escapeHTML(expectedKanaChar || expectedRomaji)}')" type="button" aria-label="Putar pelafalan ${escapeHTML(expectedKanaChar || expectedRomaji)}">🎧</button>
                             </div>`;
                 }).join('');
             }
         }
 
-        bind('#btnReviewWrong', 'click', ()=>{ if(!wrongList.length) return; const set=state.test.set; const labels=[...new Set(wrongList.map(w=>w.romaji || w.romajiSeq))]; // PATCH: Ambil romaji atau romajiSeq
-            testPool = labels.map(r=>({romaji:r, char: (set==='hira'?HIRA_MAP:KATA_MAP).get(r)})); // This might need adjustment for sequences
-            
-            // For review wrong, we need to reconstruct items properly if they were sequences
+        bind('#btnReviewWrong', 'click', ()=>{ if(!wrongList.length) return; const set=state.test.set; 
             testPool = wrongList.map(w => {
-                if (w.qType === 'kseq' || w.qType === 'seq') {
-                    return { romaji: w.romaji, char: w.char, kanaSeq: w.kanaSeq, romajiSeq: w.romajiSeq, qType: w.qType };
-                } else {
-                    return { romaji: w.romaji, char: (set==='hira'?HIRA_MAP:KATA_MAP).get(w.romaji), qType: w.qType };
-                }
+                // Reconstruct items including sequence data and original qType for review
+                return { 
+                    romaji: w.romaji, 
+                    char: w.char, 
+                    kanaSeq: w.kanaSeq, 
+                    romajiSeq: w.romajiSeq, 
+                    qType: w.qType, // Preserve original qType for review
+                    subset: state.test.subset // Keep original subset context
+                };
             });
             shuffle(testPool); // Shuffle the review pool
 
-            poolIdx = labels.map(r=>ALL_ROMAJI.indexOf(r)).filter(x=>x>=0); 
-            state.test.total=0; state.test.score=0; state.test.correctStreak=0; state.test.target = Math.min(20, testPool.length); qIndex=0; closeCelebrate(); qs('#testArea').hidden=false; updateProgress(); nextQ(); });
+            poolIdx = buildPoolLabels().map(r=>ALL_ROMAJI.indexOf(r)).filter(x=>x>=0); // Re-calculate poolIdx based on current pool labels
+            state.test.total=0; state.test.score=0; state.test.correctStreak=0; state.test.target = Math.min(20, testPool.length); qIndex=0; 
+            closeCelebrate(); 
+            qs('#testArea').hidden=false; 
+            qs('#testArea').style.opacity = '0';
+            qs('#testArea').style.pointerEvents = 'none';
+            setTimeout(() => {
+                qs('#testArea').style.opacity = '1';
+                qs('#testArea').style.pointerEvents = 'auto';
+            }, 10);
+            updateProgress(); 
+            nextQ(); 
+        });
 
         function buildPoolLabels(){
             const rangeMode = qs('#rangeMode').value;
@@ -1871,7 +2075,7 @@
                 const selTo=GROUPS.findIndex(x=>x.key===eKey);
                 if(selFrom > -1 && selTo > -1){
                     const [from,to]= selFrom<=selTo? [selFrom,selTo] : [selTo,selFrom];
-                    labels = GROUPS.slice(from,to+1).flatMap(g=> g.idx.map(i=> g.list[i] ));
+                    labels = GROUPS.slice(from,to+1).flatMap(g=> g.idx.map(i=> g.list[i]) );
                 }
             }
             return labels;
@@ -1941,32 +2145,30 @@
             }catch(e){ console.error('Error playing sound:', e); }
         }
 
-        // TTS function to speak the kana character
-        function speak(text){
+        // PATCH: Unified TTS function to speak Kana or Romaji
+        function speakKanaOrRomaji(text, force=false){
             try{
-                if(!state.audio) return;
+                if(!state.audio && !force) return;
+
+                const now = Date.now();
+                if (now - lastSpeakTime < SPEAK_COOLDOWN) {
+                    // console.log("Speech cooldown active, skipping.");
+                    return;
+                }
+
                 if(!('speechSynthesis' in window)) return;
                 speechSynthesis.cancel();
                 const u=new SpeechSynthesisUtterance(text);
-                u.lang='ja-JP';
+                
+                // Determine if text is primarily Kana or Romaji
+                const isKana = /[ぁ-んァ-ン]/.test(text);
+                u.lang='ja-JP'; // Always use Japanese for both Kana and Romaji (Romaji pronounced as Japanese)
                 u.rate=.9; u.pitch=1.02; u.volume=1;
                 speechSynthesis.speak(u);
+                lastSpeakTime = now;
             }catch(error){ console.error('Error speaking text:', error); }
         }
-        window._speak = speak; // Expose globally for review items
-
-        // PATCH: speakForce function (bypasses state.audio check)
-        function speakForce(text){
-            try{
-                if(!('speechSynthesis' in window)) return;
-                speechSynthesis.cancel();
-                const u=new SpeechSynthesisUtterance(text);
-                u.lang='ja-JP';
-                u.rate=.9; u.pitch=1.02; u.volume=1;
-                speechSynthesis.speak(u);
-            }catch(error){ console.error('Error speaking text (force):', error); }
-        }
-
+        window._speak = speakKanaOrRomaji; // Expose globally for review items
 
         let currentToast = null;
         let toastTimeout = null;
@@ -1978,17 +2180,8 @@
 
             const toast = document.createElement('div');
             toast.className = 'toast';
-            toast.style.position = 'fixed';
-            // Rely solely on CSS for left: 50vw and transform: translateX(-50%)
-            toast.style.bottom = '20px';
-            toast.style.padding = '10px 15px';
-            toast.style.borderRadius = '8px';
-            toast.style.backgroundColor = type === 'warn' ? 'var(--warnBg)' : 'var(--okBg)';
-            toast.style.color = 'var(--ink)';
-            toast.style.boxShadow = 'var(--shadow)';
-            toast.style.zIndex = '1000';
-            toast.style.opacity = '0';
-            toast.style.transition = 'opacity 0.3s ease-in-out';
+            if (type === 'warn') toast.classList.add('warn');
+            
             toast.textContent = message; // Use textContent for safety
             toast.setAttribute('role', 'status');
             toast.setAttribute('aria-live', 'polite');
@@ -2033,13 +2226,13 @@
 
             if(type==='streak' && state.test.correctStreak>0 && state.test.correctStreak % 10 === 0){
                 openCelebrate('streak');
-                if (!isReducedMotion) burst();
+                if (!isReducedMotion && !state.lite) burst(); // Disable burst in lite mode
                 clickTone('ok');
             } else if (type === 'levelUp') {
                 if (qs('#celebrateTitle')) qs('#celebrateTitle').textContent = t('level_up_title', level); 
                 if (qs('#celebrateMsg')) qs('#celebrateMsg').textContent = t('level_up_msg', LEVEL_NAMES[level-1] || `Level ${level}`);
                 openCelebrate('levelUp');
-                if (!isReducedMotion) burst();
+                if (!isReducedMotion && !state.lite) burst(); // Disable burst in lite mode
                 clickTone('ok');
             }
         }
@@ -2054,12 +2247,21 @@
                 if (title) title.textContent=t('streak_title');
                 if (msg) msg.textContent=t('streak_msg');
             }
-            if (modal) modal.style.display='flex';
+            if (modal) {
+                modal.hidden = false;
+                modal.classList.add('is-open'); // Use class for transition
+            }
             _trapModal();
         }
 
         function closeCelebrate(){
-            if (modal) modal.style.display='none';
+            if (modal) {
+                modal.classList.remove('is-open');
+                modal.addEventListener('transitionend', function handler() {
+                    modal.hidden = true;
+                    modal.removeEventListener('transitionend', handler);
+                }, { once: true });
+            }
             void document.body.offsetHeight;
             requestAnimationFrame(()=>{
                 document.documentElement.style.transform='translateZ(0)';
@@ -2074,16 +2276,17 @@
                 modal.removeEventListener('keydown', _modalKeydownListener);
                 _modalKeydownListener = null;
             }
+            // PATCH: Refocus on input after closing modal if test is active
+            const ansEl = qs('#ans');
+            if (ansEl && !qs('#testArea').hidden && getComputedStyle(qs('#typeWrap')).display !== 'none') {
+                ansEl.focus();
+            }
         }
         bind('#btnCloseModal', 'click', closeCelebrate);
 
         function _escClose(e){
             if(e.key==='Escape') {
                 closeCelebrate();
-                const ansEl = qs('#ans');
-                if (ansEl && !qs('#testArea').hidden && getComputedStyle(qs('#typeWrap')).display !== 'none') {
-                    ansEl.focus();
-                }
             }
         }
 
@@ -2126,7 +2329,7 @@
         }
 
         function burst(){ 
-            if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+            if (state.lite || window.matchMedia('(prefers-reduced-motion: reduce)').matches) { // Disable burst in lite mode
                 return;
             }
             if (!burstBox) return; // Guard against null
@@ -2161,11 +2364,16 @@
                 </div>
             `;
             document.body.appendChild(tempModal);
-            tempModal.style.display = 'flex';
+            tempModal.hidden = false;
+            tempModal.classList.add('is-open');
             const okBtn = tempModal.querySelector('#customAlertOk');
             if (okBtn) {
                 okBtn.onclick = () => {
-                    tempModal.remove();
+                    tempModal.classList.remove('is-open');
+                    tempModal.addEventListener('transitionend', function handler() {
+                        tempModal.remove();
+                        tempModal.removeEventListener('transitionend', handler);
+                    }, { once: true });
                 };
                 okBtn.focus();
             }
@@ -2187,18 +2395,27 @@
                 </div>
             `;
             document.body.appendChild(tempModal);
-            tempModal.style.display = 'flex';
+            tempModal.hidden = false;
+            tempModal.classList.add('is-open');
             const okBtn = tempModal.querySelector('#customConfirmOk');
             const cancelBtn = tempModal.querySelector('#customConfirmCancel');
 
             if (okBtn && cancelBtn) {
                 okBtn.onclick = () => {
-                    tempModal.remove();
-                    onConfirm(true);
+                    tempModal.classList.remove('is-open');
+                    tempModal.addEventListener('transitionend', function handler() {
+                        tempModal.remove();
+                        onConfirm(true);
+                        tempModal.removeEventListener('transitionend', handler);
+                    }, { once: true });
                 };
                 cancelBtn.onclick = () => {
-                    tempModal.remove();
-                    onConfirm(false);
+                    tempModal.classList.remove('is-open');
+                    tempModal.addEventListener('transitionend', function handler() {
+                        tempModal.remove();
+                        onConfirm(false);
+                        tempModal.removeEventListener('transitionend', handler);
+                    }, { once: true });
                 };
                 okBtn.focus();
             }
@@ -2222,7 +2439,8 @@
                 save();
             }
             tickPomo();
-            if(!pomoHandle) pomoHandle=setInterval(tickPomo, 250);
+            const interval = state.lite ? 1000 : 250; // PATCH: Adjust interval for lite mode
+            if(!pomoHandle) pomoHandle=setInterval(tickPomo, interval);
         }
         function pausePomo(){ state.pomo.running=false; save(); if(pomoHandle){ clearInterval(pomoHandle); pomoHandle=null; } }
         function resetPomo(){ pausePomo(); state.pomo.mode='work'; state.pomo.remaining = state.pomo.work*60; upPomoLabel(); drawRemain(); save(); }
@@ -2257,6 +2475,7 @@
             const alias = {
                 si:'shi', ti:'chi', tu:'tsu', hu:'fu', wo:'o',
                 di:'dji', du:'dzu',
+                ji:'dji', zu:'dzu' // PATCH: Terima varian ji/di = dji, zu/du = dzu
             };
             return alias[v] || v;
         }
@@ -2264,49 +2483,67 @@
         function romajiStringToKana(str,set){
             let s=(str||'').toLowerCase().replace(/\s+/g,'');
             let out='';
+            const map = set === 'hira' ? HIRA_MAP : KATA_MAP;
+
             while(s.length){
                 let matched=false;
+                // Handle 'n' (ん/ン)
                 if(s[0]==='n'){
-                    if(s[1]==='n'){ out += (set==='hira'? 'ん':'ン'); s=s.slice(2); matched=true; continue; }
+                    if(s[1]==='n'){ out += map.get('n'); s=s.slice(2); matched=true; continue; } // nn -> ん
                     const next=s[1]||'';
-                    if(next && !'aeiouy'.includes(next)){ out += (set==='hira'? 'ん':'ン'); s=s.slice(1); matched=true; continue; }
+                    if(next && !'aeiouy'.includes(next)){ out += map.get('n'); s=s.slice(1); matched=true; continue; } // n + consonant -> ん
                 }
+                
+                // Prioritize longer matches (e.g., "kya" before "ka")
                 for(const r of ROMAJI_SORTED){
                     if(s.startsWith(r)){
-                        out += (set==='hira'? HIRA_MAP.get(r): KATA_MAP.get(r));
+                        out += map.get(r);
                         s=s.slice(r.length);
                         matched=true;
                         break;
                     }
                 }
                 if(!matched){
-                    if(/^[bcdfghjklmnpqrstvwxyz]\1/.test(s)){
-                        out += (set==='hira'? 'っ':'ッ'); s=s.slice(1); matched=true; continue;
+                    // Handle small tsu (っ/ッ) for geminate consonants
+                    // This is a simplification and might not cover all cases (e.g. atsu -> あつ vs attsu -> あつ)
+                    if(/^[bcdfghjklmnpqrstvwxyz]\1/.test(s)){ // double consonant (e.g., 'tto', 'kka')
+                        out += (set==='hira'?'っ':'ッ'); // Add small tsu
+                        s = s.slice(1); // Consume one consonant, the next iteration will find the actual kana
+                        matched=true;
+                        continue;
                     }
+                    // If no match found, consume one character and continue (might be an invalid romaji)
                     s=s.slice(1);
                 }
             } return out;
         }
 
-        function makeSequence(idxArr,set){
-            const src = idxArr.length? idxArr.map(i=>ALL_ROMAJI[i]) : ALL_ROMAJI;
-            const len = 2 + Math.floor(Math.random()*2);
+        // PATCH: makeSequence now accepts a pool of Romaji labels and length
+        function makeSequence(poolLabels, set, length){
+            const src = poolLabels.filter(r => ALL_ROMAJI.includes(r)); // Ensure labels are valid Romaji
+            const len = Math.max(2, Math.min(6, length || state.test.sylPerItem || 3)); // Use state.test.sylPerItem
             const picks=[];
+            if (src.length === 0) return { romaji: '', kana: '' }; // Handle empty pool
+
             for(let i=0;i<len;i++){ const r = src[Math.floor(Math.random()*src.length)]; picks.push(r); }
             const romaji=picks.join('');
             const kana=romajiStringToKana(romaji,set);
             return {romaji,kana};
         }
 
-        // PATCH: makeKanaSequence untuk qType kseq
-        function makeKanaSequence(length, set) {
+        // PATCH: makeKanaSequence for qType kseq, now accepts a pool of Romaji labels
+        function makeKanaSequence(length, set, poolLabels) {
             const map = set === 'hira' ? HIRA_MAP : KATA_MAP;
-            const availableRomaji = ALL_ROMAJI.filter(r => map.has(r)); // Filter to ensure valid kana for the set
+            // Filter available romaji based on the current poolLabels and ensure they map to valid kana
+            const availableRomaji = poolLabels.filter(r => map.has(r));
             
+            if (availableRomaji.length === 0) return { romaji: '', kana: '' };
+
+            const len = Math.max(2, Math.min(6, length || state.test.sylPerItem || 3));
             let romajiSequence = [];
             let kanaSequence = '';
 
-            for (let i = 0; i < length; i++) {
+            for (let i = 0; i < len; i++) {
                 const randomRomaji = availableRomaji[Math.floor(Math.random() * availableRomaji.length)];
                 romajiSequence.push(randomRomaji);
                 kanaSequence += map.get(randomRomaji);
@@ -2328,7 +2565,8 @@
             wCanvas = qs('#writerCanvas');
             wWrap   = qs('#writerWrap');
             wGhost  = qs('#writerGhost');
-            wCtx    = wCanvas?.getContext('2d'); // Guard against null
+            // PATCH: Conditionally apply willReadFrequently for lite mode
+            wCtx    = wCanvas?.getContext('2d', state.lite ? { willReadFrequently: true } : {}); 
         }
         function writerSetupCanvasSize() {
             if (!wCanvas || !wWrap || !wCtx) return; // Guard against null
@@ -2337,7 +2575,7 @@
                 requestAnimationFrame(writerSetupCanvasSize);
                 return;
             }
-            dpr = Math.max(1, window.devicePixelRatio || 1);
+            dpr = state.lite ? Math.min(1.5, window.devicePixelRatio || 1) : Math.max(1, window.devicePixelRatio || 1); // PATCH: Limit DPR in lite mode
             const size = Math.floor(rect.width);
             wCanvas.style.width = size + 'px';
             wCanvas.style.height = size + 'px';
@@ -2532,7 +2770,7 @@
             bind('#writePrev', 'click', ()=>{ writerPick(-1); writerClear(); });
             bind('#writeNext', 'click', ()=>{ writerPick(1); writerClear(); });
             bind('#writeRand', 'click', ()=>{ writerRandom(); writerClear(); });
-            bind('#writeSpeak', 'click', ()=>{ speak(writerCurrentChar()); clickTone('click'); });
+            bind('#writeSpeak', 'click', ()=>{ speakKanaOrRomaji(writerCurrentChar()); clickTone('click'); });
             bind('#penSize', 'input', (e)=>{ state.writer.penSize = parseInt(e.target.value,10)||10; save(); });
             // PATCH: Perbaiki handler toggle Grid (biar redraw setelah ganti latar)
             bind('#gridToggle', 'change', (e)=>{ 
@@ -2601,6 +2839,7 @@
                     ctx.moveTo(s.points[0].x*sx, s.points[0].y*sy);
                     for(let i=1;i<s.points.length;i++){
                         const b=s.points[i];
+                        // PATCH: Perbaikan ReferenceError di writerRedrawAll()
                         ctx.lineTo(b.x*sx, b.y*sy);
                     }
                 }
@@ -2697,11 +2936,13 @@
             safe.writer.autoSnap = !!safe.writer.autoSnap;
             safe.pomo.running = !!safe.pomo.running;
             safe.hasSeenOnboarding = !!safe.hasSeenOnboarding;
+            safe.lite = !!safe.lite; // PATCH: Sanitize lite mode
 
             safe.theme = ['pastel', 'hc'].includes(safe.theme) ? safe.theme : 'pastel';
             safe.test.set = ['hira', 'kata'].includes(safe.test.set) ? safe.test.set : 'hira';
             safe.test.mode = ['type', 'mc'].includes(safe.test.mode) ? safe.test.mode : 'type';
-            safe.test.qType = ['k2r', 'r2k', 'seq', 'audio', 'kseq'].includes(safe.test.qType) ? safe.test.qType : 'k2r'; // PATCH: Sanitasi qType baru
+            // PATCH: Sanitasi qType baru (audio_k2r, audio_r2k)
+            safe.test.qType = ['k2r', 'r2k', 'seq', 'audio_k2r', 'audio_r2k', 'kseq'].includes(safe.test.qType) ? safe.test.qType : 'k2r'; 
             safe.test.rangeMode = ['range', 'single'].includes(safe.test.rangeMode) ? safe.test.rangeMode : 'range';
             safe.writer.set = ['hira', 'kata'].includes(safe.writer.set) ? safe.writer.set : 'hira';
             safe.writer.kana = ALL_ROMAJI.includes(safe.writer.kana) ? safe.writer.kana : 'a';
@@ -2733,7 +2974,7 @@
         }
 
         function exportProgress(){
-            const blob = new Blob([localStorage.getItem(KEY)||'{}'], {type:'application/json'});
+            const blob = new Blob([JSON.stringify(sanitizeState(state))], {type:'application/json'}); // Sanitize before export
             const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
             a.download='kana-progress.json'; a.click(); URL.revokeObjectURL(a.href);
             showToast(t('export_ok'));
@@ -2777,14 +3018,19 @@
             }
 
             if (onboardingModal) onboardingModal.hidden = false;
-            if (onboardingModal) onboardingModal.style.display = 'flex';
+            if (onboardingModal) onboardingModal.classList.add('is-open'); // Use class for transition
             _trapModalOnboarding();
 
             bind('#btnStartLearningOnboarding', 'click', () => {
                 state.hasSeenOnboarding = true;
                 save();
-                if (onboardingModal) onboardingModal.style.display = 'none';
-                if (onboardingModal) onboardingModal.hidden = true;
+                if (onboardingModal) {
+                    onboardingModal.classList.remove('is-open');
+                    onboardingModal.addEventListener('transitionend', function handler() {
+                        onboardingModal.hidden = true;
+                        onboardingModal.removeEventListener('transitionend', handler);
+                    }, { once: true });
+                }
                 if (mainContent) mainContent.style.display = 'block';
                 // PATCH: Dukungan Escape key untuk modal onboarding
                 if (_escCloseListenerOnboarding) {
@@ -2834,6 +3080,28 @@
             firstFocusable?.focus();
         }
 
+        // ---------- LITE MODE ----------
+        function applyPerfMode() {
+            document.documentElement.setAttribute('data-lite', state.lite ? '1' : '0');
+            const liteToggle = qs('#liteToggle');
+            if (liteToggle) {
+                liteToggle.checked = state.lite;
+            }
+            // Update Pomodoro interval dynamically
+            if (pomoHandle) {
+                clearInterval(pomoHandle);
+                pomoHandle = null;
+                if (state.pomo.running) {
+                    startPomo();
+                }
+            }
+            // Re-initialize writer canvas context to apply willReadFrequently if changed
+            if (typeof writerInit === 'function') { // Ensure writerInit is defined
+                writerInit();
+            }
+            showToast(state.lite ? t('lite_mode_on') : t('lite_mode_off'));
+        }
+
         // ---------- BINDINGS ----------
         bind('#btnShowLearn', 'click', startLearn);
         bind('#btnStart', 'click', startTest);
@@ -2853,8 +3121,16 @@
         document.addEventListener('keydown', (e)=>{
             if(e.target.matches('input,textarea') && e.target.id !== 'ans' && !e.target.closest('#testArea')) return;
 
-            const map={a:'A',b:'B',c:'C',d:'D'}; const k=map[e.key?.toLowerCase?.()]; if(k && getComputedStyle(qs('#mcWrap') || {display:'none'}).display!=='none'){ e.preventDefault(); mcPick(k); }
+            const map={a:'A',b:'B',c:'C',d:'D'}; const k=map[e.key?.toLowerCase?.()]; 
+            if(k && getComputedStyle(qs('#mcWrap') || {display:'none'}).display!=='none'){ 
+                e.preventDefault(); 
+                mcPick(k); 
+            }
             if(e.key==='ArrowRight' && !qs('#testArea')?.hidden){ e.preventDefault(); skipQ(); }
+            // PATCH: Hotkey 'R' for replay audio
+            if(e.key.toLowerCase()==='r' && !qs('#celebrate')?.classList.contains('is-open') && !qs('#testArea')?.hidden){
+                qs('#btnReplayAudio')?.click();
+            }
 
             const writerSection = qs('#writerSection');
             const isWriterSectionVisible = writerSection && getComputedStyle(writerSection).display !== 'none' && writerSection.offsetParent !== null;
@@ -2899,6 +3175,8 @@
         bind('#tPastel', 'click', ()=>{ state.theme='pastel'; save(); applyTheme(); });
         bind('#tHC', 'click', ()=>{ state.theme='hc'; save(); applyTheme(); });
         bind('#audToggle', 'change', (e)=>{ state.audio = e.target.checked; save(); });
+        // PATCH: Bind lite mode toggle
+        bind('#liteToggle', 'change', (e) => { state.lite = e.target.checked; save(); applyPerfMode(); });
 
         bind('#resetBtn', 'click', ()=>{
             showCustomConfirm(t('confirm_reset_title'), (confirmed) => {
@@ -2907,6 +3185,7 @@
                     state=initState();
                     applyTheme();
                     applyAudio();
+                    applyPerfMode(); // Reapply lite mode
                     renderAll();
                     if (typeof writerClear==='function') writerClear();
                     save();
@@ -2951,10 +3230,14 @@
         });
         // PATCH: Bind tombol replay audio
         bind('#btnReplayAudio', 'click', () => {
-            if (currentItem && currentItem.char) { // Replay only if char is defined
-                speakForce(currentItem.char);
-            } else if (currentItem && currentItem.kanaSeq) { // Replay for sequence
-                speakForce(currentItem.kanaSeq);
+            if (currentItem) {
+                if (currentItem.qType === 'audio_k2r' && currentItem.char) { // Replay Kana for audio_k2r
+                    speakKanaOrRomaji(currentItem.char, true); // Force replay without audio state check
+                } else if (currentItem.qType === 'audio_r2k' && currentItem.romaji) { // Replay Romaji for audio_r2k
+                    speakKanaOrRomaji(currentItem.romaji, true); // Force replay without audio state check
+                } else if (currentItem.qType === 'kseq' && currentItem.kanaSeq) { // Replay Kana sequence for kseq
+                     speakKanaOrRomaji(currentItem.kanaSeq, true); // Force replay without audio state check
+                }
             }
             clickTone('click');
         });
@@ -2980,6 +3263,7 @@
             renderStats();
             applyTheme();
             applyAudio();
+            applyPerfMode(); // Apply Lite Mode settings
             upPomoLabel();
             if(!state.pomo.remaining) state.pomo.remaining=state.pomo.work*60;
             drawRemain();
@@ -2995,42 +3279,19 @@
         }
 
         document.addEventListener('DOMContentLoaded', ()=>{
+            // Auto-enable Lite Mode on low-end devices
+            const deviceMemory = navigator.deviceMemory || 0;
+            const hardwareConcurrency = navigator.hardwareConcurrency || 0;
+            if (!state.hasSeenOnboarding && (deviceMemory < 4 || hardwareConcurrency <= 4)) {
+                state.lite = true;
+                save();
+            }
+
             renderAll();
             if(state.pomo.running){ startPomo(); }
             showOnboarding();
             setInterval(renderStats, 5000); // Update review due indicator periodically
         });
-
-        // ==== Hardening anti-overflow saat runtime (debug + fix cepat) ====
-        // PATCH: Menghapus seluruh IIFE ini karena override window.showToast bentrok dan tidak diperlukan
-        /*
-        (function fixRuntimeOverflow(){
-            document.documentElement.style.overflowX = 'hidden';
-            document.body.style.overflowX = 'hidden';
-            document.documentElement.style.maxWidth = '100%';
-            document.body.style.maxWidth = '100%';
-
-            document.querySelectorAll('img,canvas,video,svg').forEach(el=>{
-                el.style.maxWidth = '100%';
-                el.style.height = 'auto';
-            });
-
-            const origShowToast = window.showToast;
-            if (typeof origShowToast === 'function') {
-                window.showToast = function(message, type='info', duration=2500){
-                    const n = origShowToast(message, type, duration);
-                    if (window.currentToast) {
-                        const toast = window.currentToast;
-                        toast.style.position = 'fixed';
-                        toast.style.left = '50vw';
-                        toast.style.transform = 'translateX(-50%)';
-                        toast.style.maxWidth = 'calc(100vw - 24px)';
-                    }
-                    return n;
-                }
-            }
-        })();
-        */
     </script>
 </body>
 </html>
