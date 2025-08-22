@@ -40,6 +40,7 @@
             radial-gradient(900px 420px at 110% -30%, rgba(22,198,161,.12), transparent),
             var(--bg);color:var(--ink);
             transition: background-color var(--transition-duration) ease-out, color var(--transition-duration) ease-out;
+            line-height: 1.6; /* Tambahan untuk keterbacaan */
         }
         .wrap{
             max-width: 1200px; /* Lebar untuk tabel */
@@ -72,7 +73,7 @@
         .main-nav { width: 100%; margin-top: 12px; padding-top: 8px; border-top: 1px solid var(--border); }
         .main-nav .row { justify-content: center; }
         .main-nav .btn { flex-grow: 1; }
-        @media (min-width: 768px) { .main-nav .btn { flex-grow: 0; } }
+        @media (min-width: 768px) { .main-nav .btn { flex-grow: 0; } } /* Tombol navigasi tidak lagi "flex-grow: 1" di layar lebih besar */
         .seg{display:flex;border:1px solid var(--border);border-radius:12px;overflow:hidden; transition: border-color var(--transition-duration) ease-out;}
         .seg button{ flex:1; background:var(--soft); border:none; padding: 12px 16px; font-size: 14px; cursor: pointer; transition: all var(--transition-duration) ease-out; color: var(--ink); }
         .seg button.active{background:linear-gradient(135deg, rgba(122,108,255,.18), rgba(22,198,161,.18))}
@@ -84,20 +85,22 @@
             -webkit-overflow-scrolling: touch;
         }
         .kana-table {
-            width: 100%;
+            width: 100%; /* Memastikan tabel mengisi lebar container */
             border-collapse: collapse;
             text-align: center;
             font-family: 'Noto Sans JP', sans-serif;
+            min-width: 500px; /* Minimal lebar tabel untuk mencegah terlalu padat di mobile */
         }
         .kana-table th, .kana-table td {
             border: 1px solid var(--border);
             padding: 8px;
-            min-width: 70px;
+            min-width: 50px; /* Mengurangi min-width default untuk sel */
         }
         .kana-table th {
             background-color: var(--soft);
             font-weight: 600;
             color: var(--muted);
+            padding: 10px 5px; /* Sedikit mengurangi padding header */
         }
         .kana-table td {
             cursor: pointer;
@@ -107,11 +110,11 @@
             background-color: var(--soft);
         }
         .kana-char {
-            font-size: 28px;
+            font-size: 24px; /* Sedikit mengurangi ukuran font kana */
             line-height: 1.2;
         }
         .romaji-char {
-            font-size: 12px;
+            font-size: 11px; /* Sedikit mengurangi ukuran font romaji */
             color: var(--muted);
         }
         .empty-cell {
@@ -119,6 +122,85 @@
         }
         [data-theme="hc"] .empty-cell {
             background-color: rgba(255,255,255,0.04);
+        }
+
+        /* Media Queries untuk Responsivitas */
+
+        /* Untuk layar kecil (ponsel), e.g., lebar < 768px */
+        @media (max-width: 767px) {
+            .wrap {
+                padding: 12px; /* Mengurangi padding wrap di mobile */
+                padding-left: calc(12px + env(safe-area-inset-left));
+                padding-right: calc(12px + env(safe-area-inset-right));
+            }
+            .card {
+                padding: 12px; /* Mengurangi padding kartu di mobile */
+            }
+            .card h2 {
+                font-size: 18px; /* Mengurangi ukuran judul kartu */
+            }
+            h1 {
+                font-size: 18px; /* Mengurangi ukuran judul utama */
+            }
+            .small {
+                font-size: 11px; /* Mengurangi ukuran teks kecil */
+            }
+            .btn {
+                min-height: 48px; /* Mengurangi tinggi tombol */
+                padding: 0 12px;
+                font-size: 13px; /* Mengurangi ukuran font tombol */
+            }
+            .main-nav .row {
+                gap: 6px; /* Mengurangi jarak antar tombol navigasi */
+            }
+            .seg button {
+                padding: 10px 12px; /* Mengurangi padding tombol segmen */
+                font-size: 13px;
+            }
+            .kana-table th, .kana-table td {
+                padding: 6px 4px; /* Mengurangi padding sel tabel di mobile */
+                min-width: 45px; /* Minimal lebar sel tabel di mobile */
+            }
+            .kana-char {
+                font-size: 20px; /* Mengurangi ukuran font karakter Kana */
+            }
+            .romaji-char {
+                font-size: 10px; /* Mengurangi ukuran font karakter Romaji */
+            }
+        }
+
+        /* Untuk layar sedang (tablet, laptop kecil), e.g., 768px - 1023px */
+        @media (min-width: 768px) and (max-width: 1023px) {
+            .wrap {
+                padding: 24px;
+            }
+            .kana-table th, .kana-table td {
+                padding: 8px 6px;
+                min-width: 60px;
+            }
+            .kana-char {
+                font-size: 26px;
+            }
+            .romaji-char {
+                font-size: 12px;
+            }
+        }
+
+        /* Untuk layar besar (laptop, desktop), e.g., >= 1024px */
+        @media (min-width: 1024px) {
+            .main-nav .row {
+                justify-content: flex-end; /* Navigasi rata kanan di layar besar */
+            }
+            .kana-table th, .kana-table td {
+                padding: 10px;
+                min-width: 70px;
+            }
+            .kana-char {
+                font-size: 28px;
+            }
+            .romaji-char {
+                font-size: 12px;
+            }
         }
     </style>
 </head>
@@ -142,8 +224,8 @@
                     <div class="small">Tabel Hiragana & Katakana Lengkap</div>
                 </div>
             </div>
-             <!-- NAVIGASI UTAMA -->
-             <nav class="main-nav">
+            <!-- NAVIGASI UTAMA -->
+            <nav class="main-nav">
                 <div class="row">
                     <a href="index.html" class="btn ghost"><i class="fa-solid fa-home"></i> Latihan</a>
                     <a href="index2.html" class="btn ghost"><i class="fa-solid fa-clone"></i> Flashcard</a>
@@ -273,9 +355,11 @@
                     const romaji = c + v;
                     const kana = kanaMap.get(romaji);
                     if (['yi', 'ye', 'wi', 'wu', 'we'].includes(romaji)) {
-                         html += '<td class="empty-cell"></td>';
+                            html += '<td class="empty-cell"></td>';
                     } else if (kana) {
                         html += `<td data-kana="${kana}"><div class="kana-char">${kana}</div><div class="romaji-char">${romaji}</div></td>`;
+                    } else {
+                        html += '<td class="empty-cell"></td>'; // Tambahkan sel kosong untuk romaji yang tidak ada
                     }
                 });
                 html += '</tr>';
@@ -291,8 +375,8 @@
                 VOWELS.forEach(v => {
                     let romaji = c + v;
                     if (c === 'z' && v === 'i') romaji = 'ji';
-                    if (c === 'd' && v === 'i') romaji = 'dji';
-                    if (c === 'd' && v === 'u') romaji = 'dzu';
+                    else if (c === 'd' && v === 'i') romaji = 'dji';
+                    else if (c === 'd' && v === 'u') romaji = 'dzu';
                     
                     const kana = kanaMap.get(romaji);
                     if (kana) {
@@ -309,23 +393,24 @@
             html += '<div class="spacer"></div><h3>Youon (拗音)</h3>';
             html += '<table class="kana-table"><thead><tr><th></th><th>YA</th><th>YU</th><th>YO</th></tr></thead><tbody>';
             YOUON_CONSONANTS.forEach(c => {
-                 html += `<tr><th>${c.toUpperCase()}</th>`;
-                 YOUON_VOWELS.forEach(v => {
-                    let romaji = c + v;
-                    if (c === 'j') romaji = c + (v === 'a' ? 'a' : v === 'u' ? 'u' : 'o'); // ja, ju, jo
-                    else if (['sh', 'ch'].includes(c) && v === 'i') { // shi, chi tidak ada di youon
-                        html += '<td class="empty-cell"></td>';
-                        return;
-                    }
+                    html += `<tr><th>${c.toUpperCase().replace('SH', 'SH').replace('CH', 'CH').replace('NY', 'NY').replace('HY', 'HY').replace('MY', 'MY').replace('RY', 'RY').replace('GY', 'GY').replace('J', 'J').replace('BY', 'BY').replace('PY', 'PY')}</th>`; // Menggunakan upperCase untuk konsonan Youon
+                    YOUON_VOWELS.forEach(v => {
+                        let romaji = c + v;
+                        if (c === 'j') { // 'ja', 'ju', 'jo'
+                            romaji = (v === 'a' ? 'ja' : v === 'u' ? 'ju' : 'jo');
+                        } else if (['sh', 'ch'].includes(c) && v === 'i') { 
+                            html += '<td class="empty-cell"></td>';
+                            return;
+                        }
 
-                    const kana = kanaMap.get(romaji);
-                     if (kana) {
-                        html += `<td data-kana="${kana}"><div class="kana-char">${kana}</div><div class="romaji-char">${romaji}</div></td>`;
-                    } else {
-                        html += '<td class="empty-cell"></td>';
-                    }
-                 });
-                 html += '</tr>';
+                        const kana = kanaMap.get(romaji);
+                        if (kana) {
+                            html += `<td data-kana="${kana}"><div class="kana-char">${kana}</div><div class="romaji-char">${romaji}</div></td>`;
+                        } else {
+                            html += '<td class="empty-cell"></td>';
+                        }
+                    });
+                    html += '</tr>';
             });
             html += '</tbody></table>';
 
@@ -340,7 +425,8 @@
         function speak(text) {
             try {
                 if (!('speechSynthesis' in window)) {
-                    alert('Maaf, browser Anda tidak mendukung audio.');
+                    // Mengganti alert dengan console.warn atau pesan di UI jika diinginkan
+                    console.warn('Maaf, browser Anda tidak mendukung audio.');
                     return;
                 }
                 speechSynthesis.cancel();
