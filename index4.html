@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="pastel">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Kosakata Bahasa Jepang — Latihan</title>
+    <meta name="description" content="Daftar kosakata dasar bahasa Jepang berdasarkan kategori. Lengkap dengan kana, romaji, arti, dan audio pelafalan." />
+    <meta name="theme-color" content="#7a6cff">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;700&family=Noto+Serif+JP:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <style>
+        /* Menggunakan style yang sama dari index.html untuk konsistensi */
+        :root{
+            --bg:#f8fbff; --panel:#ffffff; --soft:#f2f6ff; --ink:#132030; --muted:#76849c;
+            --pri:#7a6cff; --sec:#16c6a1; --warn:#ff7b7b; --ok:#2fb875; --accent:#ffd166;
+            --btn:#e9eefc; --btnText:#0b101a; --border:rgba(19,32,48,.10);
+            --radius:18px; --shadow:0 6px 18px rgba(15,23,34,.08);
+            --ring: 0 0 0 3px rgba(122,108,255,.28);
+            --iconColor: var(--muted);
+            --transition-duration: 0.2s;
+        }
+        [data-theme="hc"]{
+            --bg:#0a0f1a; --panel:#0f1626; --soft:#0c1220; --ink:#e6efff; --muted:#9fb0cc;
+            --pri:#8fa8ff; --sec:#3dd8b5; --warn:#ff8c8c; --ok:#7be0b3; --accent:#ffd98a;
+            --btn:#18243a;
+            --btnText:#e6efff;
+            --border:rgba(230,239,255,.12);
+            --ring: 0 0 0 3px rgba(143,168,255,.35);
+            --iconColor: var(--ink);
+        }
+        *{box-sizing:border-box}
+        html, body { max-width: 100%; overflow-x: hidden; }
+        body {
+            min-height: 100svh;
+            margin:0;font-family:'Inter', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;background:
+            radial-gradient(900px 420px at -10% -20%, rgba(122,108,255,.10), transparent),
+            radial-gradient(900px 420px at 110% -30%, rgba(22,198,161,.12), transparent),
+            var(--bg);color:var(--ink);
+            transition: background-color var(--transition-duration) ease-out, color var(--transition-duration) ease-out;
+        }
+        .wrap{
+            max-width: 960px;
+            margin: auto;
+            padding: 16px;
+            padding-left: calc(16px + env(safe-area-inset-left));
+            padding-right: calc(16px + env(safe-area-inset-right));
+        }
+        header{position:sticky;top:0;z-index:30;background:linear-gradient(180deg, rgba(255,255,255,.92), rgba(255,255,255,.72));backdrop-filter: blur(8px);border-bottom:1px solid var(--border); padding-top:env(safe-area-inset-top);
+        transition: background var(--transition-duration) ease-out, backdrop-filter var(--transition-duration) ease-out, border-bottom-color var(--transition-duration) ease-out;}
+        [data-theme="hc"] header{background:linear-gradient(180deg, rgba(15,22,38,.86), rgba(15,22,38,.66))}
+        
+        .brand{ display:flex; align-items:center; gap:12px; justify-content: space-between; flex-wrap: wrap; }
+        .logo{width:36px;height:36px;border-radius:12px;background:linear-gradient(135deg,var(--pri),var(--sec));box-shadow:var(--shadow);
+        transition: box-shadow var(--transition-duration) ease-out, background var(--transition-duration) ease-out;}
+        h1{font-size:20px;margin:0}
+        .small{font-size:12px;color:var(--muted)}
+        .card{background:var(--panel);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px;border:1px solid var(--border);
+        transition: background-color var(--transition-duration) ease-out, border-color var(--transition-duration) ease-out, box-shadow var(--transition-duration) ease-out;}
+        .card h2{font-size:16px;margin:0 0 10px 0; display: flex; align-items: center; gap: 8px;}
+        .card h2 .icon { color: var(--iconColor); transition: color var(--transition-duration) ease-out;}
+        .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+        .btn{ min-height:52px; padding: 0 16px; border-radius: 12px; border: none; cursor: pointer; font-size: 14px; font-weight: 500; transition: all var(--transition-duration) ease-out; color: var(--ink); background: var(--btn); display: flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none; }
+        .btn:active{transform:translateY(1px)}
+        .btn.primary{ background:linear-gradient(135deg, var(--pri), var(--sec)); color:white; }
+        .btn.ghost{background:transparent;outline:1px solid var(--border); color: var(--ink);}
+        .btn:focus-visible{outline:none; box-shadow:var(--ring); outline-offset: 3px;}
+        .spacer{height:16px}
+        .main-nav { width: 100%; margin-top: 12px; padding-top: 8px; border-top: 1px solid var(--border); }
+        .main-nav .row { justify-content: center; }
+        .main-nav .btn { flex-grow: 1; }
+        @media (min-width: 768px) { .main-nav .btn { flex-grow: 0; } }
+        input[type="search"]{ width:100%;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--soft);color:var(--ink); transition: border-color var(--transition-duration) ease-out, background-color var(--transition-duration) ease-out, box-shadow var(--transition-duration) ease-out; }
+        input[type="search"]:focus { border-color: var(--pri); outline: none; box-shadow: var(--ring); }
+        .chips{ display:flex; flex-wrap: wrap; gap:8px; }
+        .chip{ padding:8px 12px; border-radius:999px; background:var(--soft); border:1px solid var(--border); cursor:pointer; font-size: 14px; transition: all var(--transition-duration) ease-out; color: var(--ink); }
+        .chip.active{ background:linear-gradient(135deg, rgba(122,108,255,.18), rgba(22,198,161,.18)); border-color: var(--pri); }
+
+        /* Style khusus untuk Daftar Kosakata */
+        .vocab-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .vocab-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 8px;
+            border-bottom: 1px solid var(--border);
+            cursor: pointer;
+            transition: background-color var(--transition-duration) ease-out;
+        }
+        .vocab-item:hover {
+            background-color: var(--soft);
+        }
+        .vocab-item:last-child {
+            border-bottom: none;
+        }
+        .vocab-jp {
+            font-family: 'Noto Sans JP', sans-serif;
+            font-size: 20px;
+        }
+        .vocab-jp .kanji {
+            font-weight: 600;
+        }
+        .vocab-jp .kana {
+            font-size: 14px;
+            color: var(--muted);
+            margin-left: 8px;
+        }
+        .vocab-id {
+            text-align: right;
+        }
+        .vocab-id .romaji {
+            font-size: 12px;
+            color: var(--muted);
+            display: block;
+        }
+        .vocab-id .arti {
+            font-size: 16px;
+        }
+        .vocab-item i {
+            color: var(--muted);
+            margin-left: 16px;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="wrap">
+            <div class="brand">
+                <svg class="logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="36" height="36">
+                    <defs>
+                        <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+                            <stop stop-color="#7a6cff"/><stop offset="1" stop-color="#16c6a1"/>
+                        </linearGradient>
+                    </defs>
+                    <rect width="64" height="64" rx="14" fill="url(#g)"/>
+                    <text x="50%" y="50%" text-anchor="middle" dominant-baseline="middle"
+                          font-family="Noto Sans JP, 'Noto Serif JP', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif"
+                          font-size="38" fill="white" dy="-2">あ</text>
+                </svg>
+                <div>
+                    <h1>Pelatih Kana Jepang</h1>
+                    <div class="small">Daftar Kosakata Dasar</div>
+                </div>
+            </div>
+             <!-- NAVIGASI UTAMA -->
+             <nav class="main-nav">
+                <div class="row">
+                    <a href="index.html" class="btn ghost"><i class="fa-solid fa-home"></i> Latihan</a>
+                    <a href="index2.html" class="btn ghost"><i class="fa-solid fa-clone"></i> Flashcard</a>
+                    <a href="index3.html" class="btn ghost"><i class="fa-solid fa-table"></i> Tabel Kana</a>
+                    <a href="index4.html" class="btn primary"><i class="fa-solid fa-book-open"></i> Kosakata</a>
+                    <a href="index5.html" class="btn ghost"><i class="fa-solid fa-comments"></i> Ungkapan</a>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <main class="wrap">
+        <div class="card">
+            <h2><i class="fa-solid fa-book-open icon"></i> Kosakata (単語)</h2>
+            <div class="small">Cari kosakata atau filter berdasarkan kategori. Klik pada kata untuk mendengarkan pelafalannya.</div>
+            <div class="spacer"></div>
+            <input type="search" id="searchInput" placeholder="Cari kata (e.g., 'neko', 'kucing', 'ねこ')...">
+            <div class="spacer"></div>
+            <div id="categoryChips" class="chips">
+                <!-- Kategori akan digenerate oleh JavaScript -->
+            </div>
+        </div>
+
+        <div class="spacer"></div>
+
+        <div class="card">
+            <ul id="vocabList" class="vocab-list">
+                <!-- Daftar kosakata akan digenerate oleh JavaScript -->
+            </ul>
+        </div>
+    </main>
+
+    <script>
+        // DATA KOSAKATA
+        const vocabulary = [
+            { kana: 'こんにちは', kanji: '今日は', romaji: 'konnichiwa', arti: 'Halo / Selamat siang', kategori: 'salam' },
+            { kana: 'おはようございます', kanji: '', romaji: 'ohayou gozaimasu', arti: 'Selamat pagi', kategori: 'salam' },
+            { kana: 'こんばんは', kanji: '今晩は', romaji: 'konbanwa', arti: 'Selamat malam', kategori: 'salam' },
+            { kana: 'ありがとう', kanji: '', romaji: 'arigatou', arti: 'Terima kasih', kategori: 'salam' },
+            { kana: 'すみません', kanji: '', romaji: 'sumimasen', arti: 'Maaf / Permisi', kategori: 'salam' },
+            { kana: 'はい', kanji: '', romaji: 'hai', arti: 'Ya', kategori: 'dasar' },
+            { kana: 'いいえ', kanji: '', romaji: 'iie', arti: 'Tidak / Bukan', kategori: 'dasar' },
+            { kana: 'わたし', kanji: '私', romaji: 'watashi', arti: 'Saya', kategori: 'dasar' },
+            { kana: 'あなた', kanji: '貴方', romaji: 'anata', arti: 'Anda / Kamu', kategori: 'dasar' },
+            { kana: 'にほん', kanji: '日本', romaji: 'nihon', arti: 'Jepang', kategori: 'tempat' },
+            { kana: 'がっこう', kanji: '学校', romaji: 'gakkou', arti: 'Sekolah', kategori: 'tempat' },
+            { kana: 'えき', kanji: '駅', romaji: 'eki', arti: 'Stasiun', kategori: 'tempat' },
+            { kana: 'ねこ', kanji: '猫', romaji: 'neko', arti: 'Kucing', kategori: 'hewan' },
+            { kana: 'いぬ', kanji: '犬', romaji: 'inu', arti: 'Anjing', kategori: 'hewan' },
+            { kana: 'さかな', kanji: '魚', romaji: 'sakana', arti: 'Ikan', kategori: 'hewan' },
+            { kana: 'いち', kanji: '一', romaji: 'ichi', arti: 'Satu', kategori: 'angka' },
+            { kana: 'に', kanji: '二', romaji: 'ni', arti: 'Dua', kategori: 'angka' },
+            { kana: 'さん', kanji: '三', romaji: 'san', arti: 'Tiga', kategori: 'angka' },
+            { kana: 'たべる', kanji: '食べる', romaji: 'taberu', arti: 'Makan', kategori: 'kerja' },
+            { kana: 'のむ', kanji: '飲む', romaji: 'nomu', arti: 'Minum', kategori: 'kerja' },
+            { kana: 'みる', kanji: '見る', romaji: 'miru', arti: 'Melihat', kategori: 'kerja' },
+        ];
+
+        // Elemen DOM
+        const searchInput = document.getElementById('searchInput');
+        const categoryChips = document.getElementById('categoryChips');
+        const vocabList = document.getElementById('vocabList');
+
+        let activeCategory = 'semua';
+
+        function renderCategories() {
+            const categories = ['semua', ...new Set(vocabulary.map(item => item.kategori))];
+            categoryChips.innerHTML = '';
+            categories.forEach(category => {
+                const chip = document.createElement('button');
+                chip.className = 'chip';
+                chip.textContent = category.charAt(0).toUpperCase() + category.slice(1);
+                chip.dataset.category = category;
+                if (category === activeCategory) {
+                    chip.classList.add('active');
+                }
+                chip.addEventListener('click', () => {
+                    activeCategory = category;
+                    renderCategories();
+                    renderVocabList();
+                });
+                categoryChips.appendChild(chip);
+            });
+        }
+
+        function renderVocabList() {
+            const searchTerm = searchInput.value.toLowerCase();
+            
+            const filteredVocab = vocabulary.filter(item => {
+                const inCategory = activeCategory === 'semua' || item.kategori === activeCategory;
+                const matchesSearch = item.kana.includes(searchTerm) ||
+                                      item.romaji.includes(searchTerm) ||
+                                      item.arti.toLowerCase().includes(searchTerm) ||
+                                      (item.kanji && item.kanji.includes(searchTerm));
+                return inCategory && matchesSearch;
+            });
+
+            vocabList.innerHTML = '';
+            if (filteredVocab.length === 0) {
+                vocabList.innerHTML = '<li class="vocab-item"><div class="arti">Tidak ada hasil ditemukan.</div></li>';
+                return;
+            }
+
+            filteredVocab.forEach(item => {
+                const li = document.createElement('li');
+                li.className = 'vocab-item';
+                li.innerHTML = `
+                    <div class="vocab-jp">
+                        <span class="kanji">${item.kanji || item.kana}</span>
+                        ${item.kanji ? `<span class="kana">${item.kana}</span>` : ''}
+                    </div>
+                    <div class="vocab-id">
+                        <span class="arti">${item.arti}</span>
+                        <span class="romaji">${item.romaji}</span>
+                    </div>
+                    <i class="fa-solid fa-volume-up"></i>
+                `;
+                li.addEventListener('click', () => speak(item.kanji || item.kana));
+                vocabList.appendChild(li);
+            });
+        }
+
+        function speak(text) {
+            try {
+                if (!('speechSynthesis' in window)) {
+                    alert('Maaf, browser Anda tidak mendukung audio.');
+                    return;
+                }
+                speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'ja-JP';
+                utterance.rate = 0.9;
+                speechSynthesis.speak(utterance);
+            } catch (error) {
+                console.error('Error speaking text:', error);
+            }
+        }
+
+        // Event Listeners
+        searchInput.addEventListener('input', renderVocabList);
+
+        // Inisialisasi
+        document.addEventListener('DOMContentLoaded', () => {
+            renderCategories();
+            renderVocabList();
+        });
+    </script>
+</body>
+</html>

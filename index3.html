@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="pastel">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Tabel Kana Jepang — Hiragana & Katakana</title>
+    <meta name="description" content="Tabel lengkap Hiragana dan Katakana (Dasar, Dakuon, Handakuon, Youon) yang interaktif. Klik untuk mendengar audio pelafalan." />
+    <meta name="theme-color" content="#7a6cff">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;700&family=Noto+Serif+JP:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <style>
+        /* Menggunakan style yang sama dari index.html untuk konsistensi */
+        :root{
+            --bg:#f8fbff; --panel:#ffffff; --soft:#f2f6ff; --ink:#132030; --muted:#76849c;
+            --pri:#7a6cff; --sec:#16c6a1; --warn:#ff7b7b; --ok:#2fb875; --accent:#ffd166;
+            --btn:#e9eefc; --btnText:#0b101a; --border:rgba(19,32,48,.10);
+            --radius:18px; --shadow:0 6px 18px rgba(15,23,34,.08);
+            --ring: 0 0 0 3px rgba(122,108,255,.28);
+            --iconColor: var(--muted);
+            --transition-duration: 0.2s;
+        }
+        [data-theme="hc"]{
+            --bg:#0a0f1a; --panel:#0f1626; --soft:#0c1220; --ink:#e6efff; --muted:#9fb0cc;
+            --pri:#8fa8ff; --sec:#3dd8b5; --warn:#ff8c8c; --ok:#7be0b3; --accent:#ffd98a;
+            --btn:#18243a;
+            --btnText:#e6efff;
+            --border:rgba(230,239,255,.12);
+            --ring: 0 0 0 3px rgba(143,168,255,.35);
+            --iconColor: var(--ink);
+        }
+        *{box-sizing:border-box}
+        html, body { max-width: 100%; overflow-x: hidden; }
+        body {
+            min-height: 100svh;
+            margin:0;font-family:'Inter', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;background:
+            radial-gradient(900px 420px at -10% -20%, rgba(122,108,255,.10), transparent),
+            radial-gradient(900px 420px at 110% -30%, rgba(22,198,161,.12), transparent),
+            var(--bg);color:var(--ink);
+            transition: background-color var(--transition-duration) ease-out, color var(--transition-duration) ease-out;
+        }
+        .wrap{
+            max-width: 1200px; /* Lebar untuk tabel */
+            margin: auto;
+            padding: 16px;
+            padding-left: calc(16px + env(safe-area-inset-left));
+            padding-right: calc(16px + env(safe-area-inset-right));
+        }
+        header{position:sticky;top:0;z-index:30;background:linear-gradient(180deg, rgba(255,255,255,.92), rgba(255,255,255,.72));backdrop-filter: blur(8px);border-bottom:1px solid var(--border); padding-top:env(safe-area-inset-top);
+        transition: background var(--transition-duration) ease-out, backdrop-filter var(--transition-duration) ease-out, border-bottom-color var(--transition-duration) ease-out;}
+        [data-theme="hc"] header{background:linear-gradient(180deg, rgba(15,22,38,.86), rgba(15,22,38,.66))}
+        
+        .brand{ display:flex; align-items:center; gap:12px; justify-content: space-between; flex-wrap: wrap; }
+        .logo{width:36px;height:36px;border-radius:12px;background:linear-gradient(135deg,var(--pri),var(--sec));box-shadow:var(--shadow);
+        transition: box-shadow var(--transition-duration) ease-out, background var(--transition-duration) ease-out;}
+        h1{font-size:20px;margin:0}
+        .small{font-size:12px;color:var(--muted)}
+        .card{background:var(--panel);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px;border:1px solid var(--border);
+        transition: background-color var(--transition-duration) ease-out, border-color var(--transition-duration) ease-out, box-shadow var(--transition-duration) ease-out;}
+        .card h2{font-size:16px;margin:0 0 10px 0; display: flex; align-items: center; gap: 8px;}
+        .card h3{font-size:14px; margin: 16px 0 8px 0; color: var(--muted);}
+        .card h2 .icon { color: var(--iconColor); transition: color var(--transition-duration) ease-out;}
+        .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+        .btn{ min-height:52px; padding: 0 16px; border-radius: 12px; border: none; cursor: pointer; font-size: 14px; font-weight: 500; transition: all var(--transition-duration) ease-out; color: var(--ink); background: var(--btn); display: flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none; }
+        .btn:active{transform:translateY(1px)}
+        .btn.primary{ background:linear-gradient(135deg, var(--pri), var(--sec)); color:white; }
+        .btn.ghost{background:transparent;outline:1px solid var(--border); color: var(--ink);}
+        .btn:focus-visible{outline:none; box-shadow:var(--ring); outline-offset: 3px;}
+        .spacer{height:16px}
+        .main-nav { width: 100%; margin-top: 12px; padding-top: 8px; border-top: 1px solid var(--border); }
+        .main-nav .row { justify-content: center; }
+        .main-nav .btn { flex-grow: 1; }
+        @media (min-width: 768px) { .main-nav .btn { flex-grow: 0; } }
+        .seg{display:flex;border:1px solid var(--border);border-radius:12px;overflow:hidden; transition: border-color var(--transition-duration) ease-out;}
+        .seg button{ flex:1; background:var(--soft); border:none; padding: 12px 16px; font-size: 14px; cursor: pointer; transition: all var(--transition-duration) ease-out; color: var(--ink); }
+        .seg button.active{background:linear-gradient(135deg, rgba(122,108,255,.18), rgba(22,198,161,.18))}
+        [data-theme="hc"] .seg button.active{background:linear-gradient(135deg, rgba(143,168,255,.15), rgba(61,216,181,.15))}
+
+        /* Style khusus untuk Tabel Kana */
+        .kana-table-wrapper {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        .kana-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: center;
+            font-family: 'Noto Sans JP', sans-serif;
+        }
+        .kana-table th, .kana-table td {
+            border: 1px solid var(--border);
+            padding: 8px;
+            min-width: 70px;
+        }
+        .kana-table th {
+            background-color: var(--soft);
+            font-weight: 600;
+            color: var(--muted);
+        }
+        .kana-table td {
+            cursor: pointer;
+            transition: background-color var(--transition-duration) ease-out;
+        }
+        .kana-table td:hover {
+            background-color: var(--soft);
+        }
+        .kana-char {
+            font-size: 28px;
+            line-height: 1.2;
+        }
+        .romaji-char {
+            font-size: 12px;
+            color: var(--muted);
+        }
+        .empty-cell {
+            background-color: rgba(0,0,0,0.02);
+        }
+        [data-theme="hc"] .empty-cell {
+            background-color: rgba(255,255,255,0.04);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="wrap">
+            <div class="brand">
+                <svg class="logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="36" height="36">
+                    <defs>
+                        <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+                            <stop stop-color="#7a6cff"/><stop offset="1" stop-color="#16c6a1"/>
+                        </linearGradient>
+                    </defs>
+                    <rect width="64" height="64" rx="14" fill="url(#g)"/>
+                    <text x="50%" y="50%" text-anchor="middle" dominant-baseline="middle"
+                          font-family="Noto Sans JP, 'Noto Serif JP', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif"
+                          font-size="38" fill="white" dy="-2">あ</text>
+                </svg>
+                <div>
+                    <h1>Pelatih Kana Jepang</h1>
+                    <div class="small">Tabel Hiragana & Katakana Lengkap</div>
+                </div>
+            </div>
+             <!-- NAVIGASI UTAMA -->
+             <nav class="main-nav">
+                <div class="row">
+                    <a href="index.html" class="btn ghost"><i class="fa-solid fa-home"></i> Latihan</a>
+                    <a href="index2.html" class="btn ghost"><i class="fa-solid fa-clone"></i> Flashcard</a>
+                    <a href="index3.html" class="btn primary"><i class="fa-solid fa-table"></i> Tabel Kana</a>
+                    <a href="index4.html" class="btn ghost"><i class="fa-solid fa-book-open"></i> Kosakata</a>
+                    <a href="index5.html" class="btn ghost"><i class="fa-solid fa-comments"></i> Ungkapan</a>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <main class="wrap">
+        <div class="card">
+            <h2><i class="fa-solid fa-table icon"></i> Tabel Referensi Kana</h2>
+            <div class="small">Pilih tabel yang ingin ditampilkan. Klik pada karakter untuk mendengar suaranya.</div>
+            <div class="spacer"></div>
+            <div class="seg" role="tablist" aria-label="Pilih Tabel">
+                <button id="showHira" class="btn active" role="tab" aria-selected="true" type="button">Hiragana (ひらがな)</button>
+                <button id="showKata" class="btn" role="tab" aria-selected="false" type="button">Katakana (カタカナ)</button>
+            </div>
+        </div>
+
+        <div class="spacer"></div>
+
+        <div class="card">
+            <div id="tableContainer" class="kana-table-wrapper">
+                <!-- Tabel akan digenerate oleh JavaScript di sini -->
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // DATA KANA (Sama seperti di file lain)
+        const HIRA_MAP = new Map([
+            ['a','あ'], ['i','い'], ['u','う'], ['e','え'], ['o','お'],
+            ['ka','か'], ['ki','き'], ['ku','く'], ['ke','け'], ['ko','こ'],
+            ['sa','さ'], ['shi','し'], ['su','す'], ['se','せ'], ['so','そ'],
+            ['ta','た'], ['chi','ち'], ['tsu','つ'], ['te','て'], ['to','と'],
+            ['na','な'], ['ni','に'], ['nu','ぬ'], ['ne','ね'], ['no','の'],
+            ['ha','は'], ['hi','ひ'], ['fu','ふ'], ['he','へ'], ['ho','ほ'],
+            ['ma','ま'], ['mi','み'], ['mu','む'], ['me','め'], ['mo','も'],
+            ['ya','や'], ['yu','ゆ'], ['yo','よ'],
+            ['ra','ら'], ['ri','り'], ['ru','る'], ['re','れ'], ['ro','ろ'],
+            ['wa','わ'], ['wo','を'], ['n','ん'],
+            ['ga','が'], ['gi','ぎ'], ['gu','ぐ'], ['ge','げ'], ['go','ご'],
+            ['za','ざ'], ['ji','じ'], ['zu','ず'], ['ze','ぜ'], ['zo','ぞ'],
+            ['da','だ'], ['dji','ぢ'], ['dzu','づ'], ['de','で'], ['do','ど'],
+            ['ba','ば'], ['bi','び'], ['bu','ぶ'], ['be','べ'], ['bo','ぼ'],
+            ['pa','ぱ'], ['pi','ぴ'], ['pu','ぷ'], ['pe','ぺ'], ['po','ぽ'],
+            ['kya','きゃ'], ['kyu','きゅ'], ['kyo','きょ'],
+            ['sha','しゃ'], ['shu','しゅ'], ['sho','しょ'],
+            ['cha','ちゃ'], ['chu','ちゅ'], ['cho','ちょ'],
+            ['nya','にゃ'], ['nyu','にゅ'], ['nyo','にょ'],
+            ['hya','ひゃ'], ['hyu','ひゅ'], ['hyo','ひょ'],
+            ['mya','みゃ'], ['myu','みゅ'], ['myo','みょ'],
+            ['rya','りゃ'], ['ryu','りゅ'], ['ryo','りょ'],
+            ['gya','ぎゃ'], ['gyu','ぎゅ'], ['gyo','ぎょ'],
+            ['ja','じゃ'], ['ju','じゅ'], ['jo','じょ'],
+            ['bya','びゃ'], ['byu','びゅ'], ['byo','びょ'],
+            ['pya','ぴゃ'], ['pyu','ぴゅ'], ['pyo','ぴょ']
+        ]);
+
+        const KATA_MAP = new Map([
+            ['a','ア'], ['i','イ'], ['u','ウ'], ['e','エ'], ['o','オ'],
+            ['ka','カ'], ['ki','キ'], ['ku','ク'], ['ke','ケ'], ['ko','コ'],
+            ['sa','サ'], ['shi','シ'], ['su','ス'], ['se','セ'], ['so','ソ'],
+            ['ta','タ'], ['chi','チ'], ['tsu','ツ'], ['te','テ'], ['to','ト'],
+            ['na','ナ'], ['ni','ニ'], ['nu','ヌ'], ['ne','ネ'], ['no','ノ'],
+            ['ha','ハ'], ['hi','ヒ'], ['fu','フ'], ['he','ヘ'], ['ho','ホ'],
+            ['ma','マ'], ['mi','ミ'], ['mu','ム'], ['me','メ'], ['mo','モ'],
+            ['ya','ヤ'], ['yu','ユ'], ['yo','ヨ'],
+            ['ra','ラ'], ['ri','リ'], ['ru','ル'], ['re','レ'], ['ro','ロ'],
+            ['wa','ワ'], ['wo','ヲ'], ['n','ン'],
+            ['ga','ガ'], ['gi','ギ'], ['gu','グ'], ['ge','ゲ'], ['go','ゴ'],
+            ['za','ザ'], ['ji','ジ'], ['zu','ズ'], ['ze','ゼ'], ['zo','ゾ'],
+            ['da','ダ'], ['dji','ヂ'], ['dzu','ヅ'], ['de','デ'], ['do','ド'],
+            ['ba','バ'], ['bi','ビ'], ['bu','ブ'], ['be','ベ'], ['bo','ボ'],
+            ['pa','パ'], ['pi','ピ'], ['pu','プ'], ['pe','ペ'], ['po','ポ'],
+            ['kya','キャ'], ['kyu','キュ'], ['kyo','キョ'],
+            ['sha','シャ'], ['shu','シュ'], ['sho','ショ'],
+            ['cha','チャ'], ['chu','チュ'], ['cho','チョ'],
+            ['nya','ニャ'], ['nyu','ニュ'], ['nyo','ニョ'],
+            ['hya','ヒャ'], ['hyu','ヒュ'], ['hyo','ヒョ'],
+            ['mya','ミャ'], ['myu','ミュ'], ['myo','ミョ'],
+            ['rya','リャ'], ['ryu','リュ'], ['ryo','リョ'],
+            ['gya','ギャ'], ['gyu','ギュ'], ['gyo','ギョ'],
+            ['ja','ジャ'], ['ju','ジュ'], ['jo','ジョ'],
+            ['bya','ビャ'], ['byu','ビュ'], ['byo','ビョ'],
+            ['pya','ピャ'], ['pyu','ピュ'], ['pyo','ピョ']
+        ]);
+
+        // Struktur Tabel
+        const VOWELS = ['a', 'i', 'u', 'e', 'o'];
+        const BASE_CONSONANTS = ['', 'k', 's', 't', 'n', 'h', 'm', 'y', 'r', 'w'];
+        const DAKUON_CONSONANTS = ['g', 'z', 'd', 'b', 'p'];
+        const YOUON_CONSONANTS = ['ky', 'sh', 'ch', 'ny', 'hy', 'my', 'ry', 'gy', 'j', 'by', 'py'];
+        const YOUON_VOWELS = ['a', 'u', 'o'];
+
+
+        const tableContainer = document.getElementById('tableContainer');
+        const showHiraBtn = document.getElementById('showHira');
+        const showKataBtn = document.getElementById('showKata');
+
+        function createCell(kanaMap, romaji) {
+            const td = document.createElement('td');
+            const kana = kanaMap.get(romaji);
+            if (kana) {
+                td.innerHTML = `<div class="kana-char">${kana}</div><div class="romaji-char">${romaji}</div>`;
+                td.dataset.kana = kana;
+                td.addEventListener('click', () => speak(kana));
+            } else {
+                td.className = 'empty-cell';
+            }
+            return td;
+        }
+
+        function generateTable(type) {
+            const kanaMap = type === 'hira' ? HIRA_MAP : KATA_MAP;
+            let html = '';
+
+            // 1. Tabel Dasar (Gojuuon)
+            html += '<h3>Dasar (Gojuuon)</h3>';
+            html += '<table class="kana-table"><thead><tr><th></th><th>A</th><th>I</th><th>U</th><th>E</th><th>O</th></tr></thead><tbody>';
+            BASE_CONSONANTS.forEach(c => {
+                html += `<tr><th>${c.toUpperCase()}</th>`;
+                VOWELS.forEach(v => {
+                    const romaji = c + v;
+                    const kana = kanaMap.get(romaji);
+                    if (['yi', 'ye', 'wi', 'wu', 'we'].includes(romaji)) {
+                         html += '<td class="empty-cell"></td>';
+                    } else if (kana) {
+                        html += `<td data-kana="${kana}"><div class="kana-char">${kana}</div><div class="romaji-char">${romaji}</div></td>`;
+                    }
+                });
+                html += '</tr>';
+            });
+            html += `<tr><th></th><td data-kana="${kanaMap.get('n')}"><div class="kana-char">${kanaMap.get('n')}</div><div class="romaji-char">n</div></td><td colspan="4" class="empty-cell"></td></tr>`;
+            html += '</tbody></table>';
+
+            // 2. Tabel Dakuon & Handakuon
+            html += '<div class="spacer"></div><h3>Dakuon (゛) & Handakuon (゜)</h3>';
+            html += '<table class="kana-table"><thead><tr><th></th><th>A</th><th>I</th><th>U</th><th>E</th><th>O</th></tr></thead><tbody>';
+            DAKUON_CONSONANTS.forEach(c => {
+                html += `<tr><th>${c.toUpperCase()}</th>`;
+                VOWELS.forEach(v => {
+                    let romaji = c + v;
+                    if (c === 'z' && v === 'i') romaji = 'ji';
+                    if (c === 'd' && v === 'i') romaji = 'dji';
+                    if (c === 'd' && v === 'u') romaji = 'dzu';
+                    
+                    const kana = kanaMap.get(romaji);
+                    if (kana) {
+                        html += `<td data-kana="${kana}"><div class="kana-char">${kana}</div><div class="romaji-char">${romaji}</div></td>`;
+                    } else {
+                        html += '<td class="empty-cell"></td>';
+                    }
+                });
+                html += '</tr>';
+            });
+            html += '</tbody></table>';
+            
+            // 3. Tabel Youon
+            html += '<div class="spacer"></div><h3>Youon (拗音)</h3>';
+            html += '<table class="kana-table"><thead><tr><th></th><th>YA</th><th>YU</th><th>YO</th></tr></thead><tbody>';
+            YOUON_CONSONANTS.forEach(c => {
+                 html += `<tr><th>${c.toUpperCase()}</th>`;
+                 YOUON_VOWELS.forEach(v => {
+                    let romaji = c + v;
+                    if (c === 'j') romaji = c + (v === 'a' ? 'a' : v === 'u' ? 'u' : 'o'); // ja, ju, jo
+                    else if (['sh', 'ch'].includes(c) && v === 'i') { // shi, chi tidak ada di youon
+                        html += '<td class="empty-cell"></td>';
+                        return;
+                    }
+
+                    const kana = kanaMap.get(romaji);
+                     if (kana) {
+                        html += `<td data-kana="${kana}"><div class="kana-char">${kana}</div><div class="romaji-char">${romaji}</div></td>`;
+                    } else {
+                        html += '<td class="empty-cell"></td>';
+                    }
+                 });
+                 html += '</tr>';
+            });
+            html += '</tbody></table>';
+
+            tableContainer.innerHTML = html;
+            
+            // Tambahkan event listener setelah tabel dibuat
+            document.querySelectorAll('.kana-table td[data-kana]').forEach(cell => {
+                cell.addEventListener('click', () => speak(cell.dataset.kana));
+            });
+        }
+        
+        function speak(text) {
+            try {
+                if (!('speechSynthesis' in window)) {
+                    alert('Maaf, browser Anda tidak mendukung audio.');
+                    return;
+                }
+                speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'ja-JP';
+                utterance.rate = 0.9;
+                speechSynthesis.speak(utterance);
+            } catch (error) {
+                console.error('Error speaking text:', error);
+            }
+        }
+
+        showHiraBtn.addEventListener('click', () => {
+            generateTable('hira');
+            showHiraBtn.classList.add('active');
+            showKataBtn.classList.remove('active');
+        });
+
+        showKataBtn.addEventListener('click', () => {
+            generateTable('kata');
+            showKataBtn.classList.add('active');
+            showHiraBtn.classList.remove('active');
+        });
+
+        // Inisialisasi
+        document.addEventListener('DOMContentLoaded', () => {
+            generateTable('hira'); // Tampilkan Hiragana secara default
+        });
+    </script>
+</body>
+</html>

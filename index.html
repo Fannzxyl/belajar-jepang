@@ -130,6 +130,26 @@
             margin-top: 0;
             flex-basis: auto;
         }
+        
+        /* Navigasi Baru */
+        .main-nav {
+            width: 100%;
+            margin-top: 12px;
+            padding-top: 8px;
+            border-top: 1px solid var(--border);
+        }
+        .main-nav .row {
+            justify-content: center;
+        }
+        .main-nav .btn {
+            flex-grow: 1;
+        }
+        @media (min-width: 768px) {
+            .main-nav .btn {
+                flex-grow: 0;
+            }
+        }
+
 
         @media (max-width: 767px) {
             header { position: static; } 
@@ -232,6 +252,7 @@
             align-items: center;
             justify-content: center;
             gap: 8px;
+            text-decoration: none; /* Tambahan untuk link */
         }
         .btn:active{transform:translateY(1px)}
         .btn.primary{
@@ -341,20 +362,18 @@
         .progress{height:10px;background:rgba(0,0,0,.08);border-radius:999px;overflow:hidden}
         .bar{height:100%;width:0;background:linear-gradient(90deg,var(--pri),var(--sec),var(--accent));transition:width var(--transition-duration) ease}
 
+        /* PATCH: CSS Modal */
         .modal{
-            position:fixed; inset:0; display:none;
-            align-items:center; justify-content:center;
-            background: rgba(0,0,0,.45);
-            z-index:999;
-            /* PATCH: Transition for modal */
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity var(--transition-duration) ease-out;
+          position:fixed; inset:0;
+          display:flex; align-items:center; justify-content:center;
+          background: rgba(0,0,0,.45);
+          z-index:999;
+          opacity: 0;
+          pointer-events: none;
+          transition: opacity var(--transition-duration) ease-out;
         }
-        .modal.is-open {
-            opacity: 1;
-            pointer-events: auto;
-        }
+        .modal[hidden]{ display:none; }
+        .modal.is-open { opacity:1; pointer-events:auto; }
 
         @supports (backdrop-filter: blur(6px)) {
             @media (min-width: 768px) {
@@ -396,8 +415,7 @@
             .toast { transition: none !important; }
             /* PATCH: Lite mode will also disable animations */
             [data-lite="1"] * {animation-duration:0.01ms !important; animation-iteration-count:1 !important; transition-duration:0.01ms !important; scroll-behavior:auto !important}
-            [data-lite="1"] #qKana.correct-answer, [data-lite="1"] #qKana.wrong-answer, [data-lite="1"] #streakCounter.grow { animation:none !important }
-            [data-lite="1"] .toast { transition: none !important; }
+            [data-lite="1"] #qKana.correct-answer, [data-lite="1"] #qKana.wrong-answer, [data-lite="1"] .toast { transition: none !important; }
         }
 
         /* === Writer (Latihan Menulis) === */
@@ -572,9 +590,119 @@
         /* (Opsional) sembunyikan scrollbar yang kasar di WebKit tanpa mematikan scroll */
         #subsetChips::-webkit-scrollbar{ height: 8px; }
         #subsetChips::-webkit-scrollbar-thumb{ background: var(--border); border-radius: 999px; }
+
+        /* New styles for sidebar */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: -300px; /* Hidden by default */
+            width: 280px;
+            height: 100%;
+            background: var(--panel);
+            box-shadow: var(--shadow);
+            z-index: 1000;
+            transition: left 0.3s ease-in-out;
+            padding: 20px;
+            padding-top: calc(20px + env(safe-area-inset-top));
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            overflow-y: auto;
+            border-right: 1px solid var(--border);
+        }
+
+        .sidebar.is-open {
+            left: 0;
+        }
+
+        .sidebar-toggle-btn {
+            position: fixed;
+            top: 16px;
+            left: 16px;
+            z-index: 1001; /* Above sidebar */
+            background: var(--btn);
+            border: 1px solid var(--border);
+            border-radius: 50%;
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease-in-out;
+        }
+
+        .sidebar-toggle-btn:hover {
+            background: var(--soft);
+        }
+
+        .sidebar-toggle-btn i {
+            color: var(--ink);
+            font-size: 20px;
+        }
+
+        /* Adjust main content when sidebar is open on desktop */
+        @media (min-width: 768px) {
+            body.sidebar-open {
+                padding-left: 280px;
+            }
+            .sidebar-toggle-btn {
+                left: 16px; /* Stays on the left */
+            }
+            .sidebar.is-open + .sidebar-toggle-btn {
+                left: 296px; /* Moves with the sidebar */
+            }
+        }
+
+        /* Ensure header content is not hidden by sidebar toggle button */
+        header .brand {
+            position: relative;
+            z-index: 1002;
+            padding-left: 60px; /* Space for the toggle button */
+        }
+        @media (max-width: 767px) {
+            .sidebar-toggle-btn {
+                top: calc(16px + env(safe-area-inset-top));
+            }
+            header .brand {
+                padding-left: 0; /* No extra padding on mobile, as button is fixed */
+            }
+        }
     </style>
 </head>
 <body>
+    <!-- Sidebar Toggle Button -->
+    <button id="sidebarToggle" class="sidebar-toggle-btn" aria-label="Toggle Sidebar">
+        <i class="fa-solid fa-bars"></i>
+    </button>
+
+    <!-- Sidebar Content -->
+    <aside id="sidebar" class="sidebar">
+        <div class="row" style="justify-content: space-between; align-items: center;">
+            <h3 style="margin:0;">Navigasi</h3>
+            <button class="btn ghost" id="closeSidebar" aria-label="Tutup Sidebar">
+                <i class="fa-solid fa-times"></i>
+            </button>
+        </div>
+        <hr style="border: none; border-top: 1px solid var(--border); width: 100%;">
+        <button class="btn" onclick="scrollToSection('learnTitle')">
+            <i class="fa-solid fa-book"></i> Belajar
+        </button>
+        <button class="btn" onclick="scrollToSection('testTitle')">
+            <i class="fa-solid fa-pencil-alt"></i> Tes
+        </button>
+        <button class="btn" onclick="scrollToSection('pomoTitle')">
+            <i class="fa-solid fa-clock"></i> Timer Pomodoro
+        </button>
+        <button class="btn" onclick="scrollToSection('trackTitle')">
+            <i class="fa-solid fa-chart-line"></i> Tracker Kana
+        </button>
+        <button class="btn" onclick="scrollToSection('writerTitle')">
+            <i class="fa-solid fa-pen-fancy"></i> Latihan Menulis
+        </button>
+    </aside>
+
     <header>
         <div class="wrap">
             <div class="brand" style="gap:10px">
@@ -607,12 +735,22 @@
                     <label class="btn ghost" id="liteModeToggleBtn" style="display:flex;align-items:center;gap:8px">
                         <input id="liteToggle" type="checkbox" aria-label="Mode Ringan" /> Lite Mode
                     </label>
-                    <button id="exportBtn" class="btn ghost" type="button" title="Simpan progres ke file"><i class="fas fa-download"></i> Simpan Progres ke File</button>
+                    <button id="exportBtn" class="btn ghost" type="button" title="Simpan progres ke file"><i class="fa-solid fa-download"></i> Simpan Progres ke File</button>
                     <input type="file" id="importFile" accept=".json" style="display:none;" aria-label="Pulihkan progres dari file">
-                    <button id="importBtn" class="btn ghost" type="button" title="Pulihkan progres dari file"><i class="fas fa-upload"></i> Pulihkan Progres dari File</button>
+                    <button id="importBtn" class="btn ghost" type="button" title="Pulihkan progres dari file"><i class="fa-solid fa-upload"></i> Pulihkan Progres dari File</button>
                     <button id="resetBtn" class="btn ghost" type="button" title="Atur ulang semua progres">Atur Ulang Semua</button>
                 </div>
             </div>
+            <!-- PENAMBAHAN NAVIGASI UTAMA -->
+            <nav class="main-nav">
+                <div class="row">
+                    <a href="index.html" class="btn primary"><i class="fa-solid fa-home"></i> Latihan</a>
+                    <a href="index2.html" class="btn ghost"><i class="fa-solid fa-clone"></i> Flashcard</a>
+                    <a href="index3.html" class="btn ghost"><i class="fa-solid fa-table"></i> Tabel Kana</a>
+                    <a href="index4.html" class="btn ghost"><i class="fa-solid fa-book-open"></i> Kosakata</a>
+                    <a href="index5.html" class="btn ghost"><i class="fa-solid fa-comments"></i> Ungkapan</a>
+                </div>
+            </nav>
         </div>
     </header>
 
@@ -620,7 +758,7 @@
         <!-- LEARN MODE -->
         <section class="grid" aria-labelledby="learnTitle">
             <div class="card" style="grid-column: span 12;">
-                <h2 id="learnTitle"><i class="fas fa-book icon"></i> Belajar (Pilih Rentang Kana)</h2>
+                <h2 id="learnTitle"><i class="fa-solid fa-book icon"></i> Belajar (Pilih Rentang Kana)</h2>
                 <div class="small">Pilih set (Hiragana/Katakana) dan rentang fleksibel. Ketuk tile untuk dengar pelafalan.</div>
                 <div class="spacer"></div>
                 <div class="row">
@@ -630,7 +768,7 @@
                     </select>
                     <select id="fromGrp" aria-label="Dari kelompok"></select>
                     <select id="toGrp" aria-label="Sampai kelompok"></select>
-                    <button class="btn primary" id="btnShowLearn" type="button"><i class="fas fa-eye"></i> Tampilkan</button>
+                    <button class="btn primary" id="btnShowLearn" type="button"><i class="fa-solid fa-eye"></i> Tampilkan</button>
                 </div>
                 <div class="spacer"></div>
                 <div id="learnTiles" class="pillbox" aria-live="polite">
@@ -644,7 +782,7 @@
         <section class="grid" aria-labelledby="testTitle">
             <div class="card" style="grid-column: span 12;">
                 <!-- PATCH: Ganti heading & deskripsi bagian Tes jadi lebih pendek -->
-                <h2 id="testTitle"><i class="fas fa-pencil-alt icon"></i> Tes</h2>
+                <h2 id="testTitle"><i class="fa-solid fa-pencil-alt icon"></i> Tes</h2>
                 <div class="small">
                     Pilih subset atau rentang. Tentukan tipe & mode, lalu jumlah soal.
                 </div>
@@ -705,9 +843,9 @@
                 </div>
                 <div class="spacer"></div>
                 <div class="row" style="justify-content: center;">
-                    <button class="btn primary" id="btnStart" type="button"><i class="fas fa-play"></i> Mulai Tes</button>
-                    <button class="btn" id="btnSkip" type="button" title="Lewati soal (→)"><i class="fas fa-forward"></i> Lewati</button>
-                    <button class="btn warn" id="btnEnd" type="button"><i class="fas fa-stop"></i> Selesai</button>
+                    <button class="btn primary" id="btnStart" type="button"><i class="fa-solid fa-play"></i> Mulai Tes</button>
+                    <button class="btn" id="btnSkip" type="button" title="Lewati soal (→)"><i class="fa-solid fa-forward"></i> Lewati</button>
+                    <button class="btn warn" id="btnEnd" type="button"><i class="fa-solid fa-stop"></i> Selesai</button>
                 </div>
 
                 <div class="spacer"></div>
@@ -717,12 +855,12 @@
                     <div id="promptWrap" style="display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap">
                         <div id="qKana" style="font-size:64px;line-height:1.1;margin:6px 0">あ</div>
                         <!-- PATCH: Tombol replay audio -->
-                        <button class="btn ghost" id="btnReplayAudio" type="button" title="Putar lagi" hidden><i class="fas fa-volume-up"></i></button>
+                        <button class="btn ghost" id="btnReplayAudio" type="button" title="Putar lagi" hidden><i class="fa-solid fa-volume-up"></i></button>
                     </div>
                     <div id="typeWrap" style="max-width:520px;margin:0 auto">
-                        <input id="ans" placeholder="Ketik jawaban kamu di sini…" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" inputmode="latin" aria-label="Jawaban" />
+                        <input id="ans" placeholder="Ketik jawaban kamu di sini…" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" inputmode="text" aria-label="Jawaban" />
                         <div class="spacer"></div>
-                        <button class="btn" id="btnCheck" type="button"><i class="fas fa-check"></i> Cek (Enter)</button>
+                        <button class="btn" id="btnCheck" type="button"><i class="fa-solid fa-check"></i> Cek (Enter)</button>
                     </div>
                     <div id="mcWrap" class="optwrap" hidden>
                         <button class="btn opt" id="optA" aria-label="Pilihan A" type="button">A</button>
@@ -744,7 +882,7 @@
         <!-- POMODORO -->
         <section class="grid" aria-labelledby="pomoTitle" id="pomoSection">
             <div class="card">
-                <h2 id="pomoTitle"><i class="fas fa-clock icon"></i> Timer Pomodoro (Opsional)</h2>
+                <h2 id="pomoTitle"><i class="fa-solid fa-clock icon"></i> Timer Pomodoro (Opsional)</h2>
                 <div class="small">Default 25/5, bisa diubah. Status dan sisa waktu tersimpan otomatis.</div>
                 <div class="row" role="group" aria-label="Kontrol Pomodoro">
                     <label>
@@ -755,9 +893,9 @@
                         <span class="sr-only">Menit istirahat</span>
                         <input id="pomoBreak" type="number" min="1" value="5" style="width:90px"> menit istirahat
                     </label>
-                    <button class="btn primary" id="pStart" type="button"><i class="fas fa-play"></i> Mulai</button>
-                    <button class="btn" id="pPause" type="button"><i class="fas fa-pause"></i> Pause</button>
-                    <button class="btn warn" id="pReset" type="button"><i class="fas fa-redo"></i> Reset</button>
+                    <button class="btn primary" id="pStart" type="button"><i class="fa-solid fa-play"></i> Mulai</button>
+                    <button class="btn" id="pPause" type="button"><i class="fa-solid fa-pause"></i> Pause</button>
+                    <button class="btn warn" id="pReset" type="button"><i class="fa-solid fa-redo"></i> Reset</button>
                 </div>
                 <div class="spacer"></div>
                 <div class="center">
@@ -770,7 +908,7 @@
         <!-- TRACKER -->
         <section class="grid" aria-labelledby="trackTitle" id="trackerSection">
             <div class="card">
-                <h2 id="trackTitle"><i class="fas fa-chart-line icon"></i> Tracker Kana</h2>
+                <h2 id="trackTitle"><i class="fa-solid fa-chart-line icon"></i> Tracker Kana</h2>
                 <div class="small">Ketuk untuk tandai sudah hafal. Tahan (long-press) untuk batal.</div>
                 <div class="spacer"></div>
                 <div class="row">
@@ -806,7 +944,7 @@
         <!-- WRITER / LATIHAN MENULIS -->
         <section class="grid" aria-labelledby="writerTitle" id="writerSection">
             <div class="card" style="grid-column: span 12;">
-                <h2 id="writerTitle"><i class="fas fa-pen-fancy icon"></i> Latihan Menulis (Hiragana/Katakana)</h2>
+                <h2 id="writerTitle"><i class="fa-solid fa-pen-fancy icon"></i> Latihan Menulis (Hiragana/Katakana)</h2>
                 <div class="small">Gambar huruf dengan jari/mouse. Nyalakan <b>Panduan</b> untuk meniru bentuk.</div>
                 <div class="spacer"></div>
 
@@ -816,21 +954,21 @@
                         <option value="kata">Katakana</option>
                     </select>
                     <select id="writeKana" aria-label="Pilih kana"></select>
-                    <button class="btn" id="writePrev" type="button" title="Sebelumnya"><i class="fas fa-chevron-left"></i> Sebelumnya</button>
-                    <button class="btn" id="writeNext" type="button" title="Berikutnya">Berikutnya <i class="fas fa-chevron-right"></i></button>
-                    <button class="btn" id="writeRand" type="button" title="Acak"><i class="fas fa-shuffle"></i> Acak</button>
-                    <button class="btn" id="writeSpeak" type="button" title="Dengar pelafalan kana"><i class="fas fa-volume-up"></i></button>
+                    <button class="btn" id="writePrev" type="button" title="Sebelumnya"><i class="fa-solid fa-chevron-left"></i> Sebelumnya</button>
+                    <button class="btn" id="writeNext" type="button" title="Berikutnya">Berikutnya <i class="fa-solid fa-chevron-right"></i></button>
+                    <button class="btn" id="writeRand" type="button" title="Acak"><i class="fa-solid fa-shuffle"></i> Acak</button>
+                    <button class="btn" id="writeSpeak" type="button" title="Dengar pelafalan kana"><i class="fa-solid fa-volume-up"></i></button>
                 </div>
 
                 <div class="spacer"></div>
 
                 <div class="writer-toolbar">
-                    <button class="btn ok" id="penBtn" type="button"><i class="fas fa-pen"></i> Pena</button>
-                    <button class="btn" id="eraserBtn" type="button"><i class="fas fa-eraser"></i> Penghapus</button>
+                    <button class="btn ok" id="penBtn" type="button"><i class="fa-solid fa-pen"></i> Pena</button>
+                    <button class="btn" id="eraserBtn" type="button"><i class="fa-solid fa-eraser"></i> Penghapus</button>
                     <div class="slider">
                         <label for="penSize">Ukuran</label>
                         <input id="penSize" type="range" min="2" max="28" value="10" style="width:140px">
-                    </div>
+                    </div >
                     <label class="btn ghost" style="gap:8px">
                         <input id="gridToggle" type="checkbox"> Grid
                     </label>
@@ -841,9 +979,9 @@
                         <input id="autoSnapToggle" type="checkbox"> Auto-Snap
                     </label>
                     <div style="flex:1"></div>
-                    <button class="btn" id="undoStroke" type="button" title="Undo (Ctrl+Z)"><i class="fas fa-undo"></i> Undo</button>
-                    <button class="btn warn" id="clearCanvas" type="button"><i class="fas fa-redo"></i> Bersihkan</button>
-                    <button class="btn primary" id="savePNG" type="button"><i class="fas fa-download"></i> Simpan PNG</button>
+                    <button class="btn" id="undoStroke" type="button" title="Undo (Ctrl+Z)"><i class="fa-solid fa-undo"></i> Undo</button>
+                    <button class="btn warn" id="clearCanvas" type="button"><i class="fa-solid fa-redo"></i> Bersihkan</button>
+                    <button class="btn primary" id="savePNG" type="button"><i class="fa-solid fa-download"></i> Simpan PNG</button>
                 </div>
 
                 <div class="spacer"></div>
@@ -859,22 +997,23 @@
     </main>
 
     <!-- Celebration Modal / Review -->
-    <div id="celebrate" class="modal" aria-modal="true" role="dialog" aria-labelledby="celebrateTitle" aria-describedby="celebrateMsg">
+    <div id="celebrate" class="modal" aria-modal="true" role="dialog" aria-labelledby="celebrateTitle" aria-describedby="celebrateMsg" hidden>
         <div class="box">
             <h3 id="celebrateTitle" style="margin:0 0 6px 0">Tes selesai! 🎉</h3>
             <div id="celebrateMsg" class="small">Skor: 0/0</div>
             <div class="spacer"></div>
             <div id="reviewWrap" style="text-align:left;max-height:40vh;overflow:auto;margin:8px 0" hidden></div>
             <div class="row" style="justify-content:center">
-                <button class="btn" id="btnReviewWrong" hidden type="button"><i class="fas fa-redo-alt"></i> Belajar ulang yang salah</button>
-                <button class="btn primary" id="btnCloseModal" type="button"><i class="fas fa-times"></i> Lanjut</button>
+                <button class="btn" id="btnReviewWrong" hidden type="button"><i class="fa-solid fa-redo-alt"></i> Belajar ulang yang salah</button>
+                <button class="btn primary" id="btnCloseModal" type="button"><i class="fa-solid fa-times"></i> Lanjut</button>
             </div>
         </div>
         <div id="burst" class="burst" aria-hidden="true"></div>
     </div>
 
     <!-- Onboarding Modal -->
-    <div id="onboardingModal" class="modal" aria-modal="true" role="dialog" aria-labelledby="onboardingTitle" aria-describedby="onboardingMsg" hidden>
+    <div id="onboardingModal" class="modal" aria-modal="true" role="dialog"
+     aria-labelledby="onboardingTitle" aria-describedby="onboardingMsg" hidden>
         <div class="box">
             <h3 id="onboardingTitle" style="margin:0 0 6px 0">Selamat Datang di Pelatih Kana Jepang! 👋</h3>
             <div id="onboardingMsg" class="small">
@@ -886,7 +1025,6 @@
             <div class="spacer"></div>
             <div class="row" style="justify-content:center">
                 <button class="btn primary" id="btnStartLearningOnboarding" type="button">Mulai Belajar!</button>
-            </div>
             </div>
         </div>
     </div>
@@ -953,7 +1091,7 @@
             feedback_wrong: (kana, romaji, user_input) => `Belum pas. ${kana} dibaca ${romaji}. Jawaban kamu: ${user_input}. Coba lagi ya.`,
             feedback_wrong_dji_dzu: (kana, romaji, user_input) => `Belum pas. ${kana} dibaca ${romaji} (boleh juga ji/zu). Jawaban kamu: ${user_input}. Coba lagi ya.`,
             feedback_skipped: 'Oke, kita lanjut dulu.',
-            writer_snap_success: 'Rapi! Bentuknya sudah pas 👌',
+            writer_snap_success: 'Rapi! Bentuknya sudah pas ',
             writer_snap_fail: 'Hampir! Coba garisnya sedikit lebih melengkung.',
             // PATCH: String lokal baru
             confuse_train_label: 'Latih Pasangan Tertukar',
@@ -1122,7 +1260,7 @@
         ];
         // PATCH: Tambah pasangan Hiragana yang membingungkan
         const CONFUSE_HIRA = [
-            ['ぬ','め'], ['れ','ね'], ['う','ら'], ['ち','さ'], ['つ','て'], ['を','わ']
+            ['ぬ','め'], ['れ','ね'], ['う','ら'], ['ち','さ'], ['つ','te'], ['を','わ']
         ];
         
         function similarChoicesKata(correct){
@@ -1805,7 +1943,6 @@
                 })
                 .filter(confusedKana => confusedKana !== targetKanaChar); // Ensure it's not the target itself
 
-            // Convert confused kana back to romaji for decoys
             const confusedRomajiDecoys = confusionPairs.map(kanaToRomajiKey).filter(r => r !== null && r !== targetRomaji);
             decoys.push(...shuffleReturn(confusedRomajiDecoys).slice(0, 2)); // Ambil maks 2 dari confusion
 
@@ -1910,13 +2047,13 @@
             } else if (rangeMode === 'single') {
                 const singleKey = qs('#testSingleGroup').value;
                 const grp = GROUPS.find(x => x.key === singleKey);
-                rangeLabel = grp ? grp.label : 'Grup Tunggal';
+                if (grp) rangeLabel = grp.label; else rangeLabel = 'Grup Tunggal';
             } else {
                 const sKey = qs('#testFrom').value;
                 const eKey = qs('#testTo').value;
                 const grpFrom = GROUPS.find(x => x.key === sKey);
                 const grpTo = GROUPS.find(x => x.key === eKey);
-                rangeLabel = (grpFrom && grpTo) ? `${grpFrom.label} - ${grpTo.label}` : 'Rentang khusus';
+                if (grpFrom && grpTo) rangeLabel = `${grpFrom.label} - ${grpTo.label}`; else rangeLabel = 'Rentang khusus';
             }
 
             const tlabel = {
@@ -1963,7 +2100,7 @@
             if (box) box.hidden=!hasWrong;
             if (qs('#celebrateMsg')) qs('#celebrateMsg').textContent=t('done_test_sub', state.test.score, state.test.total);
             if(!hasWrong){
-                if (box) box.innerHTML=`<div class="small" style="text-align: center; margin-top: 8px;">${t('empty_review')}</div>`;
+                if (box) box.innerHTML=`<div class="small" style="text-column: span 4; text-align: center;">${t('empty_review')}</div>`;
                 return;
             }
             const set=state.test.set;
@@ -2129,6 +2266,10 @@
                 if(!C) return;
                 _audioCtx = _audioCtx || new C();
                 const ctx = _audioCtx;
+
+                // penting: pastikan aktif
+                if (ctx.state !== 'running') { ctx.resume().catch(()=>{}); }
+
                 const o=ctx.createOscillator();
                 const g=ctx.createGain();
                 o.connect(g);
@@ -2744,6 +2885,7 @@
             writerFillKanaOptions();
             writerSetGrid(state.writer.grid);
             writerSetupCanvasSize();
+            writerRedrawAll(); // Perlu ini biar canvas langsung di-render ulang
         }
         function writerPick(offset) {
             const idx = ALL_ROMAJI.indexOf(state.writer.kana);
@@ -3012,7 +3154,7 @@
             const mainContent = qs('#main');
 
             if (state.hasSeenOnboarding) {
-                if (onboardingModal) onboardingModal.style.display='none';
+                if (onboardingModal) onboardingModal.hidden = true; // Use hidden attribute
                 if (mainContent) mainContent.style.display = 'block';
                 return;
             }
@@ -3252,6 +3394,33 @@
             }
         });
 
+        // Sidebar functions
+        function toggleSidebar() {
+            const sidebar = qs('#sidebar');
+            const body = qs('body');
+            if (sidebar && body) {
+                sidebar.classList.toggle('is-open');
+                body.classList.toggle('sidebar-open');
+            }
+        }
+
+        function closeSidebar() {
+            const sidebar = qs('#sidebar');
+            const body = qs('body');
+            if (sidebar && body) {
+                sidebar.classList.remove('is-open');
+                body.classList.remove('sidebar-open');
+            }
+        }
+
+        function scrollToSection(id) {
+            const element = document.getElementById(id);
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth' });
+                closeSidebar(); // Close sidebar after navigating
+            }
+        }
+
 
         // ---------- RENDER ----------
         function renderAll(){
@@ -3291,6 +3460,15 @@
             if(state.pomo.running){ startPomo(); }
             showOnboarding();
             setInterval(renderStats, 5000); // Update review due indicator periodically
+
+            // Sidebar event listeners
+            bind('#sidebarToggle', 'click', toggleSidebar);
+            bind('#closeSidebar', 'click', closeSidebar);
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && qs('#sidebar')?.classList.contains('is-open')) {
+                    closeSidebar();
+                }
+            });
         });
     </script>
 </body>
