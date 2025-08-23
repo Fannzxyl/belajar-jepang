@@ -76,19 +76,9 @@
         .btn.ghost{background:transparent;outline:1px solid var(--border); color: var(--ink);}
         .btn:focus-visible{outline:none; box-shadow:var(--ring); outline-offset: 3px;}
         .spacer{height:16px}
-        .main-nav {
-            width: 100%; margin-top: 12px; padding-top: 8px; border-top: 1px solid var(--border);
-        }
-        .main-nav .row {
-            justify-content: center;
-        }
-        .main-nav .btn {
-            flex-grow: 1; /* Tombol akan mengisi ruang yang tersedia di layar kecil */
-        }
-        @media (min-width: 768px) {
-            /* Untuk layar yang lebih lebar dari 768px (tablet & laptop), tombol tidak akan memanjang penuh */
-            .main-nav .btn { flex-grow: 0; }
-        }
+        /* Sembunyikan nav/header lama kalau ada */
+        .main-nav{ display:none !important; }
+
         input[type="search"]{
             width:100%; /* Memastikan input selalu memenuhi lebar container */
             padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--soft);color:var(--ink);
@@ -157,9 +147,99 @@
             font-size: 16px;
             flex-shrink: 0; /* Mencegah ikon menyusut */
         }
+
+        /* === Sidebar === */
+        .sidebar{
+            position:fixed; top:0; left:-300px; width:280px; height:100%;
+            background:var(--panel); box-shadow:var(--shadow); z-index:1000;
+            transition:left .3s ease-in-out; padding:20px; padding-top:calc(20px + env(safe-area-inset-top));
+            display:flex; flex-direction:column; gap:10px; overflow-y:auto; border-right:1px solid var(--border);
+        }
+        .sidebar.is-open{ left:0; }
+        .sidebar .menu{ list-style:none; margin:0; padding:0; }
+        .sidebar .menu li a{
+            display:flex; gap:.5rem; align-items:center; padding:.75rem 1rem;
+            border-radius:12px; color:var(--ink); text-decoration:none;
+        }
+        .sidebar .menu li a:hover{ background:var(--soft); }
+        .sidebar .menu li a.active{ background:rgba(122,108,255,.12); font-weight:600; }
+
+        /* Toggle button */
+        .sidebar-toggle-btn{
+            position:fixed; top:16px; left:16px; z-index:1001; background:var(--btn);
+            border:1px solid var(--border); border-radius:50%; width:44px; height:44px;
+            display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:var(--shadow);
+            transition: all 0.3s ease-in-out; /* Added transition for smooth movement */
+        }
+        .sidebar-toggle-btn i{ color:var(--ink); font-size:20px; }
+
+        @media (min-width:768px){ 
+            body.sidebar-open{ padding-left:280px; } 
+            .sidebar-toggle-btn { left: 16px; } /* Stays on the left */
+            .sidebar.is-open + .sidebar-toggle-btn { left: 296px; } /* Moves with the sidebar */
+        }
+        @media (max-width:640px){ .sidebar{ width:84vw; max-width:320px; } }
+
+        /* Amanin layout */
+        header .brand{ position:relative; z-index:1002; padding-left:60px; }
+        @media (max-width:767px){
+            header .brand{ padding-left:0; }
+            .sidebar-toggle-btn{ top:calc(16px + env(safe-area-inset-top)); }
+        }
+
+        /* CSS untuk ujian ketik jawaban */
+        #fcPrompt{ word-break:keep-all }
+        #fcFeedback.ok{ color:var(--ok) }
+        #fcFeedback.bad{ color:var(--warn) }
+
+        /* Form look & feel */
+        input, select, textarea, input[type="number"], input[type="text"]{
+            height:52px; padding:0 14px; border:1px solid var(--border);
+            border-radius:12px; background:var(--panel); color:var(--ink);
+            box-shadow: var(--shadow);
+            transition: box-shadow var(--transition-duration) ease, border-color var(--transition-duration) ease, background var(--transition-duration) ease;
+        }
+        input::placeholder{ color: var(--muted); }
+
+        /* Focus ring */
+        input:focus, select:focus, textarea:focus, input[type="number"]:focus, input[type="text"]:focus{
+            outline:none; box-shadow: var(--ring); border-color: transparent;
+        }
+
+        /* Number tidy (hapus spinner di mobile/Chromium) */
+        input[type=number]::-webkit-outer-spin-button,
+        input[type=number]::-webkit-inner-spin-button{ -webkit-appearance:none; margin:0; }
+        input[type=number]{ -moz-appearance:textfield; }
+
+        /* Select arrow padding sudah di CSS; tambahkan height konsisten */
+        select{ height:52px; }
     </style>
 </head>
 <body>
+    <!-- Toggle Button (burger) -->
+    <button id="sidebarToggle" class="sidebar-toggle-btn" aria-label="Toggle Sidebar">
+        <i class="fa-solid fa-bars"></i>
+    </button>
+
+    <!-- Sidebar -->
+    <nav id="sidebar" class="sidebar">
+        <div class="row" style="justify-content: space-between; align-items: center;">
+            <h3 style="margin:0;">Navigasi</h3>
+            <button class="btn ghost" id="closeSidebar" aria-label="Tutup Sidebar">
+                <i class="fa-solid fa-times"></i>
+            </button>
+        </div>
+        <hr style="border:none;border-top:1px solid var(--border);width:100%;">
+        <ul class="menu">
+            <li><a href="index.html">📘 Latihan</a></li>
+            <li><a href="index2.html">🗂️ Flashcard</a></li>
+            <li><a href="index3.html">🧮 Tabel Kana</a></li>
+            <li><a href="index4.html">🗒️ Kosakata</a></li>
+            <li><a href="index5.html">💬 Ungkapan</a></li>
+            <li><a href="index6.html">✍️ Menulis</a></li>
+        </ul>
+    </nav>
+
     <header>
         <div class="wrap">
             <div class="brand">
@@ -179,7 +259,7 @@
                     <div class="small">Daftar Kosakata Dasar</div>
                 </div>
             </div>
-             <!-- NAVIGASI UTAMA -->
+             <!-- NAVIGASI UTAMA (LAMA - TERSEMBUNYI) -->
              <nav class="main-nav">
                 <div class="row">
                     <a href="index.html" class="btn ghost"><i class="fa-solid fa-home"></i> Latihan</a>
@@ -211,198 +291,305 @@
                 <!-- Daftar kosakata akan digenerate oleh JavaScript -->
             </ul>
         </div>
+
+        <div class="spacer"></div>
+
+        <!-- === Flashcard Ketik Jawaban (Ujian) === -->
+        <div class="card" style="grid-column:span 12">
+            <h3><i class="fa-solid fa-rectangle-list icon"></i> Ujian — Ketik Jawaban</h3>
+
+            <div class="row">
+                <select id="fcMode" class="input" aria-label="Mode pertanyaan">
+                    <option value="jp_idn">JP → Arti (ketik arti)</option>
+                    <option value="jp_ro">JP → Romaji (ketik romaji)</option>
+                    <option value="idn_jp">Arti → JP (ketik kana/kanji)</option>
+                    <option value="ro_jp">Romaji → JP (ketik kana/kanji)</option>
+                </select>
+                <select id="fcSource" class="input" aria-label="Sumber kartu">
+                    <option value="filter">Dari hasil filter</option>
+                    <option value="fav">Hanya favorit</option>
+                    <option value="rand20">Acak 20</option>
+                </select>
+                <button class="btn primary" id="fcStart">Mulai</button>
+            </div>
+
+            <div class="spacer"></div>
+
+            <div id="fcArea" hidden>
+                <div class="small" id="fcProgress">0 / 0</div>
+                <div id="fcPrompt" class="center" style="font-size:28px;margin:10px 0 16px"></div>
+
+                <div style="max-width:520px;margin:0 auto">
+                    <input id="fcInput" class="input" placeholder="Ketik jawaban…" autocomplete="off" autocapitalize="none" aria-label="Jawaban">
+                    <div class="row" style="justify-content:center;margin-top:10px;gap:8px">
+                        <button class="btn" id="fcCheck">Cek (Enter)</button>
+                        <button class="btn ghost" id="fcReveal">Lihat jawaban</button>
+                        <button class="btn" id="fcNext" disabled>Berikutnya (Tab)</button>
+                    </div>
+                    <div class="small center" id="fcFeedback" style="min-height:22px;margin-top:8px"></div>
+                </div>
+            </div>
+        </div>
     </main>
 
     <script>
         // DATA KOSAKATA
         const vocabulary = [
             // --- Salam dan Frasa Dasar ---
-            { kana: 'こんにちは', kanji: '今日は', romaji: 'konnichiwa', arti: 'Halo / Selamat siang', kategori: 'salam' },
-            { kana: 'おはようございます', kanji: '', romaji: 'ohayou gozaimasu', arti: 'Selamat pagi', kategori: 'salam' },
-            { kana: 'こんばんは', kanji: '今晩は', romaji: 'konbanwa', arti: 'Selamat malam', kategori: 'salam' },
-            { kana: 'おやすみなさい', kanji: 'お休みなさい', romaji: 'oyasuminasai', arti: 'Selamat tidur', kategori: 'salam' },
-            { kana: 'さようなら', kanji: '', romaji: 'sayounara', arti: 'Selamat tinggal', kategori: 'salam' },
-            { kana: 'ありがとう', kanji: '', romaji: 'arigatou', arti: 'Terima kasih', kategori: 'salam' },
-            { kana: 'ありがとうございます', kanji: '', romaji: 'arigatou gozaimasu', arti: 'Terima kasih (formal)', kategori: 'salam' },
-            { kana: 'どうもありがとう', kanji: '', romaji: 'doumo arigatou', arti: 'Terima kasih banyak', kategori: 'salam' },
-            { kana: 'すみません', kanji: '', romaji: 'sumimasen', arti: 'Maaf / Permisi / Terima kasih', kategori: 'salam' },
-            { kana: 'ごめんなさい', kanji: '', romaji: 'gomen nasai', arti: 'Maafkan saya', kategori: 'salam' },
-            { kana: 'はい', kanji: '', romaji: 'hai', arti: 'Ya', kategori: 'dasar' },
-            { kana: 'いいえ', kanji: '', romaji: 'iie', arti: 'Tidak / Bukan', kategori: 'dasar' },
-            { kana: 'おねがいします', kanji: 'お願いします', romaji: 'onegai shimasu', arti: 'Mohon / Tolong', kategori: 'dasar' },
-            { kana: 'どうぞ', kanji: '', romaji: 'douzo', arti: 'Silakan', kategori: 'dasar' },
-            { kana: 'はじめまして', kanji: '', romaji: 'hajimemashite', arti: 'Senang bertemu dengan Anda (perkenalan)', kategori: 'salam' },
-            { kana: 'よろしくおねがいします', kanji: 'よろしくお願いします', romaji: 'yoroshiku onegai shimasu', arti: 'Mohon bantuannya (saat perkenalan)', kategori: 'salam' },
-            { kana: 'いただきます', kanji: '', romaji: 'itadakimasu', arti: 'Selamat makan (sebelum makan)', kategori: 'makanan' },
-            { kana: 'ごちそうさまでした', kanji: '', romaji: 'gochisousama deshita', arti: 'Terima kasih atas makanannya (setelah makan)', kategori: 'makanan' },
+            { id: 'konnichiwa', kana: 'こんにちは', kanji: '今日は', romaji: 'konnichiwa', arti: 'Halo / Selamat siang', kategori: 'salam' },
+            { id: 'ohayougozaimasu', kana: 'おはようございます', kanji: '', romaji: 'ohayou gozaimasu', arti: 'Selamat pagi', kategori: 'salam' },
+            { id: 'konbanwa', kana: 'こんばんは', kanji: '今晩は', romaji: 'konbanwa', arti: 'Selamat malam', kategori: 'salam' },
+            { id: 'oyasuminasai', kana: 'おやすみなさい', kanji: 'お休みなさい', romaji: 'oyasuminasai', arti: 'Selamat tidur', kategori: 'salam' },
+            { id: 'sayounara', kana: 'さようなら', kanji: '', romaji: 'sayounara', arti: 'Selamat tinggal', kategori: 'salam' },
+            { id: 'arigatou', kana: 'ありがとう', kanji: '', romaji: 'arigatou', arti: 'Terima kasih', kategori: 'salam' },
+            { id: 'arigatougozaimasu', kana: 'ありがとうございます', kanji: '', romaji: 'arigatou gozaimasu', arti: 'Terima kasih (formal)', kategori: 'salam' },
+            { id: 'doumoarigatou', kana: 'どうもありがとう', kanji: '', romaji: 'doumo arigatou', arti: 'Terima kasih banyak', kategori: 'salam' },
+            { id: 'sumimasen', kana: 'すみません', kanji: '', romaji: 'sumimasen', arti: 'Maaf / Permisi / Terima kasih', kategori: 'salam' },
+            { id: 'gomennasai', kana: 'ごめんなさい', kanji: '', romaji: 'gomen nasai', arti: 'Maafkan saya', kategori: 'salam' },
+            { id: 'hai', kana: 'はい', kanji: '', romaji: 'hai', arti: 'Ya', kategori: 'dasar' },
+            { id: 'iie', kana: 'いいえ', kanji: '', romaji: 'iie', arti: 'Tidak / Bukan', kategori: 'dasar' },
+            { id: 'onegaishimasu', kana: 'おねがいします', kanji: 'お願いします', romaji: 'onegai shimasu', arti: 'Mohon / Tolong', kategori: 'dasar' },
+            { id: 'douzo', kana: 'どうぞ', kanji: '', romaji: 'douzo', arti: 'Silakan', kategori: 'dasar' },
+            { id: 'hajimemashite', kana: 'はじめまして', kanji: '', romaji: 'hajimemashite', arti: 'Senang bertemu dengan Anda (perkenalan)', kategori: 'salam' },
+            { id: 'yoroshikuonegaishimasu', kana: 'よろしくおねがいします', kanji: 'よろしくお願いします', romaji: 'yoroshiku onegai shimasu', arti: 'Mohon bantuannya (saat perkenalan)', kategori: 'salam' },
+            { id: 'itadakimasu', kana: 'いただきます', kanji: '', romaji: 'itadakimasu', arti: 'Selamat makan (sebelum makan)', kategori: 'makanan' },
+            { id: 'gochisousamadeshita', kana: 'ごちそうさまでした', kanji: '', romaji: 'gochisousama deshita', arti: 'Terima kasih atas makanannya (setelah makan)', kategori: 'makanan' },
 
             // --- Orang dan Keluarga ---
-            { kana: 'わたし', kanji: '私', romaji: 'watashi', arti: 'Saya', kategori: 'orang' },
-            { kana: 'あなた', kanji: '貴方', romaji: 'anata', arti: 'Anda / Kamu', kategori: 'orang' },
-            { kana: 'あのひと', kanji: 'あの人', romaji: 'ano hito', arti: 'Orang itu', kategori: 'orang' },
-            { kana: 'せんせい', kanji: '先生', romaji: 'sensei', arti: 'Guru', kategori: 'orang' },
-            { kana: 'がくせい', kanji: '学生', romaji: 'gakusei', arti: 'Murid / Pelajar', kategori: 'orang' },
-            { kana: 'かいしゃいん', kanji: '会社員', romaji: 'kaishain', arti: 'Karyawan perusahaan', kategori: 'orang' },
-            { kana: 'いしゃ', kanji: '医者', romaji: 'isha', arti: 'Dokter', kategori: 'orang' },
-            { kana: 'おとうさん', kanji: 'お父さん', romaji: 'otousan', arti: 'Ayah', kategori: 'keluarga' },
-            { kana: 'おかあさん', kanji: 'お母さん', romaji: 'okaasan', arti: 'Ibu', kategori: 'keluarga' },
-            { kana: 'おにいさん', kanji: 'お兄さん', romaji: 'oniisan', arti: 'Kakak laki-laki', kategori: 'keluarga' },
-            { kana: 'おねえさん', kanji: 'お姉さん', romaji: 'oneesan', arti: 'Kakak perempuan', kategori: 'keluarga' },
-            { kana: 'おとうと', kanji: '弟', romaji: 'otouto', arti: 'Adik laki-laki', kategori: 'keluarga' },
-            { kana: 'いもうと', kanji: '妹', romaji: 'imouto', arti: 'Adik perempuan', kategori: 'keluarga' },
-            { kana: 'こども', kanji: '子供', romaji: 'kodomo', arti: 'Anak-anak', kategori: 'keluarga' },
+            { id: 'watashi', kana: 'わたし', kanji: '私', romaji: 'watashi', arti: 'Saya', kategori: 'orang' },
+            { id: 'anata', kana: 'あなた', kanji: '貴方', romaji: 'anata', arti: 'Anda / Kamu', kategori: 'orang' },
+            { id: 'anohito', kana: 'あのひと', kanji: 'あの人', romaji: 'ano hito', arti: 'Orang itu', kategori: 'orang' },
+            { id: 'sensei', kana: 'せんせい', kanji: '先生', romaji: 'sensei', arti: 'Guru', kategori: 'orang' },
+            { id: 'gakusei', kana: 'がくせい', kanji: '学生', romaji: 'gakusei', arti: 'Murid / Pelajar', kategori: 'orang' },
+            { id: 'kaishain', kana: 'かいしゃいん', kanji: '会社員', romaji: 'kaishain', arti: 'Karyawan perusahaan', kategori: 'orang' },
+            { id: 'isha', kana: 'いしゃ', kanji: '医者', romaji: 'isha', arti: 'Dokter', kategori: 'orang' },
+            { id: 'otousan', kana: 'おとうさん', kanji: 'お父さん', romaji: 'otousan', arti: 'Ayah', kategori: 'keluarga' },
+            { id: 'okaasan', kana: 'おかあさん', kanji: 'お母さん', romaji: 'okaasan', arti: 'Ibu', kategori: 'keluarga' },
+            { id: 'oniisan', kana: 'おにいさん', kanji: 'お兄さん', romaji: 'oniisan', arti: 'Kakak laki-laki', kategori: 'keluarga' },
+            { id: 'oneesan', kana: 'おねえさん', kanji: 'お姉さん', romaji: 'oneesan', arti: 'Kakak perempuan', kategori: 'keluarga' },
+            { id: 'otouto', kana: 'おとうと', kanji: '弟', romaji: 'otouto', arti: 'Adik laki-laki', kategori: 'keluarga' },
+            { id: 'imouto', kana: 'いもうと', kanji: '妹', romaji: 'imouto', arti: 'Adik perempuan', kategori: 'keluarga' },
+            { id: 'kodomo', kana: 'こども', kanji: '子供', romaji: 'kodomo', arti: 'Anak-anak', kategori: 'keluarga' },
 
             // --- Angka ---
-            { kana: 'いち', kanji: '一', romaji: 'ichi', arti: 'Satu', kategori: 'angka' },
-            { kana: 'に', kanji: '二', romaji: 'ni', arti: 'Dua', kategori: 'angka' },
-            { kana: 'さん', kanji: '三', romaji: 'san', arti: 'Tiga', kategori: 'angka' },
-            { kana: 'し / よん', kanji: '四', romaji: 'shi / yon', arti: 'Empat', kategori: 'angka' },
-            { kana: 'ご', kanji: '五', romaji: 'go', arti: 'Lima', kategori: 'angka' },
-            { kana: 'ろく', kanji: '六', romaji: 'roku', arti: 'Enam', kategori: 'angka' },
-            { kana: 'しち / なな', kanji: '七', romaji: 'shichi / nana', arti: 'Tujuh', kategori: 'angka' },
-            { kana: 'はち', kanji: '八', romaji: 'hachi', arti: 'Delapan', kategori: 'angka' },
-            { kana: 'きゅう / く', kanji: '九', romaji: 'kyuu / ku', arti: 'Sembilan', kategori: 'angka' },
-            { kana: 'じゅう', kanji: '十', romaji: 'juu', arti: 'Sepuluh', kategori: 'angka' },
-            { kana: 'ひゃく', kanji: '百', romaji: 'hyaku', arti: 'Seratus', kategori: 'angka' },
-            { kana: 'せん', kanji: '千', romaji: 'sen', arti: 'Seribu', kategori: 'angka' },
-            { kana: 'まん', kanji: '万', romaji: 'man', arti: 'Sepuluh ribu', kategori: 'angka' },
+            { id: 'ichi', kana: 'いち', kanji: '一', romaji: 'ichi', arti: 'Satu', kategori: 'angka' },
+            { id: 'ni', kana: 'に', kanji: '二', romaji: 'ni', arti: 'Dua', kategori: 'angka' },
+            { id: 'san', kana: 'さん', kanji: '三', romaji: 'san', arti: 'Tiga', kategori: 'angka' },
+            { id: 'shi/yon', kana: 'し / よん', kanji: '四', romaji: 'shi / yon', arti: 'Empat', kategori: 'angka' },
+            { id: 'go', kana: 'ご', kanji: '五', romaji: 'go', arti: 'Lima', kategori: 'angka' },
+            { id: 'roku', kana: 'ろく', kanji: '六', romaji: 'roku', arti: 'Enam', kategori: 'angka' },
+            { id: 'shichi/nana', kana: 'しち / なな', kanji: '七', romaji: 'shichi / nana', arti: 'Tujuh', kategori: 'angka' },
+            { id: 'hachi', kana: 'はち', kanji: '八', romaji: 'hachi', arti: 'Delapan', kategori: 'angka' },
+            { id: 'kyuu/ku', kana: 'きゅう / く', kanji: '九', romaji: 'kyuu / ku', arti: 'Sembilan', kategori: 'angka' },
+            { id: 'juu', kana: 'じゅう', kanji: '十', romaji: 'juu', arti: 'Sepuluh', kategori: 'angka' },
+            { id: 'hyaku', kana: 'ひゃく', kanji: '百', romaji: 'hyaku', arti: 'Seratus', kategori: 'angka' },
+            { id: 'sen', kana: 'せん', kanji: '千', romaji: 'sen', arti: 'Seribu', kategori: 'angka' },
+            { id: 'man', kana: 'まん', kanji: '万', romaji: 'man', arti: 'Sepuluh ribu', kategori: 'angka' },
 
             // --- Tempat dan Lokasi ---
-            { kana: 'にほん', kanji: '日本', romaji: 'nihon', arti: 'Jepang', kategori: 'tempat' },
-            { kana: 'がっこう', kanji: '学校', romaji: 'gakkou', arti: 'Sekolah', kategori: 'tempat' },
-            { kana: 'えき', kanji: '駅', romaji: 'eki', arti: 'Stasiun', kategori: 'tempat' },
-            { kana: 'いえ / うち', kanji: '家', romaji: 'ie / uchi', arti: 'Rumah', kategori: 'tempat' },
-            { kana: 'かいしゃ', kanji: '会社', romaji: 'kaisha', arti: 'Kantor / Perusahaan', kategori: 'tempat' },
-            { kana: 'ぎんこう', kanji: '銀行', romaji: 'ginkou', arti: 'Bank', kategori: 'tempat' },
-            { kana: 'びょういん', kanji: '病院', romaji: 'byouin', arti: 'Rumah sakit', kategori: 'tempat' },
-            { kana: 'レストラン', kanji: '', romaji: 'resutoran', arti: 'Restoran', kategori: 'tempat' },
-            { kana: 'スーパー', kanji: '', romaji: 'suupaa', arti: 'Supermarket', kategori: 'tempat' },
-            { kana: 'デパート', kanji: '', romaji: 'depaato', arti: 'Toserba', kategori: 'tempat' },
-            { kana: 'まち', kanji: '町', romaji: 'machi', arti: 'Kota', kategori: 'tempat' },
-            { kana: 'くに', kanji: '国', romaji: 'kuni', arti: 'Negara', kategori: 'tempat' },
-            { kana: 'へや', kanji: '部屋', romaji: 'heya', arti: 'Kamar', kategori: 'tempat' },
-            { kana: 'トイレ', kanji: '', romaji: 'toire', arti: 'Toilet', kategori: 'tempat' },
+            { id: 'nihon', kana: 'にほん', kanji: '日本', romaji: 'nihon', arti: 'Jepang', kategori: 'tempat' },
+            { id: 'gakkou', kana: 'がっこう', kanji: '学校', romaji: 'gakkou', arti: 'Sekolah', kategori: 'tempat' },
+            { id: 'eki', kana: 'えき', kanji: '駅', romaji: 'eki', arti: 'Stasiun', kategori: 'tempat' },
+            { id: 'ie/uchi', kana: 'いえ / うち', kanji: '家', romaji: 'ie / uchi', arti: 'Rumah', kategori: 'tempat' },
+            { id: 'kaisha', kana: 'かいしゃ', kanji: '会社', romaji: 'kaisha', arti: 'Kantor / Perusahaan', kategori: 'tempat' },
+            { id: 'ginkou', kana: 'ぎんこう', kanji: '銀行', romaji: 'ginkou', arti: 'Bank', kategori: 'tempat' },
+            { id: 'byouin', kana: 'びょういん', kanji: '病院', romaji: 'byouin', arti: 'Rumah sakit', kategori: 'tempat' },
+            { id: 'resutoran', kana: 'レストラン', kanji: '', romaji: 'resutoran', arti: 'Restoran', kategori: 'tempat' },
+            { id: 'suupaa', kana: 'スーパー', kanji: '', romaji: 'suupaa', arti: 'Supermarket', kategori: 'tempat' },
+            { id: 'depaato', kana: 'デパート', kanji: '', romaji: 'depaato', arti: 'Toserba', kategori: 'tempat' },
+            { id: 'machi', kana: 'まち', kanji: '町', romaji: 'machi', arti: 'Kota', kategori: 'tempat' },
+            { id: 'kuni', kana: 'くに', kanji: '国', romaji: 'kuni', arti: 'Negara', kategori: 'tempat' },
+            { id: 'heya', kana: 'へや', kanji: '部屋', romaji: 'heya', arti: 'Kamar', kategori: 'tempat' },
+            { id: 'toire', kana: 'トイレ', kanji: '', romaji: 'toire', arti: 'Toilet', kategori: 'tempat' },
 
             // --- Makanan dan Minuman ---
-            { kana: 'ごはん', kanji: 'ご飯', romaji: 'gohan', arti: 'Nasi / Makanan', kategori: 'makanan' },
-            { kana: 'パン', kanji: '', romaji: 'pan', arti: 'Roti', kategori: 'makanan' },
-            { kana: 'みず', kanji: '水', romaji: 'mizu', arti: 'Air', kategori: 'minuman' },
-            { kana: 'おちゃ', kanji: 'お茶', romaji: 'ocha', arti: 'Teh', kategori: 'minuman' },
-            { kana: 'コーヒー', kanji: '', romaji: 'koohii', arti: 'Kopi', kategori: 'minuman' },
-            { kana: 'ぎゅうにゅう', kanji: '牛乳', romaji: 'gyuunyuu', arti: 'Susu', kategori: 'minuman' },
-            { kana: 'にく', kanji: '肉', romaji: 'niku', arti: 'Daging', kategori: 'makanan' },
-            { kana: 'さかな', kanji: '魚', romaji: 'sakana', arti: 'Ikan', kategori: 'makanan' },
-            { kana: 'やさい', kanji: '野菜', romaji: 'yasai', arti: 'Sayur', kategori: 'makanan' },
-            { kana: 'くだもの', kanji: '果物', romaji: 'kudamono', arti: 'Buah', kategori: 'makanan' },
-            { kana: 'たまご', kanji: '卵', romaji: 'tamago', arti: 'Telur', kategori: 'makanan' },
-            { kana: 'ジュース', kanji: '', romaji: 'juusu', arti: 'Jus', kategori: 'minuman' },
-            { kana: 'ビール', kanji: '', romaji: 'biiru', arti: 'Bir', kategori: 'minuman' },
+            { id: 'gohan', kana: 'ごはん', kanji: 'ご飯', romaji: 'gohan', arti: 'Nasi / Makanan', kategori: 'makanan' },
+            { id: 'pan', kana: 'パン', kanji: '', romaji: 'pan', arti: 'Roti', kategori: 'makanan' },
+            { id: 'mizu', kana: 'みず', kanji: '水', romaji: 'mizu', arti: 'Air', kategori: 'minuman' },
+            { id: 'ocha', kana: 'おちゃ', kanji: 'お茶', romaji: 'ocha', arti: 'Teh', kategori: 'minuman' },
+            { id: 'koohii', kana: 'コーヒー', kanji: '', romaji: 'koohii', arti: 'Kopi', kategori: 'minuman' },
+            { id: 'gyuunyuu', kana: 'ぎゅうにゅう', kanji: '牛乳', romaji: 'gyuunyuu', arti: 'Susu', kategori: 'minuman' },
+            { id: 'niku', kana: 'にく', kanji: '肉', romaji: 'niku', arti: 'Daging', kategori: 'makanan' },
+            { id: 'sakana', kana: 'さかな', kanji: '魚', romaji: 'sakana', arti: 'Ikan', kategori: 'makanan' },
+            { id: 'yasai', kana: 'やさい', kanji: '野菜', romaji: 'yasai', arti: 'Sayur', kategori: 'makanan' },
+            { id: 'kudamono', kana: 'くだもの', kanji: '果物', romaji: 'kudamono', arti: 'Buah', kategori: 'makanan' },
+            { id: 'tamago', kana: 'たまご', kanji: '卵', romaji: 'tamago', arti: 'Telur', kategori: 'makanan' },
+            { id: 'juusu', kana: 'ジュース', kanji: '', romaji: 'juusu', arti: 'Jus', kategori: 'minuman' },
+            { id: 'biiru', kana: 'ビール', kanji: '', romaji: 'biiru', arti: 'Bir', kategori: 'minuman' },
 
             // --- Kata Kerja ---
-            { kana: 'たべる', kanji: '食べる', romaji: 'taberu', arti: 'Makan', kategori: 'kerja' },
-            { kana: 'のむ', kanji: '飲む', romaji: 'nomu', arti: 'Minum', kategori: 'kerja' },
-            { kana: 'みる', kanji: '見る', romaji: 'miru', arti: 'Melihat', kategori: 'kerja' },
-            { kana: 'きく', kanji: '聞く', romaji: 'kiku', arti: 'Mendengar / Bertanya', kategori: 'kerja' },
-            { kana: 'はなす', kanji: '話す', romaji: 'hanasu', arti: 'Berbicara', kategori: 'kerja' },
-            { kana: 'よむ', kanji: '読む', romaji: 'yomu', arti: 'Membaca', kategori: 'kerja' },
-            { kana: 'かく', kanji: '書く', romaji: 'kaku', arti: 'Menulis', kategori: 'kerja' },
-            { kana: 'いく', kanji: '行く', romaji: 'iku', arti: 'Pergi', kategori: 'kerja' },
-            { kana: 'くる', kanji: '来る', romaji: 'kuru', arti: 'Datang', kategori: 'kerja' },
-            { kana: 'かえる', kanji: '帰る', romaji: 'kaeru', arti: 'Pulang', kategori: 'kerja' },
-            { kana: 'ねる', kanji: '寝る', romaji: 'neru', arti: 'Tidur', kategori: 'kerja' },
-            { kana: 'おきる', kanji: '起きる', romaji: 'okiru', arti: 'Bangun', kategori: 'kerja' },
-            { kana: 'べんきょうする', kanji: '勉強する', romaji: 'benkyou suru', arti: 'Belajar', kategori: 'kerja' },
-            { kana: 'しごとをする', kanji: '仕事をする', romaji: 'shigoto wo suru', arti: 'Bekerja', kategori: 'kerja' },
-            { kana: 'わかる', kanji: '分かる', romaji: 'wakaru', arti: 'Mengerti', kategori: 'kerja' },
-            { kana: 'しる', kanji: '知る', romaji: 'shiru', arti: 'Tahu', kategori: 'kerja' },
-            { kana: 'もつ', kanji: '持つ', romaji: 'motsu', arti: 'Membawa / Memiliki', kategori: 'kerja' },
-            { kana: 'かう', kanji: '買う', romaji: 'kau', arti: 'Membeli', kategori: 'kerja' },
-            { kana: 'うる', kanji: '売る', romaji: 'uru', arti: 'Menjual', kategori: 'kerja' },
+            { id: 'taberu', kana: 'たべる', kanji: '食べる', romaji: 'taberu', arti: 'Makan', kategori: 'kerja' },
+            { id: 'nomu', kana: 'のむ', kanji: '飲む', romaji: 'nomu', arti: 'Minum', kategori: 'kerja' },
+            { id: 'miru', kana: 'みる', kanji: '見る', romaji: 'miru', arti: 'Melihat', kategori: 'kerja' },
+            { id: 'kiku', kana: 'きく', kanji: '聞く', romaji: 'kiku', arti: 'Mendengar / Bertanya', kategori: 'kerja' },
+            { id: 'hanasu', kana: 'はなす', kanji: '話す', romaji: 'hanasu', arti: 'Berbicara', kategori: 'kerja' },
+            { id: 'yomu', kana: 'よむ', kanji: '読む', romaji: 'yomu', arti: 'Membaca', kategori: 'kerja' },
+            { id: 'kaku', kana: 'かく', kanji: '書く', romaji: 'kaku', arti: 'Menulis', kategori: 'kerja' },
+            { id: 'iku', kana: 'いく', kanji: '行く', romaji: 'iku', arti: 'Pergi', kategori: 'kerja' },
+            { id: 'kuru', kana: 'くる', kanji: '来る', romaji: 'kuru', arti: 'Datang', kategori: 'kerja' },
+            { id: 'kaeru', kana: 'かえる', kanji: '帰る', romaji: 'kaeru', arti: 'Pulang', kategori: 'kerja' },
+            { id: 'neru', kana: 'ねる', kanji: '寝る', romaji: 'neru', arti: 'Tidur', kategori: 'kerja' },
+            { id: 'okiru', kana: 'おきる', kanji: '起きる', romaji: 'okiru', arti: 'Bangun', kategori: 'kerja' },
+            { id: 'benkyousuru', kana: 'べんきょうする', kanji: '勉強する', romaji: 'benkyou suru', arti: 'Belajar', kategori: 'kerja' },
+            { id: 'shigotowosuru', kana: 'しごとをする', kanji: '仕事をする', romaji: 'shigoto wo suru', arti: 'Bekerja', kategori: 'kerja' },
+            { id: 'wakaru', kana: 'わかる', kanji: '分かる', romaji: 'wakaru', arti: 'Mengerti', kategori: 'kerja' },
+            { id: 'shiru', kana: 'しる', kanji: '知る', romaji: 'shiru', arti: 'Tahu', kategori: 'kerja' },
+            { id: 'motsu', kana: 'もつ', kanji: '持つ', romaji: 'motsu', arti: 'Membawa / Memiliki', kategori: 'kerja' },
+            { id: 'kau', kana: 'かう', kanji: '買う', romaji: 'kau', arti: 'Membeli', kategori: 'kerja' },
+            { id: 'uru', kana: 'うる', kanji: '売る', romaji: 'uru', arti: 'Menjual', kategori: 'kerja' },
 
             // --- Kata Sifat (i-keiyoushi) ---
-            { kana: 'おおきい', kanji: '大きい', romaji: 'ookii', arti: 'Besar', kategori: 'sifat' },
-            { kana: 'ちいさい', kanji: '小さい', romaji: 'chiisai', arti: 'Kecil', kategori: 'sifat' },
-            { kana: 'あたらしい', kanji: '新しい', romaji: 'atarashii', arti: 'Baru', kategori: 'sifat' },
-            { kana: 'ふるい', kanji: '古い', romaji: 'furui', arti: 'Lama / Tua', kategori: 'sifat' },
-            { kana: 'よい / いい', kanji: '良い', romaji: 'yoi / ii', arti: 'Baik', kategori: 'sifat' },
-            { kana: 'わるい', kanji: '悪い', romaji: 'warui', arti: 'Jelek / Buruk', kategori: 'sifat' },
-            { kana: 'たかい', kanji: '高い', romaji: 'takai', arti: 'Tinggi / Mahal', kategori: 'sifat' },
-            { kana: 'やすい', kanji: '安い', romaji: 'yasui', arti: 'Murah', kategori: 'sifat' },
-            { kana: 'さむい', kanji: '寒い', romaji: 'samui', arti: 'Dingin (cuaca)', kategori: 'sifat' },
-            { kana: 'あつい', kanji: '暑い', romaji: 'atsui', arti: 'Panas (cuaca)', kategori: 'sifat' },
-            { kana: 'いそがしい', kanji: '忙しい', romaji: 'isogashii', arti: 'Sibuk', kategori: 'sifat' },
-            { kana: 'たのしい', kanji: '楽しい', romaji: 'tanoshii', arti: 'Menyenangkan', kategori: 'sifat' },
-            { kana: 'むずかしい', kanji: '難しい', romaji: 'muzukashii', arti: 'Sulit', kategori: 'sifat' },
-            { kana: 'やさしい', kanji: '易しい', romaji: 'yasashii', arti: 'Mudah / Baik hati', kategori: 'sifat' },
+            { id: 'ookii', kana: 'おおきい', kanji: '大きい', romaji: 'ookii', arti: 'Besar', kategori: 'sifat' },
+            { id: 'chiisai', kana: 'ちいさい', kanji: '小さい', romaji: 'chiisai', arti: 'Kecil', kategori: 'sifat' },
+            { id: 'atarashii', kana: 'あたらしい', kanji: '新しい', romaji: 'atarashii', arti: 'Baru', kategori: 'sifat' },
+            { id: 'furui', kana: 'ふるい', kanji: '古い', romaji: 'furui', arti: 'Lama / Tua', kategori: 'sifat' },
+            { id: 'yoi/ii', kana: 'よい / いい', kanji: '良い', romaji: 'yoi / ii', arti: 'Baik', kategori: 'sifat' },
+            { id: 'warui', kana: 'わるい', kanji: '悪い', romaji: 'warui', arti: 'Jelek / Buruk', kategori: 'sifat' },
+            { id: 'takai', kana: 'たかい', kanji: '高い', romaji: 'takai', arti: 'Tinggi / Mahal', kategori: 'sifat' },
+            { id: 'yasui', kana: 'やすい', kanji: '安い', romaji: 'yasui', arti: 'Murah', kategori: 'sifat' },
+            { id: 'samui', kana: 'さむい', kanji: '寒い', romaji: 'samui', arti: 'Dingin (cuaca)', kategori: 'sifat' },
+            { id: 'atsui', kana: 'あつい', kanji: '暑い', romaji: 'atsui', arti: 'Panas (cuaca)', kategori: 'sifat' },
+            { id: 'isogashii', kana: 'いそがしい', kanji: '忙しい', romaji: 'isogashii', arti: 'Sibuk', kategori: 'sifat' },
+            { id: 'tanoshii', kana: 'たのしい', kanji: '楽しい', romaji: 'tanoshii', arti: 'Menyenangkan', kategori: 'sifat' },
+            { id: 'muzukashii', kana: 'むずかしい', kanji: '難しい', romaji: 'muzukashii', arti: 'Sulit', kategori: 'sifat' },
+            { id: 'yasashii', kana: 'やさしい', kanji: '易しい', romaji: 'yasashii', arti: 'Mudah / Baik hati', kategori: 'sifat' },
 
             // --- Kata Sifat (na-keiyoushi) ---
-            { kana: 'きれい', kanji: '綺麗', romaji: 'kirei', arti: 'Cantik / Bersih', kategori: 'sifat' },
-            { kana: 'しずか', kanji: '静か', romaji: 'shizuka', arti: 'Tenang / Sunyi', kategori: 'sifat' },
-            { kana: 'にぎやか', kanji: '賑やか', romaji: 'nigiyaka', arti: 'Ramai / Sibuk (tempat)', kategori: 'sifat' },
-            { kana: 'ゆうめい', kanji: '有名', romaji: 'yuumei', arti: 'Terkenal', kategori: 'sifat' },
-            { kana: 'げんき', kanji: '元気', romaji: 'genki', arti: 'Sehat / Semangat', kategori: 'sifat' },
-            { kana: 'べんり', kanji: '便利', romaji: 'benri', arti: 'Praktis / Nyaman', kategori: 'sifat' },
-            { kana: 'ふべん', kanji: '不便', romaji: 'fuben', arti: 'Tidak praktis / Tidak nyaman', kategori: 'sifat' },
-            { kana: 'じょうず', kanji: '上手', romaji: 'jouzu', arti: 'Mahir / Pandai', kategori: 'sifat' },
-            { kana: 'へた', kanji: '下手', romaji: 'heta', arti: 'Tidak mahir / Canggung', kategori: 'sifat' },
+            { id: 'kirei', kana: 'きれい', kanji: '綺麗', romaji: 'kirei', arti: 'Cantik / Bersih', kategori: 'sifat' },
+            { id: 'shizuka', kana: 'しずか', kanji: '静か', romaji: 'shizuka', arti: 'Tenang / Sunyi', kategori: 'sifat' },
+            { id: 'nigiyaka', kana: 'にぎやか', kanji: '賑やか', romaji: 'nigiyaka', arti: 'Ramai / Sibuk (tempat)', kategori: 'sifat' },
+            { id: 'yuumei', kana: 'ゆうめい', kanji: '有名', romaji: 'yuumei', arti: 'Terkenal', kategori: 'sifat' },
+            { id: 'genki', kana: 'げんき', kanji: '元気', romaji: 'genki', arti: 'Sehat / Semangat', kategori: 'sifat' },
+            { id: 'benri', kana: 'べんり', kanji: '便利', romaji: 'benri', arti: 'Praktis / Nyaman', kategori: 'sifat' },
+            { id: 'fuben', kana: 'ふべん', kanji: '不便', romaji: 'fuben', arti: 'Tidak praktis / Tidak nyaman', kategori: 'sifat' },
+            { id: 'jouzu', kana: 'じょうず', kanji: '上手', romaji: 'jouzu', arti: 'Mahir / Pandai', kategori: 'sifat' },
+            { id: 'heta', kana: 'へた', kanji: '下手', romaji: 'heta', arti: 'Tidak mahir / Canggung', kategori: 'sifat' },
 
             // --- Kata Benda Umum ---
-            { kana: 'ほん', kanji: '本', romaji: 'hon', arti: 'Buku', kategori: 'benda' },
-            { kana: 'かばん', kanji: '', romaji: 'kaban', arti: 'Tas', kategori: 'benda' },
-            { kana: 'つくえ', kanji: '机', romaji: 'tsukue', arti: 'Meja', kategori: 'benda' },
-            { kana: 'いす', kanji: '椅子', romaji: 'isu', arti: 'Kursi', kategori: 'benda' },
-            { kana: 'てがみ', kanji: '手紙', romaji: 'tegami', arti: 'Surat', kategori: 'benda' },
-            { kana: 'えいが', kanji: '映画', romaji: 'eiga', arti: 'Film', kategori: 'benda' },
-            { kana: 'おんがく', kanji: '音楽', romaji: 'ongaku', arti: 'Musik', kategori: 'benda' },
-            { kana: 'テレビ', kanji: '', romaji: 'terebi', arti: 'Televisi', kategori: 'benda' },
-            { kana: 'くるま', kanji: '車', romaji: 'kuruma', arti: 'Mobil', kategori: 'transportasi' },
-            { kana: 'でんしゃ', kanji: '電車', romaji: 'densha', arti: 'Kereta listrik', kategori: 'transportasi' },
-            { kana: 'バス', kanji: '', romaji: 'basu', arti: 'Bus', kategori: 'transportasi' },
-            { kana: 'ひこうき', kanji: '飛行機', romaji: 'hikouki', arti: 'Pesawat terbang', kategori: 'transportasi' },
-            { kana: 'でんわ', kanji: '電話', romaji: 'denwa', arti: 'Telepon', kategori: 'benda' },
-            { kana: 'おかね', kanji: 'お金', romaji: 'okane', arti: 'Uang', kategori: 'benda' },
-            { kana: 'じかん', kanji: '時間', romaji: 'jikan', arti: 'Waktu', kategori: 'waktu' },
-            { kana: 'きょう', kanji: '今日', romaji: 'kyou', arti: 'Hari ini', kategori: 'waktu' },
-            { kana: 'あした', kanji: '明日', romaji: 'ashita', arti: 'Besok', kategori: 'waktu' },
-            { kana: 'きのう', kanji: '昨日', romaji: 'kinou', arti: 'Kemarin', kategori: 'waktu' },
-            { kana: 'まいあさ', kanji: '毎朝', romaji: 'maiasa', arti: 'Setiap pagi', kategori: 'waktu' },
-            { kana: 'まいにち', kanji: '毎日', romaji: 'mainichi', arti: 'Setiap hari', kategori: 'waktu' },
-            { kana: 'らいしゅう', kanji: '来週', romaji: 'raishuu', arti: 'Minggu depan', kategori: 'waktu' },
-            { kana: 'せんしゅう', kanji: '先週', romaji: 'senshuu', arti: 'Minggu lalu', kategori: 'waktu' },
-            { kana: 'いま', kanji: '今', romaji: 'ima', arti: 'Sekarang', kategori: 'waktu' },
-            { kana: 'ごぜん', kanji: '午前', romaji: 'gozen', arti: 'Pagi (AM)', kategori: 'waktu' },
-            { kana: 'ごご', kanji: '午後', romaji: 'gogo', arti: 'Sore (PM)', kategori: 'waktu' },
+            { id: 'hon', kana: 'ほん', kanji: '本', romaji: 'hon', arti: 'Buku', kategori: 'benda' },
+            { id: 'kaban', kana: 'かばん', kanji: '', romaji: 'kaban', arti: 'Tas', kategori: 'benda' },
+            { id: 'tsukue', kana: 'つくえ', kanji: '机', romaji: 'tsukue', arti: 'Meja', kategori: 'benda' },
+            { id: 'isu', kana: 'いす', kanji: '椅子', romaji: 'isu', arti: 'Kursi', kategori: 'benda' },
+            { id: 'tegami', kana: 'てがみ', kanji: '手紙', romaji: 'tegami', arti: 'Surat', kategori: 'benda' },
+            { id: 'eiga', kana: 'えいが', kanji: '映画', romaji: 'eiga', arti: 'Film', kategori: 'benda' },
+            { id: 'ongaku', kana: 'おんがく', kanji: '音楽', romaji: 'ongaku', arti: 'Musik', kategori: 'benda' },
+            { id: 'terebi', kana: 'テレビ', kanji: '', romaji: 'terebi', arti: 'Televisi', kategori: 'benda' },
+            { id: 'kuruma', kana: 'くるま', kanji: '車', romaji: 'kuruma', arti: 'Mobil', kategori: 'transportasi' },
+            { id: 'densha', kana: 'でんしゃ', kanji: '電車', romaji: 'densha', arti: 'Kereta listrik', kategori: 'transportasi' },
+            { id: 'basu', kana: 'バス', kanji: '', romaji: 'basu', arti: 'Bus', kategori: 'transportasi' },
+            { id: 'hikouki', kana: 'ひこうき', kanji: '飛行機', romaji: 'hikouki', arti: 'Pesawat terbang', kategori: 'transportasi' },
+            { id: 'denwa', kana: 'でんわ', kanji: '電話', romaji: 'denwa', arti: 'Telepon', kategori: 'benda' },
+            { id: 'okane', kana: 'おかね', kanji: 'お金', romaji: 'okane', arti: 'Uang', kategori: 'benda' },
+            { id: 'jikan', kana: 'じかん', kanji: '時間', romaji: 'jikan', arti: 'Waktu', kategori: 'waktu' },
+            { id: 'kyou', kana: 'きょう', kanji: '今日', romaji: 'kyou', arti: 'Hari ini', kategori: 'waktu' },
+            { id: 'ashita', kana: 'あした', kanji: '明日', romaji: 'ashita', arti: 'Besok', kategori: 'waktu' },
+            { id: 'kinou', kana: 'きのう', kanji: '昨日', romaji: 'kinou', arti: 'Kemarin', kategori: 'waktu' },
+            { id: 'maiasa', kana: 'まいあさ', kanji: '毎朝', romaji: 'maiasa', arti: 'Setiap pagi', kategori: 'waktu' },
+            { id: 'mainichi', kana: 'まいにち', kanji: '毎日', romaji: 'mainichi', arti: 'Setiap hari', kategori: 'waktu' },
+            { id: 'raishuu', kana: 'らいしゅう', kanji: '来週', romaji: 'raishuu', arti: 'Minggu depan', kategori: 'waktu' },
+            { id: 'senshuu', kana: 'せんしゅう', kanji: '先週', romaji: 'senshuu', arti: 'Minggu lalu', kategori: 'waktu' },
+            { id: 'ima', kana: 'いま', kanji: '今', romaji: 'ima', arti: 'Sekarang', kategori: 'waktu' },
+            { id: 'gozen', kana: 'ごぜん', kanji: '午前', romaji: 'gozen', arti: 'Pagi (AM)', kategori: 'waktu' },
+            { id: 'gogo', kana: 'ごご', kanji: '午後', romaji: 'gogo', arti: 'Sore (PM)', kategori: 'waktu' },
 
             // --- Hewan ---
-            { kana: 'ねこ', kanji: '猫', romaji: 'neko', arti: 'Kucing', kategori: 'hewan' },
-            { kana: 'いぬ', kanji: '犬', romaji: 'inu', arti: 'Anjing', kategori: 'hewan' },
-            { kana: 'とり', kanji: '鳥', romaji: 'tori', arti: 'Burung', kategori: 'hewan' },
-            { kana: 'うま', kanji: '馬', romaji: 'uma', arti: 'Kuda', kategori: 'hewan' },
-            { kana: 'ぞう', kanji: '象', romaji: 'zou', arti: 'Gajah', kategori: 'hewan' },
+            { id: 'neko', kana: 'ねこ', kanji: '猫', romaji: 'neko', arti: 'Kucing', kategori: 'hewan' },
+            { id: 'inu', kana: 'いぬ', kanji: '犬', romaji: 'inu', arti: 'Anjing', kategori: 'hewan' },
+            { id: 'tori', kana: 'とり', kanji: '鳥', romaji: 'tori', arti: 'Burung', kategori: 'hewan' },
+            { id: 'uma', kana: 'うま', kanji: '馬', romaji: 'uma', arti: 'Kuda', kategori: 'hewan' },
+            { id: 'zou', kana: 'ぞう', kanji: '象', romaji: 'zou', arti: 'Gajah', kategori: 'hewan' },
 
             // --- Cuaca ---
-            { kana: 'てんき', kanji: '天気', romaji: 'tenki', arti: 'Cuaca', kategori: 'cuaca' },
-            { kana: 'はれ', kanji: '晴れ', romaji: 'hare', arti: 'Cerah', kategori: 'cuaca' },
-            { kana: 'あめ', kanji: '雨', romaji: 'ame', arti: 'Hujan', kategori: 'cuaca' },
-            { kana: 'ゆき', kanji: '雪', romaji: 'yuki', arti: 'Salju', kategori: 'cuaca' },
-            { kana: 'くもり', kanji: '曇り', romaji: 'kumori', arti: 'Berawan', kategori: 'cuaca' },
+            { id: 'tenki', kana: 'てんき', kanji: '天気', romaji: 'tenki', arti: 'Cuaca', kategori: 'cuaca' },
+            { id: 'hare', kana: 'はれ', kanji: '晴れ', romaji: 'hare', arti: 'Cerah', kategori: 'cuaca' },
+            { id: 'ame', kana: 'あめ', kanji: '雨', romaji: 'ame', arti: 'Hujan', kategori: 'cuaca' },
+            { id: 'yuki', kana: 'ゆき', kanji: '雪', romaji: 'yuki', arti: 'Salju', kategori: 'cuaca' },
+            { id: 'kumori', kana: 'くもり', kanji: '曇り', romaji: 'kumori', arti: 'Berawan', kategori: 'cuaca' },
 
             // --- Warna ---
-            { kana: 'あか', kanji: '赤', romaji: 'aka', arti: 'Merah', kategori: 'warna' },
-            { kana: 'あお', kanji: '青', romaji: 'ao', arti: 'Biru', kategori: 'warna' },
-            { kana: 'しろ', kanji: '白', romaji: 'shiro', arti: 'Putih', kategori: 'warna' },
-            { kana: 'くろ', kanji: '黒', romaji: 'kuro', arti: 'Hitam', kategori: 'warna' },
-            { kana: 'きいろ', kanji: '黄色', romaji: 'kiiro', arti: 'Kuning', kategori: 'warna' },
-            { kana: 'みどり', kanji: '緑', romaji: 'midori', arti: 'Hijau', kategori: 'warna' },
+            { id: 'aka', kana: 'あか', kanji: '赤', romaji: 'aka', arti: 'Merah', kategori: 'warna' },
+            { id: 'ao', kana: 'あお', kanji: '青', romaji: 'ao', arti: 'Biru', kategori: 'warna' },
+            { id: 'shiro', kana: 'しろ', kanji: '白', romaji: 'shiro', arti: 'Putih', kategori: 'warna' },
+            { id: 'kuro', kana: 'くろ', kanji: '黒', romaji: 'kuro', arti: 'Hitam', kategori: 'warna' },
+            { id: 'kiiro', kana: 'きいろ', kanji: '黄色', romaji: 'kiiro', arti: 'Kuning', kategori: 'warna' },
+            { id: 'midori', kana: 'みどり', kanji: '緑', romaji: 'midori', arti: 'Hijau', kategori: 'warna' },
 
             // --- Pakaian ---
-            { kana: 'ふく', kanji: '服', romaji: 'fuku', arti: 'Pakaian', kategori: 'pakaian' },
-            { kana: 'シャツ', kanji: '', romaji: 'shatsu', arti: 'Kemeja', kategori: 'pakaian' },
-            { kana: 'ズボン', kanji: '', romaji: 'zubon', arti: 'Celana', kategori: 'pakaian' },
-            { kana: 'スカート', kanji: '', romaji: 'sukaato', arti: 'Rok', kategori: 'pakaian' },
-            { kana: 'くつ', kanji: '靴', romaji: 'kutsu', arti: 'Sepatu', kategori: 'pakaian' },
-            { kana: 'ぼうし', kanji: '帽子', romaji: 'boushi', arti: 'Topi', kategori: 'pakaian' },
+            { id: 'fuku', kana: 'ふく', kanji: '服', romaji: 'fuku', arti: 'Pakaian', kategori: 'pakaian' },
+            { id: 'shatsu', kana: 'シャツ', kanji: '', romaji: 'shatsu', arti: 'Kemeja', kategori: 'pakaian' },
+            { id: 'zubon', kana: 'ズボン', kanji: '', romaji: 'zubon', arti: 'Celana', kategori: 'pakaian' },
+            { id: 'sukaato', kana: 'スカート', kanji: '', romaji: 'sukaato', arti: 'Rok', kategori: 'pakaian' },
+            { id: 'kutsu', kana: 'くつ', kanji: '靴', romaji: 'kutsu', arti: 'Sepatu', kategori: 'pakaian' },
+            { id: 'boushi', kana: 'ぼうし', kanji: '帽子', romaji: 'boushi', arti: 'Topi', kategori: 'pakaian' },
         ];
+
+        // STATE (untuk favorit dan SRS)
+        const VOCAB_KEY = 'kanaTrainer_vocab_v1';
+        let state = loadVocabState();
+
+        function loadVocabState() {
+            try {
+                const raw = localStorage.getItem(VOCAB_KEY);
+                const loadedState = raw ? JSON.parse(raw) : {};
+                // Initialize fav as a Set for easier lookup
+                loadedState.fav = new Set(loadedState.fav || []);
+                // Initialize srs as an object
+                loadedState.srs = loadedState.srs || {};
+                return loadedState;
+            } catch (e) {
+                console.error("Error loading vocab state from localStorage:", e);
+                return { fav: new Set(), srs: {} };
+            }
+        }
+
+        function saveVocabState() {
+            try {
+                const stateToSave = {
+                    ...state,
+                    fav: Array.from(state.fav) // Convert Set back to Array for storage
+                };
+                localStorage.setItem(VOCAB_KEY, JSON.stringify(stateToSave));
+            } catch (e) {
+                console.error("Error saving vocab state to localStorage:", e);
+            }
+        }
+
+        // SRS Intervals (in seconds) - Re-defined here for index4.html
+        const SRS_INTERVAL = {
+            1: 0,      // Box 1: Immediate repeat
+            2: 86400,  // Box 2: 1 day
+            3: 3 * 86400, // Box 3: 3 days
+            4: 7 * 86400, // Box 4: 7 days
+            5: 14 * 86400 // Box 5: 14 days
+        };
+
+        // Function to mark SRS progress
+        window.srsMark = function(vocabId, isCorrect) {
+            const now = Math.floor(Date.now() / 1000);
+            const currentBox = state.srs[vocabId] ? state.srs[vocabId].box : 1;
+            let nextBox = currentBox;
+
+            if (isCorrect) {
+                nextBox = Math.min(5, currentBox + 1);
+            } else {
+                nextBox = 1; // Reset to box 1 on incorrect answer
+            }
+
+            state.srs[vocabId] = {
+                box: nextBox,
+                due: now + SRS_INTERVAL[nextBox]
+            };
+            saveVocabState();
+        };
+
+        window.dueToday = function() {
+            const now = Math.floor(Date.now() / 1000);
+            return vocabulary.filter(item => {
+                const srsData = state.srs[item.id];
+                return srsData && srsData.due <= now;
+            });
+        };
+
 
         // Elemen DOM
         const searchInput = document.getElementById('searchInput');
@@ -410,6 +597,7 @@
         const vocabList = document.getElementById('vocabList');
 
         let activeCategory = 'semua';
+        let currentFilteredVocab = []; // Global variable for filtered vocab
 
         function renderCategories() {
             const categories = ['semua', ...new Set(vocabulary.map(item => item.kategori))];
@@ -435,7 +623,7 @@
         function renderVocabList() {
             const searchTerm = searchInput.value.toLowerCase();
             
-            const filteredVocab = vocabulary.filter(item => {
+            currentFilteredVocab = vocabulary.filter(item => {
                 const inCategory = activeCategory === 'semua' || item.kategori === activeCategory;
                 const matchesSearch = item.kana.includes(searchTerm) ||
                                             item.romaji.includes(searchTerm) ||
@@ -445,12 +633,12 @@
             });
 
             vocabList.innerHTML = ''; // Kosongkan daftar saat ini
-            if (filteredVocab.length === 0) {
+            if (currentFilteredVocab.length === 0) {
                 vocabList.innerHTML = '<li class="vocab-item"><div class="arti">Tidak ada hasil ditemukan.</div></li>';
                 return;
             }
 
-            filteredVocab.forEach(item => {
+            currentFilteredVocab.forEach(item => {
                 const li = document.createElement('li');
                 li.className = 'vocab-item';
                 li.innerHTML = `
@@ -467,6 +655,7 @@
                 li.addEventListener('click', () => speak(item.kanji || item.kana)); // Ucapkan kanji jika tersedia, jika tidak kana
                 vocabList.appendChild(li);
             });
+            window.currentFilteredVocab = currentFilteredVocab; // Make it globally accessible for the quiz
         }
 
         function speak(text) {
@@ -537,6 +726,143 @@
                 document.documentElement.setAttribute('data-theme', savedTheme);
             }
         }
+
+        // --- SIDEBAR JS ---
+        (() => {
+            const sidebar  = document.getElementById('sidebar');
+            const toggle   = document.getElementById('sidebarToggle');
+            const closeBtn = document.getElementById('closeSidebar');
+
+            function open(){ sidebar.classList.add('is-open'); document.body.classList.add('sidebar-open'); }
+            function close(){ sidebar.classList.remove('is-open'); document.body.classList.remove('sidebar-open'); }
+
+            toggle?.addEventListener('click', open);
+            closeBtn?.addEventListener('click', close);
+
+            // Klik luar = tutup (mobile)
+            document.addEventListener('click', (e)=>{
+                if(!sidebar.classList.contains('is-open')) return;
+                const hit = sidebar.contains(e.target) || toggle.contains(e.target);
+                if(!hit) close();
+            });
+            // ESC = tutup
+            document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') close(); });
+
+            // Tandai link aktif sesuai pathname
+            document.querySelectorAll('#sidebar a').forEach(a=>{
+                const href = a.getAttribute('href');
+                // Use endsWith for robustness with different base paths
+                if(href && location.pathname.endsWith(href)) {
+                    a.classList.add('active');
+                } else {
+                    a.classList.remove('active'); // Ensure other links are not active
+                }
+            });
+        })();
+
+        // --- UJIAN / FLASHCARD “KETIK JAWABAN” (KHUSUS index4.html) ---
+        (() => {
+            const fcMode   = document.getElementById('fcMode');
+            const fcSource = document.getElementById('fcSource');
+            const fcStart  = document.getElementById('fcStart');
+            const fcArea   = document.getElementById('fcArea');
+            const fcPrompt = document.getElementById('fcPrompt');
+            const fcInput  = document.getElementById('fcInput');
+            const fcCheck  = document.getElementById('fcCheck');
+            const fcReveal = document.getElementById('fcReveal');
+            const fcNext   = document.getElementById('fcNext');
+            const fcProg   = document.getElementById('fcProgress');
+            const fcFeed   = document.getElementById('fcFeedback');
+
+            // Ambil list sesuai pilihan sumber
+            function getPool(){
+                let list = (window.currentFilteredVocab && currentFilteredVocab.length) ? currentFilteredVocab.slice() : (vocabulary || []);
+                if(fcSource.value === 'fav' && state?.fav){ list = list.filter(v => state.fav.has(v.id)); }
+                if(fcSource.value === 'rand20'){ list = shuffle(list).slice(0,20); }
+                return list;
+            }
+
+            function norm(s){ return (s||'').toString().trim().toLowerCase().replace(/\s+/g,' ').replace(/[－–—]/g,'-'); }
+
+            function buildQA(item){
+                const conf = {
+                    'jp_idn': { q: item.kanji || item.kana, accept: [item.arti] },
+                    'jp_ro' : { q: item.kanji || item.kana, accept: [item.romaji] },
+                    'idn_jp': { q: item.arti,                accept: [item.kanji || item.kana] },
+                    'ro_jp' : { q: item.romaji,              accept: [item.kanji || item.kana] }
+                }[fcMode.value];
+                // Add kana as an alternative answer for JP questions if kanji is the primary
+                if (fcMode.value === 'idn_jp' || fcMode.value === 'ro_jp') {
+                    if (item.kanji && item.kana && item.kanji !== item.kana) {
+                        conf.accept.push(item.kana);
+                    }
+                }
+                return { q: conf.q, a: conf.accept };
+            }
+
+            let deck = []; let idx = 0; let correct = 0;
+
+            function updateProg(){ fcProg.textContent = `${Math.min(idx, deck.length)} / ${deck.length}`; }
+
+            function showCard(){
+                const it = deck[idx];
+                if(!it){ finish(); return; }
+                const qa = buildQA(it);
+                fcPrompt.textContent = qa.q;
+                fcInput.value = ''; fcInput.focus();
+                fcFeed.textContent = ''; fcFeed.className = 'small center';
+                fcNext.disabled = true;
+                updateProg();
+            }
+
+            function check(){
+                const it = deck[idx]; if(!it) return;
+                const qa = buildQA(it);
+                const ok = qa.a.some(x => norm(x) === norm(fcInput.value));
+                if(ok){
+                    correct++;
+                    fcFeed.textContent = 'Benar! ✅'; fcFeed.classList.add('ok');
+                    try{ if(window.srsMark) { srsMark(it.id, true); /* Update SRS */ } }catch(e){}
+                }else{
+                    fcFeed.innerHTML = `Salah. Jawaban: <b>${qa.a[0]}</b> ❌`; fcFeed.classList.add('bad');
+                    try{ if(window.srsMark) { srsMark(it.id, false); /* Update SRS */ } }catch(e){}
+                }
+                fcNext.disabled = false;
+            }
+
+            function reveal(){
+                const it = deck[idx]; if(!it) return;
+                const qa = buildQA(it);
+                fcFeed.innerHTML = `Jawaban: <b>${qa.a[0]}</b>`;
+                fcNext.disabled = false;
+            }
+
+            function next(){ idx++; showCard(); }
+
+            function finish(){
+                fcPrompt.textContent = 'Selesai! 🎉';
+                fcInput.value = '';
+                fcFeed.innerHTML = `Skor: <b>${correct}</b> / ${deck.length}`;
+                fcNext.disabled = true;
+                updateProg();
+            }
+
+            fcStart.addEventListener('click', () => {
+                const pool = getPool();
+                if(!pool.length){ fcArea.hidden = false; fcPrompt.textContent = 'Kosong. Atur filter atau tambahkan favorit dulu ya 🙏'; fcFeed.textContent = ''; return; }
+                deck = shuffle(pool).slice(0, Math.min(30, pool.length)); // Limit to 30 for a reasonable quiz length
+                idx = 0; correct = 0; fcArea.hidden = false; showCard();
+            });
+            fcCheck.addEventListener('click', check);
+            fcReveal.addEventListener('click', reveal);
+            fcNext.addEventListener('click', next);
+            fcInput.addEventListener('keydown', (e)=>{ 
+                if(e.key==='Enter'){ e.preventDefault(); check(); } 
+                if(e.key==='Tab'){ e.preventDefault(); if(!fcNext.disabled) next(); } 
+            });
+
+            function shuffle(a){ for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+        })();
     </script>
 </body>
 </html>

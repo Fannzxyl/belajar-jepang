@@ -1,38 +1,30 @@
 <!DOCTYPE html>
-<html lang="id" data-theme="pastel">
+<html lang="id" data-theme="pastel" class="no-js">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>Pelatih Kana Jepang — v9</title>
-    <meta name="description" content="Pelajari Hiragana & Katakana lengkap (dasar, dakuon/handakuon, youon) dengan tes & review, audio, Pomodoro, progress, tema pastel/kontras, dan kanvas menulis." />
+    <meta name="description" content="Pelajari Hiragana & Katakana lengkap (dasar, dakuon/handakuon, youon) dengan tes & review, audio, Pomodoro, progress, tema pastel/kontras." />
     <meta name="theme-color" content="#7a6cff">
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
-    <!-- Diperbarui: URL Github Pages asli -->
-    <meta property="og:url" content="https://alfan.github.io/kana-trainer/"> 
+    <meta property="og:url" content="https://alfan.github.io/kana-trainer/">
     <meta property="og:title" content="Pelatih Kana Jepang — v9">
-    <meta property="og:description" content="Pelatih Kana Jepang v9 — latihan interaktif, audio pelafalan, tes adaptif, Pomodoro, dan kanvas menulis. Progres tersimpan lokal. Mulai gratis sekarang.">
-    <!-- Diperbarui: URL Github Pages asli -->
-    <meta property="og:image" content="https://alfan.github.io/kana-trainer/kana-trainer-preview.png"> 
+    <meta property="og:description" content="Pelatih Kana Jepang v9 — latihan interaktif, audio pelafalan, tes adaptif, Pomodoro, progress, tema pastel/kontras. Progres tersimpan lokal. Mulai gratis sekarang.">
+    <meta property="og:image" content="https://alfan.github.io/kana-trainer/kana-trainer-preview.png">
 
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image">
-    <!-- Diperbarui: URL Github Pages asli -->
-    <meta name="twitter:url" content="https://alfan.github.io/kana-trainer/"> 
-    <meta name="twitter:title" content="Pelatih Kana Jepang — v9">
-    <!-- PATCH: Tag twitter:description pakai name, bukan property -->
-    <meta name="twitter:description" content="Pelatih Kana Kana Jepang v9 — latihan interaktif, audio pelafalan, tes adaptif, Pomodoro, dan kanvas menulis. Progres tersimpan lokal. Mulai gratis sekarang.">
-    <!-- Diperbarui: URL Github Pages asli -->
-    <meta name="twitter:image" content="https://alfan.github.io/kana-trainer/kana-trainer-preview.png"> 
+    <meta property="twitter:url" content="https://alfan.github.io/kana-trainer/">
+    <meta property="twitter:title" content="Pelatih Kana Jepang — v9">
+    <meta property="twitter:description" content="Pelatih Kana Kana Jepang v9 — latihan interaktif, audio pelafalan, tes adaptif, Pomodoro, progress, tema pastel/kontras. Progres tersimpan lokal. Mulai gratis sekarang.">
+    <meta property="twitter:image" content="https://alfan.github.io/kana-trainer/kana-trainer-preview.png">
 
-    <!-- Diperbarui: URL Github Pages asli -->
     <link rel="canonical" href="https://alfan.github.io/kana-trainer/">
 
     <!-- Favicon -->
-    <!-- Diperbarui: Path relatif untuk GitHub Pages -->
     <link rel="icon" href="favicon.ico">
-    <!-- PATCH: Fallback SVG inline favicon -->
     <link rel="icon" type="image/svg+xml"
       href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop stop-color='%237a6cff'/><stop offset='1' stop-color='%2316c6a1'/></linearGradient></defs><rect width='64' height='64' rx='14' fill='url(%23g)'/><text x='50%' y='54%' text-anchor='middle' font-family='Noto Sans JP,Arial' font-size='38' fill='white'>あ</text></svg>">
     <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -131,12 +123,13 @@
             flex-basis: auto;
         }
         
-        /* Navigasi Baru */
+        /* Main Navigation (now handled by JS router, but keeping styles for consistency) */
         .main-nav {
             width: 100%;
             margin-top: 12px;
             padding-top: 8px;
             border-top: 1px solid var(--border);
+            display: none !important; /* Hide old main nav */
         }
         .main-nav .row {
             justify-content: center;
@@ -171,8 +164,45 @@
             }
         }
 
-        .logo{width:36px;height:36px;border-radius:12px;background:linear-gradient(135deg,var(--pri),var(--sec));box-shadow:var(--shadow);
-        transition: box-shadow var(--transition-duration) ease-out, background var(--transition-duration) ease-out;}
+        /* Logo positioning for header */
+        .header-logo-container {
+            position: absolute;
+            top: 0;
+            right: 16px; /* Default right padding */
+            padding-top: env(safe-area-inset-top);
+            z-index: 100; /* Ensure it's above other header content */
+            display: flex;
+            align-items: center;
+            height: 100%; /* Match header height for vertical alignment */
+        }
+        .header-logo-container .logo {
+            width: 36px;
+            height: 36px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--pri), var(--sec));
+            box-shadow: var(--shadow);
+            transition: box-shadow var(--transition-duration) ease-out, background var(--transition-duration) ease-out;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .header-logo-container .logo text {
+            font-size: 38px;
+        }
+        /* Adjust brand padding to make space for the logo */
+        header .brand {
+            padding-right: 60px; /* Make space for the logo on the right */
+        }
+        @media (max-width: 767px) {
+            header .brand {
+                padding-right: 16px; /* Reset padding for mobile if needed, or adjust */
+            }
+            .header-logo-container {
+                right: 16px; /* Keep it on the right on mobile */
+            }
+        }
+
+
         h1{font-size:20px;margin:0}
         .grid{display:grid;gap:14px;margin-top:16px}
         
@@ -187,56 +217,9 @@
         .card{grid-column:span 12;background:var(--panel);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px;border:1px solid var(--border);
         transition: background-color var(--transition-duration) ease-out, border-color var(--transition-duration) ease-out, box-shadow var(--transition-duration) ease-out;}
         .card h2{font-size:16px;margin:0 0 10px 0; display: flex; align-items: center; gap: 8px;}
+        .card h3{font-size:14px; margin: 16px 0 8px 0; color: var(--muted);}
         .card h2 .icon { color: var(--iconColor); transition: color var(--transition-duration) ease-out;}
-        .muted{color:var(--muted);font-size:13px; transition: color var(--transition-duration) ease-out;}
-
-        input, textarea{
-            width:100%;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--soft);color:var(--ink);
-            transition: border-color var(--transition-duration) ease-out, background-color var(--transition-duration) ease-out, box-shadow var(--transition-duration) ease-out;
-            -webkit-appearance: none;
-            -moz-appearance: none;
-            appearance: none;
-        }
-        select{
-            width:100%;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--soft);color:var(--ink);
-            transition: border-color var(--transition-duration) ease-out, background-color var(--transition-duration) ease-out, box-shadow var(--transition-duration) ease-out;
-            -webkit-appearance: none;
-            -moz-appearance: none;
-            appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2376849c' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 12px center;
-            background-size: 16px;
-            padding-right: 36px;
-        }
-
-        input:focus, select:focus, textarea:focus {
-            border-color: var(--pri);
-            outline: none;
-            box-shadow: var(--ring);
-        }
-
         .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-        
-        .row input[type="number"],
-        .row select {
-            flex: 1;
-            min-width: 120px;
-        }
-
-        @media (max-width: 480px) {
-            .row input[type="number"],
-            .row select {
-                width: 100%;
-                flex: none;
-            }
-        }
-
-        .spacer{height:10px}
-        @media(min-width:768px){
-            .spacer{height:16px}
-        }
-
         .btn{
             min-height:52px;
             padding: 0 16px;
@@ -252,7 +235,7 @@
             align-items: center;
             justify-content: center;
             gap: 8px;
-            text-decoration: none; /* Tambahan untuk link */
+            text-decoration: none; /* Additional for links */
         }
         .btn:active{transform:translateY(1px)}
         .btn.primary{
@@ -338,17 +321,123 @@
             color: var(--ink);
         }
 
-        #subsetScroll { flex: 1; min-width: 100%; overflow: visible; white-space: normal; }
-        .test-controls-row { display:flex; flex-wrap:wrap; gap:8px; align-items:flex-end }
-        .test-controls-row > div { flex-basis:100%; min-width:0 }
-        @media (min-width: 768px) { .test-controls-row > div { flex-basis:auto } }
-
-        .row #countChips { flex-wrap:wrap; flex:1; justify-content:flex-start }
-        .row #testCount { flex-grow:0; flex-shrink:0 }
-        @media (max-width: 767px) {
-            .row #testCount { width: calc(50% - 4px) }
-            .row .tag { width: calc(50% - 4px); text-align:center }
+        /* Responsive adjustments for subset chips (horizontal scroll) */
+        /* Updated for sticky label */
+        #subsetChips {
+            position: relative; /* For sticky title */
+            padding-top: 22px; /* Space for sticky title */
+            display: flex;
+            flex-wrap: nowrap; /* Prevent wrapping */
+            overflow-x: auto; /* Enable horizontal scrolling */
+            -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+            gap: 8px;
+            padding-bottom: 6px; /* Space for scrollbar */
+            scroll-snap-type: x proximity; /* Smooth snapping */
+            justify-content: flex-start; /* Align items to the start */
+            width: 100%; /* Ensure it takes full width */
         }
+        #subsetChips .chips-title { /* New style for sticky title */
+            position: absolute;
+            left: 0;
+            top: 0;
+            font-size: 12px;
+            color: var(--muted);
+            white-space: nowrap; /* Prevent title from wrapping */
+        }
+        #subsetChips .chip {
+            flex: 0 0 auto; /* Prevent stretching, allow width based on content */
+            width: auto; /* Let content define width */
+            white-space: nowrap; /* Keep text on one line */
+            scroll-snap-align: start;
+        }
+        /* Hide scrollbar for aesthetic, but keep functionality */
+        #subsetChips::-webkit-scrollbar{ height: 8px; }
+        #subsetChips::-webkit-scrollbar-thumb{ background: var(--border); border-radius: 999px; }
+
+
+        /* --- NEW RESPONSIVE TEST CONTROLS (GRID-BASED) --- */
+
+        /* 1. Baris chip + select-set + qType + answerMode */
+        .test-controls-row{
+            display:grid;
+            grid-template-columns: 1fr; /* mobile: satu kolom */
+            gap:8px;
+            align-items:end;
+        }
+        @media (min-width:480px){
+            .test-controls-row{ grid-template-columns: 1fr 1fr; }
+        }
+        @media (min-width:768px){
+            .test-controls-row{ grid-template-columns: 1fr auto auto auto; }
+        }
+
+        /* 2. Kelompok “Jumlah soal” jadi Grid yang aman di HP */
+        .test-control-group{
+            display:grid;
+            grid-template-columns: 1fr; /* tumpuk di HP */
+            gap:8px;
+        }
+        @media (min-width:520px){
+            /* label kecil | input angka | chips */
+            .test-control-group{ grid-template-columns: auto 120px 1fr; align-items:center; }
+        }
+        /* Biar input nggak maksa melebar */
+        .test-control-group > *{ min-width:0; }
+
+        /* 3. Range khusus (rentang/grup tunggal) juga Grid */
+        /* tag + 3–4 select */
+        /* These are now applied directly to the selects within the grid context */
+        #rangeMode, #testFrom, #testTo, #testSingleGroup{
+            width:100%; min-width:0; pointer-events:auto; position:relative; z-index:1;
+        }
+        /* Styling for the new #rangeControls div */
+        #rangeControls {
+            display: grid;
+            grid-template-columns: 1fr; /* Default to 1 column on mobile */
+            gap: 8px;
+            align-items: center;
+        }
+        @media (min-width:520px){
+            #rangeControls {
+                grid-template-columns: auto 1fr 1fr 1fr; /* tag + 3 kontrol */
+            }
+        }
+        /* Hide element's parent if the element is hidden */
+        #testSingleGroup[hidden] {
+            display: none !important;
+        }
+        #testToWrap[hidden] {
+            display: none !important;
+        }
+
+
+        /* 4. Amankan komponen “chips” supaya nggak dorong lebar */
+        #countChips{
+            display:flex; flex-wrap:wrap; gap:8px;
+        }
+        /* #subsetChips already handled above */
+        @media (min-width:768px){
+            #subsetChips{ display:flex; flex-wrap:nowrap; overflow-x:auto; }
+        }
+
+        /* 5. Form control benar-benar fleksibel */
+        input, select, textarea { width:100%; min-width:0; }
+        @media (max-width:480px){
+            /* Hapus lebar fix di HP */
+            #testCount, #sylPerItem { width:100% !important; }
+        }
+        /* Ikon panah pada <select> tidak menambah lebar */
+        select{ background-origin:content-box; padding-right:36px; }
+
+        /* 6. Tombol aksi Tes menumpuk rapi di HP */
+        /* Baris Mulai/Lewati/Selesai */
+        .row[style*="justify-content: center;"]{
+            flex-wrap:wrap; gap:8px;
+        }
+        .row[style*="justify-content: center;"] .btn{ flex:1 1 140px; }
+
+        /* --- END NEW RESPONSIVE TEST CONTROLS --- */
+
 
         .center{text-align:center}
         .small{font-size:12px;color:var(--muted)}
@@ -395,7 +484,7 @@
 
         .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 
-        @media (max-width: 420px){ :root{ --radius:14px } .kana .jp{ font-size:24px } #qKana{ font-size:56px !important } }
+        @media (max-width: 420px){ :root{ --radius:14px } .kana .jp{ font-size:56px !important } }
 
         @keyframes correctPop { 0%{transform:scale(1);background-color:transparent} 50%{transform:scale(1.1);background-color:var(--ok)} 100%{transform:scale(1);background-color:transparent} }
         @keyframes wrongShake { 0%,100%{transform:translateX(0);background-color:transparent} 25%{transform:translateX(-5px);background-color:var(--warn)} 75%{transform:translateX(5px);background-color:var(--warn)} }
@@ -418,80 +507,50 @@
             [data-lite="1"] #qKana.correct-answer, [data-lite="1"] #qKana.wrong-answer, [data-lite="1"] .toast { transition: none !important; }
         }
 
-        /* === Writer (Latihan Menulis) === */
-        .writer-toolbar { display:flex; gap:8px; flex-wrap:wrap; align-items:center }
-        .writer-toolbar .slider { display:flex; align-items:center; gap:6px; font-size:13px; color:var(--muted) }
-        /* PATCH: Writer layering fix: pastikan kanvas di atas ghost */
-        .writer-wrap { position: relative; width: 100%; border:1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); background: var(--soft); overflow: hidden; }
-        #writerCanvas { position: relative; z-index: 1; background: transparent; width: 100%; height: auto; display:block; touch-action: none; }
-        .writer-wrap.grid {
-            background-image:
-                repeating-linear-gradient(0deg, rgba(0,0,0,.06) 0, rgba(0,0,0,.06) 1px, transparent 1px, transparent 24px),
-                repeating-linear-gradient(90deg, rgba(0,0,0,.06) 0, rgba(0,0,0,.06) 1px, transparent 1px, transparent 24px);
-        }
-        [data-theme="hc"] .writer-wrap.grid {
-            background-image:
-                repeating-linear-gradient(0deg, rgba(230,239,255,.15) 0, rgba(230,239,255,.15) 1px, transparent 1px, transparent 24px),
-                repeating-linear-gradient(90deg, rgba(230,239,255,.15) 0, rgba(230,239,255,.15) 1px, transparent 1px, transparent 24px);
-        }
-        .writer-ghost {
-            position:absolute; inset:0; pointer-events:none; display:flex; align-items:center; justify-content:center;
-            font-size: clamp(200px, 55vw, 380px);
-            line-height:1; user-select:none;
-            color: var(--muted);
-            opacity: .12;
-            filter: saturate(70%);
-            /* PATCH: Writer layering fix */
-            z-index: 0; 
-            pointer-events: none;
-            transition: opacity var(--transition-duration) ease-out;
-        }
-        .writer-ghost.hidden { display:none; }
-
         /* === Anti horizontal overflow global === */
         html, body {
             max-width: 100%;
-            overflow-x: hidden; /* cegah scroll horizontal */
+            overflow-x: hidden; /* Prevent horizontal scroll */
+        }
+        /* No-JS fallback */
+        .no-js #main {
+            display: block !important;
         }
 
-        /* Pastikan kontainer utama tidak melebar */
+        /* Ensure main containers don't over-expand */
         .wrap, main, header {
             width: 100%;
             max-width: 100%;
         }
 
-        /* Grid aman: kolom tidak memaksa melebar */
+        /* Safe grid: columns don't force expansion */
         @media (min-width: 768px) {
             .grid { grid-template-columns: repeat(12, minmax(0, 1fr)); }
         }
 
-        /* Pillbox aman di semua breakpoint */
+        /* Pillbox safe at all breakpoints */
         .pillbox { grid-template-columns: repeat(4, minmax(0, 1fr)); }
         @media (min-width:480px){ .pillbox{ grid-template-columns: repeat(5, minmax(0,1fr)); } }
         @media (min-width:680px){ .pillbox{ grid-template-columns: repeat(6, minmax(0,1fr)); } }
 
-        /* Flex children boleh menyusut (supaya gak mepet dan motong layout) */
+        /* Flex children can shrink (to prevent crowding and layout breaks) */
         .row > * { min-width: 0; }
 
-        /* Header controls: cegah item ngedorong lebar */
+        /* Header controls: prevent items from pushing width */
         .header-controls-row > * { min-width: 0; }
 
-        /* Buttons/chips jangan punya min-width besar yang bikin overflow */
+        /* Buttons/chips shouldn't have large min-width that causes overflow */
         .btn, .chip { max-width: 100%; }
 
-        /* Form controls aman lebar */
+        /* Form controls safe width */
         input, select, textarea { max-width: 100%; }
 
-        /* Canvas & media responsif */
+        /* Responsive canvas & media */
         img, video, svg { max-width: 100%; height: auto; display: block; }
 
-
-        /* Writer wrap sudah overflow: hidden; tambahkan ini supaya tak “melar” */
-        .writer-wrap { max-width: 100%; }
-
-        /* Modal & toast selalu pakai viewport, bukan lebar dokumen yang overflow */
+        /* Modal & toast always use viewport, not overflowing document width */
         .modal { inset: 0; }
-        /* PATCH: Biar toast selalu center lebar-aman */
+        /* PATCH: Ensure toast is always horizontally centered and safe width */
         .toast{
           position: fixed; /* Ensure it's fixed */
           left:50%;
@@ -510,86 +569,34 @@
         .toast.warn { background-color: var(--warnBg); } /* Warning specific color */
 
 
-        /* Progress bar dan segmen tidak melebarkan kontainer */
+        /* Progress bar and segments don't expand container */
         .progress, .seg { max-width: 100%; }
 
-        /* Perbaiki select dengan background-icon agar tidak menambah lebar total */
-        select { background-origin: content-box; }
+        /* Fix select with background-icon so it's consistent */
+        select{ background-origin:content-box; } /* Moved up for general application */
 
-        /* Pada layar kecil, pastikan kolom kontrol tes tidak memaksa melebar */
-        .test-controls-row > div { min-width: 0; }
-        .test-control-group { width: 100%; }
 
-        /* PATCH: Desktop layout (≥1024px): Pomodoro & Tracker berdampingan */
+        /* PATCH: Desktop layout (≥1024px): Pomodoro & Tracker side by side */
         @media (min-width: 1024px) {
             main.wrap {
                 display: grid;
                 grid-template-columns: repeat(12, minmax(0, 1fr));
                 gap: 14px;
             }
-            /* Default: setiap section full-width */
+            /* Default: each section full-width */
             main.wrap > section { grid-column: span 12; }
-            /* Khusus: Pomodoro & Tracker 50:50 */
+            /* Specific: Pomodoro & Tracker 50:50 */
             #pomoSection { grid-column: span 6; }
             #trackerSection { grid-column: span 6; }
         }
 
-        /* PATCH: Center subjudul “Hiragana • Katakana … Writer” */
+        /* PATCH: Center subtitle "Hiragana • Katakana … Writer" */
         header .brand > div:nth-child(2){
           flex: 1 1 auto;
           text-align: center;
         }
         header .brand h1{ margin-bottom: 4px; }
         header .brand .small{ display:block; }
-
-        /* ========== Subset chips: HP vertikal, Laptop horizontal scroll ========== */
-
-        /* HP / default: vertikal satu per baris */
-        #subsetChips{
-          display: grid !important;          /* pastikan override dari .chips */
-          grid-template-columns: 1fr;        /* satu kolom penuh */
-          gap: 8px;
-          align-items: stretch;
-        }
-        #subsetChips .chip{
-          width: 100%;                       /* biar tombol melebar penuh di HP */
-          text-align: center;
-        }
-        #subsetChips > .small{
-          grid-column: 1 / -1;
-          text-align: center;
-          margin-bottom: 2px;
-        }
-
-        /* Laptop/desktop (>=1024px): horizontal, tidak membungkus, bisa di-scroll ke kanan */
-        @media (min-width:1024px){
-          #subsetChips{
-            display: flex !important;
-            flex-wrap: nowrap;               /* satu baris saja */
-            overflow-x: auto;                /* scroll ke kanan */
-            gap: 8px;
-            padding-bottom: 6px;
-            scroll-snap-type: x proximity;   /* scroll lebih halus */
-            -webkit-overflow-scrolling: touch;
-          }
-          #subsetChips .chip{
-            width: auto;                     /* lebar sesuai konten */
-            flex: 0 0 auto;                  /* jangan melebar */
-            white-space: nowrap;             /* tetap satu baris */
-            scroll-snap-align: start;
-          }
-          /* Biar label "Pilih cepat:" tetap di atas, bukan ikut geser */
-          #subsetChips > .small{
-            flex: 0 0 100%;
-            order: -1;
-            margin-bottom: 4px;
-            text-align: left;                /* opsional: kiri di desktop */
-          }
-        }
-
-        /* (Opsional) sembunyikan scrollbar yang kasar di WebKit tanpa mematikan scroll */
-        #subsetChips::-webkit-scrollbar{ height: 8px; }
-        #subsetChips::-webkit-scrollbar-thumb{ background: var(--border); border-radius: 999px; }
 
         /* New styles for sidebar */
         .sidebar {
@@ -662,13 +669,54 @@
             padding-left: 60px; /* Space for the toggle button */
         }
         @media (max-width: 767px) {
-            .sidebar-toggle-btn {
-                top: calc(16px + env(safe-area-inset-top));
-            }
             header .brand {
                 padding-left: 0; /* No extra padding on mobile, as button is fixed */
             }
         }
+
+        /* --- NEW CSS FOR SIDEBAR AND ROUTING --- */
+        .sidebar .menu { list-style:none; margin:0; padding:0; }
+        .sidebar .menu li a{
+            display:flex; gap:.5rem; align-items:center;
+            padding:.75rem 1rem; border-radius:12px;
+            color: var(--ink); /* Ensure text color is correct */
+            text-decoration: none; /* Remove underline */
+            transition: background-color var(--transition-duration) ease-out;
+        }
+        .sidebar .menu li a:hover {
+            background: var(--soft);
+        }
+        .sidebar .menu li a.active{ background:rgba(122,108,255,.12); font-weight:600; }
+        @media (max-width:640px){
+            .sidebar{ width:84vw; max-width:320px; }
+        }
+        [data-page][hidden]{ display:none !important; }
+        [inert]{ pointer-events:none; user-select:none; }
+        /* --- END NEW CSS FOR SIDEBAR AND ROUTING --- */
+
+        /* Form look & feel */
+        /* Updated: Applied to input, select, textarea, and specific input types */
+        .input, select, textarea, input[type="number"], input[type="text"]{
+            height:52px; padding:0 14px; border:1px solid var(--border);
+            border-radius:12px; background:var(--panel); color:var(--ink);
+            box-shadow: var(--shadow);
+            transition: box-shadow var(--transition-duration) ease, border-color var(--transition-duration) ease, background var(--transition-duration) ease;
+        }
+        .input::placeholder{ color: var(--muted); }
+
+        /* Focus ring */
+        .input:focus, select:focus, textarea:focus, input[type="number"]:focus, input[type="text"]:focus{
+            outline:none; box-shadow: var(--ring); border-color: transparent;
+        }
+
+        /* Number tidy (hapus spinner di mobile/Chromium) */
+        input[type=number]::-webkit-outer-spin-button,
+        input[type=number]::-webkit-inner-spin-button{ -webkit-appearance:none; margin:0; }
+        input[type=number]{ -moz-appearance:textfield; }
+
+        /* Select arrow padding sudah di CSS; tambahkan height konsisten */
+        select{ height:52px; }
+
     </style>
 </head>
 <body>
@@ -678,7 +726,7 @@
     </button>
 
     <!-- Sidebar Content -->
-    <aside id="sidebar" class="sidebar">
+    <nav id="sidebar" class="sidebar">
         <div class="row" style="justify-content: space-between; align-items: center;">
             <h3 style="margin:0;">Navigasi</h3>
             <button class="btn ghost" id="closeSidebar" aria-label="Tutup Sidebar">
@@ -686,42 +734,37 @@
             </button>
         </div>
         <hr style="border: none; border-top: 1px solid var(--border); width: 100%;">
-        <button class="btn" onclick="scrollToSection('learnTitle')">
-            <i class="fa-solid fa-book"></i> Belajar
-        </button>
-        <button class="btn" onclick="scrollToSection('testTitle')">
-            <i class="fa-solid fa-pencil-alt"></i> Tes
-        </button>
-        <button class="btn" onclick="scrollToSection('pomoTitle')">
-            <i class="fa-solid fa-clock"></i> Timer Pomodoro
-        </button>
-        <button class="btn" onclick="scrollToSection('trackTitle')">
-            <i class="fa-solid fa-chart-line"></i> Tracker Kana
-        </button>
-        <button class="btn" onclick="scrollToSection('writerTitle')">
-            <i class="fa-solid fa-pen-fancy"></i> Latihan Menulis
-        </button>
-    </aside>
+        <ul class="menu">
+            <li><a href="index.html">📘 Latihan</a></li>
+            <li><a href="index2.html">🗂️ Flashcard</a></li>
+            <li><a href="index3.html">🧮 Tabel Kana</a></li>
+            <li><a href="index4.html">🗒️ Kosakata</a></li>
+            <li><a href="index5.html">💬 Ungkapan</a></li>
+            <li><a href="index6.html">✍️ Menulis</a></li>
+        </ul>
+    </nav>
 
     <header>
         <div class="wrap">
             <div class="brand" style="gap:10px">
-                <!-- PATCH: Ganti div.logo dengan SVG logo -->
-                <svg class="logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="36" height="36">
-                    <defs>
-                        <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-                            <stop stop-color="#7a6cff"/><stop offset="1" stop-color="#16c6a1"/>
-                        </linearGradient>
-                    </defs>
-                    <rect width="64" height="64" rx="14" fill="url(#g)"/>
-                    <!-- Naik ~2px: pakai dominant-baseline + dy negatif -->
-                    <text x="50%" y="50%" text-anchor="middle" dominant-baseline="middle"
-                          font-family="Noto Sans JP, 'Noto Serif JP', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif"
-                          font-size="38" fill="white" dy="-2">あ</text>
-                </svg>
+                <!-- Moved logo to a container for absolute positioning -->
+                <div class="header-logo-container">
+                    <svg class="logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="36" height="36">
+                        <defs>
+                            <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+                                <stop stop-color="#7a6cff"/><stop offset="1" stop-color="#16c6a1"/>
+                            </linearGradient>
+                        </defs>
+                        <rect width="64" height="64" rx="14" fill="url(#g)"/>
+                        <text x="50%" y="50%" text-anchor="middle" dominant-baseline="middle"
+                                font-family="Noto Sans JP, 'Noto Serif JP', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif"
+                                font-size="38" fill="white" dy="-2">あ</text>
+                    </svg>
+                </div>
+                <!-- Original brand content -->
                 <div>
                     <h1>Pelatih Kana Jepang <span class="tag">v9</span></h1>
-                    <div class="small">Dasar • Dakuon/Handakuon • Youon • Tes & Review • Pomodoro • Tema • Writer</div>
+                    <div class="small">Dasar • Dakuon/Handakuon • Youon • Tes & Review • Pomodoro • Tema</div>
                 </div>
                 <div class="row header-controls-row" style="gap:6px">
                     <div class="seg" role="tablist" aria-label="Tema">
@@ -731,7 +774,6 @@
                     <label class="btn ghost" style="display:flex;align-items:center;gap:8px">
                         <input id="audToggle" type="checkbox" aria-label="Suara efek & pelafalan" /> Suara (efek & pelafalan)
                     </label>
-                    <!-- PATCH: Tambah tombol Lite Mode -->
                     <label class="btn ghost" id="liteModeToggleBtn" style="display:flex;align-items:center;gap:8px">
                         <input id="liteToggle" type="checkbox" aria-label="Mode Ringan" /> Lite Mode
                     </label>
@@ -741,7 +783,7 @@
                     <button id="resetBtn" class="btn ghost" type="button" title="Atur ulang semua progres">Atur Ulang Semua</button>
                 </div>
             </div>
-            <!-- PENAMBAHAN NAVIGASI UTAMA -->
+            <!-- MAIN NAVIGATION (OLD - HIDDEN) -->
             <nav class="main-nav">
                 <div class="row">
                     <a href="index.html" class="btn primary"><i class="fa-solid fa-home"></i> Latihan</a>
@@ -749,249 +791,234 @@
                     <a href="index3.html" class="btn ghost"><i class="fa-solid fa-table"></i> Tabel Kana</a>
                     <a href="index4.html" class="btn ghost"><i class="fa-solid fa-book-open"></i> Kosakata</a>
                     <a href="index5.html" class="btn ghost"><i class="fa-solid fa-comments"></i> Ungkapan</a>
-                    <a href="index6.html" class="btn ghost"><i class="fa-solid fa-comments"></i> Menulis</a>
                 </div>
             </nav>
         </div>
     </header>
 
     <main class="wrap" id="main" style="display: none;">
-        <!-- LEARN MODE -->
-        <section class="grid" aria-labelledby="learnTitle">
-            <div class="card" style="grid-column: span 12;">
-                <h2 id="learnTitle"><i class="fa-solid fa-book icon"></i> Belajar (Pilih Rentang Kana)</h2>
-                <div class="small">Pilih set (Hiragana/Katakana) dan rentang fleksibel. Ketuk tile untuk dengar pelafalan.</div>
-                <div class="spacer"></div>
-                <div class="row">
-                    <select id="learnSet" aria-label="Pilih set belajar">
-                        <option value="hira">Hiragana</option>
-                        <option value="kata">Katakana</option>
-                    </select>
-                    <select id="fromGrp" aria-label="Dari kelompok"></select>
-                    <select id="toGrp" aria-label="Sampai kelompok"></select>
-                    <button class="btn primary" id="btnShowLearn" type="button"><i class="fa-solid fa-eye"></i> Tampilkan</button>
-                </div>
-                <div class="spacer"></div>
-                <div id="learnTiles" class="pillbox" aria-live="polite">
-                    <!-- Empty state for Learn Mode -->
-                    <div class="small" style="grid-column: span 4; text-align: center;">Pilih set & rentang dulu, lalu tekan Tampilkan.</div>
-                </div>
-            </div>
-        </section>
-
-        <!-- TEST MODE -->
-        <section class="grid" aria-labelledby="testTitle">
-            <div class="card" style="grid-column: span 12;">
-                <!-- PATCH: Ganti heading & deskripsi bagian Tes jadi lebih pendek -->
-                <h2 id="testTitle"><i class="fa-solid fa-pencil-alt icon"></i> Tes</h2>
-                <div class="small">
-                    Pilih subset atau rentang. Tentukan tipe & mode, lalu jumlah soal.
-                </div>
-                <div class="spacer"></div>
-
-                <div class="row test-controls-row" style="align-items:flex-end">
-                    <div style="flex:1;"> <!-- PATCH: Menghapus width:100% dari inline style -->
-                        <!-- PATCH: Hapus inline style display:flex di #subsetChips -->
-                        <div class="chips" id="subsetChips">
-                            <div class="small" style="margin-bottom: 4px;">Pilih cepat:</div>
-                        </div>
-                    </div>
-                    <select id="testSet" aria-label="Pilih set tes">
-                        <option value="hira">Hiragana</option>
-                        <option value="kata">Katakana</option>
-                    </select>
-                    <select id="qType" title="Tipe Soal" aria-label="Tipe soal">
-                        <option value="k2r">Kana → Romaji</option>
-                        <option value="r2k">Romaji → Kana (Pilihan Ganda)</option>
-                        <option value="seq">Rangkaian Romaji → Kana</option>
-                        <!-- PATCH: Tambah qType 'audio' dan 'kseq' -->
-                        <option value="audio_k2r">Listening (Dengar Kana → Romaji)</option>
-                        <option value="audio_r2k">Listening (Dengar Romaji → Kana)</option>
-                        <option value="kseq">Kana Sequence (Ketik Romaji)</option>
-                    </select>
-                    <select id="answerMode" aria-label="Mode jawaban">
-                        <option value="type">Mode Ketik</option>
-                        <option value="mc">Pilihan Ganda (A–D)</option>
-                    </select>
-                </div>
-
-                <div class="spacer"></div>
-                <div class="row test-control-group">
-                    <div class="tag" style="align-self: center;">Jumlah soal:</div>
-                    <input id="testCount" type="number" min="1" value="10" style="width:100px" aria-label="Jumlah soal" />
-                    <div class="chips" id="countChips">
-                        <button class="chip" data-count="10" type="button">10</button>
-                        <button class="chip" data-count="25" type="button">25</button>
-                        <button class="chip" data-count="50" type="button">50</button>
-                        <button class="chip" data-count="100" type="button">100</button>
-                    </div>
-                </div>
-                <!-- PATCH: Kontrol jumlah suku kata/soal -->
-                <div class="row test-control-group" id="sylPerItemControl" hidden>
-                    <div class="tag">Suku kata/soal:</div>
-                    <input id="sylPerItem" type="number" min="2" max="6" value="3" style="width:90px" aria-label="Jumlah suku kata per soal" />
-                </div>
-                <div class="spacer"></div>
-                <div class="row test-control-group">
-                    <div class="tag">Atau rentang khusus:</div>
-                    <select id="rangeMode" aria-label="Mode rentang">
-                        <option value="range">Rentang</option>
-                        <option value="single">Grup Tunggal</option>
-                    </select>
-                    <select id="testFrom" aria-label="Tes dari"></select>
-                    <div id="testToWrap"><select id="testTo" aria-label="Tes sampai"></select></div>
-                    <select id="testSingleGroup" aria-label="Pilih Grup" hidden></select>
-                </div>
-                <div class="spacer"></div>
-                <div class="row" style="justify-content: center;">
-                    <button class="btn primary" id="btnStart" type="button"><i class="fa-solid fa-play"></i> Mulai Tes</button>
-                    <button class="btn" id="btnSkip" type="button" title="Lewati soal (→)"><i class="fa-solid fa-forward"></i> Lewati</button>
-                    <button class="btn warn" id="btnEnd" type="button"><i class="fa-solid fa-stop"></i> Selesai</button>
-                </div>
-
-                <div class="spacer"></div>
-                <div class="progress" aria-label="Progress Tes" role="progressbar" aria-valuemin="0" aria-valuemax="100"><div id="bar" class="bar"></div></div>
-                <div class="spacer"></div>
-                <div id="testArea" class="center" hidden>
-                    <div id="promptWrap" style="display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap">
-                        <div id="qKana" style="font-size:64px;line-height:1.1;margin:6px 0">あ</div>
-                        <!-- PATCH: Tombol replay audio -->
-                        <button class="btn ghost" id="btnReplayAudio" type="button" title="Putar lagi" hidden><i class="fa-solid fa-volume-up"></i></button>
-                    </div>
-                    <div id="typeWrap" style="max-width:520px;margin:0 auto">
-                        <input id="ans" placeholder="Ketik jawaban kamu di sini…" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" inputmode="text" aria-label="Jawaban" />
-                        <div class="spacer"></div>
-                        <button class="btn" id="btnCheck" type="button"><i class="fa-solid fa-check"></i> Cek (Enter)</button>
-                    </div>
-                    <div id="mcWrap" class="optwrap" hidden>
-                        <button class="btn opt" id="optA" aria-label="Pilihan A" type="button">A</button>
-                        <button class="btn opt" id="optB" aria-label="Pilihan B" type="button">B</button>
-                        <button class="btn opt" id="optC" aria-label="Pilihan C" type="button">C</button>
-                        <button class="btn opt" id="optD" aria-label="Pilihan D" type="button">D</button>
-                        <div class="small" style="grid-column: span 4; text-align: center; margin-top: 4px;">Ketuk atau tekan A/B/C/D</div>
+        <!-- ==== LATIHAN (gabungan: Belajar + Tes + Pomodoro + Tracker) ==== -->
+        <section id="page-latihan" data-page>
+            <!-- Subbagian A: Belajar rentang kana -->
+            <div id="latihan-belajar" class="grid">
+                <div class="card" style="grid-column: span 12;">
+                    <h2 id="learnTitle"><i class="fa-solid fa-book icon"></i> Belajar (Pilih Rentang Kana)</h2>
+                    <div class="small">Pilih set (Hiragana/Katakana) dan rentang fleksibel. Ketuk tile untuk dengar pelafalan.</div>
+                    <div class="spacer"></div>
+                    <div class="row">
+                        <select id="learnSet" class="input" aria-label="Pilih set belajar">
+                            <option value="hira">Hiragana</option>
+                            <option value="kata">Katakana</option>
+                        </select>
+                        <select id="fromGrp" class="input" aria-label="Dari kelompok"></select>
+                        <select id="toGrp" class="input" aria-label="Sampai kelompok"></select>
+                        <button class="btn primary" id="btnShowLearn" type="button"><i class="fa-solid fa-eye"></i> Tampilkan</button>
                     </div>
                     <div class="spacer"></div>
-                    <div class="small" id="testInfo" aria-live="polite">
-                        <span id="testInfoText"></span>
-                        <span id="streakCounter">Streak: 0</span>
+                    <div id="learnTiles" class="pillbox" aria-live="polite">
+                        <!-- Empty state for Learn Mode -->
+                        <div class="small" style="grid-column: span 4; text-align: center;">Pilih set & rentang dulu, lalu tekan Tampilkan.</div>
                     </div>
                 </div>
-                <div id="testEmptyState" class="small" style="text-align: center; margin-top: 16px;">Setel tipe soal dan jumlah, lalu tekan Mulai Tes.</div>
+            </div>
+
+            <!-- Subbagian B: Tes (ketik/MCQ) -->
+            <div id="latihan-tes" class="grid">
+                <div class="card" style="grid-column: span 12;">
+                    <h2 id="testTitle"><i class="fa-solid fa-pencil-alt icon"></i> Tes</h2>
+                    <div class="small">
+                        Pilih set, tipe & mode soal, lalu jumlah soal. Kamu bisa juga pilih rentang atau grup spesifik.
+                    </div>
+                    <div class="spacer"></div>
+
+                    <div class="row test-controls-row">
+                        <!-- Updated: subsetChips now has a sticky label -->
+                        <div id="subsetChips">
+                            <div class="chips-title">Pilih cepat:</div>
+                            <button class="chip" data-preset="aiueo-m">aiueo → m</button>
+                            <button class="chip" data-preset="base-all">Dasar semua</button>
+                            <button class="chip" data-preset="dakuon-all">Dakuon</button>
+                            <button class="chip" data-preset="youon-all">Youon</button>
+                            <!-- Original chips will be added by JS renderAll -> buildSubsetChips() -->
+                        </div>
+                        <select id="testSet" class="input" aria-label="Pilih set tes">
+                            <option value="hira">Hiragana</option>
+                            <option value="kata">Katakana</option>
+                        </select>
+                        <select id="qType" class="input" title="Tipe Soal" aria-label="Tipe soal">
+                            <option value="k2r">Kana → Romaji</option>
+                            <option value="r2k">Romaji → Kana (Pilihan Ganda)</option>
+                            <option value="seq">Rangkaian Romaji → Kana</option>
+                            <option value="audio_k2r">Listening (Dengar Kana → Romaji)</option>
+                            <option value="audio_r2k">Listening (Dengar Romaji → Kana)</option>
+                            <option value="kseq">Kana Sequence (Ketik Romaji)</option>
+                        </select>
+                        <select id="answerMode" class="input" aria-label="Mode jawaban">
+                            <option value="type">Mode Ketik</option>
+                            <option value="mc">Pilihan Ganda (A–D)</option>
+                        </select>
+                    </div>
+
+                    <div class="spacer"></div>
+                    <div class="row test-control-group">
+                        <div class="tag" style="align-self: center;">Jumlah soal:</div>
+                        <input id="testCount" class="input" type="number" min="1" value="10" aria-label="Jumlah soal" />
+                        <div class="chips" id="countChips">
+                            <button class="chip" data-count="10" type="button">10</button>
+                            <button class="chip" data-count="25" type="button">25</button>
+                            <button class="chip" data-count="50" type="button">50</button>
+                            <button class="chip" data-count="100" type="button">100</button>
+                        </div>
+                    </div>
+                    <div class="row test-control-group" id="sylPerItemControl" hidden>
+                        <div class="tag">Suku kata/soal:</div>
+                        <input id="sylPerItem" class="input" type="number" min="2" max="6" value="3" aria-label="Jumlah suku kata per soal" />
+                    </div>
+                    <div class="spacer"></div>
+                    <!-- Updated: Changed class to ID for specific styling -->
+                    <div id="rangeControls" class="test-control-group">
+                        <div class="tag">Atau rentang khusus:</div>
+                        <select id="rangeMode" class="input" aria-label="Mode rentang">
+                            <option value="range">Rentang</option>
+                            <option value="single">Grup Tunggal</option>
+                        </select>
+                        <select id="testFrom" class="input" aria-label="Tes dari"></select>
+                        <div id="testToWrap"><select id="testTo" class="input" aria-label="Tes sampai"></select></div>
+                        <select id="testSingleGroup" class="input" aria-label="Pilih Grup"></select> <!-- Removed hidden attribute here, visibility handled by JS -->
+                        <div class="small" style="grid-column: span 4; text-align: center; margin-top: 4px;">Jika 'Dari' > 'Sampai', sistem akan menukar otomatis.</div>
+                    </div>
+                    <div class="spacer"></div>
+                    <div class="row" style="justify-content: center;">
+                        <button class="btn primary" id="btnStart" type="button" title="Gunakan Enter untuk Cek, → untuk Lewati"><i class="fa-solid fa-play"></i> Mulai Tes</button>
+                        <button class="btn" id="btnSkip" type="button" title="Lewati soal (→)"><i class="fa-solid fa-forward"></i> Lewati</button>
+                        <button class="btn warn" id="btnEnd" type="button"><i class="fa-solid fa-stop"></i> Selesai</button>
+                    </div>
+
+                    <div class="spacer"></div>
+                    <div class="progress" aria-label="Progress Tes" role="progressbar" aria-valuemin="0" aria-valuemax="100"><div id="bar" class="bar"></div></div>
+                    <div class="spacer"></div>
+                    <div id="testArea" class="center" hidden>
+                        <div id="promptWrap" style="display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap">
+                            <div id="qKana" style="font-size:64px;line-height:1.1;margin:6px 0">あ</div>
+                            <button class="btn ghost" id="btnReplayAudio" type="button" title="Putar lagi audio" aria-label="Putar ulang audio" hidden><i class="fa-solid fa-volume-up"></i></button>
+                        </div>
+                        <div id="typeWrap" style="max-width:520px;margin:0 auto">
+                            <input id="ans" class="input" placeholder="Ketik jawaban kamu di sini…" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" inputmode="text" aria-label="Jawaban" />
+                            <div class="spacer"></div>
+                            <button class="btn" id="btnCheck" type="button"><i class="fa-solid fa-check"></i> Cek (Enter)</button>
+                        </div>
+                        <div id="mcWrap" class="optwrap" hidden>
+                            <button class="btn opt" id="optA" aria-label="Pilihan A" type="button">A</button>
+                            <button class="btn opt" id="optB" aria-label="Pilihan B" type="button">B</button>
+                            <button class="btn opt" id="optC" aria-label="Pilihan C" type="button">C</button>
+                            <button class="btn opt" id="optD" aria-label="Pilihan D" type="button">D</button>
+                            <div class="small" style="grid-column: span 4; text-align: center; margin-top: 4px;">Ketuk atau tekan A/B/C/D</div>
+                        </div>
+                        <div class="spacer"></div>
+                        <div class="small" id="testInfo" aria-live="polite">
+                            <span id="testInfoText"></span>
+                            <span id="streakCounter">Streak: 0</span>
+                        </div>
+                    </div>
+                    <div id="testEmptyState" class="small" style="text-align: center; margin-top: 16px;">Setel tipe soal dan jumlah, lalu tekan Mulai Tes.</div>
+                </div>
+            </div>
+
+            <!-- Subbagian C: Pomodoro mini -->
+            <div id="latihan-pomodoro" class="grid" id="pomoSection">
+                <div class="card">
+                    <h2 id="pomoTitle"><i class="fa-solid fa-clock icon"></i> Timer Pomodoro (Opsional)</h2>
+                    <div class="small">Default 25/5, bisa diubah. Status dan sisa waktu tersimpan otomatis.</div>
+                    <div class="row" role="group" aria-label="Kontrol Pomodoro">
+                        <label>
+                            <span class="sr-only">Menit fokus</span>
+                            <input id="pomoWork" class="input" type="number" min="1" value="25"> menit fokus
+                        </label>
+                        <label>
+                            <span class="sr-only">Menit istirahat</span>
+                            <input id="pomoBreak" class="input" type="number" min="1" value="5"> menit istirahat
+                        </label>
+                        <button class="btn primary" id="pStart" type="button"><i class="fa-solid fa-play"></i> Mulai</button>
+                        <button class="btn" id="pPause" type="button"><i class="fa-solid fa-pause"></i> Pause</button>
+                        <button class="btn warn" id="pReset" type="button" aria-label="Reset Pomodoro"><i class="fa-solid fa-redo"></i> Reset</button>
+                    </div>
+                    <div class="spacer"></div>
+                    <div class="center">
+                        <div id="pomoLabel" class="tag" aria-live="polite">Fokus</div>
+                        <div id="pomoTime" style="font-size:32px;margin-top:6px">25:00</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Subbagian D: Tracker/Progres -->
+            <div id="latihan-tracker" class="grid" id="trackerSection">
+                <div class="card">
+                    <h2 id="trackTitle"><i class="fa-solid fa-chart-line icon"></i> Tracker Kana</h2>
+                    <div class="small">Ketuk untuk tandai sudah hafal. Tahan (long-press) untuk batal.</div>
+                    <div class="spacer"></div>
+                    <div class="row">
+                        <div style="flex:1;min-width:280px">
+                            <div class="muted">Hiragana</div>
+                            <div id="hiraBox" class="pillbox"></div>
+                        </div>
+                        <div style="flex:1;min-width:280px">
+                            <div class="muted">Katakana</div>
+                            <div id="kataBox" class="pillbox"></div>
+                        </div>
+                    </div>
+                    <div class="spacer"></div>
+                    <div class="row">
+                        <div class="tag" id="jpStats" aria-live="polite">0/104 hira • 0/104 kata</div>
+                        <div class="tag" id="reviewDueIndicator" aria-live="polite" hidden>Review due: 0</div>
+                    </div>
+                    <div class="spacer"></div>
+                    <div class="row" style="justify-content: center; font-size: 14px;">
+                        <span id="totalPointsDisplay">Poin: 0</span>
+                        <span style="margin: 0 10px;">•</span>
+                        <span id="levelDisplay">Level: 1 (Pemula Kana)</span>
+                    </div>
+                    <div class="spacer"></div>
+                    <div class="row" style="justify-content:center;">
+                        <button class="btn warn" id="resetConfusionBtn" type="button" aria-label="Atur ulang log pasangan tertukar">Reset Confusion</button>
+                    </div>
+                </div>
             </div>
         </section>
 
-        <!-- POMODORO -->
-        <section class="grid" aria-labelledby="pomoTitle" id="pomoSection">
+        <!-- Placeholder halaman lain -->
+        <section id="page-flashcard" data-page hidden>
             <div class="card">
-                <h2 id="pomoTitle"><i class="fa-solid fa-clock icon"></i> Timer Pomodoro (Opsional)</h2>
-                <div class="small">Default 25/5, bisa diubah. Status dan sisa waktu tersimpan otomatis.</div>
-                <div class="row" role="group" aria-label="Kontrol Pomodoro">
-                    <label>
-                        <span class="sr-only">Menit fokus</span>
-                        <input id="pomoWork" type="number" min="1" value="25" style="width:90px"> menit fokus
-                    </label>
-                    <label>
-                        <span class="sr-only">Menit istirahat</span>
-                        <input id="pomoBreak" type="number" min="1" value="5" style="width:90px"> menit istirahat
-                    </label>
-                    <button class="btn primary" id="pStart" type="button"><i class="fa-solid fa-play"></i> Mulai</button>
-                    <button class="btn" id="pPause" type="button"><i class="fa-solid fa-pause"></i> Pause</button>
-                    <button class="btn warn" id="pReset" type="button"><i class="fa-solid fa-redo"></i> Reset</button>
-                </div>
-                <div class="spacer"></div>
-                <div class="center">
-                    <div id="pomoLabel" class="tag" aria-live="polite">Fokus</div>
-                    <div id="pomoTime" style="font-size:32px;margin-top:6px">25:00</div>
-                </div>
+                <h2>🗂️ Flashcard</h2>
+                <p>Konten untuk Flashcard akan ditampilkan di sini.</p>
+                <div class="small">Ini adalah halaman placeholder.</div>
             </div>
         </section>
-
-        <!-- TRACKER -->
-        <section class="grid" aria-labelledby="trackTitle" id="trackerSection">
+        <section id="page-tabel" data-page hidden>
             <div class="card">
-                <h2 id="trackTitle"><i class="fa-solid fa-chart-line icon"></i> Tracker Kana</h2>
-                <div class="small">Ketuk untuk tandai sudah hafal. Tahan (long-press) untuk batal.</div>
-                <div class="spacer"></div>
-                <div class="row">
-                    <div style="flex:1;min-width:280px">
-                        <div class="muted">Hiragana</div>
-                        <div id="hiraBox" class="pillbox"></div>
-                    </div>
-                    <div style="flex:1;min-width:280px">
-                        <div class="muted">Katakana</div>
-                        <div id="kataBox" class="pillbox"></div>
-                    </div>
-                </div>
-                <div class="spacer"></div>
-                <div class="row">
-                    <div class="tag" id="jpStats" aria-live="polite">0/104 hira • 0/104 kata</div>
-                    <!-- PATCH: Indikator Review due -->
-                    <div class="tag" id="reviewDueIndicator" aria-live="polite" hidden>Review due: 0</div>
-                </div>
-                <div class="spacer"></div>
-                <div class="row" style="justify-content: center; font-size: 14px;">
-                    <span id="totalPointsDisplay">Poin: 0</span>
-                    <span style="margin: 0 10px;">•</span>
-                    <span id="levelDisplay">Level: 1 (Pemula Kana)</span>
-                </div>
-                <!-- PATCH: Tombol Reset Confusion -->
-                <div class="spacer"></div>
-                <div class="row" style="justify-content:center;">
-                    <button class="btn warn" id="resetConfusionBtn" type="button">Reset Confusion</button>
-                </div>
+                <h2>🧮 Tabel Kana</h2>
+                <p>Konten untuk Tabel Kana akan ditampilkan di sini.</p>
+                <div class="small">Ini adalah halaman placeholder.</div>
             </div>
         </section>
-
-        <!-- WRITER / LATIHAN MENULIS -->
-        <section class="grid" aria-labelledby="writerTitle" id="writerSection">
-            <div class="card" style="grid-column: span 12;">
-                <h2 id="writerTitle"><i class="fa-solid fa-pen-fancy icon"></i> Latihan Menulis (Hiragana/Katakana)</h2>
-                <div class="small">Gambar huruf dengan jari/mouse. Nyalakan <b>Panduan</b> untuk meniru bentuk.</div>
-                <div class="spacer"></div>
-
-                <div class="row" style="align-items:flex-end">
-                    <select id="writeSet" aria-label="Pilih set tulis">
-                        <option value="hira">Hiragana</option>
-                        <option value="kata">Katakana</option>
-                    </select>
-                    <select id="writeKana" aria-label="Pilih kana"></select>
-                    <button class="btn" id="writePrev" type="button" title="Sebelumnya"><i class="fa-solid fa-chevron-left"></i> Sebelumnya</button>
-                    <button class="btn" id="writeNext" type="button" title="Berikutnya">Berikutnya <i class="fa-solid fa-chevron-right"></i></button>
-                    <button class="btn" id="writeRand" type="button" title="Acak"><i class="fa-solid fa-shuffle"></i> Acak</button>
-                    <button class="btn" id="writeSpeak" type="button" title="Dengar pelafalan kana"><i class="fa-solid fa-volume-up"></i></button>
-                </div>
-
-                <div class="spacer"></div>
-
-                <div class="writer-toolbar">
-                    <button class="btn ok" id="penBtn" type="button"><i class="fa-solid fa-pen"></i> Pena</button>
-                    <button class="btn" id="eraserBtn" type="button"><i class="fa-solid fa-eraser"></i> Penghapus</button>
-                    <div class="slider">
-                        <label for="penSize">Ukuran</label>
-                        <input id="penSize" type="range" min="2" max="28" value="10" style="width:140px">
-                    </div >
-                    <label class="btn ghost" style="gap:8px">
-                        <input id="gridToggle" type="checkbox"> Grid
-                    </label>
-                    <label class="btn ghost" style="gap:8px">
-                        <input id="ghostToggle" type="checkbox"> Panduan
-                    </label>
-                    <label class="btn ghost" style="gap:8px">
-                        <input id="autoSnapToggle" type="checkbox"> Auto-Snap
-                    </label>
-                    <div style="flex:1"></div>
-                    <button class="btn" id="undoStroke" type="button" title="Undo (Ctrl+Z)"><i class="fa-solid fa-undo"></i> Undo</button>
-                    <button class="btn warn" id="clearCanvas" type="button"><i class="fa-solid fa-redo"></i> Bersihkan</button>
-                    <button class="btn primary" id="savePNG" type="button"><i class="fa-solid fa-download"></i> Simpan PNG</button>
-                </div>
-
-                <div class="spacer"></div>
-
-                <div id="writerWrap" class="writer-wrap grid">
-                    <canvas id="writerCanvas" width="900" height="900" aria-label="Kanvas menulis"></canvas>
-                    <div id="writerGhost" class="writer-ghost" aria-hidden="true">あ</div>
-                </div>
-                <div class="small center" style="margin-top: 8px;">Tips: Tarik cepat untuk garis tipis, pelan untuk lebih tebal.</div>
+        <section id="page-kosakata" data-page hidden>
+            <div class="card">
+                <h2>🗒️ Kosakata</h2>
+                <p>Konten untuk Kosakata akan ditampilkan di sini.</p>
+                <div class="small">Ini adalah halaman placeholder.</div>
+            </div>
+        </section>
+        <section id="page-ungkapan" data-page hidden>
+            <div class="card">
+                <h2>💬 Ungkapan</h2>
+                <p>Konten untuk Ungkapan akan ditampilkan di sini.</p>
+                <div class="small">Ini adalah halaman placeholder.</div>
+            </div>
+        </section>
+        <section id="page-menulis" data-page hidden>
+            <div class="card">
+                <h2>✍️ Menulis</h2>
+                <p>Konten untuk latihan menulis Kana akan ditampilkan di sini.</p>
+                <div class="small">Ini adalah halaman placeholder.</div>
             </div>
         </section>
 
@@ -1006,22 +1033,21 @@
             <div id="reviewWrap" style="text-align:left;max-height:40vh;overflow:auto;margin:8px 0" hidden></div>
             <div class="row" style="justify-content:center">
                 <button class="btn" id="btnReviewWrong" hidden type="button"><i class="fa-solid fa-redo-alt"></i> Belajar ulang yang salah</button>
-                <button class="btn primary" id="btnCloseModal" type="button"><i class="fa-solid fa-times"></i> Lanjut</button>
+                <button class="btn primary" id="btnCloseModal" type="button" aria-label="Lanjut"><i class="fa-solid fa-times"></i> Lanjut</button>
             </div>
+            <div id="burst" class="burst" aria-hidden="true"></div>
         </div>
-        <div id="burst" class="burst" aria-hidden="true"></div>
     </div>
 
     <!-- Onboarding Modal -->
     <div id="onboardingModal" class="modal" aria-modal="true" role="dialog"
-     aria-labelledby="onboardingTitle" aria-describedby="onboardingMsg" hidden>
+       aria-labelledby="onboardingTitle" aria-describedby="onboardingMsg" hidden>
         <div class="box">
             <h3 id="onboardingTitle" style="margin:0 0 6px 0">Selamat Datang di Pelatih Kana Jepang! 👋</h3>
             <div id="onboardingMsg" class="small">
                 <p>Aplikasi ini akan membantumu menguasai Hiragana & Katakana.</p>
                 <p><b>1. Belajar:</b> Pilih set & rentang, ketuk huruf buat dengar pelafalan.</p>
                 <p><b>2. Tes:</b> Atur tipe soal (Kana → Romaji, Romaji → Kana, atau Rangkaian) & jumlah soal. Kamu bisa ketik atau pilih jawaban.</p>
-                <p><b>3. Menulis:</b> Latih goresanmu di kanvas. Aktifkan "Panduan" untuk menjiplak, dan "Auto-Snap" kalau mau dibantu rapi.</p>
             </div>
             <div class="spacer"></div>
             <div class="row" style="justify-content:center">
@@ -1031,6 +1057,11 @@
     </div>
 
     <script>
+        // No-JS Fallback: Remove 'no-js' class and show #main if JS is enabled
+        document.documentElement.classList.remove('no-js');
+        // Initial display for #main will be handled by renderAll -> showOnboarding, so we don't need a direct style here
+        // qs('#main').style.display = '';
+
         /**
          * Escapes HTML entities in a string to prevent XSS.
          * @param {string} str - The string to escape.
@@ -1050,16 +1081,14 @@
             nav_learn: 'Belajar',
             nav_test: 'Tes',
             nav_tracker: 'Tracker',
-            nav_writer: 'Menulis',
             nav_timer: 'Timer',
             btn_show: 'Tampilkan',
             btn_start_test: 'Mulai Tes',
             btn_check: 'Cek Jawaban',
             btn_skip: 'Lewati',
             btn_end: 'Selesai',
-            writer_hint: 'Tips: Tarik cepat untuk garis tipis, pelan untuk lebih tebal.',
             empty_learn: 'Pilih set & rentang dulu, lalu tekan Tampilkan.',
-            empty_test: 'Setel tipe soal dan jumlah, lalu tekan Mulai Tes.',
+            empty_test: 'Setel tipe soal, jumlah, dan rentang/grup, lalu tekan Mulai Tes.',
             empty_review: 'Bersih! Nggak ada jawaban keliru. 👍',
             done_test_title: 'Tes selesai! 🎉',
             done_test_sub: (s,t)=>`Skor kamu ${s}/${t}. Bagus!`,
@@ -1071,7 +1100,7 @@
             export_ok: 'Progres berhasil diekspor sebagai kana-progress.json!',
             level_up_title: (level)=>`Level Up! 🎉 Level ${level}!`,
             level_up_msg: (name)=>`Kamu sekarang seorang ${name}! Terus semangat! 🔥`,
-            // PATCH: Perbaikan karakter di streak_title
+            // PATCH: Character fix in streak_title
             streak_title: 'Wii! Keren banget! ✨',
             streak_msg: '10 jawaban benar berturut-turut. Lanjutkan momentummu! ✨',
             pomo_focus: 'Fokus',
@@ -1082,19 +1111,14 @@
             test_streak: (streak)=>`Streak: ${streak}`,
             test_mc_hint: 'Ketuk atau tekan A/B/C/D',
             learn_tile_tooltip: 'Ketuk untuk dengar, tahan untuk batal',
-            writer_guide_hint: 'Tips: Tarik cepat untuk garis tipis, pelan untuk lebih tebal.',
             onboarding_title: 'Selamat Datang di Pelatih Kana Jepang! 👋',
             onboarding_step1: '<b>1. Belajar:</b> Pilih set & rentang, ketuk huruf buat dengar pelafalan.',
             onboarding_step2: '<b>2. Tes:</b> Atur tipe soal (Kana → Romaji, Romaji → Kana, atau Rangkaian) & jumlah soal. Kamu bisa ketik atau pilih jawaban.',
-            onboarding_step3: '<b>3. Menulis:</b> Latih goresanmu di kanvas. Aktifkan "Panduan" untuk menjiplak, dan "Auto-Snap" kalau mau dibantu rapi.',
             onboarding_button_start: 'Mulai Belajar!',
             feedback_correct: (kana, romaji) => `Mantap! ${kana} = ${romaji} ✅`,
             feedback_wrong: (kana, romaji, user_input) => `Belum pas. ${kana} dibaca ${romaji}. Jawaban kamu: ${user_input}. Coba lagi ya.`,
             feedback_wrong_dji_dzu: (kana, romaji, user_input) => `Belum pas. ${kana} dibaca ${romaji} (boleh juga ji/zu). Jawaban kamu: ${user_input}. Coba lagi ya.`,
             feedback_skipped: 'Oke, kita lanjut dulu.',
-            writer_snap_success: 'Rapi! Bentuknya sudah pas ',
-            writer_snap_fail: 'Hampir! Coba garisnya sedikit lebih melengkung.',
-            // PATCH: String lokal baru
             confuse_train_label: 'Latih Pasangan Tertukar',
             review_today_label: 'Review Hari Ini',
             replay_audio: 'Putar lagi',
@@ -1110,6 +1134,7 @@
             test_type_kseq: 'Kana Sequence (Ketik Romaji)',
             lite_mode_on: 'Mode Ringan AKTIF!',
             lite_mode_off: 'Mode Ringan NONAKTIF!',
+            all_kana_label: 'Semua Kana',
         };
 
         const t = (key, ...args) => {
@@ -1127,31 +1152,19 @@
             audio:false,
             hiraMastered:[], kataMastered:[],
             test:{
-                subset:'aiueo', set:'hira', mode:'type', qType:'k2r',
-                score:0, total:0, correctStreak:0, target:10, rangeMode:'range',
-                // PATCH: Tambah sylPerItem untuk kseq dan seq
-                sylPerItem: 3 
+                subset:'all', set:'hira', mode:'type', qType:'k2r', // subset default to 'all'
+                score:0, total:0, correctStreak:0, target:10, rangeMode:'range', // rangeMode default
+                sylPerItem: 3,
+                rangeFrom: 'aiueo', // Default values for range selects
+                rangeTo: 'n',
+                singleGroup: 'aiueo'
             },
             pomo:{mode:'work', work:25, break:5, remaining:25*60, running:false, last:0},
             totalPoints: 0,
             level: 1,
-            writer: {
-                set: 'hira',
-                kana: 'a',
-                penSize: 10,
-                eraser: false,
-                grid: true,
-                ghost: true,
-                ghostOpacity: 0.12,
-                autoSnap: false,
-                snapThreshold: 0.52,
-            },
             hasSeenOnboarding: false,
-            // PATCH: State untuk Confusion Trainer
             confusionLog:{ hira:{}, kata:{} },
-            // PATCH: State untuk Leitner SRS
             srs:{ boxes:{}, due:{} },
-            // PATCH: State untuk Lite Mode
             lite: false,
         });
         let state = load();
@@ -1163,12 +1176,9 @@
                 const mergedState = { ...initState(), ...loadedState };
                 mergedState.test = deepMerge(initState().test, loadedState.test);
                 mergedState.pomo = deepMerge(initState().pomo, loadedState.pomo);
-                mergedState.writer = deepMerge(initState().writer, loadedState.writer);
                 mergedState.hasSeenOnboarding = loadedState.hasSeenOnboarding !== undefined ? loadedState.hasSeenOnboarding : initState().hasSeenOnboarding;
-                // PATCH: Merge confusionLog dan srs
                 mergedState.confusionLog = deepMerge(initState().confusionLog, loadedState.confusionLog);
                 mergedState.srs = deepMerge(initState().srs, loadedState.srs);
-                // PATCH: Merge lite state
                 mergedState.lite = loadedState.lite !== undefined ? loadedState.lite : initState().lite;
                 return mergedState;
             }catch(e){
@@ -1210,7 +1220,6 @@
         const HIRA_BASE = ['あ','い','う','え','お','か','き','く','け','こ','さ','し','す','せ','そ','た','ち','つ','て','と','な','に','ぬ','ね','の','は','ひ','ふ','へ','ほ','ま','み','む','め','も','や','ゆ','よ','ら','り','る','れ','ろ','わ','を','ん'];
         const KATA_BASE = ['ア','イ','ウ','エ','オ','カ','キ','ク','ケ','コ','サ','シ','ス','セ','ソ','タ','チ','ツ','テ','ト','ナ','ニ','ヌ','ネ','ノ','ハ','ヒ','フ','ヘ','ホ','マ','ミ','ム','メ','モ','ヤ','ユ','ヨ','ラ','リ','ル','レ','ロ','ワ','ヲ','ン'];
 
-        // FIX: Karakter Hiragana Dakuon dan Handakuten yang benar
         const HIRA_DAKU = ['が','ぎ','ぐ','げ','ご','ざ','じ','ず','ぜ','ぞ','だ','ぢ','づ','で','ど','ば','び','ぶ','べ','ぼ','ぱ','ぴ','ぷ','ぺ','ぽ'];
         const KATA_DAKU = ['ガ','ギ','グ','ゲ','ゴ','ザ','ジ','ズ','ゼ','ゾ','ダ','ヂ','ヅ','デ','ド','バ','ビ','ブ','ベ','ボ','パ','ピ','プ','ペ','ポ'];
 
@@ -1259,9 +1268,8 @@
             ['シ','ツ'], ['ソ','ン'], ['ク','ケ'], ['フ','ワ'], ['ヂ','ジ'], ['ヅ','ズ'],
             ['ノ','メ'], ['イ','リ'], ['エ','ヱ'], ['ネ','レ'], ['ア','マ'], ['ム','厶']
         ];
-        // PATCH: Tambah pasangan Hiragana yang membingungkan
         const CONFUSE_HIRA = [
-            ['ぬ','め'], ['れ','ね'], ['う','ら'], ['ち','さ'], ['つ','te'], ['を','わ']
+            ['ぬ','め'], ['れ','ね'], ['う','ら'], ['ち','さ'], ['つ','て'], ['を','わ']
         ];
         
         function similarChoicesKata(correct){
@@ -1272,8 +1280,6 @@
             }
             return [];
         }
-
-        // PATCH: Fungsi untuk mendapatkan pilihan serupa Hiragana
         function similarChoicesHira(correct) {
             for(const g of CONFUSE_HIRA) {
                 if(g.includes(correct)) {
@@ -1283,14 +1289,29 @@
             return [];
         }
 
-        // PATCH: Leitner SRS Intervals (in seconds)
+        // Leitner SRS Intervals (in seconds)
         const SRS_INTERVAL = {
-            1: 0,         // Box 1: Immediate repeat
-            2: 86400,     // Box 2: 1 day
+            1: 0,      // Box 1: Immediate repeat
+            2: 86400,  // Box 2: 1 day
             3: 3 * 86400, // Box 3: 3 days
             4: 7 * 86400, // Box 4: 7 days
             5: 14 * 86400 // Box 5: 14 days
         };
+
+        function getDueReviewItems(set) {
+            const now = Math.floor(Date.now() / 1000);
+            const dueItems = [];
+            for (const romaji in state.srs.due) {
+                if (state.srs.due[romaji] <= now) {
+                    const char = (set === 'hira' ? HIRA_MAP : KATA_MAP).get(romaji);
+                    if (char) {
+                        dueItems.push({ romaji, char });
+                    }
+                }
+            }
+            return dueItems;
+        }
+
 
         // ---------- UI HELPERS ----------
         const qs = (s,el=document)=>el.querySelector(s);
@@ -1360,8 +1381,7 @@
         }
         function renderStats(){ 
             qs('#jpStats').textContent = `${state.hiraMastered.length}/${ALL_ROMAJI.length} hira • ${state.kataMastered.length}/${ALL_ROMAJI.length} kata`; 
-            // PATCH: Indikator Review due
-            const dueCount = getDueReviewItems(state.test.set).length;
+            const dueCount = getDueReviewItems('hira').length + getDueReviewItems('kata').length; // Check both sets
             const reviewDueIndicator = qs('#reviewDueIndicator');
             if (reviewDueIndicator) {
                 reviewDueIndicator.textContent = t('review_due_count', dueCount);
@@ -1413,9 +1433,9 @@
                     const pointsCurrentLevel = state.totalPoints - (LEVEL_THRESHOLDS[level - 1] || 0);
                     const pointsNeededForNext = nextThreshold - (LEVEL_THRESHOLDS[level - 1] || 0);
                     if (pointsNeededForNext > 0) {
-                        progressText = ` (${pointsCurrentLevel}/${pointsNeededForNext})`;    
+                        progressText = ` (${pointsCurrentLevel}/${pointsNeededForNext})`;  
                     } else { // Should not happen if thresholds are well-defined
-                        progressText = ``; 
+                        progressText = ``;  
                     }
                 } else {
                     progressText = ` (MAX)`;
@@ -1431,7 +1451,6 @@
             const from=qs('#fromGrp').value, to=qs('#toGrp').value;
             const labels = rangeLabels(from,to);
             const map = set==='hira'?HIRA_MAP:KATA_MAP;
-            // PATCH: Mendefinisikan 'mastered' di sini
             const mastered = set==='hira'? state.hiraMastered: state.kataMastered;
             const box=qs('#learnTiles');
             box.innerHTML='';
@@ -1458,98 +1477,261 @@
         let lastSpeakTime = 0;
         const SPEAK_COOLDOWN = 600; // ms
 
-        // PATCH: Utility untuk Confusion Trainer
         function _pairKey(a, b) {
             const [x, y] = [a, b].sort();
             return x + '|' + y;
         }
 
-        // PATCH: Utility untuk mendapatkan top confused pairs
         function _confuseTopPairs(set, N = 10) {
             const log = state.confusionLog[set] || {};
             const pairs = Object.entries(log)
-                .sort(([, countA], [, countB]) => countB - countA) // Sort by count descending
+                .sort(([, countA], [, countB]) => countB - countA)
                 .slice(0, N)
-                .flatMap(([pairStr]) => pairStr.split('|')); // Get both kana from the pair
-            return [...new Set(pairs)]; // Return unique kana from top N pairs
+                .flatMap(([pairStr]) => pairStr.split('|'));
+            return [...new Set(pairs)];
         }
 
-        // PATCH: Utility untuk mendapatkan item SRS yang jatuh tempo
-        function getDueReviewItems(set) {
-            const now = Math.floor(Date.now() / 1000);
-            const dueItems = [];
-            for (const romaji in state.srs.due) {
-                if (state.srs.due[romaji] <= now) {
-                    // Check if the item belongs to the current set (hira/kata)
-                    const char = (set === 'hira' ? HIRA_MAP : KATA_MAP).get(romaji);
-                    if (char) { // Ensure it's a valid kana for the set
-                        dueItems.push({ romaji, char });
-                    }
+        // ====== RENTANG KHUSUS (SELECTS) ======
+        const elRangeMode = document.getElementById('rangeMode');
+        const elFrom      = document.getElementById('testFrom');
+        const elTo        = document.getElementById('testTo');
+        const elSingle    = document.getElementById('testSingleGroup');
+        const elToWrap    = document.getElementById('testToWrap');
+
+        // helper isi <select>
+        function fillOptions(select, items){
+            if (!select) return; // Add null check
+            select.innerHTML = '';
+            for(const it of items){
+                const opt = document.createElement('option');
+                opt.value = it.key;            // 'aiueo','m','ky',dst.
+                opt.textContent = it.label;    // 'a i u e o', 'ma mi mu me mo', dst.
+                select.appendChild(opt);
+            }
+        }
+
+        function populateRangeSelects(){
+            // Urutan ikut index GROUPS → ini penting buat potong rentang
+            fillOptions(elFrom, GROUPS);
+            fillOptions(elTo,    GROUPS);
+            fillOptions(elSingle, GROUPS);
+
+            // restore saved values or set default safe values
+            if (state.test.rangeFrom && elFrom && elFrom.querySelector(`option[value="${state.test.rangeFrom}"]`)) {
+                elFrom.value = state.test.rangeFrom;
+            } else if (elFrom) {
+                elFrom.selectedIndex = 0;
+                state.test.rangeFrom = elFrom.value;
+            }
+
+            if (state.test.rangeTo && elTo && elTo.querySelector(`option[value="${state.test.rangeTo}"]`)) {
+                elTo.value = state.test.rangeTo;
+            } else if (elTo) {
+                elTo.selectedIndex = GROUPS.length - 1;
+                state.test.rangeTo = elTo.value;
+            }
+
+            if (state.test.singleGroup && elSingle && elSingle.querySelector(`option[value="${state.test.singleGroup}"]`)) {
+                elSingle.value = state.test.singleGroup;
+            } else if (elSingle) {
+                elSingle.selectedIndex = 0;
+                state.test.singleGroup = elSingle.value;
+            }
+            
+            // Set range mode
+            if (state.test.rangeMode && elRangeMode && elRangeMode.querySelector(`option[value="${state.test.rangeMode}"]`)) {
+                elRangeMode.value = state.test.rangeMode;
+            } else if (elRangeMode) {
+                elRangeMode.value = 'range'; // Default to 'range'
+                state.test.rangeMode = 'range';
+            }
+            save(); // Save initial state
+        }
+        // populateRangeSelects(); // Call this in renderAll
+
+        // toggle enable/disable + visibilitas
+        function setEnabled(el, on){
+            if (el) {
+                el.disabled = !on;
+                // Removed opacity/pointer-events, using 'inert' attribute and 'hidden' instead for better accessibility
+                if (!on) {
+                    el.setAttribute('inert', '');
+                    el.hidden = true;
+                } else {
+                    el.removeAttribute('inert');
+                    el.hidden = false;
                 }
             }
-            return dueItems;
+        }
+
+        // Updated function name from applyRangeMode to updateRangeUI as requested
+        function updateRangeUI(){
+            if (!elRangeMode) return; // Ensure element exists
+
+            const mode = elRangeMode.value; // 'range' | 'single'
+            state.test.rangeMode = mode; // Save current mode
+            save(); // Save state immediately when rangeMode changes
+
+            if(mode === 'range'){
+                setEnabled(elFrom, true); 
+                setEnabled(elTo, true);
+                if (elToWrap) elToWrap.hidden = false; // Show the wrapper for elTo
+                setEnabled(elSingle, false); 
+            }else if(mode === 'single'){
+                setEnabled(elFrom, false); 
+                setEnabled(elTo, false);
+                if (elToWrap) elToWrap.hidden = true; // Hide the wrapper for elTo
+                setEnabled(elSingle, true); 
+            } else { // Fallback for 'all' or other modes (e.g., when a preset chip is active)
+                setEnabled(elFrom, false);
+                setEnabled(elTo, false);
+                if (elToWrap) elToWrap.hidden = true;
+                setEnabled(elSingle, false);
+            }
+            ensureValidRange(); // Ensure range is valid after UI update
+            updateTestInfo(); // Update test info text
+        }
+
+        function ensureValidRange() {
+            if (!elFrom || !elTo || elFrom.hidden || elTo.hidden) return; // Only validate if range is visible
+
+            const fromKey = elFrom.value;
+            const toKey = elTo.value;
+            const order = GROUPS.map(g=>g.key);
+            
+            const fromIndex = order.indexOf(fromKey);
+            const toIndex = order.indexOf(toKey);
+
+            if (fromIndex > toIndex) {
+                // Auto-swap biar gak "gabisa diklik"
+                elFrom.value = toKey;
+                elTo.value = fromKey;
+                state.test.rangeFrom = toKey;
+                state.test.rangeTo = fromKey;
+                save(); // Save the swapped values
+            } else {
+                state.test.rangeFrom = fromKey;
+                state.test.rangeTo = toKey;
+                save(); // Save current valid values
+            }
+            updateTestInfo(); // Update test info text
         }
 
 
-        function fillTestRange(){
-            const tf=qs('#testFrom'), tt=qs('#testTo'), ts=qs('#testSingleGroup');
-            tf.innerHTML=''; tt.innerHTML=''; ts.innerHTML='';
-            GROUPS.forEach(g=>{
-                tf.add(new Option(g.label,g.key));
-                tt.add(new Option(g.label,g.key));
-                ts.add(new Option(g.label,g.key));
-            });
-            tf.value='aiueo';
-            tt.value='k';
-            ts.value='aiueo';
-            qs('#rangeMode').value = state.test.rangeMode;
-            toggleRangeInputs();
+        bind('#rangeMode','change', updateRangeUI); // Bind to updated function name
+        bind('#testFrom','change', ensureValidRange);
+        bind('#testTo','change', ensureValidRange);
+
+        // Ambil daftar romaji dari 1 group
+        function romajiFromGroup(g){
+            // g.list menunjuk BASE/DAKUON/YOUON, g.idx indeks romaji di list tsb.
+            return g.idx.map(i => g.list[i]);
         }
 
+        // Ambil subset dari UI
+        function getChosenSubset(){
+            if (!elRangeMode) return null; // Ensure element exists
+
+            const mode = elRangeMode.value; // 'range' | 'single'
+
+            if(mode === 'range'){
+                if (!elFrom || !elTo || elFrom.hidden || elTo.hidden) return null; // Check if hidden (inert)
+                const i1 = elFrom.selectedIndex;
+                const i2 = elTo.selectedIndex;
+                if(i1 < 0 || i2 < 0) return null;
+                const lo = Math.min(i1,i2), hi = Math.max(i1,i2);
+                let pool = [];
+                for(let i=lo;i<=hi;i++){ pool = pool = pool.concat(romajiFromGroup(GROUPS[i])); }
+                return pool;
+            }
+
+            if(mode === 'single'){
+                if (!elSingle || elSingle.hidden) return null; // Check if hidden (inert)
+                const i = elSingle.selectedIndex;
+                if(i < 0) return null;
+                const picked = romajiFromGroup(GROUPS[i]);
+                return picked; // Return array directly
+            }
+
+            return null; // fallback: biarkan logic defaultmu jalan (mis. “Pilih cepat”)
+        }
+
+        // Moved buildSubsetChips definition here to ensure it's defined before renderAll
         function buildSubsetChips(){
             const box=qs('#subsetChips');
-            const existingText = box.querySelector('.small');
-            box.innerHTML='';
-            if (existingText) {
-                box.appendChild(existingText);
+            // Preserve the chips-title div
+            const existingTitle = box.querySelector('.chips-title');
+            if (existingTitle) {
+                box.innerHTML = ''; // Clear only chips, keep title
+                box.appendChild(existingTitle);
             } else {
+                 box.innerHTML=''; // Fallback if title not found
                 const hint = document.createElement('div');
-                hint.className = 'small';
-                hint.style.marginBottom = '4px';
+                hint.className = 'chips-title'; // Use new class for sticky
                 hint.textContent = 'Pilih cepat:';
                 box.appendChild(hint);
             }
 
             const frag=df();
-            GROUPS.forEach(g=>{
-                const b=document.createElement('button');
-                b.type='button';
-                b.className='chip'+(state.test.subset===g.key?' active':'');
-                b.setAttribute('aria-pressed', state.test.subset===g.key);
-                b.textContent=g.label;
-                b.onclick=()=>{ state.test.subset=g.key; save(); buildSubsetChips(); };
-                frag.appendChild(b);
-            });
-            // PATCH: Tambah chip "Latih Pasangan Tertukar"
+            // Add "All Kana" chip
+            const allKanaChip = document.createElement('button');
+            allKanaChip.type = 'button';
+            allKanaChip.className = 'chip' + (state.test.subset === 'all' ? ' active' : '');
+            allKanaChip.setAttribute('aria-pressed', state.test.subset === 'all');
+            allKanaChip.textContent = t('all_kana_label');
+            allKanaChip.onclick = () => { 
+                state.test.subset = 'all'; 
+                state.test.rangeMode = 'range'; // Reset to range, then hide via updateRangeUI
+                save(); 
+                buildSubsetChips(); 
+                updateRangeUI(); // This will effectively hide range selects for 'all' or 'confusion' etc.
+            };
+            frag.appendChild(allKanaChip);
+
+            // QUICK_PRESETS chips
+            for (const key in QUICK_PRESETS) {
+                const button = document.createElement('button');
+                button.type = 'button';
+                button.className = 'chip';
+                button.textContent = key.replace(/-/g, ' → '); // Display preset key nicely
+                button.dataset.preset = key;
+                button.onclick = () => applyPreset(key);
+                frag.appendChild(button);
+            }
+
+            // Add "Train Confused Pairs" chip
             const confuseChip = document.createElement('button');
             confuseChip.type = 'button';
             confuseChip.className = 'chip' + (state.test.subset === 'confusion' ? ' active' : '');
             confuseChip.setAttribute('aria-pressed', state.test.subset === 'confusion');
             confuseChip.textContent = t('confuse_train_label');
-            confuseChip.onclick = () => { state.test.subset = 'confusion'; save(); buildSubsetChips(); };
+            confuseChip.onclick = () => { 
+                state.test.subset = 'confusion'; 
+                state.test.rangeMode = 'range'; // Reset to range, then hide via updateRangeUI
+                save(); 
+                buildSubsetChips(); 
+                updateRangeUI(); 
+            };
             frag.appendChild(confuseChip);
 
-            // PATCH: Tambah chip "Review Hari Ini"
+            // Add "Review Today" chip
             const reviewChip = document.createElement('button');
             reviewChip.type = 'button';
             reviewChip.className = 'chip' + (state.test.subset === 'srs_due' ? ' active' : '');
             reviewChip.setAttribute('aria-pressed', state.test.subset === 'srs_due');
             reviewChip.textContent = t('review_today_label');
-            reviewChip.onclick = () => { state.test.subset = 'srs_due'; save(); buildSubsetChips(); };
+            reviewChip.onclick = () => { 
+                state.test.subset = 'srs_due'; 
+                state.test.rangeMode = 'range'; // Reset to range, then hide via updateRangeUI
+                save(); 
+                buildSubsetChips(); 
+                updateRangeUI(); 
+            };
             frag.appendChild(reviewChip);
 
             box.appendChild(frag);
         }
+
 
         function startTest(){
             wrongList=[];
@@ -1560,8 +1742,12 @@
             const req = Math.max(1, parseInt(qs('#testCount').value,10)||10);
             
             let labels;
-            // PATCH: Logika pool soal untuk chip baru (confusion, srs_due)
-            if (state.test.subset === 'confusion') {
+            const chosenSubset = getChosenSubset(); // Get labels from new function
+            if (chosenSubset !== null && chosenSubset.length > 0) {
+                labels = chosenSubset;
+            } else if (state.test.subset === 'all') { // Fallback if no specific range/group chosen
+                labels = ALL_ROMAJI;
+            } else if (state.test.subset === 'confusion') {
                 labels = _confuseTopPairs(state.test.set);
                 if (labels.length === 0) {
                     showCustomAlert('Tidak ada pasangan tertukar yang cukup untuk dilatih.');
@@ -1574,11 +1760,13 @@
                     return;
                 }
                 labels = dueItems.map(item => item.romaji);
-            } else {
-                labels = buildPoolLabels();
+            } else { // Fallback to 'all' if subset is unknown
+                labels = ALL_ROMAJI;
             }
 
+
             let uniquePoolItems = labels.map(r=>({romaji:r, char: (set==='hira'?HIRA_MAP:KATA_MAP).get(r)}));
+            uniquePoolItems = uniquePoolItems.filter(item => item.char !== undefined); // Filter out items that don't have a corresponding Kana
 
             if(!uniquePoolItems.length){ showCustomAlert('Pilih subset atau rentang yang valid.'); return; }
 
@@ -1620,7 +1808,7 @@
             const mcWrap = qs('#mcWrap');
             const answerModeSelect = qs('#answerMode');
             const qTypeSelect = qs('#qType');
-            const sylPerItemControl = qs('#sylPerItemControl'); // PATCH: Kontrol suku kata
+            const sylPerItemControl = qs('#sylPerItemControl');
             const btnReplayAudio = qs('#btnReplayAudio');
 
             const mode = answerModeSelect.value;
@@ -1629,25 +1817,24 @@
             typeWrap.style.display = 'none';
             mcWrap.style.display = 'none';
             answerModeSelect.disabled = false;
-            sylPerItemControl.hidden = true; // PATCH: Sembunyikan default
-            btnReplayAudio.hidden = !(qType.startsWith('audio') || qType === 'kseq'); // Show for audio types and kseq
+            sylPerItemControl.hidden = true;
+            btnReplayAudio.hidden = !(qType.startsWith('audio') || qType === 'kseq');
 
             if (qType === 'seq') {
                 typeWrap.style.display = 'block';
                 answerModeSelect.value = 'type';
                 answerModeSelect.disabled = true;
-                sylPerItemControl.hidden = false; // PATCH: Tampilkan untuk seq
-            } else if (qType === 'kseq') { // PATCH: qType kseq
+                sylPerItemControl.hidden = false;
+            } else if (qType === 'kseq') {
                 typeWrap.style.display = 'block';
                 answerModeSelect.value = 'type';
-                answerModeSelect.disabled = true; // Force type mode
-                sylPerItemControl.hidden = false; // PATCH: Tampilkan untuk kseq
+                answerModeSelect.disabled = true;
+                sylPerItemControl.hidden = false;
             } else if (qType === 'r2k') {
                 mcWrap.style.display = 'grid';
                 answerModeSelect.value = 'mc';
                 answerModeSelect.disabled = true;
-            } else if (qType === 'audio_k2r' || qType === 'audio_r2k') { // PATCH: qType audio
-                // Audio can be type or MC, so don't disable answerModeSelect
+            } else if (qType === 'audio_k2r' || qType === 'audio_r2k') {
                 if (mode === 'type') {
                     typeWrap.style.display = 'block';
                 } else {
@@ -1662,7 +1849,6 @@
             }
         }
 
-        // PATCH: Panggil finishTest() di endTest()
         function endTest(){
             qs('#testArea').style.opacity = '0';
             qs('#testArea').style.pointerEvents = 'none';
@@ -1684,32 +1870,25 @@
             const ansEl=qs('#ans'); 
             if(ansEl) ansEl.value='';
             
-            // PATCH: Sembunyikan tombol replay audio default
-            // Handled by toggleAnswerUI now, ensuring it's shown for audio/kseq types
-
             if (qType.startsWith('audio')) {
                 qs('#qKana').textContent='Dengar & jawab';
                 qs('#qKana').style.fontSize='24px';
                 if (qType === 'audio_k2r') {
-                    speakKanaOrRomaji(currentItem.char); // Speak Kana
+                    speakKanaOrRomaji(currentItem.char);
                 } else { // audio_r2k
-                    speakKanaOrRomaji(currentItem.romaji); // Speak Romaji (as Japanese)
+                    speakKanaOrRomaji(currentItem.romaji);
                 }
-                // btnReplayAudio visibility is handled by toggleAnswerUI
             } else if(qType==='seq'){
-                // For 'seq', currentItem.char is undefined, currentItem.romaji is the original romaji for the single item
-                // makeSequence will generate a sequence from the general pool
-                // FIX: Pass buildPoolLabels() directly
                 const seqData = makeSequence(buildPoolLabels(), state.test.set, state.test.sylPerItem);
-                currentItem = { ...currentItem, romaji: seqData.romaji, char: seqData.kana, qType: qType }; // Store sequence info in currentItem
+                currentItem = { ...currentItem, romaji: seqData.romaji, char: seqData.kana, qType: qType };
                 qs('#qKana').textContent=`Romaji: ${escapeHTML(seqData.romaji)}`;
                 qs('#qKana').style.fontSize='28px';
             }
-            else if(qType==='kseq'){ // PATCH: qType kseq
-                const seqData = makeKanaSequence(state.test.sylPerItem, state.test.set, buildPoolLabels()); // Pass labels to restrict pool
+            else if(qType==='kseq'){
+                const seqData = makeKanaSequence(buildPoolLabels(), state.test.set, state.test.sylPerItem); // Pass buildPoolLabels() result
                 currentItem = { ...currentItem, kanaSeq: seqData.kana, romajiSeq: seqData.romaji, qType: qType };
                 qs('#qKana').textContent = escapeHTML(seqData.kana);
-                qs('#qKana').style.fontSize = '48px'; // Adjust font size for sequences
+                qs('#qKana').style.fontSize = '48px';
             }
             else if(qType==='k2r'){
                 qs('#qKana').textContent=escapeHTML(currentItem.char);
@@ -1721,10 +1900,10 @@
                 buildMC_r2k(currentItem);
             }
 
-            if(qs('#answerMode').value === 'mc' && (qType==='k2r' || qType === 'audio_k2r')) { // PATCH: MC for audio_k2r
+            if(qs('#answerMode').value === 'mc' && (qType==='k2r' || qType === 'audio_k2r')) {
                 buildMC_k2r(currentItem);
-            } else if (qs('#answerMode').value === 'mc' && qType === 'audio_r2k') { // PATCH: MC for audio_r2k
-                buildMC_r2k(currentItem); // This will render Kana options from Romaji prompt
+            } else if (qs('#answerMode').value === 'mc' && qType === 'audio_r2k') {
+                buildMC_r2k(currentItem);
             }
 
             updateTestInfo();
@@ -1733,7 +1912,7 @@
                 const tw = qs('#typeWrap');
                 const mcw = qs('#mcWrap');
                 if (tw && getComputedStyle(tw).display !== 'none') ansEl && ansEl.focus();
-                else if (mcw && getComputedStyle(mcw).display !== 'none') qs('#optA')?.focus(); // Focus first MC option
+                else if (mcw && getComputedStyle(mcw).display !== 'none') qs('#optA')?.focus();
             }, 30);
         }
 
@@ -1742,10 +1921,9 @@
             const val=mcMap[letter];
             let correct=false;
 
-            if(qType==='k2r' || qType==='audio_k2r'){ // PATCH: mcPick for audio_k2r
+            if(qType==='k2r' || qType==='audio_k2r'){
                 correct = (val===currentItem.romaji);
-            } else if(qType==='r2k' || qType==='audio_r2k'){ // PATCH: mcPick for audio_r2k
-                // For R2K/Audio_R2K, MC options are Kana. So we compare the selected Kana with the target Kana.
+            } else if(qType==='r2k' || qType==='audio_r2k'){
                 const targetKana = (state.test.set==='hira'? HIRA_MAP.get(currentItem.romaji): KATA_MAP.get(currentItem.romaji));
                 correct = (val===targetKana);
             }
@@ -1753,19 +1931,17 @@
         }
 
         function normalizeRomajiSequence(s){
-            // PATCH: Normalisasi sequence hanya hapus spasi
             return (s||'').toLowerCase().replace(/\s+/g,''); 
         }
 
         function romajiEquals(a,b){
             if (!a || !b) return false;
             if (a === b) return true;
-            // PATCH: Normalisasi for wo->o, dji/ji/di, dzu/zu/du
             const canon = (t)=> {
                 let text = t.toLowerCase();
                 text = text.replace(/wo/g,'o');
-                text = text.replace(/ji|di/g,'dji'); // Normalize ji/di to dji
-                text = text.replace(/zu|du/g,'dzu'); // Normalize zu/du to dzu
+                text = text.replace(/ji|di/g,'dji');
+                text = text.replace(/zu|du/g,'dzu');
                 return text;
             };
             return canon(a) === canon(b);
@@ -1776,30 +1952,28 @@
             const qType=state.test.qType;
             let correct=false;
             let normalizedInput='';
-            let userKanaForReview = ''; // To store converted kana for review display
+            let userKanaForReview = '';
 
-            if(qType==='k2r' || qType==='audio_k2r'){ // PATCH: checkAns for audio_k2r
+            if(qType==='k2r' || qType==='audio_k2r'){
                 const norm = normalizeRomaji(valRaw);
                 normalizedInput = norm;
                 correct = romajiEquals(norm, currentItem.romaji);
                 if (qType === 'audio_k2r') userKanaForReview = romajiStringToKana(norm, state.test.set);
             }
-            else if(qType==='seq' || qType==='audio_r2k'){ // PATCH: checkAns for audio_r2k
-                // For seq and audio_r2k (type mode), prompt is Romaji, answer is Kana (user types Romaji, converted to Kana)
-                const expectedKana = currentItem.char; // This will be the actual Kana sequence for 'seq'
-                if (qType === 'audio_r2k') { // If it's audio_r2k, expectedKana is single Kana character
-                     // `currentItem.romaji` is the romaji for `audio_r2k` prompt, and `currentItem.char` is the target kana.
+            else if(qType==='seq' || qType==='audio_r2k'){
+                const expectedKana = currentItem.char;
+                if (qType === 'audio_r2k') {
                     const romajiToConvert = normalizeRomaji(valRaw);
                     userKanaForReview = romajiStringToKana(romajiToConvert, state.test.set);
                     correct = (userKanaForReview === (state.test.set==='hira'? HIRA_MAP.get(currentItem.romaji): KATA_MAP.get(currentItem.romaji)));
-                } else { // qType === 'seq'
+                } else {
                     const rawSeq = normalizeRomajiSequence(valRaw);
-                    userKanaForReview = romajiStringToKana(rawSeq, state.test.set); // Convert user's romaji sequence to kana
+                    userKanaForReview = romajiStringToKana(rawSeq, state.test.set);
                     correct = (userKanaForReview === expectedKana);
                 }
                 normalizedInput = userKanaForReview;
             }
-            else if(qType==='kseq'){ // PATCH: checkAns for kseq
+            else if(qType==='kseq'){
                 const expectedRomajiSeq = currentItem.romajiSeq;
                 const userRomajiSeq = normalizeRomajiSequence(valRaw);
                 normalizedInput = userRomajiSeq;
@@ -1811,8 +1985,8 @@
         function finalizeAnswer(correct, extra){
             const qKanaElement = qs('#qKana');
             const streakCounterElement = qs('#streakCounter');
-            const currentKanaChar = currentItem.char || (currentItem.kanaSeq ? currentItem.kanaSeq : ''); // PATCH: Ambil kana dari kanaSeq
-            const currentRomaji = currentItem.romaji || (currentItem.romajiSeq ? currentItem.romajiSeq : ''); // PATCH: Ambil romaji dari romajiSeq
+            const currentKanaChar = currentItem.char || (currentItem.kanaSeq ? currentItem.kanaSeq : '');
+            const currentRomaji = currentItem.romaji || (currentItem.romajiSeq ? currentItem.romajiSeq : '');
             const userInput = extra.typed || extra.chosen || extra.normalized || '-';
 
             state.test.total+=1;
@@ -1825,14 +1999,12 @@
                 clickTone('ok');
                 qKanaElement.classList.add('correct-answer');
                 if (streakCounterElement) streakCounterElement.classList.add('grow');
-                // PATCH: Konsistensi penerimaan jawaban dji/dzu
                 let okMsg = t('feedback_correct', escapeHTML(currentKanaChar), escapeHTML(currentRomaji));
                 const ui = (extra.typed || extra.normalized || '').toLowerCase();
                 if ((currentRomaji === 'dji' && ['ji','di'].includes(ui)) || (currentRomaji === 'dzu' && ['zu','du'].includes(ui))) {
-                    okMsg += ` (jawaban kamu "${escapeHTML(ui)}" diterima)`;
+                    okMsg += ` (your answer "${escapeHTML(ui)}" accepted)`;
                 }
                 showToast(okMsg);
-                // PATCH: Update SRS Box (correct)
                 const romajiKey = currentItem.romaji || currentItem.romajiSeq;
                 if (romajiKey) {
                     const currentBox = state.srs.boxes[romajiKey] || 1;
@@ -1852,31 +2024,25 @@
                 }
                 showToast(feedbackMsg, 'warn');
 
-                // PATCH: Update Confusion Log (wrong)
                 const currentSet = state.test.set;
                 let wrongKanaChar = '';
-                let correctKanaCharToLog = currentKanaChar; // Use the actual kana char for logging
+                let correctKanaCharToLog = currentKanaChar;
 
-                if (state.test.qType === 'r2k' || state.test.qType === 'audio_r2k') { // Romaji -> Kana, or Audio Romaji -> Kana
-                    wrongKanaChar = extra.chosen; // User picked a kana
-                } else if (state.test.qType === 'k2r' || state.test.qType === 'audio_k2r') { // Kana -> Romaji or Audio Kana -> Romaji
-                    // The user input is romaji, we need to convert it to kana to find a confused pair
+                if (state.test.qType === 'r2k' || state.test.qType === 'audio_r2k') {
+                    wrongKanaChar = extra.chosen;
+                } else if (state.test.qType === 'k2r' || state.test.qType === 'audio_k2r') {
                     const userRomajiNormalized = normalizeRomaji(extra.typed || extra.chosen);
-                    wrongKanaChar = romajiStringToKana(userRomajiNormalized, currentSet); // Convert user's input romaji to kana
-                } else if (state.test.qType === 'seq') { // Sequence Romaji -> Kana
-                    wrongKanaChar = extra.userKana; // This is the converted kana sequence from user's input
-                    correctKanaCharToLog = currentItem.char; // This is the correct kana sequence
-                    // For sequence, pinpointing single confusion pair is hard. Can skip or simplify.
-                    // For now, let's try to log confusion for the first differing character if sequences are simple.
-                    // Simplified: if both are single-char kana and wrong, log them.
+                    wrongKanaChar = romajiStringToKana(userRomajiNormalized, currentSet);
+                } else if (state.test.qType === 'seq') {
+                    wrongKanaChar = extra.userKana;
+                    correctKanaCharToLog = currentItem.char;
                     if (wrongKanaChar.length === 1 && correctKanaCharToLog.length === 1 && wrongKanaChar !== correctKanaCharToLog) {
                         const pair = _pairKey(correctKanaCharToLog, wrongKanaChar);
                         state.confusionLog[currentSet][pair] = (state.confusionLog[currentSet][pair] || 0) + 1;
-                    } else { // Complex sequences, skip for now.
+                    } else {
                         wrongKanaChar = null;
                     }
-                } else if (state.test.qType === 'kseq') { // Kana Sequence (Ketik Romaji)
-                    // Skip confusion logging for romaji sequence typing, as it's about sequence conversion not kana confusion.
+                } else if (state.test.qType === 'kseq') {
                     wrongKanaChar = null;
                 }
 
@@ -1885,11 +2051,10 @@
                     state.confusionLog[currentSet][pair] = (state.confusionLog[currentSet][pair] || 0) + 1;
                 }
 
-                // PATCH: Update SRS Box (wrong)
                 const romajiKey = currentItem.romaji || currentItem.romajiSeq;
                 if (romajiKey) {
-                    state.srs.boxes[romajiKey] = 1; // Reset to Box 1
-                    state.srs.due[romajiKey] = Math.floor(Date.now() / 1000); // Schedule immediately
+                    state.srs.boxes[romajiKey] = 1;
+                    state.srs.due[romajiKey] = Math.floor(Date.now() / 1000);
                 }
             }
 
@@ -1902,32 +2067,30 @@
             if(state.test.total>=state.test.target){ finishTest(); return; }
             qIndex=(qIndex+1)%testPool.length;
             save();
-            renderStats(); // Update review due indicator
+            renderStats();
             nextQ();
         }
 
         function shuffleReturn(arr){ const a=[...arr]; shuffle(a); return a; }
 
-        // PATCH: Pilihan ganda K->R kadang ngambil opsi dari luar rentang + Confusion Trainer decoys
         function buildMC_k2r(item){
-            const poolLabels = buildPoolLabels(); // Get current active pool labels
+            const poolLabels = buildPoolLabels();
             const currentSet = state.test.set;
             const targetRomaji = item.romaji;
             const targetKanaChar = (currentSet === 'hira' ? HIRA_MAP.get(targetRomaji) : KATA_MAP.get(targetRomaji));
 
             let decoys = [];
 
-            // 1. Ambil decoy dari confusionLog (kana yang sering tertukar dengan target)
             const confusionMaps = currentSet === 'hira' ? HIRA_MAP : KATA_MAP;
             const romajiToKanaKey = (r) => {
                 let char = confusionMaps.get(r);
-                if (!char) { // Fallback for special romaji that might not be directly mapped (e.g., dji/dzu)
+                if (!char) {
                     if (r === 'dji') char = currentSet === 'hira' ? 'ぢ' : 'ヂ';
                     else if (r === 'dzu') char = currentSet === 'hira' ? 'づ' : 'ヅ';
                 }
                 return char;
             }
-            const kanaToRomajiKey = (kana) => { // Helper to get a romaji for a given kana
+            const kanaToRomajiKey = (kana) => {
                 for (const r of ALL_ROMAJI) {
                     if (romajiToKanaKey(r) === kana) return r;
                 }
@@ -1942,25 +2105,24 @@
                     const [k1, k2] = pairStr.split('|');
                     return k1 === targetKanaChar ? k2 : k1;
                 })
-                .filter(confusedKana => confusedKana !== targetKanaChar); // Ensure it's not the target itself
+                .filter(confusedKana => confusedKana !== targetKanaChar);
 
             const confusedRomajiDecoys = confusionPairs.map(kanaToRomajiKey).filter(r => r !== null && r !== targetRomaji);
-            decoys.push(...shuffleReturn(confusedRomajiDecoys).slice(0, 2)); // Ambil maks 2 dari confusion
+            decoys.push(...shuffleReturn(confusedRomajiDecoys).slice(0, 2));
 
-            // 2. Lengkapi dengan romaji dari pool saat ini (prefer same length)
             const availablePoolRomaji = poolLabels.filter(r => r !== targetRomaji && !decoys.includes(r));
             const sameLen = availablePoolRomaji.filter(r => r.length === targetRomaji.length);
             
-            decoys.push(...shuffleReturn(sameLen).slice(0, Math.max(0, 3 - decoys.length))); // Lengkapi same length
+            decoys.push(...shuffleReturn(sameLen).slice(0, Math.max(0, 3 - decoys.length)));
             
             if (decoys.length < 3) {
-                decoys.push(...shuffleReturn(availablePoolRomaji).slice(0, Math.max(0, 3 - decoys.length))); // Lengkapi dari sisa pool
+                decoys.push(...shuffleReturn(availablePoolRomaji).slice(0, Math.max(0, 3 - decoys.length)));
             }
 
             const finalOptions = [targetRomaji, ...decoys].slice(0,4);
             const uniq = [...new Set(finalOptions)];
             while (uniq.length < 4) {
-                const fallback = ALL_ROMAJI.find(r => !uniq.includes(r) && r !== targetRomaji); // Fallback dari semua romaji
+                const fallback = ALL_ROMAJI.find(r => !uniq.includes(r) && r !== targetRomaji);
                 if (!fallback) break;
                 uniq.push(fallback);
             }
@@ -1969,9 +2131,8 @@
             setMCText({A:`A. ${escapeHTML(mcMap.A)}`,B:`B. ${escapeHTML(mcMap.B)}`,C:`C. ${escapeHTML(mcMap.C)}`,D:`D. ${escapeHTML(mcMap.D)}`});
         }
 
-        // PATCH: buildMC_r2k dengan prioritas confusionLog
         function buildMC_r2k(item){
-            const poolLabels = buildPoolLabels(); // Get current active pool labels
+            const poolLabels = buildPoolLabels();
             const currentSet = state.test.set;
             const map = currentSet === 'hira' ? HIRA_MAP : KATA_MAP;
 
@@ -1980,7 +2141,6 @@
 
             if (!correctKana) {
                 console.warn(`Cannot find kana for romaji: ${correctRomaji} in set: ${currentSet}`);
-                // Fallback: use empty options or generic ones if correct kana isn't found
                 mcMap={A:'-',B:'-',C:'-',D:'-'};
                 setMCText({A:`A. ${escapeHTML(mcMap.A)}`,B:`B. ${escapeHTML(mcMap.B)}`,C:`C. ${escapeHTML(mcMap.C)}`,D:`D. ${escapeHTML(mcMap.D)}`});
                 return;
@@ -1988,7 +2148,6 @@
             
             let decoys = [];
 
-            // 1. Ambil decoy dari confusionLog
             const confusionPairs = Object.entries(state.confusionLog[currentSet] || {})
                 .filter(([pairStr]) => pairStr.includes(correctKana))
                 .sort(([, countA], [, countB]) => countB - countA)
@@ -1998,16 +2157,14 @@
                 })
                 .filter(confusedKana => confusedKana !== correctKana);
 
-            decoys.push(...shuffleReturn(confusionPairs).slice(0, 2)); // Ambil maks 2 dari confusion
+            decoys.push(...shuffleReturn(confusionPairs).slice(0, 2));
 
-            // 2. Lengkapi dengan similarChoicesKata/Hira
             const similarChoicesFunc = currentSet === 'hira' ? similarChoicesHira : similarChoicesKata;
             if (decoys.length < 3) {
                 const sim = similarChoicesFunc(correctKana).filter(kana => !decoys.includes(kana));
                 decoys.push(...shuffleReturn(sim).slice(0, Math.max(0, 3 - decoys.length)));
             }
             
-            // 3. Lengkapi dari sisa pool (konversi romaji di pool menjadi kana)
             const allAvailableKanaInPool = poolLabels
                 .map(r => map.get(r))
                 .filter(c => c && c !== correctKana && !decoys.includes(c));
@@ -2015,15 +2172,14 @@
             decoys.push(...shuffleReturn(allAvailableKanaInPool).slice(0, Math.max(0, 3 - decoys.length)));
 
             const finalOptions = [correctKana, ...decoys].slice(0,4);
-            const uniq = [...new Set(finalOptions)]; // Ensure uniqueness
-            while (uniq.length < 4) { // Fallback if not enough unique decoys
+            const uniq = [...new Set(finalOptions)];
+            while (uniq.length < 4) {
                 const fallbackKana = ALL_ROMAJI.map(r => map.get(r))
-                                                    .find(c => c && !uniq.includes(c));
+                                                            .find(c => c && !uniq.includes(c));
                 if (!fallbackKana) break;
                 uniq.push(fallbackKana);
             }
             shuffle(uniq);
-
             mcMap={A:uniq[0],B:uniq[1],C:uniq[2],D:uniq[3]};
             setMCText({A:`A. ${escapeHTML(mcMap.A)}`,B:`B. ${escapeHTML(mcMap.B)}`,C:`C. ${escapeHTML(mcMap.C)}`,D:`D. ${escapeHTML(mcMap.D)}`});
         }
@@ -2038,33 +2194,39 @@
             nextQ();
         }
 
-        function updateTestInfo(){
-            const rangeMode = qs('#rangeMode').value;
-            let rangeLabel = '';
-            if (state.test.subset === 'confusion') {
-                rangeLabel = t('confuse_train_label');
+        function currentRangeLabel(){
+            // Check if any specific subset chip is active
+            if (state.test.subset === 'all') {
+                return t('all_kana_label');
+            } else if (state.test.subset === 'confusion') {
+                return t('confuse_train_label');
             } else if (state.test.subset === 'srs_due') {
-                rangeLabel = t('review_today_label');
-            } else if (rangeMode === 'single') {
-                const singleKey = qs('#testSingleGroup').value;
-                const grp = GROUPS.find(x => x.key === singleKey);
-                if (grp) rangeLabel = grp.label; else rangeLabel = 'Grup Tunggal';
-            } else {
-                const sKey = qs('#testFrom').value;
-                const eKey = qs('#testTo').value;
-                const grpFrom = GROUPS.find(x => x.key === sKey);
-                const grpTo = GROUPS.find(x => x.key === eKey);
-                if (grpFrom && grpTo) rangeLabel = `${grpFrom.label} - ${grpTo.label}`; else rangeLabel = 'Rentang khusus';
+                return t('review_today_label');
             }
+
+            // Fallback to range/single mode if no specific chip is active
+            if(elRangeMode.value === 'range'){
+                if (!elFrom || !elTo || elFrom.selectedIndex < 0 || elTo.selectedIndex < 0) return 'Rentang tidak valid';
+                return `${elFrom.options[elFrom.selectedIndex].text} → ${elTo.options[elTo.selectedIndex].text}`;
+            }
+            if(elRangeMode.value === 'single'){
+                if (!elSingle || elSingle.selectedIndex < 0) return 'Grup tidak valid';
+                return `${elSingle.options[elSingle.selectedIndex].text}`;
+            }
+            return 'Semua'; // Default if none selected
+        }
+
+        function updateTestInfo(){
+            const rangeLabel = currentRangeLabel();
 
             const tlabel = {
                 'k2r': t('test_type_k2r'), 
                 'r2k': t('test_type_r2k'), 
                 'seq': t('test_type_seq'),
-                'audio_k2r': t('test_type_audio_k2r'), // PATCH: Label untuk audio_k2r
-                'audio_r2k': t('test_type_audio_r2k'), // PATCH: Label untuk audio_r2k
-                'kseq': t('test_type_kseq') // PATCH: Label untuk kseq
-            }[state.test.qType] || 'Tes'; // Default if not found
+                'audio_k2r': t('test_type_audio_k2r'),
+                'audio_r2k': t('test_type_audio_r2k'),
+                'kseq': t('test_type_kseq')
+            }[state.test.qType] || 'Tes';
 
             const testInfoTextElement = qs('#testInfoText');
             const streakCounterElement = qs('#streakCounter');
@@ -2085,13 +2247,13 @@
 
         function finishTest(){
             openCelebrate('finish');
-            if (!state.lite && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) { // Disable burst in lite mode
+            if (!state.lite && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
                 burst();
             }
             clickTone('ok');
             renderReview();
             updatePointsAndLevelDisplay();
-            renderStats(); // Update review due indicator after test
+            renderStats();
         }
 
         function renderReview(){
@@ -2101,56 +2263,48 @@
             if (box) box.hidden=!hasWrong;
             if (qs('#celebrateMsg')) qs('#celebrateMsg').textContent=t('done_test_sub', state.test.score, state.test.total);
             if(!hasWrong){
-                if (box) box.innerHTML=`<div class="small" style="text-column: span 4; text-align: center;">${t('empty_review')}</div>`;
+                if (box) box.innerHTML=`<div class="small" style="grid-column: span 4; text-align: center;">${t('empty_review')}</div>`;
                 return;
             }
             const set=state.test.set;
             if (box) {
                 box.innerHTML = wrongList.map((w,i)=>{
-                    const expectedKanaChar = w.char; // Single kana char or sequence of kana
-                    const expectedRomaji = w.romaji; // Single romaji or sequence of romaji
+                    const expectedKanaChar = w.char;
+                    const expectedRomaji = w.romaji;
                     const givenInput = w.typed || w.chosen || w.normalized || '-';
-                    let displayedKana = ''; // The kana character to show as "question"
-                    let displayedExpectedAnswer = ''; // The correct answer to display
-                    let displayedGivenAnswer = ''; // The user's answer to display
+                    let displayedKana = '';
+                    let displayedExpectedAnswer = '';
+                    let displayedGivenAnswer = '';
 
-                    // Determine what to display for the prompt (left side)
                     if (w.qType === 'k2r' || w.qType === 'audio_k2r') {
-                        displayedKana = expectedKanaChar; // Kana character is the prompt
+                        displayedKana = expectedKanaChar;
                     } else if (w.qType === 'r2k' || w.qType === 'audio_r2k') {
-                        displayedKana = expectedRomaji; // Romaji is the prompt
+                        displayedKana = expectedRomaji;
                     } else if (w.qType === 'seq') {
-                        displayedKana = `Romaji: ${expectedRomaji}`; // Romaji sequence is the prompt
+                        displayedKana = `Romaji: ${expectedRomaji}`;
                     } else if (w.qType === 'kseq') {
-                        displayedKana = expectedKanaChar; // Kana sequence is the prompt
+                        displayedKana = expectedKanaChar;
                     }
 
-                    // Determine what to display for the expected answer (right side)
                     if (w.qType === 'k2r' || w.qType === 'audio_k2r' || w.qType === 'kseq') {
-                        // Expected is Romaji (or romaji sequence)
                         displayedExpectedAnswer = expectedRomaji;
-                    } else { // r2k, audio_r2k, seq
-                        // Expected is Kana (or kana sequence)
+                    } else {
                         displayedExpectedAnswer = expectedKanaChar;
                     }
 
-                    // Determine what to display for the user's given answer
                     if (w.qType === 'r2k' || w.qType === 'audio_r2k' || w.qType === 'seq') {
-                        // User typed romaji, converted to kana, or chose kana
-                        displayedGivenAnswer = givenInput; // The raw input
-                        if (w.userKana && w.userKana !== givenInput) { // If there's a converted kana and it's different from raw input
-                             displayedGivenAnswer += ` (${w.userKana})`;
+                        displayedGivenAnswer = givenInput;
+                        if (w.userKana && w.userKana !== givenInput) {
+                            displayedGivenAnswer += ` (${w.userKana})`;
                         }
-                    } else { // k2r, audio_k2r, kseq
-                        // User typed romaji, or chose romaji
+                    } else {
                         displayedGivenAnswer = givenInput;
                     }
 
-                    // Special feedback for dji/dzu variants
                     let specialNote = '';
                     if ((expectedRomaji === 'dji' && (givenInput.toLowerCase() === 'ji' || givenInput.toLowerCase() === 'di')) ||
                         (expectedRomaji === 'dzu' && (givenInput.toLowerCase() === 'zu' || givenInput.toLowerCase() === 'du'))) {
-                        specialNote = `<span class="small" style="color:var(--muted)"> (diterima sebagai ${escapeHTML(expectedRomaji)})</span>`;
+                        specialNote = `<span class="small" style="color:var(--muted)"> (accepted as ${escapeHTML(expectedRomaji)})</span>`;
                     }
 
 
@@ -2160,7 +2314,7 @@
                                     <div><b>${escapeHTML(displayedKana)}</b> → <span style="color:var(--ok)">${escapeHTML(displayedExpectedAnswer)}</span></div>
                                     <div class="small">Jawaban kamu: ${escapeHTML(displayedGivenAnswer)}${specialNote}</div>
                                 </div>
-                                <button class="btn" onclick="window._speak('${escapeHTML(expectedKanaChar || expectedRomaji)}')" type="button" aria-label="Putar pelafalan ${escapeHTML(expectedKanaChar || expectedRomaji)}">🎧</button>
+                                <button class="btn" onclick="window._speak('${escapeHTML(expectedKanaChar || expectedRomaji)}')" type="button" aria-label="Play pronunciation ${escapeHTML(expectedKanaChar || expectedRomaji)}">🎧</button>
                             </div>`;
                 }).join('');
             }
@@ -2168,19 +2322,18 @@
 
         bind('#btnReviewWrong', 'click', ()=>{ if(!wrongList.length) return; const set=state.test.set; 
             testPool = wrongList.map(w => {
-                // Reconstruct items including sequence data and original qType for review
                 return { 
                     romaji: w.romaji, 
                     char: w.char, 
                     kanaSeq: w.kanaSeq, 
                     romajiSeq: w.romajiSeq, 
-                    qType: w.qType, // Preserve original qType for review
-                    subset: state.test.subset // Keep original subset context
+                    qType: w.qType,
+                    subset: state.test.subset
                 };
             });
-            shuffle(testPool); // Shuffle the review pool
+            shuffle(testPool);
 
-            poolIdx = buildPoolLabels().map(r=>ALL_ROMAJI.indexOf(r)).filter(x=>x>=0); // Re-calculate poolIdx based on current pool labels
+            poolIdx = buildPoolLabels().map(r=>ALL_ROMAJI.indexOf(r)).filter(x=>x>=0);
             state.test.total=0; state.test.score=0; state.test.correctStreak=0; state.test.target = Math.min(20, testPool.length); qIndex=0; 
             closeCelebrate(); 
             qs('#testArea').hidden=false; 
@@ -2195,18 +2348,23 @@
         });
 
         function buildPoolLabels(){
+            // If a specific subset chip is active, use its labels
+            if (state.test.subset === 'all') {
+                return ALL_ROMAJI;
+            } else if (state.test.subset === 'confusion') {
+                return _confuseTopPairs(state.test.set);
+            } else if (state.test.subset === 'srs_due') {
+                return getDueReviewItems(state.test.set).map(item => item.romaji);
+            }
+
+            // Fallback to range/single mode logic
             const rangeMode = qs('#rangeMode').value;
             let labels = [];
-            // PATCH: Logika untuk subset 'confusion' dan 'srs_due'
-            if (state.test.subset === 'confusion') {
-                labels = _confuseTopPairs(state.test.set);
-            } else if (state.test.subset === 'srs_due') {
-                labels = getDueReviewItems(state.test.set).map(item => item.romaji);
-            } else if (rangeMode === 'single') {
+            if (rangeMode === 'single') {
                 const singleKey = qs('#testSingleGroup').value;
                 const grp = GROUPS.find(x => x.key === singleKey);
                 if (grp) labels = grp.idx.map(i => grp.list[i]);
-            } else {
+            } else { // 'range'
                 const sKey = qs('#testFrom').value;
                 const eKey = qs('#testTo').value;
                 const selFrom=GROUPS.findIndex(x=>x.key===sKey);
@@ -2220,20 +2378,65 @@
         }
 
         function rangeLabels(fromKey,toKey){ const a=GROUPS.findIndex(g=>g.key===fromKey); const b=GROUPS.findIndex(g=>g.key===toKey); if(a<0||b<0) return []; const [from,to] = a<=b? [a,b]:[b,a]; return GROUPS.slice(from,to+1).flatMap(g=> g.idx.map(i=> g.list[i]) ); }
-        function currentPoolLabels(){ return testPool.map(x=>x.romaji); } // This will need to be adjusted for sequence types
-        function currentPoolChars(){ return testPool.map(x=>x.char); } // This will need to be adjusted for sequence types
+        // function currentPoolLabels(){ return testPool.map(x=>x.romaji); } // No longer directly used
+        // function currentPoolChars(){ return testPool.map(x=>x.char); } // No longer directly used
 
+        // This function is now mostly redundant as updateRangeUI handles visibility.
+        // Keeping it for now but might remove if it causes conflicts.
         function toggleRangeInputs() {
-            const rangeMode = qs('#rangeMode').value;
-            const testFrom = qs('#testFrom');
-            const testToWrap = qs('#testToWrap');
-            const testSingleGroup = qs('#testSingleGroup');
+            // This function is now largely handled by updateRangeUI, but keep it for consistency if other parts call it.
+            // Ensure elements are initialized before trying to access their values
+            if (!elRangeMode || !elFrom || !elTo || !elSingle || !elToWrap) return;
 
-            if (testFrom) testFrom.hidden = (rangeMode === 'single');
-            if (testToWrap) testToWrap.hidden = (rangeMode === 'single');
-            if (testSingleGroup) testSingleGroup.hidden = !(rangeMode === 'single');
+            const rangeMode = elRangeMode.value;
+            
+            // Determine if a specific subset chip (not 'all', 'confusion', 'srs_due') is active
+            const isSpecificSubsetActive = state.test.subset !== 'all' && state.test.subset !== 'confusion' && state.test.subset !== 'srs_due';
+
+            // If a specific subset chip is selected, the rangeMode should reflect that.
+            if (isSpecificSubsetActive) {
+                // When a specific chip (like a group chip or confusion/srs_due) is active,
+                // we should hide the range/single group selector and show the corresponding
+                // elements as if rangeMode was set internally.
+                elRangeMode.setAttribute('inert', ''); // Disable rangeMode select
+                elRangeMode.hidden = true;
+
+                // Hide actual range selects
+                setEnabled(elFrom, false);
+                setEnabled(elTo, false);
+                if (elToWrap) elToWrap.hidden = true;
+                setEnabled(elSingle, false); // No single group for specific chips as the chip itself defines the selection
+            } else {
+                // If 'all' or no specific chip is active, enable rangeMode select and follow its logic
+                elRangeMode.removeAttribute('inert');
+                elRangeMode.hidden = false;
+                updateRangeUI(); // Apply range mode logic based on elRangeMode.value
+            }
+            updateTestInfo(); // Update test info text after range inputs are toggled
         }
 
+
+        // New: Quick Presets
+        const QUICK_PRESETS = {
+            'aiueo-m': ['aiueo', 'm'], // a i u e o → ma mi mu me mo
+            'base-all': ['aiueo','w'],
+            'dakuon-all': ['g','p'],
+            'youon-all': ['ky','py'],
+        };
+
+        function applyPreset(key){
+            const preset = QUICK_PRESETS[key];
+            if (!preset) return;
+
+            qs('#rangeMode').value = 'range';
+            updateRangeUI(); // This will show #testFrom and #testTo
+            qs('#testFrom').value = preset[0];
+            qs('#testTo').value = preset[1];
+            ensureValidRange(); // Ensures from/to are valid and saves them
+            updateTestInfo(); // Update test info text
+            clickTone('click');
+        }
+        
         // ---------- THEME & AUDIO ----------
         function applyTheme(){
             document.documentElement.setAttribute('data-theme', state.theme==='hc'?'hc':'pastel');
@@ -2247,9 +2450,6 @@
                 bHC.classList.toggle('active', isHC);
                 bHC.setAttribute('aria-selected', String(isHC));
             }
-            if (typeof writerSetGhostChar === 'function') writerSetGhostChar();
-            if (typeof writerRedrawAll === 'function') writerRedrawAll();
-            // PATCH: Meta “theme-color” tidak ikut berubah saat ganti tema
             const metaTheme = document.querySelector('meta[name="theme-color"]');
             if (metaTheme) {
               const bg = getComputedStyle(document.documentElement).getPropertyValue('--panel').trim() || (isHC ? '#0f1626' : '#ffffff');
@@ -2268,7 +2468,6 @@
                 _audioCtx = _audioCtx || new C();
                 const ctx = _audioCtx;
 
-                // penting: pastikan aktif
                 if (ctx.state !== 'running') { ctx.resume().catch(()=>{}); }
 
                 const o=ctx.createOscillator();
@@ -2287,14 +2486,12 @@
             }catch(e){ console.error('Error playing sound:', e); }
         }
 
-        // PATCH: Unified TTS function to speak Kana or Romaji
         function speakKanaOrRomaji(text, force=false){
             try{
                 if(!state.audio && !force) return;
 
                 const now = Date.now();
                 if (now - lastSpeakTime < SPEAK_COOLDOWN) {
-                    // console.log("Speech cooldown active, skipping.");
                     return;
                 }
 
@@ -2302,15 +2499,13 @@
                 speechSynthesis.cancel();
                 const u=new SpeechSynthesisUtterance(text);
                 
-                // Determine if text is primarily Kana or Romaji
-                const isKana = /[ぁ-んァ-ン]/.test(text);
-                u.lang='ja-JP'; // Always use Japanese for both Kana and Romaji (Romaji pronounced as Japanese)
+                u.lang='ja-JP';
                 u.rate=.9; u.pitch=1.02; u.volume=1;
                 speechSynthesis.speak(u);
                 lastSpeakTime = now;
             }catch(error){ console.error('Error speaking text:', error); }
         }
-        window._speak = speakKanaOrRomaji; // Expose globally for review items
+        window._speak = speakKanaOrRomaji;
 
         let currentToast = null;
         let toastTimeout = null;
@@ -2324,13 +2519,12 @@
             toast.className = 'toast';
             if (type === 'warn') toast.classList.add('warn');
             
-            toast.textContent = message; // Use textContent for safety
+            toast.textContent = message;
             toast.setAttribute('role', 'status');
             toast.setAttribute('aria-live', 'polite');
 
             document.body.appendChild(toast);
             currentToast = toast;
-            // PATCH: Ekspor currentToast ke window agar override tidak bentrok
             window.currentToast = toast; 
 
             setTimeout(() => {
@@ -2350,7 +2544,7 @@
                     toast.remove();
                     if (currentToast === toast) {
                         currentToast = null;
-                        window.currentToast = null; // Clear global reference
+                        window.currentToast = null;
                     }
                     toast.removeEventListener('transitionend', handler);
                 }
@@ -2368,13 +2562,13 @@
 
             if(type==='streak' && state.test.correctStreak>0 && state.test.correctStreak % 10 === 0){
                 openCelebrate('streak');
-                if (!isReducedMotion && !state.lite) burst(); // Disable burst in lite mode
+                if (!isReducedMotion && !state.lite) burst();
                 clickTone('ok');
             } else if (type === 'levelUp') {
                 if (qs('#celebrateTitle')) qs('#celebrateTitle').textContent = t('level_up_title', level); 
                 if (qs('#celebrateMsg')) qs('#celebrateMsg').textContent = t('level_up_msg', LEVEL_NAMES[level-1] || `Level ${level}`);
                 openCelebrate('levelUp');
-                if (!isReducedMotion && !state.lite) burst(); // Disable burst in lite mode
+                if (!isReducedMotion && !state.lite) burst();
                 clickTone('ok');
             }
         }
@@ -2391,7 +2585,7 @@
             }
             if (modal) {
                 modal.hidden = false;
-                modal.classList.add('is-open'); // Use class for transition
+                modal.classList.add('is-open');
             }
             _trapModal();
         }
@@ -2418,7 +2612,6 @@
                 modal.removeEventListener('keydown', _modalKeydownListener);
                 _modalKeydownListener = null;
             }
-            // PATCH: Refocus on input after closing modal if test is active
             const ansEl = qs('#ans');
             if (ansEl && !qs('#testArea').hidden && getComputedStyle(qs('#typeWrap')).display !== 'none') {
                 ansEl.focus();
@@ -2433,7 +2626,7 @@
         }
 
         function _trapModal(){
-            if (!modal) return; // Guard against null modal
+            if (!modal) return;
             const focusableElements = 'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
             const focusables = modal.querySelectorAll(focusableElements);
             const firstFocusable = focusables[0];
@@ -2471,10 +2664,10 @@
         }
 
         function burst(){ 
-            if (state.lite || window.matchMedia('(prefers-reduced-motion: reduce)').matches) { // Disable burst in lite mode
+            if (state.lite || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
                 return;
             }
-            if (!burstBox) return; // Guard against null
+            if (!burstBox) return;
             burstBox.innerHTML=''; 
             const colors=['#7a6cff','#16c6a1','#ffd166','#ff7b7b','#2fb875','#8acbff']; 
             const w=window.innerWidth, h=window.innerHeight; 
@@ -2581,7 +2774,7 @@
                 save();
             }
             tickPomo();
-            const interval = state.lite ? 1000 : 250; // PATCH: Adjust interval for lite mode
+            const interval = state.lite ? 1000 : 250;
             if(!pomoHandle) pomoHandle=setInterval(tickPomo, interval);
         }
         function pausePomo(){ state.pomo.running=false; save(); if(pomoHandle){ clearInterval(pomoHandle); pomoHandle=null; } }
@@ -2610,14 +2803,14 @@
             save();
         }
 
-        // ---------- NORMALISASI & KONVERSI ----------
+        // ---------- NORMALIZATION & CONVERSION ----------
         function hasKana(s){ return /[ぁ-んァ-ン]/.test(s); }
         function normalizeRomaji(v){
             v=(v||'').toLowerCase().trim();
             const alias = {
                 si:'shi', ti:'chi', tu:'tsu', hu:'fu', wo:'o',
                 di:'dji', du:'dzu',
-                ji:'dji', zu:'dzu' // PATCH: Terima varian ji/di = dji, zu/du = dzu
+                ji:'dji', zu:'dzu'
             };
             return alias[v] || v;
         }
@@ -2629,14 +2822,12 @@
 
             while(s.length){
                 let matched=false;
-                // Handle 'n' (ん/ン)
                 if(s[0]==='n'){
-                    if(s[1]==='n'){ out += map.get('n'); s=s.slice(2); matched=true; continue; } // nn -> ん
+                    if(s[1]==='n'){ out += map.get('n'); s=s.slice(2); matched=true; continue; }
                     const next=s[1]||'';
-                    if(next && !'aeiouy'.includes(next)){ out += map.get('n'); s=s.slice(1); matched=true; continue; } // n + consonant -> ん
+                    if(next && !'aeiouy'.includes(next)){ out += map.get('n'); s=s.slice(1); matched=true; continue; }
                 }
                 
-                // Prioritize longer matches (e.g., "kya" before "ka")
                 for(const r of ROMAJI_SORTED){
                     if(s.startsWith(r)){
                         out += map.get(r);
@@ -2646,26 +2837,22 @@
                     }
                 }
                 if(!matched){
-                    // Handle small tsu (っ/ッ) for geminate consonants
-                    // This is a simplification and might not cover all cases (e.g. atsu -> あつ vs attsu -> あつ)
-                    if(/^[bcdfghjklmnpqrstvwxyz]\1/.test(s)){ // double consonant (e.g., 'tto', 'kka')
-                        out += (set==='hira'?'っ':'ッ'); // Add small tsu
-                        s = s.slice(1); // Consume one consonant, the next iteration will find the actual kana
+                    if(/^[bcdfghjklmnpqrstvwxyz]\1/.test(s)){
+                        out += (set==='hira'?'っ':'ッ');
+                        s = s.slice(1);
                         matched=true;
                         continue;
                     }
-                    // If no match found, consume one character and continue (might be an invalid romaji)
                     s=s.slice(1);
                 }
             } return out;
         }
 
-        // PATCH: makeSequence now accepts a pool of Romaji labels and length
         function makeSequence(poolLabels, set, length){
-            const src = poolLabels.filter(r => ALL_ROMAJI.includes(r)); // Ensure labels are valid Romaji
-            const len = Math.max(2, Math.min(6, length || state.test.sylPerItem || 3)); // Use state.test.sylPerItem
+            const src = poolLabels.filter(r => ALL_ROMAJI.includes(r));
+            const len = Math.max(2, Math.min(6, length || state.test.sylPerItem || 3));
             const picks=[];
-            if (src.length === 0) return { romaji: '', kana: '' }; // Handle empty pool
+            if (src.length === 0) return { romaji: '', kana: '' };
 
             for(let i=0;i<len;i++){ const r = src[Math.floor(Math.random()*src.length)]; picks.push(r); }
             const romaji=picks.join('');
@@ -2673,10 +2860,8 @@
             return {romaji,kana};
         }
 
-        // PATCH: makeKanaSequence for qType kseq, now accepts a pool of Romaji labels
-        function makeKanaSequence(length, set, poolLabels) {
+        function makeKanaSequence(poolLabels, set, length) { // Changed signature to match buildPoolLabels()
             const map = set === 'hira' ? HIRA_MAP : KATA_MAP;
-            // Filter available romaji based on the current poolLabels and ensure they map to valid kana
             const availableRomaji = poolLabels.filter(r => map.has(r));
             
             if (availableRomaji.length === 0) return { romaji: '', kana: '' };
@@ -2698,355 +2883,6 @@
         function shuffle(arr){ for(let i=arr.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [arr[i],arr[j]]=[arr[j],arr[i]]; } }
         function attachLongPress(el, onClick, onLong){ let t=null, long=false; const down=()=>{ long=false; t=setTimeout(()=>{ long=true; onLong&&onLong(); }, 500); }; const up=()=>{ clearTimeout(t); if(!long) onClick&&onClick(); }; el.addEventListener('pointerdown', down, {passive:true}); el.addEventListener('pointerup', up, {passive:true}); el.addEventListener('pointerleave', ()=>clearTimeout(t), {passive:true}); el.addEventListener('keydown', (e)=>{ if(e.key==='Enter' || e.key===' '){ e.preventDefault(); onClick&&onClick(); } }); }
 
-        // ---------- WRITER (Latihan Menulis) ----------
-        let wCanvas, wCtx, wWrap, wGhost, isDrawing=false, lastX=0, lastY=0, dpr=1;
-        const wStrokes = [];
-        let _writerBound = false;
-
-        function writerInitDOMRefs() {
-            wCanvas = qs('#writerCanvas');
-            wWrap   = qs('#writerWrap');
-            wGhost  = qs('#writerGhost');
-            // PATCH: Conditionally apply willReadFrequently for lite mode
-            wCtx    = wCanvas?.getContext('2d', state.lite ? { willReadFrequently: true } : {}); 
-        }
-        function writerSetupCanvasSize() {
-            if (!wCanvas || !wWrap || !wCtx) return; // Guard against null
-            const rect = wWrap.getBoundingClientRect();
-            if (rect.width === 0) {
-                requestAnimationFrame(writerSetupCanvasSize);
-                return;
-            }
-            dpr = state.lite ? Math.min(1.5, window.devicePixelRatio || 1) : Math.max(1, window.devicePixelRatio || 1); // PATCH: Limit DPR in lite mode
-            const size = Math.floor(rect.width);
-            wCanvas.style.width = size + 'px';
-            wCanvas.style.height = size + 'px';
-            wCanvas.width  = Math.floor(size * dpr);
-            wCanvas.height = Math.floor(size * dpr);
-            wCtx.setTransform(1,0,0,1,0,0);
-            wCtx.scale(dpr, dpr);
-            writerRedrawAll();
-        }
-        function writerCurrentChar() {
-            const r = state.writer.kana;
-            return state.writer.set==='hira' ? HIRA_MAP.get(r) : KATA_MAP.get(r);
-        }
-        function writerSetGhostChar() {
-            if (!wGhost) return;
-            const ch = writerCurrentChar() || 'あ';
-            wGhost.textContent = ch;
-            wGhost.style.opacity = state.writer.ghost ? state.writer.ghostOpacity : 0;
-            wGhost.classList.toggle('hidden', !state.writer.ghost);
-        }
-        function writerSetGrid(on) { if (wWrap) wWrap.classList.toggle('grid', !!on); }
-        // PATCH: Ganti fungsi writerStrokeStyle() (supaya selalu solid & nggak “ketahan” state lama)
-        function writerStrokeStyle() {
-            if (!wCtx) return;
-            wCtx.globalAlpha = 1; // pastikan selalu terlihat
-            wCtx.lineCap = 'round';
-            wCtx.lineJoin = 'round';
-            wCtx.strokeStyle = state.theme==='hc' ? '#e6efff' : '#132030';
-            wCtx.globalCompositeOperation = state.writer.eraser ? 'destination-out' : 'source-over';
-            wCtx.lineWidth = state.writer.penSize;
-        }
-        function writerPointerPos(e) {
-            if (!wCanvas) return {x:0, y:0}; // Guard against null
-            const rect = wCanvas.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-            return { x: Math.max(0, Math.min(rect.width, x)), y: Math.max(0, Math.min(rect.height, y)) };
-        }
-        function writerStart(e) {
-            if (!wCanvas) return; // Guard against null
-            e.preventDefault();
-            const p = writerPointerPos(e);
-            isDrawing = true;
-            lastX = p.x; lastY = p.y;
-            wStrokes.push({ ops: state.writer.eraser ? 'destination-out' : 'source-over', size: state.writer.penSize, points: [{x:lastX, y:lastY}] });
-        }
-
-        let _raf = null, _lastMove = null;
-        function writerMove(e) {
-            if(!isDrawing || !wCtx) return; // Guard against null
-            _lastMove = e;
-            if(_raf) return;
-            _raf = requestAnimationFrame(() => {
-                _raf = null;
-                const p = writerPointerPos(_lastMove);
-                const s = wStrokes[wStrokes.length-1];
-                if (s && s.points) {
-                    s.points.push({x:p.x, y:p.y});
-                }
-                writerStrokeStyle();
-                wCtx.beginPath();
-                wCtx.moveTo(lastX, lastY);
-                wCtx.lineTo(p.x, p.y);
-                wCtx.stroke();
-                lastX = p.x; lastY = p.y;
-            });
-        }
-
-        function writerEnd() {
-            if (!wCtx) return; // Guard against null
-            isDrawing=false;
-            if (_raf) {
-                cancelAnimationFrame(_raf);
-                _raf = null;
-                if (_lastMove) {
-                    const p = writerPointerPos(_lastMove);
-                    const s = wStrokes[wStrokes.length-1];
-                    if (s && s.points) {
-                        s.points.push({x:p.x, y:p.y});
-                    }
-                    writerStrokeStyle();
-                    wCtx.beginPath();
-                    wCtx.moveTo(lastX, lastY);
-                    wCtx.lineTo(p.x, p.y);
-                    wCtx.stroke();
-                    lastX = p.x; lastY = p.y;
-                }
-            }
-            if (state.writer.autoSnap) {
-                writerEvaluateAndSnap();
-            }
-        }
-
-        function writerRedrawAll() {
-            if(!wCtx || !wCanvas) return; // Guard against null
-            wCtx.setTransform(1,0,0,1,0,0);
-            wCtx.clearRect(0,0,wCanvas.width,wCanvas.height);
-            wCtx.scale(dpr, dpr);
-            wCtx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--soft');
-            wCtx.fillRect(0, 0, wCanvas.width, wCanvas.height);
-
-            for(const s of wStrokes){
-                wCtx.globalCompositeOperation = s.ops;
-                wCtx.lineWidth = s.size;
-                wCtx.lineCap='round'; wCtx.lineJoin='round';
-                wCtx.strokeStyle = state.theme==='hc' ? '#e6efff' : '#132030';
-                wCtx.beginPath();
-                if (s.points.length > 0) {
-                    wCtx.moveTo(s.points[0].x, s.points[0].y);
-                    for(let i=1;i<s.points.length;i++){
-                        const b=s.points[i];
-                        // PATCH: Perbaikan ReferenceError di writerRedrawAll()
-                        wCtx.lineTo(b.x, b.y);
-                    }
-                }
-                wCtx.stroke();
-            }
-        }
-        function writerUndo() { if(!wStrokes.length) return; wStrokes.pop(); writerRedrawAll(); }
-        function writerClear() { wStrokes.length = 0; writerRedrawAll(); }
-        function writerSavePNG() {
-            if (!wCanvas) return; // Guard against null
-            const tmp = document.createElement('canvas');
-            tmp.width = wCanvas.width; tmp.height = wCanvas.height;
-            const tctx = tmp.getContext('2d');
-            if (!tctx) return; // Guard against null
-            const panel = getComputedStyle(document.documentElement).getPropertyValue('--panel') || '#fff';
-            tctx.fillStyle = panel.trim() || '#fff';
-            tctx.fillRect(0,0,tmp.width,tmp.height);
-            tctx.drawImage(wCanvas, 0, 0);
-            const url = tmp.toDataURL('image/png');
-            const a = document.createElement('a');
-            const fileName = `kana-${state.writer.kana}-${state.writer.set}.png`;
-            a.href = url; a.download = fileName; a.click(); URL.revokeObjectURL(a.href);
-            showToast(t('export_ok'));
-        }
-        function writerFillKanaOptions() {
-            const sel = qs('#writeKana');
-            if (!sel) return;
-            sel.innerHTML = '';
-            ALL_ROMAJI.forEach(r=>{
-                const o = new Option(`${r.toUpperCase()} — ${(state.writer.set==='hira'? HIRA_MAP.get(r): KATA_MAP.get(r))}`, r);
-                sel.add(o);
-            });
-            sel.value = state.writer.kana;
-        }
-        function writerApplyUIFromState() {
-            if (!wCanvas) return;
-            // Bindings are now handled in writerBindEvents to prevent double binding
-            
-            if (qs('#writeSet')) qs('#writeSet').value = state.writer.set;
-            if (qs('#penSize')) qs('#penSize').value = state.writer.penSize;
-            if (qs('#gridToggle')) qs('#gridToggle').checked = state.writer.grid;
-            if (qs('#ghostToggle')) qs('#ghostToggle').checked = state.writer.ghost;
-            if (qs('#autoSnapToggle')) qs('#autoSnapToggle').checked = state.writer.autoSnap;
-            
-            if (state.writer.eraser) {
-                qs('#eraserBtn')?.classList.add('ok');
-                qs('#penBtn')?.classList.remove('ok');
-            } else {
-                qs('#penBtn')?.classList.add('ok');
-                qs('#eraserBtn')?.classList.remove('ok');
-            }
-
-            writerSetGhostChar();
-            writerFillKanaOptions();
-            writerSetGrid(state.writer.grid);
-            writerSetupCanvasSize();
-            writerRedrawAll(); // Perlu ini biar canvas langsung di-render ulang
-        }
-        function writerPick(offset) {
-            const idx = ALL_ROMAJI.indexOf(state.writer.kana);
-            const next = (idx + offset + ALL_ROMAJI.length) % ALL_ROMAJI.length;
-            state.writer.kana = ALL_ROMAJI[next];
-            save();
-            writerFillKanaOptions();
-            writerSetGhostChar();
-        }
-        function writerRandom() {
-            state.writer.kana = ALL_ROMAJI[Math.floor(Math.random()*ALL_ROMAJI.length)];
-            save();
-            writerFillKanaOptions();
-            writerSetGhostChar();
-        }
-        function writerBindEvents() {
-            if (_writerBound) return; // Prevent double binding
-            _writerBound = true;
-            if (wCanvas) wCanvas.addEventListener('pointerdown', writerStart);
-            if (wCanvas) wCanvas.addEventListener('pointermove', writerMove);
-            window.addEventListener('pointerup', writerEnd);
-            bind('#writeSet', 'change', (e)=>{ state.writer.set=e.target.value; save(); writerFillKanaOptions(); writerSetGhostChar(); writerClear(); });
-            bind('#writeKana', 'change', (e)=>{ state.writer.kana=e.target.value; save(); writerSetGhostChar(); writerClear(); });
-            bind('#writePrev', 'click', ()=>{ writerPick(-1); writerClear(); });
-            bind('#writeNext', 'click', ()=>{ writerPick(1); writerClear(); });
-            bind('#writeRand', 'click', ()=>{ writerRandom(); writerClear(); });
-            bind('#writeSpeak', 'click', ()=>{ speakKanaOrRomaji(writerCurrentChar()); clickTone('click'); });
-            bind('#penSize', 'input', (e)=>{ state.writer.penSize = parseInt(e.target.value,10)||10; save(); });
-            // PATCH: Perbaiki handler toggle Grid (biar redraw setelah ganti latar)
-            bind('#gridToggle', 'change', (e)=>{ 
-                state.writer.grid = e.target.checked; 
-                save(); 
-                writerSetGrid(state.writer.grid); 
-                writerRedrawAll(); // penting: redraw setelah ubah grid
-            });
-            bind('#ghostToggle', 'change', (e)=>{ state.writer.ghost = e.target.checked; save(); writerSetGhostChar(); });
-            bind('#autoSnapToggle', 'change', (e)=>{ state.writer.autoSnap = e.target.checked; save(); });
-            bind('#penBtn', 'click', ()=>{ state.writer.eraser=false; save(); qs('#penBtn')?.classList.add('ok'); qs('#eraserBtn')?.classList.remove('ok'); });
-            bind('#eraserBtn', 'click', ()=>{ state.writer.eraser=true; save(); qs('#eraserBtn')?.classList.add('ok'); qs('#penBtn')?.classList.remove('ok'); });
-            bind('#undoStroke', 'click', writerUndo);
-            bind('#clearCanvas', 'click', writerClear);
-            bind('#savePNG', 'click', writerSavePNG);
-            document.addEventListener('keydown', (e)=>{ if((e.ctrlKey||e.metaKey) && e.key.toLowerCase()==='z'){ e.preventDefault(); writerUndo(); } });
-            window.addEventListener('resize', ()=>{ writerSetupCanvasSize(); });
-            // PATCH: Guard sebelum pakai ResizeObserver
-            if ('ResizeObserver' in window) {
-              const resizeObserver = new ResizeObserver(entries => {
-                  for (let entry of entries) {
-                      if (entry.target === wWrap) {
-                          writerSetupCanvasSize();
-                      }
-                  }
-              });
-              if (wWrap) resizeObserver.observe(wWrap); // Guard against null
-            } else {
-              console.warn("ResizeObserver not supported in this browser.");
-              // Fallback for older browsers if needed, e.g., using window.onresize
-            }
-        }
-        function writerInit() {
-            writerInitDOMRefs();
-            writerBindEvents();
-            writerApplyUIFromState();
-        }
-
-        function _makeOffscreen(w=128,h=128){ const c=document.createElement('canvas'); c.width=w; c.height=h; return c; }
-
-        function _drawTemplateToCanvas(c, ch, theme){
-            const ctx=c.getContext('2d'); if (!ctx) return; // Guard against null
-            ctx.clearRect(0,0,c.width,c.height);
-            ctx.fillStyle = theme==='hc' ? '#e6efff' : '#132030';
-            const s = Math.min(c.width,c.height)*0.8;
-            ctx.font = `bold ${s}px "Noto Serif JP", "Noto Sans JP", serif`;
-            ctx.textAlign='center'; ctx.textBaseline='middle';
-            ctx.fillText(ch, c.width/2, c.height/2);
-        }
-
-        function _drawUserToCanvas(c, strokes, theme){
-            const ctx=c.getContext('2d'); if (!ctx) return; // Guard against null
-            ctx.clearRect(0,0,c.width,c.height);
-            ctx.strokeStyle = theme==='hc' ? '#e6efff' : '#132030';
-            ctx.lineCap='round'; ctx.lineJoin='round';
-            if (!wCanvas) return; // Guard against null
-            const src = wCanvas.getBoundingClientRect();
-            const sx = c.width / src.width;
-            const sy = c.height / src.height;
-            for(const s of wStrokes){
-                if (s.ops === 'destination-out') continue; 
-                ctx.globalCompositeOperation = s.ops;
-                ctx.lineWidth = Math.max(2, (s.size||state.writer.penSize) * ((sx+sy)/2));
-                ctx.beginPath();
-                if (s.points.length > 0) {
-                    ctx.moveTo(s.points[0].x*sx, s.points[0].y*sy);
-                    for(let i=1;i<s.points.length;i++){
-                        const b=s.points[i];
-                        // PATCH: Perbaikan ReferenceError di writerRedrawAll()
-                        ctx.lineTo(b.x*sx, b.y*sy);
-                    }
-                }
-                ctx.stroke();
-            }
-        }
-
-        function _computeIoU(cA, cB){
-            const a = cA.getContext('2d')?.getImageData(0,0,cA.width,cA.height).data;
-            const b = cB.getContext('2d')?.getImageData(0,0,cB.width,cB.height).data;
-            if (!a || !b) return 0; // Guard against null context
-            let inter=0, uni=0;
-            for(let i=3;i<a.length;i+=4){
-                const A = a[i]>0; 
-                const B = b[i]>0;
-                if(A||B) uni++;
-                if(A&&B) inter++;
-            }
-            return uni? inter/uni : 0;
-        }
-
-        function writerEvaluateAndSnap(){
-            if(!wStrokes.length || wStrokes[wStrokes.length - 1].ops === 'destination-out') {
-                return;
-            }
-
-            const offUser = _makeOffscreen(128,128);
-            const offTemp = _makeOffscreen(128,128);
-
-            _drawUserToCanvas(offUser, wStrokes, state.theme);
-            _drawTemplateToCanvas(offTemp, writerCurrentChar(), state.theme);
-
-            const iou = _computeIoU(offUser, offTemp);
-
-            const THRESH = (state.writer.snapThreshold ?? 0.52);
-
-            if(iou >= THRESH){
-                if (!wCtx || !wCanvas) return; // Guard against null
-                wCtx.setTransform(1,0,0,1,0,0);
-                wCtx.clearRect(0,0,wCanvas.width,wCanvas.height);
-                wCtx.scale(dpr,dpr);
-                const s = Math.min(wCanvas.width/dpr, wCanvas.height/dpr)*0.8;
-                wCtx.font = `bold ${s}px "Noto Serif JP", "Noto Sans JP", serif`;
-                wCtx.textAlign='center'; wCtx.textBaseline='middle';
-                wCtx.fillStyle = state.theme==='hc' ? '#e6efff' : '#132030';
-                wCtx.fillText(writerCurrentChar(), (wCanvas.width/dpr)/2, (wCanvas.height/dpr)/2);
-                wStrokes.length = 0;
-                showToast(t('writer_snap_success'), 'ok');
-            }else{
-                const t0=Date.now(), dur=160; 
-                const snap = ()=>{
-                    const t=Date.now()-t0, k=Math.min(1,t/dur);
-                    if (wCtx) wCtx.save(); // Guard against null
-                    if (wCtx) wCtx.globalAlpha = 1-k;
-                    writerRedrawAll();
-                    if (wCtx) wCtx.restore();
-                    if(k<1) requestAnimationFrame(snap); 
-                    else writerClear();
-                }; 
-                requestAnimationFrame(snap);
-                showToast(t('writer_snap_fail'), 'warn');
-            }
-        }
-
         // ---------- EXPORT / IMPORT PROGRESS ----------
         function sanitizeState(s){
             const clamp = (n,min,max)=> Math.min(max, Math.max(min, Number(n)||0));
@@ -3060,64 +2896,50 @@
             
             if (!safe.test) safe.test = {};
             safe.test.target = clamp(safe.test.target, 1, 1000);
-            safe.test.sylPerItem = clamp(safe.test.sylPerItem, 2, 6); // PATCH: Sanitasi sylPerItem
+            safe.test.sylPerItem = clamp(safe.test.sylPerItem, 2, 6);
+            safe.test.rangeFrom = typeof safe.test.rangeFrom === 'string' ? safe.test.rangeFrom : 'aiueo';
+            safe.test.rangeTo = typeof safe.test.rangeTo === 'string' ? safe.test.rangeTo : 'n';
+            safe.test.singleGroup = typeof safe.test.singleGroup === 'string' ? safe.test.singleGroup : 'aiueo';
             
             if (!safe.pomo) safe.pomo = {};
             safe.pomo.work = clamp(safe.pomo.work, 1, 60);
             safe.pomo.break = clamp(safe.pomo.break, 1, 30);
             safe.pomo.remaining = clamp(safe.pomo.remaining, 0, (safe.pomo.work || 25) * 60);
             
-            if (!safe.writer) safe.writer = {};
-            safe.writer.penSize = clamp(safe.writer.penSize, 2, 28);
-            safe.writer.ghostOpacity = clamp(safe.writer.ghostOpacity, 0.05, 0.40);
-            safe.writer.snapThreshold = clamp(safe.writer.snapThreshold, 0.35, 0.80);
-
             safe.audio = !!safe.audio;
-            safe.writer.eraser = !!safe.writer.eraser;
-            safe.writer.grid = !!safe.writer.grid;
-            safe.writer.ghost = !!safe.writer.ghost;
-            safe.writer.autoSnap = !!safe.writer.autoSnap;
             safe.pomo.running = !!safe.pomo.running;
             safe.hasSeenOnboarding = !!safe.hasSeenOnboarding;
-            safe.lite = !!safe.lite; // PATCH: Sanitize lite mode
+            safe.lite = !!safe.lite;
 
             safe.theme = ['pastel', 'hc'].includes(safe.theme) ? safe.theme : 'pastel';
             safe.test.set = ['hira', 'kata'].includes(safe.test.set) ? safe.test.set : 'hira';
             safe.test.mode = ['type', 'mc'].includes(safe.test.mode) ? safe.test.mode : 'type';
-            // PATCH: Sanitasi qType baru (audio_k2r, audio_r2k)
             safe.test.qType = ['k2r', 'r2k', 'seq', 'audio_k2r', 'audio_r2k', 'kseq'].includes(safe.test.qType) ? safe.test.qType : 'k2r'; 
             safe.test.rangeMode = ['range', 'single'].includes(safe.test.rangeMode) ? safe.test.rangeMode : 'range';
-            safe.writer.set = ['hira', 'kata'].includes(safe.writer.set) ? safe.writer.set : 'hira';
-            safe.writer.kana = ALL_ROMAJI.includes(safe.writer.kana) ? safe.writer.kana : 'a';
-            safe.pomo.mode = ['work', 'break'].includes(safe.pomo.mode) ? safe.pomo.mode : 'work';
+            safe.test.subset = ['all', ...GROUPS.map(g => g.key), 'confusion', 'srs_due'].includes(safe.test.subset) ? safe.test.subset : 'all';
 
-            // PATCH: Sanitasi confusionLog
             if (!safe.confusionLog) safe.confusionLog = {hira:{}, kata:{}};
             if (typeof safe.confusionLog.hira !== 'object') safe.confusionLog.hira = {};
             if (typeof safe.confusionLog.kata !== 'object') safe.confusionLog.kata = {};
-            // Basic sanitation for confusionLog keys/values (ensure counts are numbers)
             for (const setType of ['hira', 'kata']) {
                 for (const pair in safe.confusionLog[setType]) {
-                    safe.confusionLog[setType][pair] = clamp(safe.confusionLog[setType][pair], 0, 10000); // Max count
+                    safe.confusionLog[setType][pair] = clamp(safe.confusionLog[setType][pair], 0, 10000);
                 }
             }
 
-            // PATCH: Sanitasi srs
             if (!safe.srs) safe.srs = {boxes:{}, due:{}};
             if (typeof safe.srs.boxes !== 'object') safe.srs.boxes = {};
             if (typeof safe.srs.due !== 'object') safe.srs.due = {};
-            // Basic sanitation for srs boxes/due
             for (const romaji in safe.srs.boxes) {
-                safe.srs.boxes[romaji] = clamp(safe.srs.boxes[romaji], 1, 5); // Box 1-5
-                safe.srs.due[romaji] = clamp(safe.srs.due[romaji], 0, 9999999999); // Epoch timestamp
+                safe.srs.boxes[romaji] = clamp(safe.srs.boxes[romaji], 1, 5);
+                safe.srs.due[romaji] = clamp(safe.srs.due[romaji], 0, 9999999999);
             }
-
 
             return safe;
         }
 
         function exportProgress(){
-            const blob = new Blob([JSON.stringify(sanitizeState(state))], {type:'application/json'}); // Sanitize before export
+            const blob = new Blob([JSON.stringify(sanitizeState(state))], {type:'application/json'});
             const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
             a.download='kana-progress.json'; a.click(); URL.revokeObjectURL(a.href);
             showToast(t('export_ok'));
@@ -3155,13 +2977,13 @@
             const mainContent = qs('#main');
 
             if (state.hasSeenOnboarding) {
-                if (onboardingModal) onboardingModal.hidden = true; // Use hidden attribute
+                if (onboardingModal) onboardingModal.hidden = true;
                 if (mainContent) mainContent.style.display = 'block';
                 return;
             }
 
             if (onboardingModal) onboardingModal.hidden = false;
-            if (onboardingModal) onboardingModal.classList.add('is-open'); // Use class for transition
+            if (onboardingModal) onboardingModal.classList.add('is-open');
             _trapModalOnboarding();
 
             bind('#btnStartLearningOnboarding', 'click', () => {
@@ -3175,7 +2997,6 @@
                     }, { once: true });
                 }
                 if (mainContent) mainContent.style.display = 'block';
-                // PATCH: Dukungan Escape key untuk modal onboarding
                 if (_escCloseListenerOnboarding) {
                     document.removeEventListener('keydown', _escCloseListenerOnboarding);
                     _escCloseListenerOnboarding = null;
@@ -3186,7 +3007,7 @@
         let _escCloseListenerOnboarding = null;
         function _trapModalOnboarding(){
             const onboardingModal = qs('#onboardingModal');
-            if (!onboardingModal) return; // Guard against null
+            if (!onboardingModal) return;
             const focusableElements = 'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
             const focusables = onboardingModal.querySelectorAll(focusableElements);
             const firstFocusable = focusables[0];
@@ -3208,13 +3029,12 @@
                     }
                 }
             });
-            // PATCH: Dukungan Escape key untuk modal onboarding
             if (!_escCloseListenerOnboarding) {
                 _escCloseListenerOnboarding = (e) => {
                     if (e.key === 'Escape') {
                         const btnStartLearning = qs('#btnStartLearningOnboarding');
                         if (btnStartLearning) {
-                            btnStartLearning.click(); // Simulate click to close and mark as seen
+                            btnStartLearning.click();
                         }
                     }
                 };
@@ -3230,7 +3050,6 @@
             if (liteToggle) {
                 liteToggle.checked = state.lite;
             }
-            // Update Pomodoro interval dynamically
             if (pomoHandle) {
                 clearInterval(pomoHandle);
                 pomoHandle = null;
@@ -3238,17 +3057,13 @@
                     startPomo();
                 }
             }
-            // Re-initialize writer canvas context to apply willReadFrequently if changed
-            if (typeof writerInit === 'function') { // Ensure writerInit is defined
-                writerInit();
-            }
             showToast(state.lite ? t('lite_mode_on') : t('lite_mode_off'));
         }
 
         // ---------- BINDINGS ----------
         bind('#btnShowLearn', 'click', startLearn);
         bind('#btnStart', 'click', startTest);
-        bind('#btnEnd', 'click', endTest); // Menggunakan fungsi endTest yang sudah diperbaiki
+        bind('#btnEnd', 'click', endTest);
         bind('#btnSkip', 'click', skipQ);
         bind('#btnCheck', 'click', checkAns);
 
@@ -3262,6 +3077,7 @@
         });
 
         document.addEventListener('keydown', (e)=>{
+            // Only respond to key events if not in an input/textarea, or if it's the answer input
             if(e.target.matches('input,textarea') && e.target.id !== 'ans' && !e.target.closest('#testArea')) return;
 
             const map={a:'A',b:'B',c:'C',d:'D'}; const k=map[e.key?.toLowerCase?.()]; 
@@ -3270,55 +3086,14 @@
                 mcPick(k); 
             }
             if(e.key==='ArrowRight' && !qs('#testArea')?.hidden){ e.preventDefault(); skipQ(); }
-            // PATCH: Hotkey 'R' for replay audio
             if(e.key.toLowerCase()==='r' && !qs('#celebrate')?.classList.contains('is-open') && !qs('#testArea')?.hidden){
                 qs('#btnReplayAudio')?.click();
-            }
-
-            const writerSection = qs('#writerSection');
-            const isWriterSectionVisible = writerSection && getComputedStyle(writerSection).display !== 'none' && writerSection.offsetParent !== null;
-
-            if (isWriterSectionVisible) {
-                if (e.key === 'g') {
-                    const el = qs('#gridToggle');
-                    if (el) { el.checked = !el.checked; el.dispatchEvent(new Event('change')); save(); } // Trigger change event
-                }
-                if (e.key === 'p') {
-                    const penBtn = qs('#penBtn');
-                    const eraserBtn = qs('#eraserBtn');
-                    if (penBtn && eraserBtn) {
-                        if (state.writer.eraser) {
-                            penBtn.click();
-                        } else {
-                            eraserBtn.click();
-                        }
-                    }
-                }
-                if (e.key === ']') {
-                    const penSizeInput = qs('#penSize');
-                    if (penSizeInput) {
-                        state.writer.penSize = Math.min(28, state.writer.penSize + 1);
-                        penSizeInput.value = state.writer.penSize;
-                        penSizeInput.dispatchEvent(new Event('input')); // Trigger input event
-                        save();
-                    }
-                }
-                if (e.key === '[') {
-                    const penSizeInput = qs('#penSize');
-                    if (penSizeInput) {
-                        state.writer.penSize = Math.max(2, state.writer.penSize - 1);
-                        penSizeInput.value = state.writer.penSize;
-                        penSizeInput.dispatchEvent(new Event('input')); // Trigger input event
-                        save();
-                    }
-                }
             }
         });
 
         bind('#tPastel', 'click', ()=>{ state.theme='pastel'; save(); applyTheme(); });
         bind('#tHC', 'click', ()=>{ state.theme='hc'; save(); applyTheme(); });
         bind('#audToggle', 'change', (e)=>{ state.audio = e.target.checked; save(); });
-        // PATCH: Bind lite mode toggle
         bind('#liteToggle', 'change', (e) => { state.lite = e.target.checked; save(); applyPerfMode(); });
 
         bind('#resetBtn', 'click', ()=>{
@@ -3328,18 +3103,16 @@
                     state=initState();
                     applyTheme();
                     applyAudio();
-                    applyPerfMode(); // Reapply lite mode
+                    applyPerfMode();
                     renderAll();
-                    if (typeof writerClear==='function') writerClear();
                     save();
                     showToast('Semua progres telah direset.');
                 }
             });
         });
 
-        // PATCH: Reset Confusion button handler
         bind('#resetConfusionBtn', 'click', () => {
-            showCustomConfirm(t('confirm_reset_title'), (confirmed) => { // Reusing confirm dialog
+            showCustomConfirm(t('confirm_reset_title'), (confirmed) => {
                 if (confirmed) {
                     state.confusionLog = { hira: {}, kata: {} };
                     save();
@@ -3349,7 +3122,6 @@
         });
 
         bind('#countChips', 'click', (e)=>{ const b=e.target.closest('.chip'); if(!b) return; const c=parseInt(b.dataset.count,10)||10; if (qs('#testCount')) qs('#testCount').value=c; clickTone('click'); save(); });
-        // PATCH: sylPerItem input handler
         bind('#sylPerItem', 'input', (e) => {
             state.test.sylPerItem = Math.max(2, Math.min(6, parseInt(e.target.value, 10) || 3));
             save();
@@ -3359,27 +3131,73 @@
         bind('#pPause', 'click', pausePomo);
         bind('#pReset', 'click', resetPomo);
 
-        bind('#rangeMode', 'change', (e) => { state.test.rangeMode = e.target.value; save(); toggleRangeInputs(); });
-        bind('#answerMode', 'change', (e) => { state.test.mode = e.target.value; save(); toggleAnswerUI(); });
+        // Event listener for subset chips (modified to exclude preset chips which have their own click handlers)
+        qsa('#subsetChips .chip:not([data-preset])').forEach(chip => {
+            chip.addEventListener('click', (e) => {
+                const clickedChip = e.target.closest('.chip');
+                if (!clickedChip) return;
+
+                let actualKey = '';
+                if (clickedChip.textContent === t('all_kana_label')) {
+                    actualKey = 'all';
+                } else if (clickedChip.textContent === t('confuse_train_label')) {
+                    actualKey = 'confusion';
+                } else if (clickedChip.textContent === t('review_today_label')) {
+                    actualKey = 'srs_due';
+                } else {
+                    const foundGroup = GROUPS.find(g => g.label === clickedChip.textContent);
+                    if (foundGroup) {
+                        actualKey = foundGroup.key;
+                    }
+                }
+
+                if (actualKey) {
+                    state.test.subset = actualKey;
+                    // If a subset chip is selected, the rangeMode should reflect that.
+                    if (actualKey === 'all' || actualKey === 'confusion' || actualKey === 'srs_due') {
+                        state.test.rangeMode = 'range'; // Treat these as 'range' mode, but with specific selection logic
+                    } else {
+                        state.test.rangeMode = 'single'; // Treat group chips as 'single'
+                    }
+                    save();
+                    buildSubsetChips(); // Rebuild to update active state
+                    updateRangeUI(); // Apply range mode logic after subset change
+                    updateTestInfo(); // Update test info text
+                    clickTone('click');
+                }
+            });
+        });
+        
+        // Bind click handlers for the new preset chips
+        qsa('#subsetChips .chip[data-preset]').forEach(ch=>{
+            ch.addEventListener('click', ()=>applyPreset(ch.dataset.preset));
+        });
+
+
+        bind('#answerMode', 'change', (e) => { 
+            state.test.mode = e.target.value; 
+            save(); 
+            toggleAnswerUI(); 
+            updateTestInfo(); // Update test info text
+        });
         bind('#qType', 'change', (e) => { 
             state.test.qType = e.target.value; 
             save(); 
             toggleAnswerUI(); 
-            // Update sylPerItem control visibility
             const sylControl = qs('#sylPerItemControl');
             if (sylControl) {
                 sylControl.hidden = !(state.test.qType === 'seq' || state.test.qType === 'kseq');
             }
+            updateTestInfo(); // Update test info text
         });
-        // PATCH: Bind tombol replay audio
         bind('#btnReplayAudio', 'click', () => {
             if (currentItem) {
-                if (currentItem.qType === 'audio_k2r' && currentItem.char) { // Replay Kana for audio_k2r
-                    speakKanaOrRomaji(currentItem.char, true); // Force replay without audio state check
-                } else if (currentItem.qType === 'audio_r2k' && currentItem.romaji) { // Replay Romaji for audio_r2k
-                    speakKanaOrRomaji(currentItem.romaji, true); // Force replay without audio state check
-                } else if (currentItem.qType === 'kseq' && currentItem.kanaSeq) { // Replay Kana sequence for kseq
-                     speakKanaOrRomaji(currentItem.kanaSeq, true); // Force replay without audio state check
+                if (currentItem.qType === 'audio_k2r' && currentItem.char) {
+                    speakKanaOrRomaji(currentItem.char, true);
+                } else if (currentItem.qType === 'audio_r2k' && currentItem.romaji) {
+                    speakKanaOrRomaji(currentItem.romaji, true);
+                } else if (currentItem.qType === 'kseq' && currentItem.kanaSeq) {
+                     speakKanaOrRomaji(currentItem.kanaSeq, true);
                 }
             }
             clickTone('click');
@@ -3395,7 +3213,7 @@
             }
         });
 
-        // Sidebar functions
+        // Sidebar functions - now integrated with router
         function toggleSidebar() {
             const sidebar = qs('#sidebar');
             const body = qs('body');
@@ -3414,42 +3232,38 @@
             }
         }
 
-        function scrollToSection(id) {
-            const element = document.getElementById(id);
-            if (element) {
-                element.scrollIntoView({ behavior: 'smooth' });
-                closeSidebar(); // Close sidebar after navigating
-            }
-        }
-
+        // Removed old scrollToSection, replaced by router
 
         // ---------- RENDER ----------
         function renderAll(){
             buildKana('hiraBox','hira');
             buildKana('kataBox','kata');
-            buildSubsetChips();
+            buildSubsetChips(); // Re-added
             fillLearnRange();
-            fillTestRange();
+            populateRangeSelects();
+            updateRangeUI(); // Initial call to updateRangeUI
+
             renderStats();
             applyTheme();
             applyAudio();
-            applyPerfMode(); // Apply Lite Mode settings
+            applyPerfMode();
             upPomoLabel();
             if(!state.pomo.remaining) state.pomo.remaining=state.pomo.work*60;
             drawRemain();
             if (qs('#pomoWork')) qs('#pomoWork').value=state.pomo.work;
             if (qs('#pomoBreak')) qs('#pomoBreak').value=state.pomo.break;
-            if (qs('#testCount')) qs('#testCount').value=state.test.target||10;
-            // PATCH: Update sylPerItem input value
-            if (qs('#sylPerItem')) qs('#sylPerItem').value = state.test.sylPerItem;
+            // Set values without affecting width
+            const testCountInput = qs('#testCount');
+            if (testCountInput) testCountInput.value = state.test.target || 10;
+            const sylPerItemInput = qs('#sylPerItem');
+            if (sylPerItemInput) sylPerItemInput.value = state.test.sylPerItem;
+
             toggleAnswerUI();
             updatePointsAndLevelDisplay();
-            writerInit();
-            writerRedrawAll(); 
+            updateTestInfo(); // Initial update of test info text
         }
 
         document.addEventListener('DOMContentLoaded', ()=>{
-            // Auto-enable Lite Mode on low-end devices
             const deviceMemory = navigator.deviceMemory || 0;
             const hardwareConcurrency = navigator.hardwareConcurrency || 0;
             if (!state.hasSeenOnboarding && (deviceMemory < 4 || hardwareConcurrency <= 4)) {
@@ -3460,9 +3274,8 @@
             renderAll();
             if(state.pomo.running){ startPomo(); }
             showOnboarding();
-            setInterval(renderStats, 5000); // Update review due indicator periodically
+            setInterval(renderStats, 5000);
 
-            // Sidebar event listeners
             bind('#sidebarToggle', 'click', toggleSidebar);
             bind('#closeSidebar', 'click', closeSidebar);
             document.addEventListener('keydown', (e) => {
@@ -3470,6 +3283,44 @@
                     closeSidebar();
                 }
             });
+
+            // --- NEW JS ROUTER ---
+            // PAGES now reference actual HTML files for full page reloads
+            const PAGES = ["index.html","index2.html","index3.html","index4.html","index5.html","index6.html"];
+            const $menu  = document.querySelectorAll('#sidebar [href]');
+
+            // Active state for sidebar links
+            $menu.forEach(a=>{
+                // Compare current pathname with link href
+                const currentPath = location.pathname.split('/').pop() || 'index.html'; // Default to index.html if root
+                const linkPath = a.getAttribute('href').split('/').pop();
+
+                if(currentPath === linkPath){
+                    a.classList.add('active');
+                } else {
+                    a.classList.remove('active');
+                }
+            });
+
+            // For the main page (index.html), ensure the content is shown
+            const mainContent = qs('#main');
+            if (mainContent) {
+                // The display logic for #main is now primarily handled by showOnboarding().
+                // Keeping this as a fallback if showOnboarding doesn't run or has issues.
+                mainContent.style.display = 'block';
+            }
+            // --- END NEW JS ROUTER ---
+
+            // Disable/enable start button based on test count
+            const btnStart = qs('#btnStart');
+            const testCountInput = qs('#testCount');
+            function updateStartButtonState() {
+                if (btnStart && testCountInput) {
+                    btnStart.disabled = (parseInt(testCountInput.value, 10) <= 0);
+                }
+            }
+            testCountInput?.addEventListener('input', updateStartButtonState);
+            updateStartButtonState(); // Initial check
         });
     </script>
 </body>

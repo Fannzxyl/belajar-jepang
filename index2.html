@@ -74,10 +74,7 @@
         select{ width:100%;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--soft);color:var(--ink); transition: border-color var(--transition-duration) ease-out, background-color var(--transition-duration) ease-out, box-shadow var(--transition-duration) ease-out; -webkit-appearance: none; -moz-appearance: none; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2376849c' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; background-size: 16px; padding-right: 36px; }
         select:focus { border-color: var(--pri); outline: none; box-shadow: var(--ring); }
         .spacer{height:10px}
-        .main-nav { width: 100%; margin-top: 12px; padding-top: 8px; border-top: 1px solid var(--border); }
-        .main-nav .row { justify-content: center; }
-        .main-nav .btn { flex-grow: 1; }
-        @media (min-width: 768px) { .main-nav .btn { flex-grow: 0; } }
+        .main-nav{ display:none !important; } /* Sembunyiin main-nav lama */
 
         /* Style khusus untuk Flashcard */
         .flashcard-container {
@@ -128,9 +125,68 @@
             font-size: 14px;
             color: var(--muted);
         }
+
+        /* === Sidebar === */
+        .sidebar{
+            position:fixed; top:0; left:-300px; width:280px; height:100%;
+            background:var(--panel); box-shadow:var(--shadow); z-index:1000;
+            transition:left .3s ease-in-out; padding:20px; padding-top:calc(20px + env(safe-area-inset-top));
+            display:flex; flex-direction:column; gap:10px; overflow-y:auto; border-right:1px solid var(--border);
+        }
+        .sidebar.is-open{ left:0; }
+        .sidebar .menu{ list-style:none; margin:0; padding:0; }
+        .sidebar .menu li a{ display:flex; gap:.5rem; align-items:center; padding:.75rem 1rem; border-radius:12px; color:var(--ink); text-decoration:none; }
+        .sidebar .menu li a:hover{ background:var(--soft); }
+        .sidebar .menu li a.active{ background:rgba(122,108,255,.12); font-weight:600; }
+        .sidebar-toggle-btn{
+            position:fixed; top:16px; left:16px; z-index:1001; background:var(--btn); border:1px solid var(--border);
+            border-radius:50%; width:44px; height:44px; display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:var(--shadow);
+        }
+        .sidebar-toggle-btn i{ color:var(--ink); font-size:20px; }
+        @media (min-width:768px){
+            body.sidebar-open{ padding-left:280px; }
+            .sidebar-toggle-btn{ left:16px; }
+        }
+        @media (max-width:640px){ .sidebar{ width:84vw; max-width:320px; } }
+
+        /* Header padding biar gak ketutup tombol (opsional, rapi di HP) */
+        header .brand{ position:relative; z-index:1002; padding-left:60px; }
+        @media (max-width:767px){ header .brand{ padding-left:0; } .sidebar-toggle-btn{ top:calc(16px + env(safe-area-inset-top)); } }
+
+        /* Form control responsivity */
+        input, select{ width:100%; min-width:0; }
+        /* Pastikan select bisa ditap & tidak ketutup */
+        #rangeMode, #testFrom, #testTo, #testSingleGroup{
+            width:100%; min-width:0; pointer-events:auto; position:relative; z-index:1;
+        }
+
     </style>
 </head>
 <body>
+    <!-- Sidebar Toggle Button -->
+    <button id="sidebarToggle" class="sidebar-toggle-btn" aria-label="Toggle Sidebar">
+        <i class="fa-solid fa-bars"></i>
+    </button>
+
+    <!-- Sidebar Content -->
+    <nav id="sidebar" class="sidebar">
+        <div class="row" style="justify-content: space-between; align-items: center;">
+            <h3 style="margin:0;">Navigasi</h3>
+            <button class="btn ghost" id="closeSidebar" aria-label="Tutup Sidebar">
+                <i class="fa-solid fa-times"></i>
+            </button>
+        </div>
+        <hr style="border:none;border-top:1px solid var(--border);width:100%;">
+        <ul class="menu">
+            <li><a href="index.html">📘 Latihan</a></li>
+            <li><a href="index2.html">🗂️ Flashcard</a></li>
+            <li><a href="index3.html">🧮 Tabel Kana</a></li>
+            <li><a href="index4.html">🗒️ Kosakata</a></li>
+            <li><a href="index5.html">💬 Ungkapan</a></li>
+            <li><a href="index6.html">✍️ Menulis</a></li>
+        </ul>
+    </nav>
+
     <header>
         <div class="wrap">
             <div class="brand">
@@ -150,7 +206,7 @@
                     <div class="small">Flashcard untuk menghafal Hiragana & Katakana</div>
                 </div>
             </div>
-             <!-- NAVIGASI UTAMA -->
+             <!-- NAVIGASI UTAMA (OLD - HIDDEN) -->
              <nav class="main-nav">
                 <div class="row">
                     <a href="index.html" class="btn ghost"><i class="fa-solid fa-home"></i> Latihan</a>
@@ -334,6 +390,36 @@
         // Inisialisasi
         document.addEventListener('DOMContentLoaded', () => {
             createDeck();
+            
+            // Sidebar wiring
+            const sidebar = document.getElementById('sidebar');
+            const toggleBtn = document.getElementById('sidebarToggle');
+            const closeBtn  = document.getElementById('closeSidebar');
+
+            function openSidebar(){ sidebar.classList.add('is-open'); document.body.classList.add('sidebar-open'); }
+            function closeSidebar(){ sidebar.classList.remove('is-open'); document.body.classList.remove('sidebar-open'); }
+
+            toggleBtn?.addEventListener('click', openSidebar);
+            closeBtn?.addEventListener('click', closeSidebar);
+            // Tutup jika klik di luar (mobile)
+            document.addEventListener('click', (e)=>{
+                if(!sidebar.classList.contains('is-open')) return;
+                // Check if the click is outside the sidebar AND outside the toggle button
+                const isClickInsideSidebar = sidebar.contains(e.target);
+                const isClickInsideToggleBtn = toggleBtn.contains(e.target);
+                if(!isClickInsideSidebar && !isClickInsideToggleBtn) {
+                    closeSidebar();
+                }
+            });
+
+            // Set active link sesuai file saat ini
+            document.querySelectorAll('#sidebar a').forEach(a=>{
+                const href = a.getAttribute('href');
+                if(href && location.pathname.endsWith(href)) a.classList.add('active');
+            });
+
+            // Aksesibilitas: ESC untuk tutup
+            document.addEventListener('keydown', (e)=>{ if(e.key === 'Escape') closeSidebar(); });
         });
     </script>
 </body>
