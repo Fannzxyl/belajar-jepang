@@ -206,7 +206,6 @@
             font-weight: 500;
             transition: all var(--transition-duration) ease-out;
             color: var(--ink);
-            background: var(--btn);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -879,10 +878,10 @@
                         <!-- Updated: subsetChips now has a sticky label -->
                         <div id="subsetChips">
                             <div class="chips-title">Pilih cepat:</div>
-                            <button class="chip" data-preset="aiueo-m">aiueo → m</button>
-                            <button class="chip" data-preset="base-all">Dasar semua</button>
-                            <button class="chip" data-preset="dakuon-all">Dakuon</button>
-                            <button class="chip" data-preset="youon-all">Youon</button>
+                            <button class="chip" data-preset="aiueo-m" type="button">aiueo → m</button>
+                            <button class="chip" data-preset="base-all" type="button">Dasar semua</button>
+                            <button class="chip" data-preset="dakuon-all" type="button">Dakuon</button>
+                            <button class="chip" data-preset="youon-all" type="button">Youon</button>
                             <!-- Original chips will be added by JS renderAll -> buildSubsetChips() -->
                         </div>
                         <select id="testSet" class="input" aria-label="Pilih set tes">
@@ -952,10 +951,10 @@
                             <button class="btn" id="btnCheck" type="button"><i class="fa-solid fa-check"></i> Cek (Enter)</button>
                         </div>
                         <div id="mcWrap" class="optwrap" hidden>
-                            <button class="btn opt" id="optA" aria-label="Pilihan A" type="button">A</button>
-                            <button class="btn opt" id="optB" aria-label="Pilihan B" type="button">B</button>
-                            <button class="btn opt" id="optC" aria-label="Pilihan C" type="button">C</button>
-                            <button class="btn opt" id="optD" aria-label="Pilihan D" type="button">D</button>
+                            <button class="btn opt" id="optA" aria-label="Pilihan A" title="Pilihan A" type="button">A</button>
+                            <button class="btn opt" id="optB" aria-label="Pilihan B" title="Pilihan B" type="button">B</button>
+                            <button class="btn opt" id="optC" aria-label="Pilihan C" title="Pilihan C" type="button">C</button>
+                            <button class="btn opt" id="optD" aria-label="Pilihan D" title="Pilihan D" type="button">D</button>
                             <div class="small" style="grid-column: span 4; text-align: center; margin-top: 4px;">Ketuk atau tekan A/B/C/D</div>
                         </div>
                         <div class="spacer"></div>
@@ -1150,7 +1149,7 @@
             btn_end: 'Selesai',
             empty_learn: 'Pilih set & rentang dulu, lalu tekan Tampilkan.',
             empty_test: 'Setel tipe soal, jumlah, dan rentang/grup, lalu tekan Mulai Tes.',
-            empty_review: 'Bersih! Nggak ada jawaban keliru. �',
+            empty_review: 'Bersih! Nggak ada jawaban keliru. 😊',
             done_test_title: 'Tes selesai! 🎉',
             done_test_sub: (s,t)=>`Skor kamu ${s}/${t}. Bagus!`,
             wrong_tip_dzu: 'Ingat:ぢ = dji (ji), づ = dzu (zu).', // Specific tip for dji/dzu
@@ -1167,7 +1166,7 @@
             pomo_focus: 'Fokus',
             pomo_break: 'Istirahat',
             pomo_start_focus: (time)=>`Fokus dimulai. ${time} — semangat!`,
-            pomo_time_break: 'Waktunya istirahat. Minum air dulu 🥤',
+            pomo_time_break: 'Waktunya istirahat. Minum air dulu �',
             test_info_text: (set, range, qType, total, target)=>`${set} • ${range} • ${qType} • Soal ${total}/${target}`,
             test_streak: (streak)=>`Streak: ${streak}`,
             test_mc_hint: 'Ketuk atau tekan A/B/C/D',
@@ -1534,6 +1533,26 @@
         let lastSpeakTime = 0;
         const SPEAK_COOLDOWN = 600; // ms
 
+        // Tipe soal yang berbasis audio
+        const AUDIO_TYPES = new Set(['audio_k2r','audio_r2k']);
+
+        // Cek apakah saat ini test aktif dengan MC
+        function isMCActive() {
+            const area = qs('#testArea');
+            const am = qs('#answerMode');
+            return !!area && !area.hidden && am?.value === 'mc';
+        }
+
+        // Petakan key -> index opsi
+        const keyToOptIndex = (key) => {
+            const k = String(key).toLowerCase();
+            if (k === 'a' || k === '1') return 0;
+            if (k === 'b' || k === '2') return 1;
+            if (k === 'c' || k === '3') return 2;
+            if (k === 'd' || k === '4') return 3;
+            return -1;
+        };
+
         function _pairKey(a, b) {
             const [x, y] = [a, b].sort();
             return x + '|' + y;
@@ -1642,7 +1661,7 @@
             } else { // Fallback for 'all' or other modes (e.g., when a preset chip is active)
                 setEnabled(elFrom, false);
                 setEnabled(elTo, false);
-                if (elToWrap) elToWrap.hidden = true;
+                if (elToWrap) elToToWrap.hidden = true;
                 setEnabled(elSingle, false);
             }
             ensureValidRange(); // Ensure range is valid after UI update
@@ -1883,7 +1902,7 @@
             const mode = answerModeSelect?.value; // Use optional chaining
             const qType = qTypeSelect?.value; // Use optional chaining
 
-            // Sembunyikan semua secara default (P0.1)
+            // Sembunyikan semua secara default
             if (typeWrap) {
                 typeWrap.hidden = true;
                 typeWrap.style.display = 'none';
@@ -1893,52 +1912,47 @@
                 mcWrap.style.display = 'none';
             }
 
+            // Atur disabled state untuk #answerMode
             if (answerModeSelect) answerModeSelect.disabled = false;
-            if (sylPerItemControl) sylPerItemControl.hidden = true;
-            if (btnReplayAudio) btnReplayAudio.hidden = false; // Tombol replay audio selalu terlihat (P0.2)
+            
+            // Atur visibilitas #sylPerItemControl
+            if (sylPerItemControl) {
+                sylPerItemControl.hidden = !(qType === 'seq' || qType === 'kseq');
+            }
 
-            if (qType === 'seq') {
+            // Atur visibilitas dan disabled state untuk #btnReplayAudio
+            if (btnReplayAudio) {
+                const isAudio = AUDIO_TYPES.has(qType);
+                btnReplayAudio.hidden = !isAudio;
+                btnReplayAudio.disabled = !isAudio;
+            }
+
+            // Tampilkan wrapper yang sesuai
+            if (qType === 'seq' || qType === 'kseq') {
                 if (typeWrap) {
                     typeWrap.hidden = false;
                     typeWrap.style.display = 'block';
                 }
-                if (answerModeSelect) answerModeSelect.value = 'type';
-                if (answerModeSelect) answerModeSelect.disabled = true;
-                if (sylPerItemControl) sylPerItemControl.hidden = false;
-            } else if (qType === 'kseq') {
-                if (typeWrap) {
-                    typeWrap.hidden = false;
-                    typeWrap.style.display = 'block';
+                if (answerModeSelect) {
+                    answerModeSelect.value = 'type';
+                    answerModeSelect.disabled = true;
                 }
-                if (answerModeSelect) answerModeSelect.value = 'type';
-                if (answerModeSelect) answerModeSelect.disabled = true;
-                if (sylPerItemControl) sylPerItemControl.hidden = false;
             } else if (qType === 'r2k') {
                 if (mcWrap) {
                     mcWrap.hidden = false;
                     mcWrap.style.display = 'grid';
                 }
-                if (answerModeSelect) answerModeSelect.value = 'mc';
-                if (answerModeSelect) answerModeSelect.disabled = true;
-            } else if (qType === 'audio_k2r' || qType === 'audio_r2k') {
-                if (mode === 'type') {
-                    if (typeWrap) {
-                        typeWrap.hidden = false;
-                        typeWrap.style.display = 'block';
-                    }
-                } else {
-                    if (mcWrap) {
-                        mcWrap.hidden = false;
-                        mcWrap.style.display = 'grid';
-                    }
+                if (answerModeSelect) {
+                    answerModeSelect.value = 'mc';
+                    answerModeSelect.disabled = true;
                 }
-            } else { // k2r (default)
+            } else if (AUDIO_TYPES.has(qType) || qType === 'k2r') { // k2r, audio_k2r, audio_r2k
                 if (mode === 'type') {
                     if (typeWrap) {
                         typeWrap.hidden = false;
                         typeWrap.style.display = 'block';
                     }
-                } else {
+                } else { // mode === 'mc'
                     if (mcWrap) {
                         mcWrap.hidden = false;
                         mcWrap.style.display = 'grid';
@@ -1946,6 +1960,7 @@
                 }
             }
         }
+
 
         function endTest(){
             qs('#testArea').style.opacity = '0';
@@ -1975,16 +1990,22 @@
             const ansEl=qs('#ans'); 
             if(ansEl) ansEl.value='';
             
+            // Selalu nonaktifkan auto-play audio saat render soal
+            // -> Jangan panggil fungsi playAudio() atau setTimeout audio di sini.
+            const replayBtn = qs('#btnReplayAudio');
+            if (replayBtn) {
+                const isAudio = AUDIO_TYPES.has(qType);
+                replayBtn.hidden = !isAudio;      // Tampilkan tombol hanya untuk tipe listening
+                replayBtn.disabled = !isAudio;    // Nonaktif jika bukan audio
+            }
+
             if (qType.startsWith('audio')) {
                 if (qs('#qKana')) {
                     qs('#qKana').textContent='Dengar & jawab';
                     qs('#qKana').style.fontSize='24px';
                 }
-                if (qType === 'audio_k2r') {
-                    speakKanaOrRomaji(currentItem.char);
-                } else { // audio_r2k
-                    speakKanaOrRomaji(currentItem.romaji);
-                }
+                // Hapus pemanggilan playAudio() otomatis di sini
+                // playCurrentQuestionAudio() will be called only on user click.
             } else if(qType==='seq'){
                 const seqData = makeSequence(buildPoolLabels(), state.test.set, state.test.sylPerItem);
                 currentItem = { ...currentItem, romaji: seqData.romaji, char: seqData.kana, qType: qType };
@@ -2056,19 +2077,67 @@
             }, 30);
         }
 
-        function mcPick(letter){
-            const qType=state.test.qType;
-            const val=mcMap[letter];
-            let correct=false;
-
-            if(qType==='k2r' || qType==='audio_k2r'){
-                correct = (val===currentItem.romaji);
-            } else if(qType==='r2k' || qType==='audio_r2k'){
-                const targetKana = (state.test.set==='hira'? HIRA_MAP.get(currentItem.romaji): KATA_MAP.get(currentItem.romaji));
-                correct = (val===targetKana);
+        // Fungsi pemutar audio soal aktif (jika belum ada)
+        function playCurrentQuestionAudio() {
+            if (!currentItem) return;
+            const qType = state.test.qType;
+            if (AUDIO_TYPES.has(qType)) {
+                if (qType === 'audio_k2r') {
+                    speakKanaOrRomaji(currentItem.char, true);
+                } else if (qType === 'audio_r2k') {
+                    speakKanaOrRomaji(currentItem.romaji, true);
+                }
             }
-            finalizeAnswer(correct, {chosen:val});
         }
+
+
+        // Modifikasi mcPick untuk memanggil chooseMC
+        function mcPick(letter) {
+            const index = ['A', 'B', 'C', 'D'].indexOf(letter);
+            if (index !== -1) {
+                chooseMC(index);
+            }
+        }
+
+        // Fungsi chooseMC
+        function chooseMC(index) {
+            const qType = state.test.qType;
+            let correct = false;
+            let pickedValue = null;
+
+            // Mapping index to option key (A, B, C, D)
+            const optionKey = ['A', 'B', 'C', 'D'][index];
+            if (optionKey && mcMap[optionKey]) {
+                pickedValue = mcMap[optionKey];
+            } else {
+                return; // Invalid index or option
+            }
+
+            if (qType === 'k2r' || qType === 'audio_k2r') {
+                correct = (pickedValue === currentItem.romaji);
+            } else if (qType === 'r2k' || qType === 'audio_r2k') {
+                const targetKana = (state.test.set === 'hira' ? HIRA_MAP.get(currentItem.romaji) : KATA_MAP.get(currentItem.romaji));
+                correct = (pickedValue === targetKana);
+            }
+            
+            // Berikan visual feedback ke tombol yang dipilih
+            qsa('#mcWrap .btn.opt').forEach((btn, i) => {
+                if (i === index) {
+                    btn.classList.add(correct ? 'ok' : 'warn'); // Add temporary class
+                }
+            });
+
+            // Jalankan logika penilaian
+            finalizeAnswer(correct, { chosen: pickedValue });
+
+            // Hapus kelas feedback setelah penundaan
+            setTimeout(() => {
+                qsa('#mcWrap .btn.opt').forEach(btn => {
+                    btn.classList.remove('ok', 'warn');
+                });
+            }, 300); // Sesuaikan dengan durasi animasi CSS jika ada
+        }
+
 
         function normalizeRomajiSequence(s){
             return (s||'').toLowerCase().replace(/\s+/g,''); 
@@ -2624,7 +2693,10 @@
 
         function speakKanaOrRomaji(text, force=false){
             try{
-                if(!state.audio && !force) return;
+                // PATCH: Jangan mainkan audio jika audio global dimatikan dan tidak dipaksa.
+                // PATCH: Audio hanya main jika user menekan tombol 🔊 (Replay) atau jika tipe soal adalah listening.
+                const audioOn = qs('#audToggle')?.checked ?? state?.audio;
+                if (!audioOn && !force) return;
 
                 const now = Date.now();
                 if (now - lastSpeakTime < SPEAK_COOLDOWN) {
@@ -3203,7 +3275,11 @@
         bind('#btnSkip', 'click', skipQ);
         bind('#btnCheck', 'click', checkAns);
 
-        bind('#mcWrap', 'pointerup', (e)=>{ const btn=e.target.closest('.opt'); if(!btn) return; const id=(btn.id||'').slice(-1); if(!id) return; mcPick(id); }, {passive:true});
+        // Kaitkan ke tombol MC
+        on('#optA','click',()=>chooseMC(0));
+        on('#optB','click',()=>chooseMC(1));
+        on('#optC','click',()=>chooseMC(2));
+        on('#optD','click',()=>chooseMC(3));
 
         bind('#ans', 'keydown', (e) => {
             if (e.key === 'Enter') {
@@ -3212,25 +3288,56 @@
             }
         });
 
-        document.addEventListener('keydown', (e)=>{
-            // Only respond to key events if not in an input/textarea, or if it's the answer input
-            if(e.target.matches('input,textarea') && e.target.id !== 'ans' && !e.target.closest('#testArea')) return;
+        document.addEventListener('keydown', (e) => {
+            // Abaikan jika ada modal terbuka atau sedang fokus pada input teks lain
+            const activeElement = document.activeElement;
+            const activeTag = activeElement?.tagName?.toLowerCase();
+            const inTypingField = (activeTag === 'input' || activeTag === 'textarea') && activeElement.id !== 'ans';
+            const isModalOpen = qs('.modal.is-open');
 
-            const map={a:'A',b:'B',c:'C',d:'D'}; const k=map[e.key?.toLowerCase?.()]; 
-            if(k && getComputedStyle(qs('#mcWrap') || {display:'none'}).display!=='none'){ 
-                e.preventDefault(); 
-                mcPick(k); 
+            if (isModalOpen && !activeElement.closest('.modal')) { // Allow keydown within active modal
+                return;
             }
-            // P2.5: Tambahkan dukungan Enter/Space untuk tombol MC yang sedang fokus
-            if ((e.key === 'Enter' || e.key === ' ') && document.activeElement && document.activeElement.classList.contains('opt')) {
-                e.preventDefault();
-                document.activeElement.click(); // Trigger click on the focused MC button
+            if (inTypingField && !isMCActive()) { // Allow typing in other inputs
+                return;
             }
-            if(e.key==='ArrowRight' && !qs('#testArea')?.hidden){ e.preventDefault(); skipQ(); }
+
+            // Enter = Cek (mode ketik)
+            if (e.key === 'Enter' && !isMCActive()) {
+                const btn = qs('#btnCheck');
+                // Allow Enter to trigger check button only if not in another typing field
+                if (btn && !inTypingField) { 
+                    e.preventDefault(); 
+                    btn.click(); 
+                }
+                return;
+            }
+
+            // → = Lewati
+            if (e.key === 'ArrowRight') {
+                const skip = qs('#btnSkip');
+                if (skip && !qs('#testArea')?.hidden) { 
+                    e.preventDefault(); 
+                    skip.click(); 
+                }
+                return;
+            }
+
+            // MC aktif → A/B/C/D atau 1/2/3/4
+            if (isMCActive()) {
+                const idx = keyToOptIndex(e.key);
+                if (idx >= 0) {
+                    e.preventDefault();
+                    chooseMC(idx);
+                }
+            }
+
+            // Tombol Replay Audio
             if(e.key.toLowerCase()==='r' && !qs('#celebrate')?.classList.contains('is-open') && !qs('#testArea')?.hidden){
                 qs('#btnReplayAudio')?.click();
             }
-        });
+        }, { passive: false }); // Gunakan passive: false untuk allow preventDefault()
+
 
         bind('#tPastel', 'click', ()=>{ state.theme='pastel'; save(); applyTheme(); });
         bind('#tHC', 'click', ()=>{ state.theme='hc'; save(); applyTheme(); });
@@ -3318,7 +3425,8 @@
         bind('#answerMode', 'change', (e) => { 
             state.test.mode = e.target.value; 
             save(); 
-            toggleAnswerUI(); 
+            // Panggil applyAnswerModeUI() untuk sinkronisasi tampilan
+            applyAnswerModeUI(); 
             updateTestInfo(); // Update test info text
         });
         bind('#qType', 'change', (e) => { 
@@ -3331,14 +3439,16 @@
             }
             updateTestInfo(); // Update test info text
         });
-        bind('#btnReplayAudio', 'click', () => {
-            // P0.2: Replay Audio di Semua Mode
-            if (currentItem) {
-                if (currentItem.char) speakKanaOrRomaji(currentItem.char, true);
-                else if (currentItem.romaji) speakKanaOrRomaji(currentItem.romaji, true);
-            }
-            // P0.2: Opsional: hilangkan beep pada replay
-            // clickTone('click'); // Dihapus atau dikomentari agar tidak ada beep tumpang tindih
+
+        // Event tombol 🔊 (Replay)
+        on('#btnReplayAudio', 'click', () => {
+            const qTypeVal = qs('#qType')?.value || state?.test?.qType;
+            const audioOn = qs('#audToggle')?.checked ?? state?.audio;
+            if (!audioOn) return;                   // Jika suara global dimatikan, jangan main
+            if (!AUDIO_TYPES.has(qTypeVal)) return; // Hanya untuk tipe listening
+
+            // Panggil fungsi internal pemutar audio milikmu di sini.
+            playCurrentQuestionAudio(); // Memanggil fungsi pemutar audio khusus
         });
 
 
@@ -3367,6 +3477,22 @@
             if (sidebar && body) {
                 sidebar.classList.remove('is-open');
                 body.classList.remove('sidebar-open');
+            }
+        }
+
+        // Sinkronkan tampilan TYPE vs MC
+        function applyAnswerModeUI() {
+            const mode = qs('#answerMode')?.value || state?.test?.mode || 'type';
+            const typeWrap = qs('#typeWrap');
+            const mcWrap = qs('#mcWrap');
+            if (typeWrap && mcWrap) {
+                const isMC = mode === 'mc';
+                typeWrap.hidden = isMC;
+                mcWrap.hidden = !isMC;
+
+                // Ensure correct display style
+                typeWrap.style.display = isMC ? 'none' : 'block';
+                mcWrap.style.display = isMC ? 'grid' : 'none';
             }
         }
 
@@ -3399,6 +3525,7 @@
             toggleAnswerUI();
             updatePointsAndLevelDisplay();
             updateTestInfo(); // Initial update of test info text
+            applyAnswerModeUI(); // Panggil sekali saat render awal
         }
 
         document.addEventListener('DOMContentLoaded', ()=>{
@@ -3463,3 +3590,4 @@
     </script>
 </body>
 </html>
+�
