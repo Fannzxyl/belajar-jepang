@@ -782,7 +782,7 @@
         </div>
         <hr style="border: none; border-top: 1px solid var(--border); width: 100%;">
         <ul class="menu">
-            <li><a href="index.html">📘 Latihan</a></li>
+            <li><a href="index.html">� Latihan</a></li>
             <li><a href="index2.html">🗂️ Flashcard</a></li>
             <li><a href="index3.html">🧮 Tabel Kana</a></li>
             <li><a href="index4.html">🗒️ Kosakata</a></li>
@@ -1559,8 +1559,7 @@
             const isK2R = /k2r/i.test(qType);
 
             if (isR2K) return romaji || kana;         // romaji → kana: bacakan romaji
-            if (isK2R || isAudio) return kana || romaji; // default: bacakan kana
-            return kana || romaji || '';
+            return kana || romaji || ''; // default: bacakan kana
         }
 
         function playCurrentQuestionAudio() {
@@ -1570,8 +1569,8 @@
 
             const qType = qs('#qType')?.value || window.state?.test?.qType || '';
             const text = getReplayTextForCurrentQuestion();
-            const lang = /r2k/i.test(qType) ? 'en-US' : 'ja-JP'; // romaji dibacakan "ejaan latin"
-            ttsSpeak(text, lang);
+            // Gunakan suara Jepang meskipun teks romaji — terdengar lebih natural untuk jp
+            ttsSpeak(text, 'ja-JP');
         }
 
         // Set window._speak untuk kompatibilitas dengan bagian lain (mis. renderReview)
@@ -2100,12 +2099,25 @@
                 if (tw && getComputedStyle(tw).display !== 'none') ansEl && ansEl.focus();
                 else if (mcw && getComputedStyle(mcw).display !== 'none') qs('#optA')?.focus();
             }, 30);
+
+            // Panggil afterRenderQuestion() di akhir fungsi render soalmu.
+            afterRenderQuestion();
         }
 
-        function chooseMC(idx){
-            // Jika kamu punya helper existing:
-            // if (typeof checkMCAnswer === 'function') return checkMCAnswer(idx); // Dihapus karena tidak ada di file Anda
+        // Panggil afterRenderQuestion() di akhir fungsi render soalmu.
+        function afterRenderQuestion(){
+            const qType = (qs('#qType')?.value || window.state?.test?.qType || '').toLowerCase();
+            const btn = qs('#btnReplayAudio');
+            if (btn){
+                const isAudioType = qType.includes('audio');
+                btn.hidden    = !isAudioType;
+                btn.disabled = !isAudioType;
+            }
+            // TIDAK ada pemanggilan ttsSpeak/playAudio di sini.
+        }
 
+
+        function chooseMC(idx){
             // Generic fallback (selaraskan dengan struktur soalmu):
             const cq = window.state?.test?.current || window.currentQuestion || currentItem;
             if (!cq) return;
@@ -2378,7 +2390,7 @@
                     const [k1, k2] = pairStr.split('|');
                     return k1 === correctKana ? k2 : k1;
                 })
-                .filter(confusedKana => confusedKana !== correctKana);
+                .filter(confusedKana => confusedKana !== targetKanaChar);
 
             decoys.push(...shuffleReturn(confusionPairs).slice(0, 2));
 
@@ -3271,41 +3283,53 @@
         on('#optC','click',()=>chooseMC(2));
         on('#optD','click',()=>chooseMC(3));
 
-        bind('#ans', 'keydown', (e) => {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                checkAns();
-            }
+        // Tambahan pengaman di input agar “r” benar-benar tidak bocor ke listener global:
+        on('#ans','keydown',(e)=>{
+            // Saat mengetik di input, jangan biarkan keydown bubbling ke listener global
+            // supaya hotkey (mis. 'r') tidak pernah tertembak.
+            e.stopPropagation();
         });
 
-        // Keyboard global
+        // Ganti handler hotkey supaya tidak mengganggu input
         document.addEventListener('keydown', (e) => {
-            const tag = document.activeElement?.tagName?.toLowerCase();
-            const inText = tag === 'input' || tag === 'textarea';
+            const tag = (document.activeElement?.tagName || '').toLowerCase();
+            const inText = tag === 'input' || tag === 'textarea' || document.activeElement?.isContentEditable;
 
-            // Enter = Cek (hanya mode ketik)
-            if (e.key === 'Enter' && !isMCActive()) {
+            // Cek mode jawaban saat ini
+            const mode = (qs('#answerMode')?.value || (window.state?.test?.mode) || 'type').toLowerCase();
+            const isTypingMode = mode === 'type';
+
+            // --- 1) Lindungi mode KETIK: biarkan semua huruf (termasuk 'r') masuk ke input ---
+            if (isTypingMode && inText) {
+                // IZINKAN pengetikan normal; JANGAN proses hotkey apa pun di bawah
+                // Kecuali: Enter & ArrowRight kita handle di bawah khusus input
+            } else {
+                // --- 2) Hotkey global hanya saat TIDAK mengetik ---
+                // Hotkey Replay (R) — aktif hanya saat TIDAK fokus input & bukan mode ketik
+                if (String(e.key).toLowerCase() === 'r') {
+                    e.preventDefault();
+                    playCurrentQuestionAudio?.();
+                    return;
+                }
+
+                // MCQ: A/B/C/D atau 1/2/3/4
+                if (mode === 'mc') {
+                    const k = String(e.key).toLowerCase();
+                    const idx = (k==='a'||k==='1')?0:(k==='b'||k==='2')?1:(k==='c'||k==='3')?2:(k==='d'||k==='4')?3:-1;
+                    if (idx >= 0) { e.preventDefault(); chooseMC?.(idx); return; }
+                }
+            }
+
+            // --- 3) Enter & ArrowRight boleh jalan kapan pun sesuai fungsinya ---
+            if (e.key === 'Enter' && !(mode === 'mc' && !inText)) {
+                // Enter = Cek hanya relevan di mode ketik, dan saat fokus bukan di tombol lain
                 const btn = qs('#btnCheck');
-                if (btn && !inText) { e.preventDefault(); btn.click(); }
+                if (btn && isTypingMode && inText) { e.preventDefault(); btn.click(); }
                 return;
             }
-            // → = Lewati (semua mode)
             if (e.key === 'ArrowRight') {
-                qs('#btnSkip')?.click();
+                const skip = qs('#btnSkip'); if (skip) { e.preventDefault(); skip.click(); }
                 return;
-            }
-            // MC aktif: A/B/C/D atau 1/2/3/4
-            if (isMCActive()) {
-                const i = keyToOptIndex(e.key);
-                if (i >= 0) { e.preventDefault(); chooseMC(i); }
-            }
-        }, { passive:false });
-
-        // Hotkey 'R' untuk replay cepat
-        document.addEventListener('keydown', (e) => {
-            if (String(e.key).toLowerCase() === 'r') {
-                e.preventDefault();
-                playCurrentQuestionAudio();
             }
         }, { passive:false });
 
@@ -3411,10 +3435,11 @@
             updateTestInfo(); // Update test info text
         });
 
-        // --- Kaitkan ke tombol 🔊 sekali saja ---
+        // Hubungkan ke tombol 🔊 (sekali saja)
         on('#btnReplayAudio','click', () => {
-            // Guard: elemen bisa saja hidden di tipe non-audio
-            if (qs('#btnReplayAudio')?.disabled) return;
+            // Jika tombol hidden/disabled (non-audio), abaikan
+            const btn = qs('#btnReplayAudio');
+            if (btn?.hidden || btn?.disabled) return;
             playCurrentQuestionAudio();
         });
 
@@ -3447,9 +3472,9 @@
             }
         }
 
-        // Sinkronkan UI Mode Jawaban
-        function applyAnswerModeUI() {
-            const mode = qs('#answerMode')?.value || window.state?.test?.mode || 'type';
+        // Sinkron UI Mode (Ketik vs MC)
+        function applyAnswerModeUI(){
+            const mode = (qs('#answerMode')?.value || window.state?.test?.mode || 'type').toLowerCase();
             const typeWrap = qs('#typeWrap');
             const mcWrap = qs('#mcWrap');
             if (!typeWrap || !mcWrap) return;
@@ -3459,7 +3484,7 @@
         }
         on('#answerMode','change',()=>{
             window.state.test.mode = qs('#answerMode').value;
-            save?.();
+            typeof save === 'function' && save();
             applyAnswerModeUI();
         });
 
@@ -3558,3 +3583,4 @@
     </script>
 </body>
 </html>
+�
