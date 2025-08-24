@@ -18,7 +18,7 @@
     <meta name="twitter:card" content="summary_large_image">
     <meta property="twitter:url" content="https://alfan.github.io/kana-trainer/">
     <meta property="twitter:title" content="Pelatih Kana Jepang — v9">
-    <meta property="twitter:description" content="Pelatih Kana Kana Jepang v9 — latihan interaktif, audio pelafalan, tes adaptif, Pomodoro, progress, tema pastel/kontras. Progres tersimpan lokal. Mulai gratis sekarang.">
+    <meta property="twitter:description" content="Pelatih Kana Jepang v9 — latihan interaktif, audio pelafalan, tes adaptif, Pomodoro, progress, tema pastel/kontras. Progres tersimpan lokal. Mulai gratis sekarang.">
     <meta property="twitter:image" content="https://alfan.github.io/kana-trainer/kana-trainer-preview.png">
 
     <link rel="canonical" href="https://alfan.github.io/kana-trainer/">
@@ -89,6 +89,8 @@
             var(--bg);color:var(--ink);
             /* PATCH: Smooth transitions for overall UI */
             transition: background-color var(--transition-duration) ease-out, color var(--transition-duration) ease-out;
+            /* PATCH 6: Hilangkan overflow horizontal global */
+            overflow-x: hidden; 
         }
         /* Override gradients if lite mode is active */
         [data-lite="1"] body {
@@ -165,40 +167,14 @@
         }
 
         /* Logo positioning for header */
-        .header-logo-container {
-            position: absolute;
-            top: 0;
-            right: 16px; /* Default right padding */
-            padding-top: env(safe-area-inset-top);
-            z-index: 100; /* Ensure it's above other header content */
-            display: flex;
-            align-items: center;
-            height: 100%; /* Match header height for vertical alignment */
-        }
-        .header-logo-container .logo {
-            width: 36px;
-            height: 36px;
-            border-radius: 12px;
-            background: linear-gradient(135deg, var(--pri), var(--sec));
-            box-shadow: var(--shadow);
-            transition: box-shadow var(--transition-duration) ease-out, background var(--transition-duration) ease-out;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .header-logo-container .logo text {
-            font-size: 38px;
-        }
+        /* Removed .header-logo-container CSS as per P1.3 */
         /* Adjust brand padding to make space for the logo */
         header .brand {
             padding-right: 60px; /* Make space for the logo on the right */
         }
         @media (max-width: 767px) {
             header .brand {
-                padding-right: 16px; /* Reset padding for mobile if needed, or adjust */
-            }
-            .header-logo-container {
-                right: 16px; /* Keep it on the right on mobile */
+                padding-left: 16px; /* Reset padding for mobile if needed, or adjust */
             }
         }
 
@@ -573,7 +549,7 @@
         .progress, .seg { max-width: 100%; }
 
         /* Fix select with background-icon so it's consistent */
-        select{ background-origin:content-box; } /* Moved up for general application */
+        select{ background-origin:content-box; padding-right:36px; } /* Moved up for general application */
 
 
         /* PATCH: Desktop layout (≥1024px): Pomodoro & Tracker side by side */
@@ -717,6 +693,78 @@
         /* Select arrow padding sudah di CSS; tambahkan height konsisten */
         select{ height:52px; }
 
+        /* UI Responsive 720p */
+        /* Header container */
+        header .brand > div:nth-child(2){
+            display:flex; flex-wrap:wrap; align-items:center; gap:.5rem;
+            flex: 1 1 auto;
+            text-align: center;
+        }
+        header .brand h1{
+            font-size: clamp(20px, 4.5vw, 28px);
+            line-height:1.2;
+            margin-bottom: 0; /* Remove default margin */
+        }
+        header .brand .tag {
+            font-size: clamp(10px, 2.8vw, 12px);
+            margin-left: 0.5rem; /* Space between title and badge */
+        }
+        header .brand .small {
+            font-size: clamp(10px, 2.8vw, 12px);
+            display: block; /* Ensure it stays on its own line */
+            width: 100%; /* Take full width */
+            margin-top: 4px; /* Space from title/badge */
+        }
+
+        /* Tombol besar (“Mulai Tes”, “Lewati”) */
+        @media (max-width: 360px) {
+            .row[style*="justify-content: center;"] .btn {
+                width: 100%;
+                flex: 1 1 auto; /* Allow buttons to grow and shrink */
+            }
+        }
+        .btn {
+            min-height: 44px; /* Apply min-height to all buttons */
+        }
+
+        /* Grid opsi MC */
+        @media (max-width: 360px) {
+            .optwrap {
+                grid-template-columns: 1fr 1fr;
+                gap: 8px;
+            }
+            .optwrap .btn {
+                flex: 1 1 auto; /* Ensure buttons in MC wrap correctly */
+            }
+        }
+
+        /* Card/section padding */
+        .card {
+            padding: clamp(10px, 3vw, 16px);
+        }
+
+        /* Sidebar FAB (tombol hamburger bulat) */
+        .sidebar-toggle-btn {
+            inset-inline-start: 8px; /* Equivalent to left */
+            inset-block-start: 8px; /* Equivalent to top */
+            z-index: 50; /* Lower z-index to avoid covering controls */
+        }
+        /* Adjust header padding for sidebar toggle button */
+        header .brand {
+            padding-left: calc(60px + env(safe-area-inset-left)); /* Make space for the toggle button */
+        }
+        @media (max-width: 767px) {
+            header .brand {
+                padding-left: calc(16px + env(safe-area-inset-left)); /* Reset padding for mobile if needed, or adjust */
+            }
+        }
+
+        /* P2.6: Lite Mode - disable animations for feedback classes */
+        [data-lite="1"] #qKana.correct-answer,
+        [data-lite="1"] #qKana.wrong-answer,
+        [data-lite="1"] #streakCounter.grow {
+            animation: none !important;
+        }
     </style>
 </head>
 <body>
@@ -746,22 +794,18 @@
 
     <header>
         <div class="wrap">
-            <div class="brand" style="gap:10px">
-                <!-- Moved logo to a container for absolute positioning -->
-                <div class="header-logo-container">
-                    <svg class="logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="36" height="36">
-                        <defs>
-                            <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-                                <stop stop-color="#7a6cff"/><stop offset="1" stop-color="#16c6a1"/>
-                            </linearGradient>
-                        </defs>
-                        <rect width="64" height="64" rx="14" fill="url(#g)"/>
-                        <text x="50%" y="50%" text-anchor="middle" dominant-baseline="middle"
+            <div class="brand">
+                <svg class="logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="36" height="36">
+                    <defs>
+                        <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+                            <stop stop-color="#7a6cff"/><stop offset="1" stop-color="#16c6a1"/>
+                        </linearGradient>
+                    </defs>
+                    <rect width="64" height="64" rx="14" fill="url(#g)"/>
+                    <text x="50%" y="50%" text-anchor="middle" dominant-baseline="middle"
                                 font-family="Noto Sans JP, 'Noto Serif JP', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif"
                                 font-size="38" fill="white" dy="-2">あ</text>
                     </svg>
-                </div>
-                <!-- Original brand content -->
                 <div>
                     <h1>Pelatih Kana Jepang <span class="tag">v9</span></h1>
                     <div class="small">Dasar • Dakuon/Handakuon • Youon • Tes & Review • Pomodoro • Tema</div>
@@ -783,7 +827,7 @@
                     <button id="resetBtn" class="btn ghost" type="button" title="Atur ulang semua progres">Atur Ulang Semua</button>
                 </div>
             </div>
-            <!-- MAIN NAVIGATION (OLD - HIDDEN) -->
+            <!-- NAVIGASI UTAMA (LAMA - TERSEMBUNYI) -->
             <nav class="main-nav">
                 <div class="row">
                     <a href="index.html" class="btn primary"><i class="fa-solid fa-home"></i> Latihan</a>
@@ -900,7 +944,7 @@
                     <div id="testArea" class="center" hidden>
                         <div id="promptWrap" style="display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap">
                             <div id="qKana" style="font-size:64px;line-height:1.1;margin:6px 0">あ</div>
-                            <button class="btn ghost" id="btnReplayAudio" type="button" title="Putar lagi audio" aria-label="Putar ulang audio" hidden><i class="fa-solid fa-volume-up"></i></button>
+                            <button class="btn ghost" id="btnReplayAudio" type="button" title="Putar lagi audio" aria-label="Putar ulang audio"><i class="fa-solid fa-volume-up"></i></button>
                         </div>
                         <div id="typeWrap" style="max-width:520px;margin:0 auto">
                             <input id="ans" class="input" placeholder="Ketik jawaban kamu di sini…" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" inputmode="text" aria-label="Jawaban" />
@@ -925,7 +969,7 @@
             </div>
 
             <!-- Subbagian C: Pomodoro mini -->
-            <div id="latihan-pomodoro" class="grid" id="pomoSection">
+            <div id="pomoSection" class="grid">
                 <div class="card">
                     <h2 id="pomoTitle"><i class="fa-solid fa-clock icon"></i> Timer Pomodoro (Opsional)</h2>
                     <div class="small">Default 25/5, bisa diubah. Status dan sisa waktu tersimpan otomatis.</div>
@@ -951,7 +995,7 @@
             </div>
 
             <!-- Subbagian D: Tracker/Progres -->
-            <div id="latihan-tracker" class="grid" id="trackerSection">
+            <div id="trackerSection" class="grid">
                 <div class="card">
                     <h2 id="trackTitle"><i class="fa-solid fa-chart-line icon"></i> Tracker Kana</h2>
                     <div class="small">Ketuk untuk tandai sudah hafal. Tahan (long-press) untuk batal.</div>
@@ -1057,6 +1101,23 @@
     </div>
 
     <script>
+        // --- Helpers aman ---
+        const isNode = el => el && (el.nodeType === 1 || el.nodeType === 9); // ELEMENT_NODE atau DOCUMENT_NODE
+
+        const qs = (sel, root = document) => (isNode(root) ? root.querySelector(sel) : null);
+
+        const qsa = (sel, root = document) => {
+            if (!isNode(root)) {
+                // console.warn('qsa(): root bukan DOM node', sel, root); // Opsional: untuk debugging
+                return [];
+            }
+            return Array.from(root.querySelectorAll(sel));
+        };
+
+        // Helper bind dan on juga diperbarui untuk menggunakan qs/qsa yang baru
+        const bind = (sel, ev, fn, el=document) => qsa(sel, el).forEach?.(n => n.addEventListener(ev, fn, { passive: true }));
+        const on = (sel, ev, fn, el=document) => { const n = qs(sel, el); if (n) n.addEventListener(ev, fn); };
+        
         // No-JS Fallback: Remove 'no-js' class and show #main if JS is enabled
         document.documentElement.classList.remove('no-js');
         // Initial display for #main will be handled by renderAll -> showOnboarding, so we don't need a direct style here
@@ -1089,7 +1150,7 @@
             btn_end: 'Selesai',
             empty_learn: 'Pilih set & rentang dulu, lalu tekan Tampilkan.',
             empty_test: 'Setel tipe soal, jumlah, dan rentang/grup, lalu tekan Mulai Tes.',
-            empty_review: 'Bersih! Nggak ada jawaban keliru. 👍',
+            empty_review: 'Bersih! Nggak ada jawaban keliru. �',
             done_test_title: 'Tes selesai! 🎉',
             done_test_sub: (s,t)=>`Skor kamu ${s}/${t}. Bagus!`,
             wrong_tip_dzu: 'Ingat:ぢ = dji (ji), づ = dzu (zu).', // Specific tip for dji/dzu
@@ -1269,7 +1330,7 @@
             ['ノ','メ'], ['イ','リ'], ['エ','ヱ'], ['ネ','レ'], ['ア','マ'], ['ム','厶']
         ];
         const CONFUSE_HIRA = [
-            ['ぬ','め'], ['れ','ね'], ['う','ら'], ['ち','さ'], ['つ','て'], ['を','わ']
+            ['ぬ','め'], ['れ','ね'], ['う','ら'], ['ち','さ'], ['つ','te'], ['を','わ']
         ];
         
         function similarChoicesKata(correct){
@@ -1314,26 +1375,22 @@
 
 
         // ---------- UI HELPERS ----------
-        const qs = (s,el=document)=>el.querySelector(s);
-        const qsa = (s,el=document)=>[...el.querySelectorAll(s)];
-        const df = ()=>document.createDocumentFragment();
+        // Helper qs dan qsa yang lebih tangguh (Fix: Error: el.querySelectorAll is not a function)
+        // Dideklarasikan sekali di awal script utama
+        // const isNode = el => el && (el.nodeType === 1 || el.nodeType === 9); // ELEMENT_NODE atau DOCUMENT_NODE
+        // const qs = (sel, root = document) => (isNode(root) ? root.querySelector(sel) : null);
+        // const qsa = (sel, root = document) => {
+        //     if (!isNode(root)) {
+        //         // console.warn('qsa(): root bukan DOM node', sel, root); // Opsional: untuk debugging
+        //         return [];
+        //     }
+        //     return Array.from(root.querySelectorAll(sel));
+        // };
+        // const bind = (sel, ev, fn, el=document) => qsa(sel, el).forEach?.(n => n.addEventListener(ev, fn, { passive: true }));
+        // const on = (sel, ev, fn, el=document) => { const n = qs(sel, el); if (n) n.addEventListener(ev, fn); };
 
-        /**
-         * Safely binds an event listener to an element.
-         * Prevents errors if the element does not exist.
-         * @param {string} selector - CSS selector for the element.
-         * @param {string} eventType - The type of event (e.g., 'click', 'change', 'keydown').
-         * @param {function} handler - The event handler function.
-         * @param {object} [options] - Optional event listener options (e.g., { passive: true }).
-         */
-        function bind(selector, eventType, handler, options) {
-            const element = qs(selector);
-            if (element) {
-                element.addEventListener(eventType, handler, options);
-            } else {
-                // console.warn(`Element with selector "${selector}" not found for event binding.`);
-            }
-        }
+
+        const df = ()=>document.createDocumentFragment();
 
         // ---------- TRACKER ----------
         function buildKana(boxId, set){
@@ -1751,12 +1808,16 @@
                 labels = _confuseTopPairs(state.test.set);
                 if (labels.length === 0) {
                     showCustomAlert('Tidak ada pasangan tertukar yang cukup untuk dilatih.');
+                    // P2.7: Guard for empty pool
+                    qs('#btnStart').disabled = true;
                     return;
                 }
             } else if (state.test.subset === 'srs_due') {
                 const dueItems = getDueReviewItems(state.test.set);
                 if (dueItems.length === 0) {
                     showCustomAlert(t('no_due_today'));
+                    // P2.7: Guard for empty pool
+                    qs('#btnStart').disabled = true;
                     return;
                 }
                 labels = dueItems.map(item => item.romaji);
@@ -1768,7 +1829,12 @@
             let uniquePoolItems = labels.map(r=>({romaji:r, char: (set==='hira'?HIRA_MAP:KATA_MAP).get(r)}));
             uniquePoolItems = uniquePoolItems.filter(item => item.char !== undefined); // Filter out items that don't have a corresponding Kana
 
-            if(!uniquePoolItems.length){ showCustomAlert('Pilih subset atau rentang yang valid.'); return; }
+            if(!uniquePoolItems.length){ 
+                showCustomAlert('Pilih subset atau rentang yang valid.'); 
+                // P2.7: Guard for empty pool
+                qs('#btnStart').disabled = true;
+                return; 
+            }
 
             testPool = [];
             let currentUniqueItems = [...uniquePoolItems];
@@ -1794,6 +1860,9 @@
             qs('#testArea').style.transition = 'opacity var(--transition-duration) ease-out'; // Transition for opacity
             qs('#testEmptyState').hidden = true;
             
+            // Clear any active state on MC buttons from previous tests
+            qsa('#mcWrap .btn.opt').forEach?.(btn => btn.classList.remove('active'));
+
             setTimeout(() => {
                 qs('#testArea').style.opacity = '1';
                 qs('#testArea').style.pointerEvents = 'auto';
@@ -1811,40 +1880,69 @@
             const sylPerItemControl = qs('#sylPerItemControl');
             const btnReplayAudio = qs('#btnReplayAudio');
 
-            const mode = answerModeSelect.value;
-            const qType = qTypeSelect.value;
+            const mode = answerModeSelect?.value; // Use optional chaining
+            const qType = qTypeSelect?.value; // Use optional chaining
 
-            typeWrap.style.display = 'none';
-            mcWrap.style.display = 'none';
-            answerModeSelect.disabled = false;
-            sylPerItemControl.hidden = true;
-            btnReplayAudio.hidden = !(qType.startsWith('audio') || qType === 'kseq');
+            // Sembunyikan semua secara default (P0.1)
+            if (typeWrap) {
+                typeWrap.hidden = true;
+                typeWrap.style.display = 'none';
+            }
+            if (mcWrap) {
+                mcWrap.hidden = true;
+                mcWrap.style.display = 'none';
+            }
+
+            if (answerModeSelect) answerModeSelect.disabled = false;
+            if (sylPerItemControl) sylPerItemControl.hidden = true;
+            if (btnReplayAudio) btnReplayAudio.hidden = false; // Tombol replay audio selalu terlihat (P0.2)
 
             if (qType === 'seq') {
-                typeWrap.style.display = 'block';
-                answerModeSelect.value = 'type';
-                answerModeSelect.disabled = true;
-                sylPerItemControl.hidden = false;
+                if (typeWrap) {
+                    typeWrap.hidden = false;
+                    typeWrap.style.display = 'block';
+                }
+                if (answerModeSelect) answerModeSelect.value = 'type';
+                if (answerModeSelect) answerModeSelect.disabled = true;
+                if (sylPerItemControl) sylPerItemControl.hidden = false;
             } else if (qType === 'kseq') {
-                typeWrap.style.display = 'block';
-                answerModeSelect.value = 'type';
-                answerModeSelect.disabled = true;
-                sylPerItemControl.hidden = false;
+                if (typeWrap) {
+                    typeWrap.hidden = false;
+                    typeWrap.style.display = 'block';
+                }
+                if (answerModeSelect) answerModeSelect.value = 'type';
+                if (answerModeSelect) answerModeSelect.disabled = true;
+                if (sylPerItemControl) sylPerItemControl.hidden = false;
             } else if (qType === 'r2k') {
-                mcWrap.style.display = 'grid';
-                answerModeSelect.value = 'mc';
-                answerModeSelect.disabled = true;
+                if (mcWrap) {
+                    mcWrap.hidden = false;
+                    mcWrap.style.display = 'grid';
+                }
+                if (answerModeSelect) answerModeSelect.value = 'mc';
+                if (answerModeSelect) answerModeSelect.disabled = true;
             } else if (qType === 'audio_k2r' || qType === 'audio_r2k') {
                 if (mode === 'type') {
-                    typeWrap.style.display = 'block';
+                    if (typeWrap) {
+                        typeWrap.hidden = false;
+                        typeWrap.style.display = 'block';
+                    }
                 } else {
-                    mcWrap.style.display = 'grid';
+                    if (mcWrap) {
+                        mcWrap.hidden = false;
+                        mcWrap.style.display = 'grid';
+                    }
                 }
             } else { // k2r (default)
                 if (mode === 'type') {
-                    typeWrap.style.display = 'block';
+                    if (typeWrap) {
+                        typeWrap.hidden = false;
+                        typeWrap.style.display = 'block';
+                    }
                 } else {
-                    mcWrap.style.display = 'grid';
+                    if (mcWrap) {
+                        mcWrap.hidden = false;
+                        mcWrap.style.display = 'grid';
+                    }
                 }
             }
         }
@@ -1864,15 +1962,24 @@
 
         function nextQ(){
             if(state.test.total>=state.test.target){ finishTest(); return; }
-            if(!testPool.length){ qs('#qKana').textContent='Selesai!'; return; }
+            if(!testPool.length){ 
+                qs('#qKana').textContent='Selesai!'; 
+                // P2.7: Tampilkan empty state jika testPool kosong
+                if (qs('#testArea')) qs('#testArea').hidden = true;
+                if (qs('#testEmptyState')) qs('#testEmptyState').hidden = false;
+                return; 
+            } 
+            
             currentItem = testPool[qIndex % testPool.length]; 
             const qType=state.test.qType; 
             const ansEl=qs('#ans'); 
             if(ansEl) ansEl.value='';
             
             if (qType.startsWith('audio')) {
-                qs('#qKana').textContent='Dengar & jawab';
-                qs('#qKana').style.fontSize='24px';
+                if (qs('#qKana')) {
+                    qs('#qKana').textContent='Dengar & jawab';
+                    qs('#qKana').style.fontSize='24px';
+                }
                 if (qType === 'audio_k2r') {
                     speakKanaOrRomaji(currentItem.char);
                 } else { // audio_r2k
@@ -1881,29 +1988,62 @@
             } else if(qType==='seq'){
                 const seqData = makeSequence(buildPoolLabels(), state.test.set, state.test.sylPerItem);
                 currentItem = { ...currentItem, romaji: seqData.romaji, char: seqData.kana, qType: qType };
-                qs('#qKana').textContent=`Romaji: ${escapeHTML(seqData.romaji)}`;
-                qs('#qKana').style.fontSize='28px';
+                if (qs('#qKana')) {
+                    qs('#qKana').textContent=`Romaji: ${escapeHTML(seqData.romaji)}`;
+                    qs('#qKana').style.fontSize='28px';
+                }
             }
             else if(qType==='kseq'){
                 const seqData = makeKanaSequence(buildPoolLabels(), state.test.set, state.test.sylPerItem); // Pass buildPoolLabels() result
                 currentItem = { ...currentItem, kanaSeq: seqData.kana, romajiSeq: seqData.romaji, qType: qType };
-                qs('#qKana').textContent = escapeHTML(seqData.kana);
-                qs('#qKana').style.fontSize = '48px';
+                if (qs('#qKana')) {
+                    qs('#qKana').textContent = escapeHTML(seqData.kana);
+                    qs('#qKana').style.fontSize = '48px';
+                }
             }
             else if(qType==='k2r'){
-                qs('#qKana').textContent=escapeHTML(currentItem.char);
-                qs('#qKana').style.fontSize='64px';
+                if (qs('#qKana')) {
+                    qs('#qKana').textContent=escapeHTML(currentItem.char);
+                    qs('#qKana').style.fontSize='64px';
+                }
             }
             else { // r2k
-                qs('#qKana').textContent=escapeHTML(currentItem.romaji);
-                qs('#qKana').style.fontSize='36px';
-                buildMC_r2k(currentItem);
+                if (qs('#qKana')) {
+                    qs('#qKana').textContent=escapeHTML(currentItem.romaji);
+                    qs('#qKana').style.fontSize='36px';
+                }
             }
 
-            if(qs('#answerMode').value === 'mc' && (qType==='k2r' || qType === 'audio_k2r')) {
-                buildMC_k2r(currentItem);
-            } else if (qs('#answerMode').value === 'mc' && qType === 'audio_r2k') {
-                buildMC_r2k(currentItem);
+            if(qs('#answerMode')?.value === 'mc') { // Use optional chaining
+                // P0.1: Ensure mcWrap is visible and styled correctly
+                const mcWrap = qs('#mcWrap');
+                if (mcWrap) {
+                    mcWrap.hidden = false;
+                    mcWrap.style.display = 'grid';
+                }
+                const typeWrap = qs('#typeWrap');
+                if (typeWrap) {
+                    typeWrap.hidden = true;
+                    typeWrap.style.display = 'none';
+                }
+
+                if(qType==='k2r' || qType === 'audio_k2r') {
+                    buildMC_k2r(currentItem);
+                } else if (qType === 'r2k' || qType === 'audio_r2k') {
+                    buildMC_r2k(currentItem);
+                }
+            } else {
+                // P0.1: Ensure typeWrap is visible and mcWrap is hidden for type mode
+                const mcWrap = qs('#mcWrap');
+                if (mcWrap) {
+                    mcWrap.hidden = true;
+                    mcWrap.style.display = 'none';
+                }
+                const typeWrap = qs('#typeWrap');
+                if (typeWrap) {
+                    typeWrap.hidden = false;
+                    typeWrap.style.display = 'block';
+                }
             }
 
             updateTestInfo();
@@ -1997,7 +2137,7 @@
                 checkLevelUp();
                 maybeCelebrate('streak');
                 clickTone('ok');
-                qKanaElement.classList.add('correct-answer');
+                if (qKanaElement) qKanaElement.classList.add('correct-answer');
                 if (streakCounterElement) streakCounterElement.classList.add('grow');
                 let okMsg = t('feedback_correct', escapeHTML(currentKanaChar), escapeHTML(currentRomaji));
                 const ui = (extra.typed || extra.normalized || '').toLowerCase();
@@ -2017,7 +2157,7 @@
                 state.test.correctStreak=0;
                 wrongList.push({...currentItem, ...extra});
                 clickTone('bad');
-                qKanaElement.classList.add('wrong-answer');
+                if (qKanaElement) qKanaElement.classList.add('wrong-answer');
                 let feedbackMsg = t('feedback_wrong', escapeHTML(currentKanaChar), escapeHTML(currentRomaji), escapeHTML(userInput));
                 if ((currentRomaji === 'dji' || currentRomaji === 'dzu') && (userInput === 'ji' || userInput === 'zu' || userInput === 'di' || userInput === 'du')) {
                     feedbackMsg = t('feedback_wrong_dji_dzu', escapeHTML(currentKanaChar), escapeHTML(currentRomaji), escapeHTML(userInput));
@@ -2059,16 +2199,16 @@
             }
 
             setTimeout(() => {
-                qKanaElement.classList.remove('correct-answer', 'wrong-answer');
+                if (qKanaElement) qKanaElement.classList.remove('correct-answer', 'wrong-answer');
                 if (streakCounterElement) streakCounterElement.classList.remove('grow');
             }, 300);
 
             updateProgress();
             if(state.test.total>=state.test.target){ finishTest(); return; }
-            qIndex=(qIndex+1)%testPool.length;
-            save();
+            qIndex=(qIndex+1)%testPool.length; // P0.1: Ensure qIndex is updated
+            save(); // P0.1: Save state after each answer
             renderStats();
-            nextQ();
+            nextQ(); // P0.1: Move to next question
         }
 
         function shuffleReturn(arr){ const a=[...arr]; shuffle(a); return a; }
@@ -2205,11 +2345,11 @@
             }
 
             // Fallback to range/single mode if no specific chip is active
-            if(elRangeMode.value === 'range'){
+            if(elRangeMode?.value === 'range'){ // Use optional chaining
                 if (!elFrom || !elTo || elFrom.selectedIndex < 0 || elTo.selectedIndex < 0) return 'Rentang tidak valid';
                 return `${elFrom.options[elFrom.selectedIndex].text} → ${elTo.options[elTo.selectedIndex].text}`;
             }
-            if(elRangeMode.value === 'single'){
+            if(elRangeMode?.value === 'single'){ // Use optional chaining
                 if (!elSingle || elSingle.selectedIndex < 0) return 'Grup tidak valid';
                 return `${elSingle.options[elSingle.selectedIndex].text}`;
             }
@@ -2336,12 +2476,12 @@
             poolIdx = buildPoolLabels().map(r=>ALL_ROMAJI.indexOf(r)).filter(x=>x>=0);
             state.test.total=0; state.test.score=0; state.test.correctStreak=0; state.test.target = Math.min(20, testPool.length); qIndex=0; 
             closeCelebrate(); 
-            qs('#testArea').hidden=false; 
-            qs('#testArea').style.opacity = '0';
-            qs('#testArea').style.pointerEvents = 'none';
+            if (qs('#testArea')) qs('#testArea').hidden=false; 
+            if (qs('#testArea')) qs('#testArea').style.opacity = '0';
+            if (qs('#testArea')) qs('#testArea').style.pointerEvents = 'none';
             setTimeout(() => {
-                qs('#testArea').style.opacity = '1';
-                qs('#testArea').style.pointerEvents = 'auto';
+                if (qs('#testArea')) qs('#testArea').style.opacity = '1';
+                if (qs('#testArea')) qs('#testArea').style.pointerEvents = 'auto';
             }, 10);
             updateProgress(); 
             nextQ(); 
@@ -2358,23 +2498,24 @@
             }
 
             // Fallback to range/single mode logic
-            const rangeMode = qs('#rangeMode').value;
-            let labels = [];
-            if (rangeMode === 'single') {
-                const singleKey = qs('#testSingleGroup').value;
-                const grp = GROUPS.find(x => x.key === singleKey);
-                if (grp) labels = grp.idx.map(i => grp.list[i]);
-            } else { // 'range'
-                const sKey = qs('#testFrom').value;
-                const eKey = qs('#testTo').value;
+            if(elRangeMode?.value === 'range'){ // Use optional chaining
+                if (!elFrom || !elTo || elFrom.selectedIndex < 0 || elTo.selectedIndex < 0) return [];
+                const sKey = elFrom.value;
+                const eKey = elTo.value;
                 const selFrom=GROUPS.findIndex(x=>x.key===sKey);
                 const selTo=GROUPS.findIndex(x=>x.key===eKey);
                 if(selFrom > -1 && selTo > -1){
                     const [from,to]= selFrom<=selTo? [selFrom,selTo] : [selTo,selFrom];
-                    labels = GROUPS.slice(from,to+1).flatMap(g=> g.idx.map(i=> g.list[i]) );
+                    return GROUPS.slice(from,to+1).flatMap(g=> g.idx.map(i=> g.list[i]) );
                 }
             }
-            return labels;
+            if(elRangeMode?.value === 'single'){ // Use optional chaining
+                if (!elSingle || elSingle.selectedIndex < 0) return [];
+                const singleKey = elSingle.value;
+                const grp = GROUPS.find(x => x.key === singleKey);
+                if (grp) return grp.idx.map(i => grp.list[i]);
+            }
+            return []; // Default if none selected or invalid range
         }
 
         function rangeLabels(fromKey,toKey){ const a=GROUPS.findIndex(g=>g.key===fromKey); const b=GROUPS.findIndex(g=>g.key===toKey); if(a<0||b<0) return []; const [from,to] = a<=b? [a,b]:[b,a]; return GROUPS.slice(from,to+1).flatMap(g=> g.idx.map(i=> g.list[i]) ); }
@@ -2398,18 +2539,13 @@
                 // When a specific chip (like a group chip or confusion/srs_due) is active,
                 // we should hide the range/single group selector and show the corresponding
                 // elements as if rangeMode was set internally.
-                elRangeMode.setAttribute('inert', ''); // Disable rangeMode select
-                elRangeMode.hidden = true;
-
-                // Hide actual range selects
+                if (elRangeMode) { elRangeMode.setAttribute('inert', ''); elRangeMode.hidden = true; }
                 setEnabled(elFrom, false);
                 setEnabled(elTo, false);
                 if (elToWrap) elToWrap.hidden = true;
                 setEnabled(elSingle, false); // No single group for specific chips as the chip itself defines the selection
             } else {
-                // If 'all' or no specific chip is active, enable rangeMode select and follow its logic
-                elRangeMode.removeAttribute('inert');
-                elRangeMode.hidden = false;
+                if (elRangeMode) { elRangeMode.removeAttribute('inert'); elRangeMode.hidden = false; }
                 updateRangeUI(); // Apply range mode logic based on elRangeMode.value
             }
             updateTestInfo(); // Update test info text after range inputs are toggled
@@ -2428,10 +2564,10 @@
             const preset = QUICK_PRESETS[key];
             if (!preset) return;
 
-            qs('#rangeMode').value = 'range';
+            if (qs('#rangeMode')) qs('#rangeMode').value = 'range';
             updateRangeUI(); // This will show #testFrom and #testTo
-            qs('#testFrom').value = preset[0];
-            qs('#testTo').value = preset[1];
+            if (qs('#testFrom')) qs('#testFrom').value = preset[0];
+            if (qs('#testTo')) qs('#testTo').value = preset[1];
             ensureValidRange(); // Ensures from/to are valid and saves them
             updateTestInfo(); // Update test info text
             clickTone('click');
@@ -2613,7 +2749,7 @@
                 _modalKeydownListener = null;
             }
             const ansEl = qs('#ans');
-            if (ansEl && !qs('#testArea').hidden && getComputedStyle(qs('#typeWrap')).display !== 'none') {
+            if (ansEl && !qs('#testArea')?.hidden && getComputedStyle(qs('#typeWrap') || {display:'none'}).display !== 'none') { // Added optional chaining and default display
                 ansEl.focus();
             }
         }
@@ -3085,6 +3221,11 @@
                 e.preventDefault(); 
                 mcPick(k); 
             }
+            // P2.5: Tambahkan dukungan Enter/Space untuk tombol MC yang sedang fokus
+            if ((e.key === 'Enter' || e.key === ' ') && document.activeElement && document.activeElement.classList.contains('opt')) {
+                e.preventDefault();
+                document.activeElement.click(); // Trigger click on the focused MC button
+            }
             if(e.key==='ArrowRight' && !qs('#testArea')?.hidden){ e.preventDefault(); skipQ(); }
             if(e.key.toLowerCase()==='r' && !qs('#celebrate')?.classList.contains('is-open') && !qs('#testArea')?.hidden){
                 qs('#btnReplayAudio')?.click();
@@ -3132,7 +3273,7 @@
         bind('#pReset', 'click', resetPomo);
 
         // Event listener for subset chips (modified to exclude preset chips which have their own click handlers)
-        qsa('#subsetChips .chip:not([data-preset])').forEach(chip => {
+        qsa('#subsetChips .chip:not([data-preset])').forEach?.(chip => { // Added optional chaining
             chip.addEventListener('click', (e) => {
                 const clickedChip = e.target.closest('.chip');
                 if (!clickedChip) return;
@@ -3169,7 +3310,7 @@
         });
         
         // Bind click handlers for the new preset chips
-        qsa('#subsetChips .chip[data-preset]').forEach(ch=>{
+        qsa('#subsetChips .chip[data-preset]').forEach?.(ch=>{ // Added optional chaining
             ch.addEventListener('click', ()=>applyPreset(ch.dataset.preset));
         });
 
@@ -3191,16 +3332,13 @@
             updateTestInfo(); // Update test info text
         });
         bind('#btnReplayAudio', 'click', () => {
+            // P0.2: Replay Audio di Semua Mode
             if (currentItem) {
-                if (currentItem.qType === 'audio_k2r' && currentItem.char) {
-                    speakKanaOrRomaji(currentItem.char, true);
-                } else if (currentItem.qType === 'audio_r2k' && currentItem.romaji) {
-                    speakKanaOrRomaji(currentItem.romaji, true);
-                } else if (currentItem.qType === 'kseq' && currentItem.kanaSeq) {
-                     speakKanaOrRomaji(currentItem.kanaSeq, true);
-                }
+                if (currentItem.char) speakKanaOrRomaji(currentItem.char, true);
+                else if (currentItem.romaji) speakKanaOrRomaji(currentItem.romaji, true);
             }
-            clickTone('click');
+            // P0.2: Opsional: hilangkan beep pada replay
+            // clickTone('click'); // Dihapus atau dikomentari agar tidak ada beep tumpang tindih
         });
 
 
