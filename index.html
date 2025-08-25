@@ -15,7 +15,7 @@
     <meta property="og:image" content="https://alfan.github.io/kana-trainer/kana-trainer-preview.png">
 
     <!-- Twitter -->
-    <meta property="twitter:card" content="summary_large_image">
+    <meta name="twitter:card" content="summary_large_image">
     <meta property="twitter:url" content="https://alfan.github.io/kana-trainer/">
     <meta property="twitter:title" content="Pelatih Kana Jepang — v9">
     <meta property="twitter:description" content="Pelatih Kana Jepang v9 — latihan interaktif, audio pelafalan, tes adaptif, Pomodoro, progress, tema pastel/kontras. Progres tersimpan lokal. Mulai gratis sekarang.">
@@ -49,10 +49,6 @@
             --space: 12px;
             --radius-clamp: 14px; /* Renamed to avoid conflict with --radius */
             --maxw: 760px; /* pas buat 720p */
-
-            /* New header variables */
-            --headerPadX: 12px;
-            --headerPadY: 8px;
         }
         [data-theme="hc"]{
             --bg:#0a0f1a; --panel:#0f1626; --soft:#0c1220; --ink:#e6efff; --muted:#9fb0cc;
@@ -102,8 +98,6 @@
             transition: background-color var(--transition-duration) ease-out, color var(--transition-duration) ease-out;
             /* PATCH 6: Hilangkan overflow horizontal global */
             overflow-x: hidden; 
-            /* Aman area bawah (browser bar) */
-            padding-bottom: env(safe-area-inset-bottom);
         }
         /* Override gradients if lite mode is active */
         [data-lite="1"] body {
@@ -124,29 +118,26 @@
             margin-inline:auto; 
             padding: clamp(10px, 2vw, 16px); 
         }
-        /* Removed old header styles, replaced by .topbar */
-        /* header{position:sticky;top:0;z-index:30;background:linear-gradient(180deg, rgba(255,255,255,.92), rgba(255,255,255,.72));backdrop-filter: blur(8px);border-bottom:1px solid var(--border); padding-top:env(safe-area-inset-top);
+        header{position:sticky;top:0;z-index:30;background:linear-gradient(180deg, rgba(255,255,255,.92), rgba(255,255,255,.72));backdrop-filter: blur(8px);border-bottom:1px solid var(--border); padding-top:env(safe-area-inset-top);
         transition: background var(--transition-duration) ease-out, backdrop-filter var(--transition-duration) ease-out, border-bottom-color var(--transition-duration) ease-out;}
-        [data-theme="hc"] header{background:linear-gradient(180deg, rgba(15,22,38,.86), rgba(15,22,38,.66))} */
+        [data-theme="hc"] header{background:linear-gradient(180deg, rgba(15,22,38,.86), rgba(15,22,38,.66))}
         
-        /* Removed .brand styles, replaced by .topbar .title */
-        /* .brand{
+        .brand{
             display:flex;
             align-items:center;
             gap:12px;
             justify-content: space-between;
             flex-wrap: wrap;
-        } */
+        }
 
-        /* Removed header .header-controls-row styles, replaced by .settings-compact */
-        /* header .header-controls-row {
+        header .header-controls-row {
             margin-left: 0;
             gap: 6px;
             flex-wrap: wrap;
             justify-content: flex-end;
             margin-top: 0;
             flex-basis: auto;
-        } */
+        }
         
         /* Main Navigation (now handled by JS router, but keeping styles for consistency) */
         .main-nav {
@@ -169,8 +160,7 @@
         }
 
 
-        /* Removed @media (max-width: 767px) header styles */
-        /* @media (max-width: 767px) {
+        @media (max-width: 767px) {
             header { position: static; } 
             .brand {
                 flex-direction: column;
@@ -188,17 +178,19 @@
                 flex-grow: 1;
                 min-width: unset;
             }
-        } */
+        }
 
-        /* Removed Logo positioning for header styles */
-        /* header .brand {
-            padding-right: 60px; 
+        /* Logo positioning for header */
+        /* Removed .header-logo-container CSS as per P1.3 */
+        /* Adjust brand padding to make space for the logo */
+        header .brand {
+            padding-right: 60px; /* Make space for the logo on the right */
         }
         @media (max-width: 767px) {
             header .brand {
-                padding-left: 16px; 
+                padding-left: 16px; /* Reset padding for mobile if needed, or adjust */
             }
-        } */
+        }
 
 
         h1{font-size:20px;margin:0}
@@ -257,17 +249,6 @@
         }
         .btn.ghost{background:transparent;outline:1px solid var(--border); color: var(--ink);}
         .btn:focus-visible{outline:none; box-shadow:var(--ring); outline-offset: 3px;}
-        .btn.outline {
-            background: transparent;
-            border: 1px solid var(--border);
-            color: var(--ink);
-        }
-        .btn.sm {
-            min-height: 36px;
-            padding: 0 12px;
-            font-size: 12px;
-        }
-
 
         .seg{display:flex;border:1px solid var(--border);border-radius:12px;overflow:hidden; transition: border-color var(--transition-duration) ease-out;}
         .seg button{
@@ -554,7 +535,7 @@
         }
 
         /* Ensure main containers don't over-expand */
-        .wrap, main {
+        .wrap, main, header {
             width: 100%;
             max-width: 100%;
         }
@@ -627,12 +608,12 @@
         }
 
         /* PATCH: Center subtitle "Hiragana • Katakana … Writer" */
-        /* header .brand > div:nth-child(2){
+        header .brand > div:nth-child(2){
           flex: 1 1 auto;
           text-align: center;
         }
         header .brand h1{ margin-bottom: 4px; }
-        header .brand .small{ display:block; } */ /* Removed, now part of .topbar .title */
+        header .brand .small{ display:block; }
 
         /* New styles for sidebar */
         .sidebar {
@@ -658,12 +639,11 @@
             left: 0;
         }
 
-        /* Removed .sidebar-toggle-btn styles, now part of .topbar .icon-btn */
-        /* .sidebar-toggle-btn {
+        .sidebar-toggle-btn {
             position: fixed;
             top: 16px;
             left: 16px;
-            z-index: 1001; 
+            z-index: 1001; /* Above sidebar */
             background: var(--btn);
             border: 1px solid var(--border);
             border-radius: 50%;
@@ -675,45 +655,41 @@
             cursor: pointer;
             box-shadow: var(--shadow);
             transition: all 0.3s ease-in-out;
-        } */
+        }
 
-        /* .sidebar-toggle-btn:hover {
+        .sidebar-toggle-btn:hover {
             background: var(--soft);
         }
 
         .sidebar-toggle-btn i {
             color: var(--ink);
             font-size: 20px;
-        } */
+        }
 
         /* Adjust main content when sidebar is open on desktop */
-        @media (min-width: 860px) { /* Changed from 768px to 860px for consistency with new header breakpoint */
+        @media (min-width: 768px) {
             body.sidebar-open {
                 padding-left: 280px;
             }
-            /* .sidebar-toggle-btn {
-                left: 16px;
+            .sidebar-toggle-btn {
+                left: 16px; /* Stays on the left */
             }
             .sidebar.is-open + .sidebar-toggle-btn {
-                left: 296px;
-            } */
-            /* In desktop, the sidebar is always open, so the toggle button is hidden */
-            .icon-btn {
-                display: none;
+                left: 296px; /* Moves with the sidebar */
             }
         }
 
         /* Ensure header content is not hidden by sidebar toggle button */
-        /* header .brand {
+        header .brand {
             position: relative;
             z-index: 1002;
-            padding-left: 60px; 
+            padding-left: 60px; /* Space for the toggle button */
         }
         @media (max-width: 767px) {
             header .brand {
-                padding-left: calc(16px + env(safe-area-inset-left)); 
+                padding-left: calc(16px + env(safe-area-inset-left)); /* Reset padding for mobile if needed, or adjust */
             }
-        } */ /* Removed, now handled by .topbar */
+        }
 
         /* --- NEW CSS FOR SIDEBAR AND ROUTING --- */
         .sidebar .menu { list-style:none; margin:0; padding:0; }
@@ -760,8 +736,7 @@
 
         /* UI Responsive 720p */
         /* Header container */
-        /* Removed old brand/h1/tag/small styles, now part of .topbar */
-        /* header .brand > div:nth-child(2){
+        header .brand > div:nth-child(2){
             display:flex; flex-wrap:wrap; align-items:center; gap:.5rem;
             flex: 1 1 auto;
             text-align: center;
@@ -769,18 +744,18 @@
         header .brand h1{
             font-size: clamp(20px, 4.5vw, 28px);
             line-height:1.2;
-            margin-bottom: 0; 
+            margin-bottom: 0; /* Remove default margin */
         }
         header .brand .tag {
             font-size: clamp(10px, 2.8vw, 12px);
-            margin-left: 0.5rem; 
+            margin-left: 0.5rem; /* Space between title and badge */
         }
         header .brand .small {
             font-size: clamp(10px, 2.8vw, 12px);
-            display: block; 
-            width: 100%; 
-            margin-top: 4px; 
-        } */
+            display: block; /* Ensure it stays on its own line */
+            width: 100%; /* Take full width */
+            margin-top: 4px; /* Space from title/badge */
+        }
 
         /* Tombol besar (“Mulai Tes”, “Lewati”) */
         @media (max-width: 360px) {
@@ -821,21 +796,20 @@
         }
 
         /* Sidebar FAB (tombol hamburger bulat) */
-        /* Removed .sidebar-toggle-btn styles, now handled by .topbar .icon-btn */
-        /* .sidebar-toggle-btn {
-            inset-inline-start: 8px; 
-            inset-block-start: 8px; 
-            z-index: 50; 
-        } */
+        .sidebar-toggle-btn {
+            inset-inline-start: 8px; /* Equivalent to left */
+            inset-block-start: 8px; /* Equivalent to top */
+            z-index: 50; /* Lower z-index to avoid covering controls */
+        }
         /* Adjust header padding for sidebar toggle button */
-        /* header .brand {
-            padding-left: calc(60px + env(safe-area-inset-left)); 
+        header .brand {
+            padding-left: calc(60px + env(safe-area-inset-left)); /* Make space for the toggle button */
         }
         @media (max-width: 767px) {
             header .brand {
-                padding-left: calc(16px + env(safe-area-inset-left)); 
+                padding-left: calc(16px + env(safe-area-inset-left)); /* Reset padding for mobile if needed, or adjust */
             }
-        } */ /* Removed, now handled by .topbar */
+        }
 
         /* P2.6: Lite Mode - disable animations for feedback classes */
         [data-lite="1"] #qKana.correct-answer,
@@ -1522,26 +1496,10 @@
                 const b = document.createElement('button'); b.type='button';
                 b.className='kana' + (mastered.includes(r) ? ' mastered' : '');
                 b.innerHTML=`<div class="jp">${escapeHTML(ch)}</div><div class="ro">${escapeHTML(r)}</div>`; // Escape kana/romaji
-                
-                // Perbaikan: Tap = tandai hafal, Long-press = batal
-                b.title = 'Ketuk = tandai hafal • Tahan = batal';
-
-                b.addEventListener('click', () => {
-                  toggleMaster(r, set);             // hijaukan / tambah poin
-                });
-
-                // long-press untuk uncheck (mobile & desktop)
-                let pressTimer;
-                const startLP = () => { pressTimer = setTimeout(() => uncheck(r, set), 500); };
-                const cancelLP = () => { clearTimeout(pressTimer); };
-
-                b.addEventListener('mousedown', startLP);
-                b.addEventListener('mouseup', cancelLP);
-                b.addEventListener('mouseleave', cancelLP);
-                b.addEventListener('touchstart', startLP, { passive:true });
-                b.addEventListener('touchend', cancelLP);
-                b.addEventListener('touchcancel', cancelLP);
-
+                b.title=t('learn_tile_tooltip');
+                // PATCH: Gunakan ttsSpeak untuk tile pembelajaran
+                b.onclick=()=> ttsSpeak(ch, 'ja-JP'); 
+                attachLongPress(b, () => toggleMaster(r, set), () => uncheck(r, set));
                 frag.appendChild(b);
             });
             box.appendChild(frag);
@@ -1660,8 +1618,9 @@
                 tile.className='kana' + (mastered.includes(r) ? ' mastered' : '');
                 tile.innerHTML=`<div class="jp">${escapeHTML(ch)}</div><div class="ro">${escapeHTML(r)}</div>`; // Escape kana/romaji
                 tile.title=t('learn_tile_tooltip');
-                // Di bagian "Belajar", tile tetap memutar audio saat di-tap
+                // PATCH: Gunakan ttsSpeak untuk tile pembelajaran
                 tile.onclick=()=> ttsSpeak(ch, 'ja-JP'); 
+                attachLongPress(tile, () => toggleMaster(r, set), () => uncheck(r, set));
                 frag.appendChild(tile);
             });
             box.appendChild(frag);
@@ -1912,8 +1871,8 @@
             state.test.rangeMode = mode; // Save current mode
             save(); // Save state immediately when rangeMode changes
 
-            // Disable/hide range controls if a special subset (all, confusion, srs_due) is active
-            const isSpecialSubsetActive = (state.test.subset === 'all' || state.test.subset === 'confusion' || state.test.subset === 'srs_due');
+            // Disable/hide range controls if a special subset (all, confusion, srs_due, jft-drill) is active
+            const isSpecialSubsetActive = (state.test.subset === 'all' || state.test.subset === 'confusion' || state.test.subset === 'srs_due' || state.test.subset === 'jft-drill');
 
             if (isSpecialSubsetActive) {
                 setEnabled(elRangeMode, false);
@@ -1977,43 +1936,25 @@
 
         // Ambil subset dari UI
         function getChosenSubset(){
-            // Prioritas 1: subset dari chip (mis. 'all', 'confusion', 'srs_due', atau group key)
-            if (state.test.subset === 'all') {
-                return ALL_ROMAJI;
-            } else if (state.test.subset === 'confusion') {
-                return _confuseTopPairs(state.test.set);
-            } else if (state.test.subset === 'srs_due') {
-                return getDueReviewItems(state.test.set).map(item => item.romaji);
-            } else if (GROUPS.some(g => g.key === state.test.subset)) { // Jika subset adalah group key
-                const grp = GROUPS.find(g => g.key === state.test.subset);
-                return romajiFromGroup(grp);
+            // 1) chip khusus
+            if (state.test.subset === 'all')        return ALL_ROMAJI;
+            if (state.test.subset === 'confusion')  return _confuseTopPairs(state.test.set);
+            if (state.test.subset === 'srs_due')    return getDueReviewItems(state.test.set).map(it => it.romaji);
+            if (state.test.subset === 'jft-drill') { // Handle JFT Drill preset
+                // Rentang kana umum (aiueo → ra/ro, plus dakuon dasar)
+                const jftGroups = GROUPS.filter(g => 
+                    (g.key >= 'aiueo' && g.key <= 'r') || // aiueo -> ra/ri/ru/re/ro
+                    (g.key >= 'g' && g.key <= 'd') // ga-go, za-zo, da-do
+                );
+                return jftGroups.flatMap(g => romajiFromGroup(g));
             }
 
-            // Prioritas 2: subset dari range/single group selector jika tidak ada chip khusus aktif
-            if (!elRangeMode) return null; // Ensure element exists
+            // 2) chip group (pakai key dari GROUPS)
+            const grp = GROUPS.find(g => g.key === state.test.subset);
+            if (grp) return romajiFromGroup(grp);
 
-            const mode = elRangeMode.value; // 'range' | 'single'
-
-            if(mode === 'range'){
-                if (!elFrom || !elTo || elFrom.hidden || elTo.hidden) return null; // Check if hidden (inert)
-                const i1 = elFrom.selectedIndex;
-                const i2 = elTo.selectedIndex;
-                if(i1 < 0 || i2 < 0) return null;
-                const lo = Math.min(i1,i2), hi = Math.max(i1,i2);
-                let pool = [];
-                for(let i=lo;i<=hi;i++){ pool = pool.concat(romajiFromGroup(GROUPS[i])); }
-                return pool;
-            }
-
-            if(mode === 'single'){
-                if (!elSingle || elSingle.hidden) return null; // Check if hidden (inert)
-                const i = elSingle.selectedIndex;
-                if(i < 0) return null;
-                const picked = romajiFromGroup(GROUPS[i]);
-                return picked; // Return array directly
-            }
-
-            return null; // fallback: biarkan logic defaultmu jalan (mis. “Pilih cepat”)
+            // 3) fallback (jangan bikin user macet)
+            return ALL_ROMAJI;
         }
 
         // Moved buildSubsetChips definition here to ensure it's defined before renderAll
@@ -2106,37 +2047,16 @@
             const chosenSubset = getChosenSubset(); // Get labels from new function
             if (chosenSubset !== null && chosenSubset.length > 0) {
                 labels = chosenSubset;
-            } else if (state.test.subset === 'all') { // Fallback if no specific range/group chosen
-                labels = ALL_ROMAJI;
-            } else if (state.test.subset === 'confusion') {
-                labels = _confuseTopPairs(state.test.set);
-                if (labels.length === 0) {
-                    showCustomAlert('Tidak ada pasangan tertukar yang cukup untuk dilatih.');
-                    // Guard for empty pool
-                    qs('#btnStart').disabled = true;
-                    return;
-                }
-            } else if (state.test.subset === 'srs_due') {
-                const dueItems = getDueReviewItems(state.test.set);
-                if (dueItems.length === 0) {
-                    showCustomAlert(t('no_due_today'));
-                    // Guard for empty pool
-                    qs('#btnStart').disabled = true;
-                    return;
-                }
-                labels = dueItems.map(item => item.romaji);
-            } else { // Fallback to 'all' if subset is unknown
+            } else { // Fallback to 'all' if no valid subset is chosen
                 labels = ALL_ROMAJI;
             }
-
 
             let uniquePoolItems = labels.map(r=>({romaji:r, char: (set==='hira'?HIRA_MAP:KATA_MAP).get(r)}));
             uniquePoolItems = uniquePoolItems.filter(item => item.char !== undefined); // Filter out items that don't have a corresponding Kana
 
             if(!uniquePoolItems.length){ 
-                showCustomAlert('Pilih subset atau rentang yang valid.'); 
-                // Guard for empty pool
-                qs('#btnStart').disabled = true;
+                showCustomAlert('Tidak ada item untuk subset ini. Pakai chip "Semua Kana" ya.'); 
+                // qs('#btnStart').disabled = false; // pastikan tetap bisa mencoba lagi
                 return; 
             }
 
@@ -2282,12 +2202,12 @@
 
             if (qType === 'seq') {
                 const seqData = makeSequence(buildPoolLabels(), state.test.set, state.test.sylPerItem);
-                currentItem = { ...newCurrentItem, romaji: seqData.romaji, char: seqData.kana, qType: qType };
+                currentItem = { ...(newCurrentItem || {}), romaji: seqData.romaji, char: seqData.kana, qType: qType }; // PATCH: Spread object
             } else if (qType === 'kseq') {
                 const seqData = makeKanaSequence(buildPoolLabels(), state.test.set, state.test.sylPerItem);
-                currentItem = { ...newCurrentItem, kanaSeq: seqData.kana, romajiSeq: seqData.romaji, qType: qType };
+                currentItem = { ...(newCurrentItem || {}), kanaSeq: seqData.kana, romajiSeq: seqData.romaji, qType: qType }; // PATCH: Spread object
             } else {
-                currentItem = { ...newCurrentItem, qType: qType }; // Untuk soal single char
+                currentItem = { ...(newCurrentItem || {}), qType: qType }; // Untuk soal single char // PATCH: Spread object
             }
 
             const ansEl=qs('#ans'); 
@@ -2531,7 +2451,7 @@
 
                 if (state.test.qType === 'r2k' || state.test.qType === 'audio_r2k') {
                     wrongKanaChar = extra.chosen;
-                } else if (state.test.qType === 'k2r' || state.test.qType === 'audio_r2k') {
+                } else if (state.test.qType === 'k2r' || state.test.qType === 'audio_k2r') {
                     const userRomajiNormalized = normalizeRomaji(extra.typed || extra.chosen);
                     wrongKanaChar = romajiStringToKana(userRomajiNormalized, currentSet);
                 } else if (state.test.qType === 'seq') {
@@ -2887,24 +2807,9 @@
                 return jftGroups.flatMap(g => romajiFromGroup(g));
             }
             // Fallback to range/single mode logic
-            if(elRangeMode?.value === 'range'){ // Use optional chaining
-                if (!elFrom || !elTo || elFrom.selectedIndex < 0 || elTo.selectedIndex < 0) return [];
-                const sKey = elFrom.value;
-                const eKey = elTo.value;
-                const selFrom=GROUPS.findIndex(x=>x.key===sKey);
-                const selTo=GROUPS.findIndex(x=>x.key===eKey);
-                if(selFrom > -1 && selTo > -1){
-                    const [from,to]= selFrom<=selTo? [selFrom,selTo] : [selTo,from];
-                    return GROUPS.slice(from,to+1).flatMap(g=> g.idx.map(i=> g.list[i]) );
-                }
-            }
-            if(elRangeMode?.value === 'single'){ // Use optional chaining
-                if (!elSingle || elSingle.selectedIndex < 0) return [];
-                const singleKey = elSingle.value;
-                const grp = GROUPS.find(x => x.key === singleKey);
-                if (grp) return grp.idx.map(i => grp.list[i]);
-            }
-            return []; // Default if none selected or invalid range
+            // PATCH: Menghindari fallback ke range/single mode jika subset tidak valid
+            // Ini akan memastikan getChosenSubset() selalu mengembalikan array valid
+            return ALL_ROMAJI; 
         }
 
         function rangeLabels(fromKey,toKey){ const a=GROUPS.findIndex(g=>g.key===fromKey); const b=GROUPS.findIndex(g=>g.key===toKey); if(a<0||b<0) return []; const [from,to] = a<=b? [a,b]:[b,a]; return GROUPS.slice(from,to+1).flatMap(g=> g.idx.map(i=> g.list[i]) ); }
@@ -2921,10 +2826,10 @@
             const rangeMode = elRangeMode.value;
             
             // Determine if a specific subset chip is active (excluding 'all', 'confusion', 'srs_due')
-            const isSpecificSubsetActive = (state.test.subset !== 'all' && state.test.subset !== 'confusion' && state.test.subset !== 'srs_due' && state.test.subset !== 'jft-drill');
+            const isSpecialSubsetActive = (state.test.subset !== 'all' && state.test.subset !== 'confusion' && state.test.subset !== 'srs_due' && state.test.subset !== 'jft-drill');
 
             // If a specific subset chip is selected, the rangeMode should reflect that.
-            if (isSpecificSubsetActive) {
+            if (isSpecialSubsetActive) {
                 // When a specific chip (like a group chip or confusion/srs_due) is active,
                 // we should hide the range/single group selector and show the corresponding
                 // elements as if rangeMode was set internally.
@@ -3890,10 +3795,7 @@
             showOnboarding();
             setInterval(renderStats, 5000);
 
-            // Bind new header menu button
-            document.getElementById('menuBtn')?.addEventListener('click', () => {
-                (window.openSidebar || window.toggleSidebar || toggleSidebar)(); // Fallback to local toggleSidebar
-            });
+            bind('#sidebarToggle', 'click', toggleSidebar);
             bind('#closeSidebar', 'click', closeSidebar);
             // Close sidebar when any link inside it is clicked
             qsa('#sidebar .menu a').forEach(link => {
