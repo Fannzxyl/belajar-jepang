@@ -1,0 +1,1520 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Kuis Arti (JP→ID)</title>
+    <meta name="description" content="Kuis untuk melatih arti kata dan ungkapan Jepang ke Indonesia." />
+    <meta name="theme-color" content="#1a1a1a">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <style>
+        /* CSS Variabel */
+        :root {
+            --bg: #1a1a1a;
+            --panel: #2a2a2a;
+            --text: #e0e0e0;
+            --muted: #a0a0a0;
+            --border: rgba(255, 255, 255, 0.1);
+            --primary: #6b8bff;
+            --secondary: #3dd8b5;
+            --success: #2fb875;
+            --warning: #ff7b7b;
+            --radius: 12px;
+            --space: 12px;
+            --maxw: 760px; /* Target HP 720p */
+            --shadow: 0 4px 12px rgba(0,0,0,0.3);
+            --transition-duration: 0.2s;
+        }
+
+        /* Base Styles */
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            background-color: var(--bg);
+            color: var(--text);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-x: hidden;
+            transition: background-color var(--transition-duration) ease, color var(--transition-duration) ease;
+        }
+
+        .container {
+            width: 100%;
+            max-width: var(--maxw);
+            margin-inline: auto;
+            padding: clamp(var(--space), 4vw, 24px);
+            display: flex;
+            flex-direction: column;
+            gap: var(--space);
+        }
+
+        @media (min-width: 860px) {
+            .container {
+                max-width: 1100px; /* Lebar lebih besar untuk desktop */
+            }
+        }
+
+        .card {
+            background: var(--panel);
+            border-radius: var(--radius);
+            padding: clamp(var(--space), 3vw, 20px);
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            transition: background-color var(--transition-duration) ease, border-color var(--transition-duration) ease, box-shadow var(--transition-duration) ease;
+        }
+
+        h1 {
+            font-size: clamp(24px, 6vw, 32px);
+            margin: 0 0 8px;
+            text-align: center;
+        }
+
+        .subtitle {
+            font-size: clamp(14px, 3vw, 16px);
+            color: var(--muted);
+            text-align: center;
+            margin-bottom: var(--space);
+        }
+
+        /* Question Area */
+        .q-wrap {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--space);
+            padding: var(--space) 0;
+            flex-wrap: wrap; /* Allow wrapping on small screens */
+        }
+
+        .q-jp {
+            font-family: 'Noto Sans JP', sans-serif;
+            font-size: clamp(36px, 10vw, 64px);
+            font-weight: 700;
+            line-height: 1.2;
+            text-align: center;
+            flex-grow: 1;
+            min-width: 0;
+        }
+
+        .q-romaji {
+            font-size: clamp(14px, 3.5vw, 20px);
+            color: var(--muted);
+            text-align: center;
+            width: 100%; /* Take full width below JP char */
+        }
+
+        .btn-audio {
+            width: 48px; /* Tap target besar */
+            height: 48px; /* Tap target besar */
+            border-radius: 50%;
+            display: grid;
+            place-items: center;
+            border: 1px solid var(--border);
+            background: var(--bg);
+            color: var(--text);
+            cursor: pointer;
+            flex-shrink: 0;
+            transition: background-color var(--transition-duration) ease, border-color var(--transition-duration) ease, color var(--transition-duration) ease;
+        }
+        .btn-audio:hover:not(:disabled) {
+            background: var(--panel);
+        }
+        .btn-audio:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Answer Options Grid */
+        .mc-grid {
+            display: grid;
+            gap: clamp(8px, 2vw, 12px);
+            grid-template-columns: 1fr 1fr; /* 2 kolom di HP */
+            margin-top: var(--space);
+        }
+
+        @media (min-width: 560px) { /* Untuk tablet/desktop */
+            .mc-grid {
+                grid-template-columns: repeat(4, 1fr); /* 4 kolom di layar lebih besar */
+            }
+        }
+
+        .mc-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 52px; /* Ramah jempol */
+            padding: 10px;
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            background: var(--panel);
+            color: var(--text);
+            text-align: center;
+            line-height: 1.2;
+            font-size: clamp(14px, 3.8vw, 16px);
+            cursor: pointer;
+            transition: all var(--transition-duration) ease;
+        }
+
+        .mc-btn:hover:not(:disabled) {
+            background: rgba(255, 255, 255, 0.08);
+        }
+        .mc-btn:focus-visible {
+            outline: 2px solid var(--primary);
+            outline-offset: 2px;
+        }
+        .mc-btn[aria-pressed="true"] {
+            outline: 2px solid var(--primary);
+            background: rgba(107, 139, 255, 0.15);
+        }
+        .mc-btn.correct {
+            background-color: var(--success);
+            border-color: var(--success);
+            color: #fff;
+        }
+        .mc-btn.wrong {
+            background-color: var(--warning);
+            border-color: var(--warning);
+            color: #fff;
+        }
+        .mc-btn:disabled {
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        /* Bottom Controls */
+        .bottom-controls {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: var(--space);
+            margin-top: var(--space);
+            padding: var(--space);
+            background: var(--panel);
+            border-top: 1px solid var(--border);
+            position: sticky;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 10;
+            box-shadow: 0 -4px 12px rgba(0,0,0,0.2);
+            border-radius: var(--radius) var(--radius) 0 0;
+        }
+        @media (min-width: 860px) {
+            .bottom-controls {
+                position: static; /* Tidak sticky di desktop */
+                box-shadow: none;
+                border-radius: 0;
+            }
+        }
+
+        .progress-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: clamp(12px, 2.8vw, 14px);
+            flex-grow: 1;
+            min-width: 120px;
+        }
+        .progress-bar {
+            height: 8px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 999px;
+            overflow: hidden;
+            flex-grow: 1;
+        }
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            border-radius: 999px;
+            transition: width 0.3s ease-out;
+        }
+
+        .btn {
+            min-height: 48px; /* Ramah jempol */
+            padding: 0 16px;
+            border-radius: var(--radius);
+            border: none;
+            cursor: pointer;
+            font-size: clamp(14px, 3.5vw, 16px);
+            font-weight: 500;
+            transition: all var(--transition-duration) ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            text-decoration: none;
+            flex-grow: 1;
+        }
+        .btn.primary {
+            background: var(--primary);
+            color: #fff;
+        }
+        .btn.secondary {
+            background: var(--panel);
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+        .btn:hover:not(:disabled) {
+            opacity: 0.9;
+        }
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Result Page */
+        #resultPage {
+            text-align: center;
+        }
+        #finalScore {
+            font-size: clamp(28px, 8vw, 48px);
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        #scorePercentage {
+            font-size: clamp(18px, 4vw, 24px);
+            color: var(--secondary);
+            margin-bottom: var(--space);
+        }
+        #wrongAnswersList {
+            text-align: left;
+            max-height: 40vh;
+            overflow-y: auto;
+            margin: var(--space) 0;
+            padding: 0 8px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+        }
+        .wrong-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px dashed rgba(255, 255, 255, 0.05);
+        }
+        .wrong-item:last-child {
+            border-bottom: none;
+        }
+        .wrong-item-jp {
+            font-family: 'Noto Sans JP', sans-serif;
+            font-weight: 700;
+            font-size: clamp(16px, 4vw, 20px);
+        }
+        .wrong-item-id {
+            color: var(--warning);
+            font-size: clamp(14px, 3.5vw, 16px);
+        }
+        .wrong-item-audio-btn {
+            width: 36px;
+            height: 36px;
+            font-size: 16px;
+        }
+        .result-actions {
+            display: flex;
+            justify-content: center;
+            gap: var(--space);
+            margin-top: var(--space);
+        }
+
+        /* Utility */
+        .hidden {
+            display: none !important;
+        }
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0,0,0,0);
+            white-space: nowrap;
+            border: 0;
+        }
+        .text-center {
+            text-align: center;
+        }
+        .spacer {
+            height: var(--space);
+        }
+
+        /* Toggle Switch for Romaji Hint */
+        .toggle-switch {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            font-size: clamp(12px, 2.8vw, 14px);
+            color: var(--muted);
+            user-select: none;
+        }
+        .toggle-switch input[type="checkbox"] {
+            appearance: none;
+            position: relative;
+            width: 36px;
+            height: 20px;
+            border-radius: 10px;
+            background-color: rgba(255, 255, 255, 0.15);
+            transition: background-color 0.2s ease;
+            outline: none;
+            cursor: pointer;
+        }
+        .toggle-switch input[type="checkbox"]::before {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background-color: #fff;
+            transition: transform 0.2s ease;
+        }
+        .toggle-switch input[type="checkbox"]:checked {
+            background-color: var(--primary);
+        }
+        .toggle-switch input[type="checkbox"]:checked::before {
+            transform: translateX(16px);
+        }
+        .toggle-switch:hover input[type="checkbox"] {
+            box-shadow: 0 0 0 3px rgba(107, 139, 255, 0.2);
+        }
+
+        /* Toast Message */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(0, 0, 0, 0.8);
+            color: #fff;
+            padding: 10px 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+            max-width: calc(100% - 40px);
+            text-align: center;
+        }
+        .toast.show {
+            opacity: 1;
+        }
+        .toast.warn {
+            background-color: var(--warning);
+            color: #333;
+        }
+
+        /* Quiz Settings Section */
+        #quizSettings {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space);
+        }
+
+        .filter-row {
+            display: flex;
+            gap: 8px;
+            flex-wrap: nowrap; /* Prevent wrapping initially */
+            overflow-x: auto; /* Enable horizontal scroll */
+            -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+            padding-bottom: 6px; /* Space for scrollbar */
+            scroll-snap-type: x proximity; /* Smooth snapping */
+            justify-content: flex-start;
+        }
+        /* Hide scrollbar for aesthetic, but keep functionality */
+        .filter-row::-webkit-scrollbar{ height: 8px; }
+        .filter-row::-webkit-scrollbar-thumb{ background: var(--border); border-radius: 999px; }
+
+        .chip {
+            padding: 8px 12px;
+            border: 1px solid #2a2a2a;
+            border-radius: 999px;
+            background: #161616;
+            color: var(--text);
+            cursor: pointer;
+            user-select: none;
+            font-size: clamp(12px, 3vw, 14px); /* Responsive font size */
+            white-space: nowrap; /* Prevent text wrapping */
+            flex-shrink: 0; /* Prevent shrinking */
+            scroll-snap-align: start;
+            transition: all var(--transition-duration) ease;
+        }
+        .chip.active {
+            outline: 2px solid var(--primary);
+            background: #1e1f2b;
+            color: #fff;
+        }
+        .chip:hover {
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .controls {
+            display: grid;
+            gap: 10px;
+            grid-template-columns: 1fr auto; /* Slider + number input */
+            align-items: center;
+        }
+        @media(min-width:860px){ 
+            .controls{ grid-template-columns: 1fr auto; } /* Keep 1fr auto for desktop */
+        }
+
+        .controls label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: clamp(14px, 3.5vw, 16px);
+            color: var(--text);
+        }
+        .controls input[type="range"] {
+            flex-grow: 1;
+            -webkit-appearance: none;
+            appearance: none;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            outline: none;
+            transition: background 0.2s ease;
+        }
+        .controls input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--primary);
+            cursor: pointer;
+            box-shadow: 0 0 0 3px rgba(107, 139, 255, 0.2);
+        }
+        .controls input[type="range"]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--primary);
+            cursor: pointer;
+            box-shadow: 0 0 0 3px rgba(107, 139, 255, 0.2);
+        }
+        .controls input[type="number"] {
+            width: 60px; /* Lebar tetap untuk input number */
+            height: 36px;
+            padding: 4px 8px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: var(--bg);
+            color: var(--text);
+            font-size: clamp(14px, 3.5vw, 16px);
+            text-align: center;
+            -moz-appearance: textfield; /* Hide spinner in Firefox */
+        }
+        .controls input[type="number"]::-webkit-outer-spin-button,
+        .controls input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        #startQuizBtn {
+            margin-top: var(--space);
+            width: 100%;
+        }
+
+        /* Quiz Info during game */
+        #quizInfo {
+            font-size: clamp(12px, 2.8vw, 14px);
+            color: var(--muted);
+            text-align: center;
+            margin-bottom: var(--space);
+        }
+
+        /* === Sidebar === */
+        .sidebar{
+            position:fixed; top:0; left:-300px; width:280px; height:100%;
+            background:var(--panel); box-shadow:var(--shadow); z-index:1000;
+            transition:left .3s ease-in-out; padding:20px; padding-top:calc(20px + env(safe-area-inset-top));
+            display:flex; flex-direction:column; gap:10px; overflow-y:auto; border-right:1px solid var(--border);
+        }
+        .sidebar.is-open{ left:0; }
+        .sidebar .menu{ list-style:none; margin:0; padding:0; }
+        .sidebar .menu li a{ display:flex; gap:.5rem; align-items:center; padding:.75rem 1rem; border-radius:12px; color:var(--text); text-decoration:none; }
+        .sidebar .menu li a:hover{ background: rgba(255, 255, 255, 0.08); }
+        .sidebar .menu li a.active{ background:rgba(107,139,255,.18); font-weight:600; }
+        .sidebar-toggle-btn{
+            position:fixed; top:16px; left:16px; z-index:1001; background:var(--panel); border:1px solid var(--border);
+            border-radius:50%; width:44px; height:44px; display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:var(--shadow);
+        }
+        .sidebar-toggle-btn i{ color:var(--text); font-size:20px; }
+        @media (min-width:768px){ body.sidebar-open{ padding-left:280px; } }
+        @media (max-width:640px){ .sidebar{ width:84vw; max-width:320px; } }
+        /* Biar header gak ketutup tombol */
+        header .brand{ position:relative; z-index:1002; padding-left:60px; }
+        @media (max-width:767px){
+            header .brand{ padding-left:0; }
+            .sidebar-toggle-btn{ top:calc(16px + env(safe-area-inset-top)); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Toggle Button -->
+    <button id="sidebarToggle" class="sidebar-toggle-btn" aria-label="Toggle Sidebar">
+      <i class="fa-solid fa-bars"></i>
+    </button>
+
+    <!-- Sidebar -->
+    <nav id="sidebar" class="sidebar">
+      <div class="row" style="justify-content: space-between; align-items: center;">
+        <h3 style="margin:0;">Navigasi</h3>
+        <button class="btn secondary" id="closeSidebar" aria-label="Tutup Sidebar">
+          <i class="fa-solid fa-times"></i>
+        </button>
+      </div>
+      <hr style="border:none;border-top:1px solid var(--border);width:100%;">
+      <ul class="menu">
+        <li><a href="index.html">📘 Latihan</a></li>
+        <li><a href="index2.html">🗂️ Flashcard</a></li>
+        <li><a href="index3.html">🧮 Tabel Kana</a></li>
+        <li><a href="index4.html">🗒️ Kosakata</a></li>
+        <li><a href="index5.html">💬 Ungkapan</a></li>
+        <li><a href="index7.html" class="active">🧠 Tebak Arti</a></li> <!-- Penambahan: Item menu "Tebak Arti" -->
+        <li><a href="index6.html">✍️ Menulis</a></li>
+      </ul>
+    </nav>
+
+    <div class="container">
+        <header class="card">
+            <h1>Kuis Arti (JP→ID)</h1>
+            <p class="subtitle">Cocokkan kata/ungkapan Jepang dengan artinya dalam Bahasa Indonesia.</p>
+            <div class="spacer"></div>
+            <label class="toggle-switch">
+                <input type="checkbox" id="toggleRomajiHint" checked>
+                Tampilkan Romaji
+            </label>
+        </header>
+
+        <!-- Quiz Settings Section -->
+        <section id="quizSettings" class="card">
+            <h2>Pengaturan Kuis</h2>
+            <div class="filter-row" id="categoryChips">
+                <!-- Category chips will be rendered here -->
+            </div>
+            <div class="controls">
+                <label for="questionCountSlider">Jumlah Soal: <span id="questionCountDisplay">20</span></label>
+                <input type="range" id="questionCountSlider" min="5" max="50" step="5" value="20">
+                <input type="number" id="questionCountInput" min="5" max="50" step="5" value="20">
+            </div>
+            <button class="btn primary" id="startQuizBtn"><i class="fa-solid fa-play"></i> Mulai Kuis</button>
+        </section>
+
+        <main id="quizPage" class="card hidden">
+            <div id="quizInfo"></div> <!-- New: Quiz info during game -->
+            <div class="q-wrap">
+                <div id="questionJp" class="q-jp"></div>
+                <button id="playAudioBtn" class="btn-audio" aria-label="Putar audio" disabled>
+                    <i class="fa-solid fa-volume-up"></i>
+                </button>
+                <div id="questionRomaji" class="q-romaji"></div>
+            </div>
+            <div class="mc-grid" id="mcOptions">
+                <button class="mc-btn" id="optA" data-choice="A" aria-pressed="false">A. </button>
+                <button class="mc-btn" id="optB" data-choice="B" aria-pressed="false">B. </button>
+                <button class="mc-btn" id="optC" data-choice="C" aria-pressed="false">C. </button>
+                <button class="mc-btn" id="optD" data-choice="D" aria-pressed="false">D. </button>
+            </div>
+        </main>
+
+        <footer class="bottom-controls">
+            <div class="progress-info">
+                <span id="scoreDisplay">Benar: 0 / Salah: 0</span>
+                <div class="progress-bar">
+                    <div id="progressBarFill" class="progress-fill"></div>
+                </div>
+                <span id="questionCount">0/0</span>
+            </div>
+            <button class="btn primary" id="nextQuestionBtn" disabled><i class="fa-solid fa-arrow-right"></i> Lanjut</button>
+            <button class="btn secondary" id="skipQuestionBtn"><i class="fa-solid fa-forward"></i> Lewati</button>
+        </footer>
+
+        <div id="resultPage" class="card hidden">
+            <h2>Hasil Kuis 🎉</h2>
+            <div id="resultSummary"></div> <!-- New: Summary of category and count -->
+            <div id="finalScore"></div>
+            <div id="scorePercentage"></div>
+            <h3>Jawaban Salah:</h3>
+            <div id="wrongAnswersList">
+                <p class="text-center" style="color: var(--muted);">Tidak ada jawaban salah. Bagus! 😊</p>
+            </div>
+            <div class="result-actions">
+                <button class="btn primary" id="retakeWrongBtn"><i class="fa-solid fa-redo-alt"></i> Latih Ulang (yang salah)</button>
+                <button class="btn secondary" id="restartQuizBtn"><i class="fa-solid fa-sync-alt"></i> Kembali ke Pengaturan</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toastMessage" class="toast"></div>
+
+    <script>
+        // Dataset Awal
+        const ITEMS = [
+            { jp: "ありがとう", romaji: "arigatou", id: "terima kasih", audio: "arigatou", cat: "Salam" },
+            { jp: "ごめんなさい", romaji: "gomen nasai", id: "maaf", audio: "gomen-nasai", cat: "Salam" },
+            { jp: "すみません", romaji: "sumimasen", id: "permisi", audio: "sumimasen", cat: "Dasar" },
+            { jp: "こんにちは", romaji: "konnichiwa", id: "halo", audio: "konnichiwa", cat: "Salam" },
+            { jp: "おはよう", romaji: "ohayou", id: "selamat pagi", audio: "ohayou", cat: "Salam" },
+            { jp: "こんばんは", romaji: "konbanwa", id: "selamat malam", audio: "konbanwa", cat: "Salam" },
+            { jp: "さようなら", romaji: "sayounara", id: "selamat tinggal", audio: "sayounara", cat: "Salam" },
+            { jp: "はい", romaji: "hai", id: "ya", audio: "hai", cat: "Dasar" },
+            { jp: "いいえ", romaji: "iie", id: "tidak", audio: "iie", cat: "Dasar" },
+            { jp: "お願いします", romaji: "onegaishimasu", id: "tolong", audio: "onegaishimasu", cat: "Dasar" },
+            { jp: "いただきます", romaji: "itadakimasu", id: "selamat makan (sebelum)", audio: "itadakimasu", cat: "Makanan" },
+            { jp: "ごちそうさまでした", romaji: "gochisousama deshita", id: "terima kasih atas makanannya (sesudah)", audio: "gochisousama-deshita", cat: "Makanan" },
+            { jp: "ただいま", romaji: "tadaima", id: "saya pulang", audio: "tadaima", cat: "Dasar" },
+            { jp: "おかえり", romaji: "okaeri", id: "selamat datang kembali", audio: "okaeri", cat: "Dasar" },
+            { jp: "いってきます", romaji: "ittekimasu", id: "saya pergi (dan akan kembali)", audio: "ittekimasu", cat: "Dasar" },
+            { jp: "いってらっしゃい", romaji: "itterasshai", id: "hati-hati di jalan", audio: "itterasshai", cat: "Dasar" },
+            { jp: "おやすみなさい", romaji: "oyasuminasai", id: "selamat tidur", audio: "oyasuminasai", cat: "Salam" },
+            { jp: "お元気ですか", romaji: "ogenki desu ka", id: "apa kabar?", audio: "ogenki-desu-ka", cat: "Dasar" },
+            { jp: "はい、元気です", romaji: "hai, genki desu", id: "ya, saya baik", audio: "hai-genki-desu", cat: "Dasar" },
+            { jp: "お名前は？", romaji: "onamae wa?", id: "siapa namamu?", audio: "onamae-wa", cat: "Dasar" },
+            { jp: "私", romaji: "watashi", id: "saya", audio: "watashi", cat: "Orang" },
+            { jp: "あなた", romaji: "anata", id: "kamu", audio: "anata", cat: "Orang" },
+            { jp: "先生", romaji: "sensei", id: "guru", audio: "sensei", cat: "Orang" },
+            { jp: "学生", romaji: "gakusei", id: "murid", audio: "gakusei", cat: "Orang" },
+            { jp: "日本人", romaji: "nihonjin", id: "orang Jepang", audio: "nihonjin", cat: "Orang" },
+            { jp: "インドネシア人", romaji: "indoneshiajin", id: "orang Indonesia", audio: "indoneshiajin", cat: "Orang" },
+            { jp: "食べる", romaji: "taberu", id: "makan", audio: "taberu", cat: "Makanan" },
+            { jp: "飲む", romaji: "nomu", id: "minum", audio: "nomu", cat: "Minuman" },
+            { jp: "行く", romaji: "iku", id: "pergi", audio: "iku", cat: "Dasar" },
+            { jp: "来る", romaji: "kuru", id: "datang", audio: "kuru", cat: "Dasar" },
+            { jp: "見る", romaji: "miru", id: "melihat", audio: "miru", cat: "Dasar" },
+            { jp: "聞く", romaji: "kiku", id: "mendengar", audio: "kiku", cat: "Dasar" },
+            { jp: "話す", romaji: "hanasu", id: "berbicara", audio: "hanasu", cat: "Dasar" },
+            { jp: "読む", romaji: "yomu", id: "membaca", audio: "yomu", cat: "Dasar" },
+            { jp: "書く", romaji: "kaku", id: "menulis", audio: "kaku", cat: "Dasar" },
+            { jp: "買う", romaji: "kau", id: "membeli", audio: "kau", cat: "Dasar" },
+            { jp: "高い", romaji: "takai", id: "mahal/tinggi", audio: "takai", cat: "Sifat" },
+            { jp: "安い", romaji: "yasui", id: "murah", audio: "yasui", cat: "Sifat" },
+            { jp: "大きい", romaji: "ookii", id: "besar", audio: "ookii", cat: "Sifat" },
+            { jp: "小さい", romaji: "chiisai", id: "kecil", audio: "chiisai", cat: "Sifat" },
+            { jp: "新しい", romaji: "atarashii", id: "baru", audio: "atarashii", cat: "Sifat" },
+            { jp: "古い", romaji: "furui", id: "lama", audio: "furui", cat: "Sifat" },
+            { jp: "美味しい", romaji: "oishii", id: "enak", audio: "oishii", cat: "Sifat" },
+            { jp: "寒い", romaji: "samui", id: "dingin (cuaca)", audio: "samui", cat: "Cuaca" },
+            { jp: "暑い", romaji: "atsui", id: "panas (cuaca)", audio: "atsui", cat: "Cuaca" },
+            { jp: "楽しい", romaji: "tanoshii", id: "menyenangkan", audio: "tanoshii", cat: "Sifat" },
+            { jp: "難しい", romaji: "muzukashii", id: "sulit", audio: "muzukashii", cat: "Sifat" },
+            { jp: "易しい", romaji: "yasashii", id: "mudah", audio: "yasashii", cat: "Sifat" },
+            { jp: "時間", romaji: "jikan", id: "waktu", audio: "jikan", cat: "Waktu" },
+            { jp: "今日", romaji: "kyou", id: "hari ini", audio: "kyou", cat: "Waktu" },
+            { jp: "明日", romaji: "ashita", id: "besok", audio: "ashita", cat: "Waktu" },
+            { jp: "昨日", romaji: "kinou", id: "kemarin", audio: "kinou", cat: "Waktu" },
+            { jp: "朝", romaji: "asa", id: "pagi", audio: "asa", cat: "Waktu" },
+            { jp: "昼", romaji: "hiru", id: "siang", audio: "hiru", cat: "Waktu" },
+            { jp: "晩", romaji: "ban", id: "malam", audio: "ban", cat: "Waktu" },
+            { jp: "週", romaji: "shuu", id: "minggu", audio: "shuu", cat: "Waktu" },
+            { jp: "月", romaji: "tsuki", id: "bulan", audio: "tsuki", cat: "Waktu" },
+            { jp: "年", romaji: "toshi", id: "tahun", audio: "toshi", cat: "Waktu" },
+            { jp: "何", romaji: "nani", id: "apa", audio: "nani", cat: "Dasar" },
+            { jp: "どこ", romaji: "doko", id: "di mana", audio: "doko", cat: "Dasar" },
+            { jp: "いつ", romaji: "itsu", id: "kapan", audio: "itsu", cat: "Dasar" },
+            { jp: "誰", romaji: "dare", id: "siapa", audio: "dare", cat: "Dasar" },
+            { jp: "なぜ", romaji: "naze", id: "mengapa", audio: "naze", cat: "Dasar" },
+            { jp: "どう", romaji: "dou", id: "bagaimana", audio: "dou", cat: "Dasar" },
+            { jp: "いくら", romaji: "ikura", id: "berapa (harga)", audio: "ikura", cat: "Dasar" },
+            { jp: "一つ", romaji: "hitotsu", id: "satu (benda)", audio: "hitotsu", cat: "Angka" },
+            { jp: "二つ", romaji: "futatsu", id: "dua (benda)", audio: "futatsu", cat: "Angka" },
+            { jp: "三つ", romaji: "mittsu", id: "tiga (benda)", audio: "mittsu", cat: "Angka" },
+            { jp: "四つ", romaji: "yottsu", id: "empat (benda)", audio: "yottsu", cat: "Angka" },
+            { jp: "五つ", romaji: "itsutsu", id: "lima (benda)", audio: "itsutsu", cat: "Angka" },
+            { jp: "六つ", romaji: "muttsu", id: "enam (benda)", audio: "muttsu", cat: "Angka" },
+            { jp: "七つ", romaji: "nanatsu", id: "tujuh (benda)", audio: "nanatsu", cat: "Angka" },
+            { jp: "八つ", romaji: "yattsu", id: "delapan (benda)", audio: "yattsu", cat: "Angka" },
+            { jp: "九つ", romaji: "kokonotsu", id: "sembilan (benda)", audio: "kokonotsu", cat: "Angka" },
+            { jp: "十", romaji: "tou", id: "sepuluh (benda)", audio: "tou", cat: "Angka" },
+            { jp: "円", romaji: "en", id: "Yen", audio: "en", cat: "Benda" },
+            { jp: "本", romaji: "hon", id: "buku", audio: "hon", cat: "Benda" },
+            { jp: "ペン", romaji: "pen", id: "pulpen", audio: "pen", cat: "Benda" },
+            { jp: "鉛筆", romaji: "enpitsu", id: "pensil", audio: "enpitsu", cat: "Benda" },
+            { jp: "消しゴム", romaji: "keshigomu", id: "penghapus", audio: "keshigomu", cat: "Benda" },
+            { jp: "ノート", romaji: "nooto", id: "buku catatan", audio: "nooto", cat: "Benda" },
+            { jp: "机", romaji: "tsukue", id: "meja", audio: "tsukue", cat: "Benda" },
+            { jp: "椅子", romaji: "isu", id: "kursi", audio: "isu", cat: "Benda" },
+            { jp: "時計", romaji: "tokei", id: "jam", audio: "tokei", cat: "Benda" },
+            { jp: "傘", romaji: "kasa", id: "payung", audio: "kasa", cat: "Benda" },
+            { jp: "靴", romaji: "kutsu", id: "sepatu", audio: "kutsu", cat: "Pakaian" },
+            { jp: "服", romaji: "fuku", id: "pakaian", audio: "fuku", cat: "Pakaian" },
+            { jp: "帽子", romaji: "boushi", id: "topi", audio: "boushi", cat: "Pakaian" },
+            { jp: "眼鏡", romaji: "megane", id: "kacamata", audio: "megane", cat: "Benda" },
+            { jp: "手", romaji: "te", id: "tangan", audio: "te", cat: "Orang" },
+            { jp: "足", romaji: "ashi", id: "kaki", audio: "ashi", cat: "Orang" },
+            { jp: "目", romaji: "me", id: "mata", audio: "me", cat: "Orang" },
+            { jp: "耳", romaji: "mimi", id: "telinga", audio: "mimi", cat: "Orang" },
+            { jp: "口", romaji: "kuchi", id: "mulut", audio: "kuchi", cat: "Orang" },
+            { jp: "鼻", romaji: "hana", id: "hidung", audio: "hana", cat: "Orang" },
+            { jp: "頭", romaji: "atama", id: "kepala", audio: "atama", cat: "Orang" },
+            { jp: "髪", romaji: "kami", id: "rambut", audio: "kami", cat: "Orang" },
+            { jp: "顔", romaji: "kao", id: "wajah", audio: "kao", cat: "Orang" },
+            { jp: "体", romaji: "karada", id: "tubuh", audio: "karada", cat: "Orang" },
+            { jp: "心", romaji: "kokoro", id: "hati/jiwa", audio: "kokoro", cat: "Sifat" },
+            { jp: "家", romaji: "ie", id: "rumah", audio: "ie", cat: "Tempat" },
+            { jp: "家族", romaji: "kazoku", id: "keluarga", audio: "kazoku", cat: "Keluarga" },
+            { jp: "父", romaji: "chichi", id: "ayah (sendiri)", audio: "chichi", cat: "Keluarga" },
+            { jp: "母", romaji: "haha", id: "ibu (sendiri)", audio: "haha", cat: "Keluarga" },
+            { jp: "兄", romaji: "ani", id: "kakak laki-laki (sendiri)", audio: "ani", cat: "Keluarga" },
+            { jp: "姉", romaji: "ane", id: "kakak perempuan (sendiri)", audio: "ane", cat: "Keluarga" },
+            { jp: "弟", romaji: "otouto", id: "adik laki-laki (sendiri)", audio: "otouto", cat: "Keluarga" },
+            { jp: "妹", romaji: "imouto", id: "adik perempuan (sendiri)", audio: "imouto", cat: "Keluarga" },
+            { jp: "夫", romaji: "otto", id: "suami (sendiri)", audio: "otto", cat: "Keluarga" },
+            { jp: "妻", romaji: "tsuma", id: "istri (sendiri)", audio: "tsuma", cat: "Keluarga" },
+            { jp: "子供", romaji: "kodomo", id: "anak-anak", audio: "kodomo", cat: "Keluarga" },
+            { jp: "友達", romaji: "tomodachi", id: "teman", audio: "tomodachi", cat: "Orang" },
+            { jp: "学校", romaji: "gakkou", id: "sekolah", audio: "gakkou", cat: "Tempat" },
+            { jp: "会社", romaji: "kaisha", id: "perusahaan", audio: "kaisha", cat: "Kerja" },
+            { jp: "仕事", romaji: "shigoto", id: "pekerjaan", audio: "shigoto", cat: "Kerja" },
+            { jp: "休み", romaji: "yasumi", id: "libur/istirahat", audio: "yasumi", cat: "Kerja" },
+            { jp: "旅行", romaji: "ryokou", id: "perjalanan", audio: "ryokou", cat: "Transportasi" },
+            { jp: "日本", romaji: "nihon", id: "Jepang", audio: "nihon", cat: "Tempat" },
+            { jp: "インドネシア", romaji: "indoneshia", id: "Indonesia", audio: "indoneshia", cat: "Tempat" },
+            { jp: "英語", romaji: "eigo", id: "Bahasa Inggris", audio: "eigo", cat: "Dasar" },
+            { jp: "日本語", romaji: "nihongo", id: "Bahasa Jepang", audio: "nihongo", cat: "Dasar" },
+            { jp: "寝る", romaji: "neru", id: "tidur", audio: "neru", cat: "Dasar" },
+            { jp: "起きる", romaji: "okiru", cat: "bangun", audio: "okiru", cat: "Dasar" },
+            { jp: "勉強する", romaji: "benkyou suru", id: "belajar", audio: "benkyou-suru", cat: "Kerja" },
+            { jp: "働く", romaji: "hataraku", id: "bekerja", audio: "hataraku", cat: "Kerja" },
+            { jp: "遊ぶ", romaji: "asobu", id: "bermain", audio: "asobu", cat: "Dasar" },
+            { jp: "泳ぐ", romaji: "oyogu", id: "berenang", audio: "oyogu", cat: "Dasar" },
+            { jp: "走る", romaji: "hashiru", id: "berlari", audio: "hashiru", cat: "Dasar" },
+            { jp: "歌う", romaji: "utau", id: "bernyanyi", audio: "utau", cat: "Dasar" },
+            { jp: "踊る", romaji: "odoru", id: "menari", audio: "odoru", cat: "Dasar" },
+            { jp: "描く", romaji: "kaku", id: "menggambar", audio: "kaku", cat: "Dasar" },
+            { jp: "写真", romaji: "shashin", id: "foto", audio: "shashin", cat: "Benda" },
+            { jp: "撮る", romaji: "toru", id: "mengambil (foto)", audio: "toru", cat: "Dasar" },
+            { jp: "料理", romaji: "ryouri", id: "masakan", audio: "ryouri", cat: "Makanan" },
+            { jp: "作る", romaji: "tsukuru", id: "membuat", audio: "tsukuru", cat: "Dasar" },
+            { jp: "運転する", romaji: "unten suru", id: "menyetir", audio: "unten-suru", cat: "Transportasi" },
+            { jp: "運転手", romaji: "untenshu", id: "supir", audio: "untenshu", cat: "Orang" },
+            { jp: "電車", romaji: "densha", id: "kereta", audio: "densha", cat: "Transportasi" },
+            { jp: "車", romaji: "kuruma", id: "mobil", audio: "kuruma", cat: "Transportasi" },
+            { jp: "自転車", romaji: "jitensha", id: "sepeda", audio: "jitensha", cat: "Transportasi" },
+            { jp: "飛行機", romaji: "hikouki", id: "pesawat", audio: "hikouki", cat: "Transportasi" },
+            { jp: "船", romaji: "fune", id: "kapal", audio: "fune", cat: "Transportasi" },
+            { jp: "駅", romaji: "eki", id: "stasiun", audio: "eki", cat: "Tempat" },
+            { jp: "空港", romaji: "kuukou", id: "bandara", audio: "kuukou", cat: "Tempat" },
+            { jp: "港", romaji: "minato", id: "pelabuhan", audio: "minato", cat: "Tempat" },
+            { jp: "道", romaji: "michi", id: "jalan", audio: "michi", cat: "Tempat" },
+            { jp: "橋", romaji: "hashi", id: "jembatan", audio: "hashi", cat: "Tempat" },
+            { jp: "公園", romaji: "kouen", id: "taman", audio: "kouen", cat: "Tempat" },
+            { jp: "病院", romaji: "byouin", id: "rumah sakit", audio: "byouin", cat: "Tempat" },
+            { jp: "銀行", romaji: "ginkou", id: "bank", audio: "ginkou", cat: "Tempat" },
+            { jp: "郵便局", romaji: "yuubinkyoku", id: "kantor pos", audio: "yuubinkyoku", cat: "Tempat" },
+            { jp: "図書館", romaji: "toshokan", id: "perpustakaan", audio: "toshokan", cat: "Tempat" },
+            { jp: "美術館", romaji: "bijutsukan", id: "galeri seni", audio: "bijutsukan", cat: "Tempat" },
+            { jp: "博物館", romaji: "hakubutsukan", id: "museum", audio: "hakubutsukan", cat: "Tempat" },
+            { jp: "映画館", romaji: "eigakan", id: "bioskop", audio: "eigakan", cat: "Tempat" },
+            { jp: "店", romaji: "mise", id: "toko", audio: "mise", cat: "Tempat" },
+            { jp: "レストラン", romaji: "resutoran", id: "restoran", audio: "resutoran", cat: "Tempat" },
+            { jp: "ホテル", romaji: "hoteru", id: "hotel", audio: "hoteru", cat: "Tempat" },
+            { jp: "大学", romaji: "daigaku", id: "universitas", audio: "daigaku", cat: "Tempat" },
+            { jp: "医者", romaji: "isha", id: "dokter", audio: "isha", cat: "Orang" },
+            { jp: "警察官", romaji: "keisatsukan", id: "polisi", audio: "keisatsukan", cat: "Orang" },
+            { jp: "消防士", romaji: "shouboushi", id: "pemadam kebakaran", audio: "shouboushi", cat: "Orang" },
+            { jp: "料理人", romaji: "ryourinin", id: "koki", audio: "ryourinin", cat: "Orang" },
+            { jp: "歌手", romaji: "kashu", id: "penyanyi", audio: "kashu", cat: "Orang" },
+            { jp: "俳優", romaji: "haiyuu", id: "aktor", audio: "haiyuu", cat: "Orang" },
+            { jp: "女優", romaji: "joyuu", id: "aktris", audio: "joyuu", cat: "Orang" },
+            { jp: "スポーツ選手", romaji: "supootsu senshu", id: "atlet", audio: "supootsu-senshu", cat: "Orang" },
+            { jp: "エンジニア", romaji: "enjinia", id: "insinyur", audio: "enjinia", cat: "Kerja" },
+            { jp: "プログラマー", romaji: "puroguramaa", id: "programmer", audio: "puroguramaa", cat: "Kerja" },
+            { jp: "デザイナー", romaji: "dezainaa", id: "desainer", audio: "dezainaa", cat: "Kerja" },
+            { jp: "ジャーナリスト", romaji: "jaanarisuto", id: "jurnalis", audio: "jaanarisuto", cat: "Kerja" },
+            { jp: "弁護士", romaji: "bengoshi", id: "pengacara", audio: "bengoshi", cat: "Kerja" },
+            { jp: "政治家", romaji: "seijika", id: "politikus", audio: "seijika", cat: "Orang" },
+            { jp: "社長", romaji: "shachou", id: "direktur perusahaan", audio: "shachou", cat: "Kerja" },
+            { jp: "店員", romaji: "tenin", id: "pelayan toko", audio: "tenin", cat: "Kerja" },
+            { jp: "受付", romaji: "uketsuke", id: "resepsionis", audio: "uketsuke", cat: "Kerja" },
+            { jp: "秘書", romaji: "hisho", id: "sekretaris", audio: "hisho", cat: "Kerja" },
+            { jp: "事務員", romaji: "jimu-in", id: "petugas administrasi", audio: "jimu-in", cat: "Kerja" },
+            { jp: "銀行員", romaji: "ginkouin", id: "pegawai bank", audio: "ginkouin", cat: "Kerja" },
+            { jp: "公務員", romaji: "koumuin", id: "pegawai negeri", audio: "koumuin", cat: "Kerja" },
+            { jp: "主婦", romaji: "shufu", id: "ibu rumah tangga", audio: "shufu", cat: "Keluarga" },
+            { jp: "フリーター", romaji: "furiitaa", id: "pekerja paruh waktu", audio: "furiitaa", cat: "Kerja" },
+            { jp: "アルバイト", romaji: "arubaito", id: "pekerjaan sampingan", audio: "arubaito", cat: "Kerja" },
+            { jp: "パートタイム", romaji: "paatotaimu", id: "paruh waktu", audio: "paatotaimu", cat: "Kerja" },
+            { jp: "フルタイム", romaji: "furutaimu", id: "penuh waktu", audio: "furutaimu", cat: "Kerja" },
+            { jp: "残業", romaji: "zangyou", id: "lembur", audio: "zangyou", cat: "Kerja" },
+            { jp: "給料", romaji: "kyuuryou", id: "gaji", audio: "kyuuryou", cat: "Kerja" },
+            { jp: "ボーナス", romaji: "boonasu", id: "bonus", audio: "boonasu", cat: "Kerja" },
+            { jp: "休暇", romaji: "kyuuka", id: "cuti", audio: "kyuuka", cat: "Kerja" },
+            { jp: "有給休暇", romaji: "yuukyuu kyuuka", id: "cuti berbayar", audio: "yuukyuu-kyuuka", cat: "Kerja" },
+            { jp: "休日", romaji: "kyuujitsu", id: "hari libur", audio: "kyuujitsu", cat: "Waktu" },
+            { jp: "祝日", romaji: "shukujitsu", id: "hari libur nasional", audio: "shukujitsu", cat: "Waktu" },
+            { jp: "年末年始", romaji: "nenmatsu nenshi", id: "libur akhir dan awal tahun", audio: "nenmatsu-nenshi", cat: "Waktu" },
+            { jp: "ゴールデンウィーク", romaji: "gooruden wiiku", id: "Golden Week", audio: "gooruden-wiiku", cat: "Waktu" },
+            { jp: "夏休み", romaji: "natsuyasumi", id: "libur musim panas", audio: "natsuyasumi", cat: "Waktu" },
+            { jp: "冬休み", romaji: "fuyuyasumi", id: "libur musim dingin", audio: "fuyuyasumi", cat: "Waktu" }
+        ];
+
+        // Konstanta daftar kategori
+        const CATEGORIES = ["Semua", "Salam", "Dasar", "Makanan", "Orang", "Keluarga", "Angka", "Tempat", "Minuman", "Kerja", "Sifat", "Benda", "Transportasi", "Waktu", "Hewan", "Cuaca", "Warna", "Pakaian"];
+
+        // Global State
+        const state = {
+            cat: localStorage.getItem('quiz.cat') || 'Semua',
+            count: +(localStorage.getItem('quiz.count') || 20),
+            quizItems: [], // Item untuk kuis saat ini
+            currentQuestionIndex: 0,
+            score: 0,
+            wrongAnswers: [],
+            showRomajiHint: true,
+            isAnswered: false, // Flag untuk melacak apakah soal sudah dijawab
+            totalQuestionsInQuiz: 0 // Jumlah soal yang benar-benar dimainkan dalam kuis saat ini
+        };
+
+        // DOM Elements
+        const quizSettingsEl = document.getElementById('quizSettings');
+        const categoryChipsEl = document.getElementById('categoryChips');
+        const questionCountSlider = document.getElementById('questionCountSlider');
+        const questionCountInput = document.getElementById('questionCountInput');
+        const questionCountDisplay = document.getElementById('questionCountDisplay');
+        const startQuizBtn = document.getElementById('startQuizBtn');
+
+        const quizInfoEl = document.getElementById('quizInfo'); // Info selama kuis berjalan
+        const questionJpEl = document.getElementById('questionJp');
+        const questionRomajiEl = document.getElementById('questionRomaji');
+        const playAudioBtn = document.getElementById('playAudioBtn');
+        const mcOptionsEl = document.getElementById('mcOptions');
+        const mcButtons = [
+            document.getElementById('optA'),
+            document.getElementById('optB'),
+            document.getElementById('optC'),
+            document.getElementById('optD')
+        ];
+        const scoreDisplayEl = document.getElementById('scoreDisplay');
+        const progressBarFillEl = document.getElementById('progressBarFill');
+        const questionCountEl = document.getElementById('questionCount');
+        const nextQuestionBtn = document.getElementById('nextQuestionBtn');
+        const skipQuestionBtn = document.getElementById('skipQuestionBtn');
+        const quizPageEl = document.getElementById('quizPage');
+        const resultPageEl = document.getElementById('resultPage');
+        const resultSummaryEl = document.getElementById('resultSummary'); // Ringkasan hasil
+        const finalScoreEl = document.getElementById('finalScore');
+        const scorePercentageEl = document.getElementById('scorePercentage');
+        const wrongAnswersListEl = document.getElementById('wrongAnswersList');
+        const retakeWrongBtn = document.getElementById('retakeWrongBtn');
+        const restartQuizBtn = document.getElementById('restartQuizBtn');
+        const toggleRomajiHintEl = document.getElementById('toggleRomajiHint');
+        const audioEl = document.getElementById('audio');
+        const toastMessageEl = document.getElementById('toastMessage');
+
+        // --- Utility Functions ---
+
+        /**
+         * Mengacak elemen dalam array.
+         * @param {Array} arr - Array yang akan diacak.
+         */
+        function shuffle(arr) {
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+        }
+
+        /**
+         * Mengacak array dan mengembalikan array baru (tidak mengubah array asli).
+         * @param {Array} arr - Array yang akan diacak.
+         * @returns {Array} Array baru yang sudah diacak.
+         */
+        function shuffleReturn(arr) {
+            const a = [...arr];
+            shuffle(a);
+            return a;
+        }
+
+        /**
+         * Menampilkan pesan toast.
+         * @param {string} message - Pesan yang akan ditampilkan.
+         * @param {string} type - Tipe pesan ('info' atau 'warn').
+         * @param {number} duration - Durasi pesan dalam ms.
+         */
+        let toastTimeout;
+        function showToast(message, type = 'info', duration = 2500) {
+            clearTimeout(toastTimeout);
+            toastMessageEl.textContent = message;
+            toastMessageEl.className = 'toast show';
+            if (type === 'warn') {
+                toastMessageEl.classList.add('warn');
+            } else {
+                toastMessageEl.classList.remove('warn');
+            }
+
+            toastTimeout = setTimeout(() => {
+                toastMessageEl.classList.remove('show');
+            }, duration);
+        }
+
+        /**
+         * Mengambil path audio untuk item Jepang.
+         * @param {Object} item - Objek item dari ITEMS.
+         * @returns {string} Path file audio.
+         */
+        function getAudioSrcFor(item) {
+            // Asumsi file audio ada di folder 'assets/audio/' dan bernama sesuai romaji
+            // Contoh: 'assets/audio/arigatou.mp3'
+            if (item && item.audio) {
+                return `assets/audio/${item.audio}.mp3`;
+            }
+            return ''; // Kembalikan string kosong jika tidak ada audio
+        }
+
+        /**
+         * Memutar audio dari item saat ini.
+         */
+        function playCurrentAudio() {
+            const currentItem = state.quizItems[state.currentQuestionIndex];
+            if (!currentItem || !currentItem.audio) {
+                console.warn("Tidak ada audio untuk item ini.");
+                return;
+            }
+            const audioSrc = getAudioSrcFor(currentItem);
+            if (audioSrc) {
+                // Hanya set src jika berbeda untuk menghindari reload yang tidak perlu
+                if (audioEl.src !== audioSrc) {
+                    audioEl.src = audioSrc;
+                    audioEl.load(); // Memastikan audio dimuat ulang jika src berubah
+                }
+                audioEl.currentTime = 0; // Mulai dari awal
+                audioEl.play().catch(e => console.warn("Audio play blocked:", e)); // Tangani jika browser memblokir autoplay
+            }
+        }
+
+        /**
+         * Memutar audio kana dari romaji.
+         * @param {string} romaji - Romaji dari kana yang akan diputar.
+         */
+        function playKanaAudioFromRomaji(romaji) {
+            const item = ITEMS.find(i => i.romaji === romaji);
+            if (item) {
+                const audioSrc = getAudioSrcFor(item);
+                if (audioSrc) {
+                    if (audioEl.src !== audioSrc) {
+                        audioEl.src = audioSrc;
+                        audioEl.load();
+                    }
+                    audioEl.currentTime = 0;
+                    audioEl.play().catch(e => console.warn("Audio play blocked:", e));
+                }
+            }
+        }
+
+        // --- Quiz Logic ---
+
+        /**
+         * Membangun dan menampilkan soal kuis.
+         * @param {Array} currentQuizItems - Daftar item yang akan digunakan untuk kuis.
+         */
+        function buildQuestion(currentQuizItems = state.quizItems) {
+            if (state.currentQuestionIndex >= currentQuizItems.length) {
+                showResult();
+                return;
+            }
+
+            state.isAnswered = false;
+            nextQuestionBtn.disabled = true;
+            playAudioBtn.disabled = false; // Aktifkan tombol audio
+
+            const currentItem = currentQuizItems[state.currentQuestionIndex];
+            questionJpEl.textContent = currentItem.jp;
+            questionRomajiEl.textContent = currentItem.romaji;
+            questionRomajiEl.classList.toggle('hidden', !state.showRomajiHint); // Toggle romaji hint
+
+            // Decoy generator
+            const correct = currentItem.id;
+            const sameCatPool = (state.cat === 'Semua') ? ITEMS : ITEMS.filter(i => i.cat === state.cat);
+            let decoys = shuffleReturn(Array.from(new Set(
+              sameCatPool.map(i => i.id).filter(v => v !== correct)
+            ))).slice(0, 3);
+
+            // fallback global jika kurang
+            if (decoys.length < 3) {
+              const global = shuffleReturn(Array.from(new Set(
+                ITEMS.map(i => i.id).filter(v => v !== correct && !decoys.includes(v))
+              )));
+              decoys = decoys.concat(global.slice(0, Math.max(0, 3 - decoys.length)));
+            }
+            
+            // Pastikan tidak ada duplikat dalam opsi akhir
+            let options = shuffleReturn([correct, ...decoys]);
+            options = Array.from(new Set(options)).slice(0, 4); // Ambil 4 opsi unik
+
+            // Jika masih kurang dari 4 opsi, tambahkan dari global (pastikan unik)
+            while (options.length < 4) {
+                const fallbackOption = ITEMS.map(i => i.id).find(id => !options.includes(id));
+                if (fallbackOption) {
+                    options.push(fallbackOption);
+                } else {
+                    break; // Tidak ada lagi opsi unik yang tersedia
+                }
+            }
+            shuffle(options); // Acak lagi setelah finalisasi
+
+            // Render options
+            mcButtons.forEach((button, index) => {
+                const optionText = options[index];
+                button.textContent = `${String.fromCharCode(65 + index)}. ${optionText}`; // A. <teks>, B. <teks>
+                button.dataset.value = optionText;
+                button.dataset.correct = (optionText === correct).toString(); // Simpan apakah ini jawaban benar
+                button.disabled = false;
+                button.classList.remove('correct', 'wrong');
+                button.setAttribute('aria-pressed', 'false');
+            });
+
+            updateProgress();
+        }
+
+        /**
+         * Menangani pilihan jawaban.
+         * @param {string} selectedValue - Nilai jawaban yang dipilih.
+         * @param {HTMLElement} selectedButton - Tombol yang dipilih.
+         */
+        function selectChoice(selectedValue, selectedButton) {
+            if (state.isAnswered) return; // Jangan izinkan memilih lagi jika sudah dijawab
+
+            state.isAnswered = true;
+            playAudioBtn.disabled = true; // Nonaktifkan tombol audio setelah menjawab
+
+            const currentItem = state.quizItems[state.currentQuestionIndex];
+            const isCorrect = (selectedValue === currentItem.id);
+
+            // Kunci semua opsi
+            mcButtons.forEach(button => {
+                button.disabled = true;
+                button.setAttribute('aria-pressed', 'false');
+                if (button.dataset.value === currentItem.id) {
+                    button.classList.add('correct'); // Selalu tandai jawaban yang benar
+                } else if (button === selectedButton && !isCorrect) {
+                    button.classList.add('wrong'); // Tandai pilihan user jika salah
+                }
+            });
+
+            if (isCorrect) {
+                state.score++;
+                showToast("Benar! 🎉", 'info');
+            } else {
+                state.wrongAnswers.push({
+                    jp: currentItem.jp,
+                    romaji: currentItem.romaji,
+                    correctId: currentItem.id,
+                    yourChoice: selectedValue,
+                    audio: currentItem.audio,
+                    cat: currentItem.cat // Simpan kategori untuk latih ulang
+                });
+                showToast(`Salah. Jawaban yang benar adalah "${currentItem.id}"`, 'warn');
+            }
+
+            nextQuestionBtn.disabled = false; // Aktifkan tombol Next
+            updateProgress();
+        }
+
+        /**
+         * Melanjutkan ke soal berikutnya.
+         */
+        function nextQuestion() {
+            state.currentQuestionIndex++;
+            buildQuestion(state.quizItems);
+        }
+
+        /**
+         * Melewati soal saat ini.
+         */
+        function skipQuestion() {
+            if (!state.isAnswered) { // Jika belum dijawab, tambahkan ke wrongAnswers
+                const currentItem = state.quizItems[state.currentQuestionIndex];
+                state.wrongAnswers.push({
+                    jp: currentItem.jp,
+                    romaji: currentItem.romaji,
+                    correctId: currentItem.id,
+                    yourChoice: "Dilewati",
+                    audio: currentItem.audio,
+                    cat: currentItem.cat
+                });
+                showToast("Soal dilewati.", 'info');
+            }
+            nextQuestion();
+        }
+
+        /**
+         * Memperbarui tampilan progres dan skor.
+         */
+        function updateProgress() {
+            const totalQuestions = state.totalQuestionsInQuiz; // Gunakan totalQuestionsInQuiz
+            const currentQNum = state.currentQuestionIndex + 1;
+
+            scoreDisplayEl.textContent = `Benar: ${state.score} / Salah: ${state.wrongAnswers.length}`;
+            questionCountEl.textContent = `${Math.min(currentQNum, totalQuestions)}/${totalQuestions}`;
+            
+            const progress = (currentQNum / totalQuestions) * 100;
+            progressBarFillEl.style.width = `${progress}%`;
+
+            // Update quiz info during game
+            quizInfoEl.textContent = `Soal ${Math.min(currentQNum, totalQuestions)}/${totalQuestions} — Kategori: ${state.cat}`;
+
+            // Nonaktifkan tombol skip jika sudah dijawab
+            skipQuestionBtn.disabled = state.isAnswered;
+        }
+
+        /**
+         * Menampilkan halaman hasil.
+         */
+        function showResult() {
+            quizPageEl.classList.add('hidden');
+            resultPageEl.classList.remove('hidden');
+            
+            const totalQuestions = state.totalQuestionsInQuiz;
+            const percentage = totalQuestions > 0 ? (state.score / totalQuestions) * 100 : 0;
+
+            resultSummaryEl.innerHTML = `Kategori: <b>${state.cat}</b> • Jumlah Soal: <b>${totalQuestions}</b>`;
+            finalScoreEl.textContent = `Skor: ${state.score} / ${totalQuestions}`;
+            scorePercentageEl.textContent = `${percentage.toFixed(0)}% Benar`;
+
+            wrongAnswersListEl.innerHTML = '';
+            if (state.wrongAnswers.length === 0) {
+                wrongAnswersListEl.innerHTML = '<p class="text-center" style="color: var(--muted);">Tidak ada jawaban salah. Bagus! 😊</p>';
+                retakeWrongBtn.disabled = true; // Nonaktifkan jika tidak ada yang salah
+            } else {
+                retakeWrongBtn.disabled = false;
+                state.wrongAnswers.forEach(item => {
+                    const div = document.createElement('div');
+                    div.className = 'wrong-item';
+                    div.innerHTML = `
+                        <div>
+                            <div class="wrong-item-jp">${item.jp}</div>
+                            <div class="wrong-item-id">→ ${item.correctId}</div>
+                            <div class="wrong-item-id" style="font-size: smaller;">(Pilihanmu: ${item.yourChoice})</div>
+                        </div>
+                        <button class="btn-audio wrong-item-audio-btn" aria-label="Putar audio ${item.jp}" data-audio-romaji="${item.audio}">
+                            <i class="fa-solid fa-volume-up"></i>
+                        </button>
+                    `;
+                    wrongAnswersListEl.appendChild(div);
+                });
+
+                // Bind audio buttons for wrong answers
+                wrongAnswersListEl.querySelectorAll('.wrong-item-audio-btn').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const audioRomaji = btn.dataset.audioRomaji;
+                        if (audioRomaji) {
+                            const tempItem = ITEMS.find(i => i.audio === audioRomaji);
+                            if (tempItem) {
+                                playKanaAudioFromRomaji(tempItem.romaji); // Menggunakan helper untuk memutar audio
+                            }
+                        }
+                    });
+                });
+            }
+        }
+
+        /**
+         * Memulai ulang kuis dengan hanya soal yang salah.
+         */
+        function retakeWrongOnly() {
+            if (state.wrongAnswers.length === 0) {
+                showToast("Tidak ada soal salah untuk dilatih ulang.", 'info');
+                return;
+            }
+            // Gunakan kategori yang sama dari state sebelumnya
+            const previousCategory = state.cat; 
+
+            state.quizItems = shuffleReturn(state.wrongAnswers.map(item => ({
+                jp: item.jp,
+                romaji: item.romaji,
+                id: item.correctId,
+                audio: item.audio,
+                cat: item.cat
+            })));
+            state.currentQuestionIndex = 0;
+            state.score = 0;
+            state.wrongAnswers = [];
+            state.totalQuestionsInQuiz = state.quizItems.length; // Jumlah soal adalah jumlah yang salah
+            
+            quizPageEl.classList.remove('hidden');
+            resultPageEl.classList.add('hidden');
+            buildQuestion(state.quizItems);
+            updateProgress();
+        }
+
+        /**
+         * Kembali ke pengaturan kuis.
+         */
+        function backToSettings() {
+            resultPageEl.classList.add('hidden');
+            quizSettingsEl.classList.remove('hidden');
+            // Reset state kuis
+            state.currentQuestionIndex = 0;
+            state.score = 0;
+            state.wrongAnswers = [];
+            state.quizItems = [];
+            state.totalQuestionsInQuiz = 0;
+            updateProgress(); // Untuk mereset tampilan progress bar
+        }
+
+        /**
+         * Memulai kuis dari pengaturan yang dipilih.
+         */
+        function startQuiz() {
+            let pool = (state.cat === 'Semua') ? ITEMS : ITEMS.filter(i => i.cat === state.cat);
+            
+            // Jika kategori kekurangan item, tampilkan info
+            if (pool.length < state.count) {
+                showToast(`Kategori "${state.cat}" hanya memiliki ${pool.length} item. Kuis akan berjalan dengan jumlah ini.`, 'info');
+                state.quizItems = shuffleReturn(pool);
+                state.totalQuestionsInQuiz = state.quizItems.length;
+            } else {
+                state.quizItems = shuffleReturn(pool).slice(0, state.count);
+                state.totalQuestionsInQuiz = state.count;
+            }
+
+            state.currentQuestionIndex = 0;
+            state.score = 0;
+            state.wrongAnswers = [];
+            state.isAnswered = false;
+
+            quizSettingsEl.classList.add('hidden');
+            quizPageEl.classList.remove('hidden');
+            buildQuestion(state.quizItems);
+            updateProgress();
+        }
+
+        /**
+         * Merender chip kategori.
+         * @param {string} activeCat - Kategori yang sedang aktif.
+         */
+        function renderCategoryChips(activeCat) {
+            categoryChipsEl.innerHTML = '';
+            CATEGORIES.forEach(cat => {
+                const chip = document.createElement('button');
+                chip.className = 'chip';
+                if (cat === activeCat) {
+                    chip.classList.add('active');
+                }
+                chip.textContent = cat;
+                chip.dataset.category = cat;
+                chip.addEventListener('click', () => {
+                    state.cat = cat;
+                    localStorage.setItem('quiz.cat', state.cat);
+                    renderCategoryChips(state.cat); // Re-render untuk update active state
+                    // Update jumlah soal yang tersedia untuk kategori ini
+                    updateAvailableQuestionCount();
+                });
+                categoryChipsEl.appendChild(chip);
+            });
+        }
+
+        /**
+         * Mengikat kontrol jumlah soal (slider dan input number).
+         */
+        function bindQuestionCountControls() {
+            questionCountSlider.value = state.count;
+            questionCountInput.value = state.count;
+            questionCountDisplay.textContent = state.count;
+
+            questionCountSlider.addEventListener('input', (e) => {
+                const value = parseInt(e.target.value, 10);
+                state.count = value;
+                localStorage.setItem('quiz.count', state.count);
+                questionCountInput.value = value;
+                questionCountDisplay.textContent = value;
+                updateAvailableQuestionCount(); // Update info jika jumlah soal melebihi yang tersedia
+            });
+
+            questionCountInput.addEventListener('input', (e) => {
+                let value = parseInt(e.target.value, 10);
+                if (isNaN(value) || value < 5) value = 5;
+                if (value > 50) value = 50;
+                value = Math.round(value / 5) * 5; // Bulatkan ke kelipatan 5
+                
+                state.count = value;
+                localStorage.setItem('quiz.count', state.count);
+                questionCountSlider.value = value;
+                questionCountInput.value = value;
+                questionCountDisplay.textContent = value;
+                updateAvailableQuestionCount(); // Update info jika jumlah soal melebihi yang tersedia
+            });
+
+            // Initial check for available questions
+            updateAvailableQuestionCount();
+        }
+
+        /**
+         * Memperbarui tampilan jumlah soal yang tersedia jika lebih kecil dari yang diminta.
+         */
+        function updateAvailableQuestionCount() {
+            const currentPool = (state.cat === 'Semua') ? ITEMS : ITEMS.filter(i => i.cat === state.cat);
+            const availableCount = currentPool.length;
+            const requestedCount = state.count;
+
+            const displayEl = document.getElementById('questionCountDisplay');
+            if (displayEl) {
+                if (requestedCount > availableCount) {
+                    displayEl.textContent = `${requestedCount} (terbatas ${availableCount} item)`;
+                    startQuizBtn.disabled = availableCount === 0; // Disable start if no items
+                } else {
+                    displayEl.textContent = requestedCount;
+                    startQuizBtn.disabled = false;
+                }
+            }
+        }
+
+
+        /**
+         * Mengikat event keyboard untuk navigasi dan pilihan.
+         */
+        function bindKeys() {
+            document.addEventListener('keydown', (e) => {
+                // Jangan aktifkan hotkey jika fokus ada di input atau textarea
+                const activeElementTag = document.activeElement?.tagName.toLowerCase();
+                const isInInput = activeElementTag === 'input' || activeElementTag === 'textarea';
+
+                if (quizSettingsEl.classList.contains('hidden') && quizPageEl.classList.contains('hidden') && !resultPageEl.classList.contains('hidden')) {
+                    // Jika di halaman hasil, hanya Enter yang berfungsi untuk aksi spesifik
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        if (!retakeWrongBtn.disabled) {
+                            retakeWrongBtn.click();
+                        } else {
+                            restartQuizBtn.click(); // Ini akan kembali ke pengaturan
+                        }
+                    }
+                    return;
+                }
+
+                if (quizPageEl.classList.contains('hidden') || isInInput) {
+                    // Jika di halaman pengaturan atau di input, jangan proses hotkey kuis
+                    return;
+                }
+
+                if (!state.isAnswered) {
+                    // Hotkey untuk pilihan ganda (A/B/C/D atau 1/2/3/4)
+                    const key = e.key.toLowerCase();
+                    let choiceIndex = -1;
+                    if (key === 'a' || key === '1') choiceIndex = 0;
+                    else if (key === 'b' || key === '2') choiceIndex = 1;
+                    else if (key === 'c' || key === '3') choiceIndex = 2;
+                    else if (key === 'd' || key === '4') choiceIndex = 3;
+
+                    if (choiceIndex !== -1 && mcButtons[choiceIndex]) {
+                        e.preventDefault();
+                        mcButtons[choiceIndex].click();
+                    }
+                } else {
+                    // Hotkey untuk Next (Enter) setelah soal dijawab
+                    if (e.key === 'Enter' && !nextQuestionBtn.disabled) {
+                        e.preventDefault();
+                        nextQuestionBtn.click();
+                    }
+                }
+
+                // Hotkey untuk Lewati (ArrowRight)
+                if (e.key === 'ArrowRight' && !skipQuestionBtn.disabled) {
+                    e.preventDefault();
+                    skipQuestionBtn.click();
+                }
+
+                // Hotkey untuk Audio (R)
+                if (e.key.toLowerCase() === 'r' && !playAudioBtn.disabled) {
+                    e.preventDefault();
+                    playAudioBtn.click();
+                }
+            });
+        }
+
+        // --- Event Listeners ---
+        playAudioBtn.addEventListener('click', playCurrentAudio);
+        nextQuestionBtn.addEventListener('click', nextQuestion);
+        skipQuestionBtn.addEventListener('click', skipQuestion);
+        retakeWrongBtn.addEventListener('click', retakeWrongOnly);
+        restartQuizBtn.addEventListener('click', backToSettings); // Kembali ke pengaturan
+
+        startQuizBtn.addEventListener('click', startQuiz);
+
+        mcButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                selectChoice(button.dataset.value, button);
+            });
+        });
+
+        toggleRomajiHintEl.addEventListener('change', (e) => {
+            state.showRomajiHint = e.target.checked;
+            questionRomajiEl.classList.toggle('hidden', !state.showRomajiHint);
+        });
+
+        // Initial Setup
+        document.addEventListener('DOMContentLoaded', () => {
+            // Restore romaji hint state from localStorage if available
+            const savedRomajiHint = localStorage.getItem('quiz.showRomajiHint');
+            if (savedRomajiHint !== null) {
+                state.showRomajiHint = JSON.parse(savedRomajiHint);
+                toggleRomajiHintEl.checked = state.showRomajiHint;
+                questionRomajiEl.classList.toggle('hidden', !state.showRomajiHint);
+            }
+
+            renderCategoryChips(state.cat);
+            bindQuestionCountControls();
+            bindKeys();
+            // Tampilkan pengaturan kuis di awal
+            quizSettingsEl.classList.remove('hidden');
+            quizPageEl.classList.add('hidden');
+            resultPageEl.classList.add('hidden');
+        });
+
+        // Simpan status romaji hint saat berubah
+        toggleRomajiHintEl.addEventListener('change', (e) => {
+            state.showRomajiHint = e.target.checked;
+            localStorage.setItem('quiz.showRomajiHint', JSON.stringify(state.showRomajiHint));
+            questionRomajiEl.classList.toggle('hidden', !state.showRomajiHint);
+        });
+
+        // --- SIDEBAR JS ---
+        (() => {
+            const sidebar  = document.getElementById('sidebar');
+            const toggle   = document.getElementById('sidebarToggle');
+            const closeBtn = document.getElementById('closeSidebar');
+
+            function open(){ sidebar.classList.add('is-open'); document.body.classList.add('sidebar-open'); }
+            function close(){ sidebar.classList.remove('is-open'); document.body.classList.remove('sidebar-open'); }
+
+            toggle?.addEventListener('click', open);
+            closeBtn?.addEventListener('click', close);
+
+            // Klik luar = tutup (mobile)
+            document.addEventListener('click', (e)=>{
+                if(!sidebar.classList.contains('is-open')) return;
+                const hit = sidebar.contains(e.target) || toggle.contains(e.target);
+                if(!hit) close();
+            });
+            // ESC = tutup
+            document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') close(); });
+
+            // Tandai link aktif sesuai pathname
+            document.querySelectorAll('#sidebar a').forEach(a=>{
+                const href = a.getAttribute('href');
+                // Use endsWith for robustness with different base paths
+                if(href && location.pathname.endsWith(href)) {
+                    a.classList.add('active');
+                } else {
+                    a.classList.remove('active'); // Ensure other links are not active
+                }
+            });
+        })();
+    </script>
+</body>
+</html>
+    

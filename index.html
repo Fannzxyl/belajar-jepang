@@ -44,6 +44,11 @@
             --warnBg:#ffe5e5;
             --iconColor: var(--muted);
             --transition-duration: 0.2s; /* New: Default transition duration */
+
+            /* UI/UX Mobile-First: Container & spacing */
+            --space: 12px;
+            --radius-clamp: 14px; /* Renamed to avoid conflict with --radius */
+            --maxw: 760px; /* pas buat 720p */
         }
         [data-theme="hc"]{
             --bg:#0a0f1a; --panel:#0f1626; --soft:#0c1220; --ink:#e6efff; --muted:#9fb0cc;
@@ -83,10 +88,12 @@
         html { height: auto; }
         body {
             min-height: 100svh;
-            margin:0;font-family:'Inter', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;background:
-            radial-gradient(900px 420px at -10% -20%, rgba(122,108,255,.10), transparent),
-            radial-gradient(900px 420px at 110% -30%, rgba(22,198,161,.12), transparent),
-            var(--bg);color:var(--ink);
+            margin:0;
+            font-family:'Inter', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+            background: radial-gradient(900px 420px at -10% -20%, rgba(122,108,255,.10), transparent),
+                        radial-gradient(900px 420px at 110% -30%, rgba(22,198,161,.12), transparent),
+                        var(--bg);
+            color:var(--ink);
             /* PATCH: Smooth transitions for overall UI */
             transition: background-color var(--transition-duration) ease-out, color var(--transition-duration) ease-out;
             /* PATCH 6: Hilangkan overflow horizontal global */
@@ -103,6 +110,13 @@
             padding: 16px;
             padding-left: calc(16px + env(safe-area-inset-left));
             padding-right: calc(16px + env(safe-area-inset-right));
+        }
+        /* UI/UX Mobile-First: Container */
+        .container{ 
+            width:100%; 
+            max-width:var(--maxw); 
+            margin-inline:auto; 
+            padding: clamp(10px, 2vw, 16px); 
         }
         header{position:sticky;top:0;z-index:30;background:linear-gradient(180deg, rgba(255,255,255,.92), rgba(255,255,255,.72));backdrop-filter: blur(8px);border-bottom:1px solid var(--border); padding-top:env(safe-area-inset-top);
         transition: background var(--transition-duration) ease-out, backdrop-filter var(--transition-duration) ease-out, border-bottom-color var(--transition-duration) ease-out;}
@@ -190,8 +204,16 @@
             .wrap{max-width: 1200px;}
         }
 
-        .card{grid-column:span 12;background:var(--panel);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px;border:1px solid var(--border);
-        transition: background-color var(--transition-duration) ease-out, border-color var(--transition-duration) ease-out, box-shadow var(--transition-duration) ease-out;}
+        /* UI/UX Mobile-First: Card */
+        .card{ 
+            grid-column:span 12;
+            background:var(--panel);
+            border-radius:var(--radius-clamp); /* Use new radius clamp variable */
+            box-shadow: 0 4px 16px rgba(0,0,0,.2); /* Per instruction */
+            padding: clamp(12px, 2vw, 16px); /* Per instruction */
+            border:1px solid var(--border);
+            transition: background-color var(--transition-duration) ease-out, border-color var(--transition-duration) ease-out, box-shadow var(--transition-duration) ease-out;
+        }
         .card h2{font-size:16px;margin:0 0 10px 0; display: flex; align-items: center; gap: 8px;}
         .card h3{font-size:14px; margin: 16px 0 8px 0; color: var(--muted);}
         .card h2 .icon { color: var(--iconColor); transition: color var(--transition-duration) ease-out;}
@@ -351,6 +373,7 @@
             display:grid;
             grid-template-columns: 1fr; /* tumpuk di HP */
             gap:8px;
+            margin-top: var(--space); /* Add margin top for spacing */
         }
         @media (min-width:520px){
             /* label kecil | input angka | chips */
@@ -413,6 +436,24 @@
 
         /* --- END NEW RESPONSIVE TEST CONTROLS --- */
 
+        /* UI/UX Mobile-First: Grid MC rapi & tombol konsisten */
+        .mc-grid{
+            display:grid; 
+            gap: clamp(10px, 2vw, 14px);
+            grid-template-columns: 1fr 1fr; /* 2 kolom di HP */
+        }
+        @media (min-width: 860px){ 
+            .mc-grid{ grid-template-columns: repeat(4, 1fr); } 
+        }
+        .mc-btn{
+            display:flex; align-items:center; justify-content:center;
+            min-height: 52px; padding: 10px;
+            border-radius: 12px; border: 1px solid #2a2a2a;
+            background:#181818; color:#fff; text-align:center;
+            line-height:1.2; font-size: clamp(14px, 3.8vw, 16px);
+        }
+        .mc-btn[aria-pressed="true"]{ outline:2px solid #6b8bff; }
+
 
         .center{text-align:center}
         .small{font-size:12px;color:var(--muted)}
@@ -453,9 +494,10 @@
         .particle{position:absolute;width:8px;height:8px;border-radius:2px;opacity:.9;animation:pop 900ms ease forwards}
         @keyframes pop{from{transform:translate(0,0) scale(1)} to{transform:translate(var(--dx), var(--dy)) rotate(360deg) scale(0.8);opacity:0}}
 
-        .optwrap{display:grid;gap:8px;grid-template-columns:repeat(2,1fr);max-width:520px;margin:0 auto}
-        @media(min-width:560px){.optwrap{grid-template-columns:repeat(4,1fr)}}
-        .optwrap .btn{font-size:16px}
+        /* UI/UX Mobile-First: Ganti optwrap dengan mc-grid */
+        .optwrap{ display: grid; gap: clamp(10px, 2vw, 14px); grid-template-columns: 1fr 1fr; max-width: 520px; margin: 0 auto; }
+        @media(min-width:560px){ .optwrap{ grid-template-columns: repeat(4, 1fr); } }
+        .optwrap .btn{ font-size: clamp(14px, 3.8vw, 16px); min-height: 52px; border-radius: 12px; } /* Consistent with .mc-btn */
 
         .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 
@@ -477,7 +519,7 @@
             *{animation-duration:0.01ms !important; animation-iteration-count:1 !important; transition-duration:0.01ms !important; scroll-behavior:auto !important}
             #qKana.correct-answer, #qKana.wrong-answer, #streakCounter.grow { animation:none !important }
             .toast { transition: none !important; }
-            /* PATCH: Lite mode will also disable animations */
+            /* PATCH: Lite Mode will also disable animations */
             [data-lite="1"] * {animation-duration:0.01ms !important; animation-iteration-count:1 !important; transition-duration:0.01ms !important; scroll-behavior:auto !important}
             [data-lite="1"] #qKana.correct-answer, [data-lite="1"] #qKana.wrong-answer, [data-lite="1"] .toast { transition: none !important; }
         }
@@ -727,14 +769,25 @@
         }
 
         /* Grid opsi MC */
-        @media (max-width: 360px) {
-            .optwrap {
-                grid-template-columns: 1fr 1fr;
-                gap: 8px;
-            }
-            .optwrap .btn {
-                flex: 1 1 auto; /* Ensure buttons in MC wrap correctly */
-            }
+        /* UI/UX Mobile-First: .mc-grid menggantikan .optwrap */
+        .mc-grid{
+            display:grid; 
+            gap: clamp(10px, 2vw, 14px);
+            grid-template-columns: 1fr 1fr; /* 2 kolom di HP */
+            max-width: 520px; /* Tetap pertahankan agar tidak terlalu lebar di desktop */
+            margin: 0 auto; /* Tengah */
+        }
+        @media (min-width: 560px){ /* Mengikuti breakpoint lama .optwrap */
+            .mc-grid{ grid-template-columns: repeat(4, 1fr); } 
+        }
+        .mc-grid .btn{
+            font-size: clamp(14px, 3.8vw, 16px); 
+            min-height: 52px; 
+            border-radius: 12px;
+            /* Tambahan: Pastikan teks MC tidak terpotong */
+            white-space: normal;
+            word-break: break-word;
+            padding: 8px 10px; /* Beri sedikit padding vertikal */
         }
 
         /* Card/section padding */
@@ -764,9 +817,42 @@
         [data-lite="1"] #streakCounter.grow {
             animation: none !important;
         }
+
+        /* UI/UX Mobile-First: Soal + audio tersusun */
+        .question{
+            display:flex; align-items:center; justify-content:center; /* Center the question and audio button */
+            gap: 12px; padding: 8px 0;
+            flex-wrap: wrap; /* Allow wrapping on small screens */
+        }
+        .q-char{ 
+            font-size: clamp(36px, 10vw, 56px); /* Per instruction */
+            font-weight:700; 
+            line-height:1.2; /* Ensure line height is consistent */
+            text-align: center; /* Center text */
+            flex-grow: 1; /* Allow it to take available space */
+            min-width: 0; /* Prevent overflow */
+        }
+        .btn-audio-current{
+            width:44px; height:44px; border-radius:50%;
+            display:grid; place-items:center; border:1px solid #2a2a2a; background:#181818;
+            flex-shrink: 0; /* Prevent shrinking */
+        }
+
+        /* UI/UX Mobile-First: Navbar bawah yang sticky (opsional) */
+        .bottom-bar{
+            position: sticky; bottom: 0; left: 0; right: 0;
+            padding: 10px; background: #0e0e0eE6; backdrop-filter: blur(6px);
+            display:flex; gap:10px; justify-content: space-between;
+            z-index: 40; /* Above main content, below modals */
+        }
+        .bottom-bar .btn{ flex:1; min-height:46px; border-radius:12px; }
+
     </style>
 </head>
 <body>
+    <!-- Audio element untuk playKanaAudio -->
+    <audio id="audio" preload="auto" style="display: none;"></audio>
+
     <!-- Sidebar Toggle Button -->
     <button id="sidebarToggle" class="sidebar-toggle-btn" aria-label="Toggle Sidebar">
         <i class="fa-solid fa-bars"></i>
@@ -782,11 +868,12 @@
         </div>
         <hr style="border: none; border-top: 1px solid var(--border); width: 100%;">
         <ul class="menu">
-            <li><a href="index.html">� Latihan</a></li>
+            <li><a href="index.html">🏡 Latihan</a></li>
             <li><a href="index2.html">🗂️ Flashcard</a></li>
             <li><a href="index3.html">🧮 Tabel Kana</a></li>
             <li><a href="index4.html">🗒️ Kosakata</a></li>
             <li><a href="index5.html">💬 Ungkapan</a></li>
+            <li><a href="index7.html" onclick="closeSidebar()">🧠 Tebak Arti</a></li> <!-- New: Tebak Arti Link -->
             <li><a href="index6.html">✍️ Menulis</a></li>
         </ul>
     </nav>
@@ -834,6 +921,8 @@
                     <a href="index3.html" class="btn ghost"><i class="fa-solid fa-table"></i> Tabel Kana</a>
                     <a href="index4.html" class="btn ghost"><i class="fa-solid fa-book-open"></i> Kosakata</a>
                     <a href="index5.html" class="btn ghost"><i class="fa-solid fa-comments"></i> Ungkapan</a>
+                    <a href="index7.html" class="btn ghost"><i class="fa-solid fa-brain"></i> Tebak Arti</a> <!-- New: Tebak Arti Link -->
+                    <a href="index6.html" class="btn ghost"><i class="fa-solid fa-pen"></i> Menulis</a>
                 </div>
             </nav>
         </div>
@@ -842,6 +931,16 @@
     <main class="wrap" id="main" style="display: none;">
         <!-- ==== LATIHAN (gabungan: Belajar + Tes + Pomodoro + Tracker) ==== -->
         <section id="page-latihan" data-page>
+            <!-- CTA Card for Tebak Arti -->
+            <div class="card" style="grid-column:span 12;">
+                <h2><i class="fa-solid fa-brain icon"></i> Tebak Arti (JP→ID)</h2>
+                <div class="small">Kuis arti Jepang → Indonesia (A–D). Pilih kategori & jumlah soal.</div>
+                <div class="row" style="justify-content:flex-start; margin-top: var(--space);">
+                    <a class="btn primary" href="index7.html"><i class="fa-solid fa-play"></i> Mulai Tebak Arti</a>
+                    <a class="btn ghost" href="index7.html#kategori"><i class="fa-solid fa-list"></i> Pilih Kategori</a>
+                </div>
+            </div>
+
             <!-- Subbagian A: Belajar rentang kana -->
             <div id="latihan-belajar" class="grid">
                 <div class="card" style="grid-column: span 12;">
@@ -882,6 +981,7 @@
                             <button class="chip" data-preset="base-all" type="button">Dasar semua</button>
                             <button class="chip" data-preset="dakuon-all" type="button">Dakuon</button>
                             <button class="chip" data-preset="youon-all" type="button">Youon</button>
+                            <button class="chip" data-preset="jft-drill" type="button">JFT Drill</button> <!-- Preset JFT Drill -->
                             <!-- Original chips will be added by JS renderAll -> buildSubsetChips() -->
                         </div>
                         <select id="testSet" class="input" aria-label="Pilih set tes">
@@ -941,21 +1041,23 @@
                     <div class="progress" aria-label="Progress Tes" role="progressbar" aria-valuemin="0" aria-valuemax="100"><div id="bar" class="bar"></div></div>
                     <div class="spacer"></div>
                     <div id="testArea" class="center" hidden>
-                        <div id="promptWrap" style="display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap">
-                            <div id="qKana" style="font-size:64px;line-height:1.1;margin:6px 0">あ</div>
-                            <button class="btn ghost" id="btnReplayAudio" type="button" title="Putar lagi audio" aria-label="Putar ulang audio"><i class="fa-solid fa-volume-up"></i></button>
+                        <!-- UI/UX Mobile-First: Soal + audio tersusun -->
+                        <div id="promptWrap" class="question">
+                            <div id="qKana" class="q-char">あ</div>
+                            <button class="btn-audio-current" type="button" title="Putar lagi audio" aria-label="Putar ulang audio" data-kana=""><i class="fa-solid fa-volume-up"></i></button>
                         </div>
                         <div id="typeWrap" style="max-width:520px;margin:0 auto">
                             <input id="ans" class="input" placeholder="Ketik jawaban kamu di sini…" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" inputmode="text" aria-label="Jawaban" />
                             <div class="spacer"></div>
                             <button class="btn" id="btnCheck" type="button"><i class="fa-solid fa-check"></i> Cek (Enter)</button>
                         </div>
-                        <div id="mcWrap" class="optwrap" hidden>
-                            <button class="btn opt" id="optA" aria-label="Pilihan A" title="Pilihan A" type="button">A</button>
-                            <button class="btn opt" id="optB" aria-label="Pilihan B" title="Pilihan B" type="button">B</button>
-                            <button class="btn opt" id="optC" aria-label="Pilihan C" title="Pilihan C" type="button">C</button>
-                            <button class="btn opt" id="optD" aria-label="Pilihan D" title="Pilihan D" type="button">D</button>
-                            <div class="small" style="grid-column: span 4; text-align: center; margin-top: 4px;">Ketuk atau tekan A/B/C/D</div>
+                        <!-- UI/UX Mobile-First: Menggunakan class mc-grid -->
+                        <div id="mcWrap" class="mc-grid" hidden>
+                            <button class="btn opt mc-btn" id="optA" aria-label="Pilihan A" title="Pilihan A" type="button">A</button>
+                            <button class="btn opt mc-btn" id="optB" aria-label="Pilihan B" title="Pilihan B" type="button">B</button>
+                            <button class="btn opt mc-btn" id="optC" aria-label="Pilihan C" title="Pilihan C" type="button">C</button>
+                            <button class="btn opt mc-btn" id="optD" aria-label="Pilihan D" title="Pilihan D" type="button">D</button>
+                            <div class="small" style="grid-column: span 2; text-align: center; margin-top: 4px;">Ketuk atau tekan A/B/C/D</div>
                         </div>
                         <div class="spacer"></div>
                         <div class="small" id="testInfo" aria-live="polite">
@@ -1099,6 +1201,13 @@
         </div>
     </div>
 
+    <!-- UI/UX Mobile-First: Bottom Bar (Opsional) -->
+    <!-- <div class="bottom-bar">
+        <button class="btn primary">Beranda</button>
+        <button class="btn">Tes Cepat</button>
+        <button class="btn">Progres</button>
+    </div> -->
+
     <script>
         // --- Helpers aman ---
         const isNode = el => el && (el.nodeType === 1 || el.nodeType === 9); // ELEMENT_NODE atau DOCUMENT_NODE
@@ -1195,6 +1304,7 @@
             lite_mode_on: 'Mode Ringan AKTIF!',
             lite_mode_off: 'Mode Ringan NONAKTIF!',
             all_kana_label: 'Semua Kana',
+            jft_drill_label: 'JFT Drill',
         };
 
         const t = (key, ...args) => {
@@ -1534,9 +1644,98 @@
             return -1;
         };
 
-        // --- TTS minimal aman untuk mobile ---
+        // --- Audio: utilitas playKanaAudio (langsung ke <audio> element) ---
+        function getAudioSrcForKana(kana) {
+            // Placeholder: Implementasi ini harus sesuai dengan aset audio Anda
+            // Contoh: './audio/hira/a.mp3'
+            // Anda perlu memiliki folder 'audio' dengan subfolder 'hira' dan 'kata',
+            // serta file audio untuk setiap karakter.
+            const set = state.test.set; // 'hira' atau 'kata'
+            if (!kana) return '';
+
+            // Map kana ke romaji untuk mendapatkan nama file
+            let romaji = '';
+            for (let [key, value] of HIRA_MAP) {
+                if (value === kana) {
+                    romaji = key;
+                    break;
+                }
+            }
+            if (!romaji) {
+                for (let [key, value] of KATA_MAP) {
+                    if (value === kana) {
+                        romaji = key;
+                        break;
+                    }
+                }
+            }
+            if (!romaji) return ''; // Tidak ditemukan romaji yang cocok
+
+            // Sesuaikan path file audio Anda di sini
+            // Contoh: './audio/hira/a.mp3'
+            // Jika ada dakuon/youon yang punya file khusus, sesuaikan
+            let audioFileName = romaji;
+            if (romaji === 'dji' && set === 'hira') audioFileName = 'dji_hira'; // Contoh penamaan khusus
+            if (romaji === 'dzu' && set === 'hira') audioFileName = 'dzu_hira';
+            if (romaji === 'dji' && set === 'kata') audioFileName = 'dji_kata';
+            if (romaji === 'dzu' && set === 'kata') audioFileName = 'dzu_kata';
+
+            return `./audio/${set}/${audioFileName}.mp3`; // Sesuaikan path jika berbeda
+        }
+
+        function playKanaAudio(kana) {
+            if (!kana) return;
+            const audioEl = document.getElementById('audio') || (() => {
+                const a = document.createElement('audio'); a.id = 'audio'; document.body.appendChild(a); return a;
+            })();
+
+            const src = getAudioSrcForKana(kana);
+            if (!src) return; 
+            if (audioEl.src !== src) {
+                audioEl.src = src;
+                audioEl.load(); // Memastikan audio dimuat ulang jika src berubah
+            }
+            audioEl.currentTime = 0;
+            audioEl.play().catch(()=>{ /* biarkan silent jika browser blokir sebelum user interaction */ });
+        }
+
+        // --- Audio: Dipanggil tombol audio di UI: ---
+        function bindAudioButtonToCurrent() {
+            const btn = document.querySelector('.btn-audio-current');
+            if (!btn) return;
+
+            // Hapus event listener sebelumnya untuk menghindari duplikasi
+            // (Ini penting jika bindAudioButtonToCurrent dipanggil berulang)
+            const oldClickHandler = btn.onclick;
+            if (oldClickHandler) {
+                btn.removeEventListener('click', oldClickHandler);
+            }
+
+            btn.onclick = (e) => {
+                e.preventDefault();
+                // Pastikan ambil kana soal saat ini:
+                const kana = (window.currentItem && window.currentItem.char) 
+                          || (window.currentItem && window.currentItem.kanaSeq && window.currentItem.kanaSeq[0]) 
+                          || btn.dataset.kana 
+                          || '';
+                playKanaAudio(kana);
+            };
+
+            // Set data-kana di tombol saat ini untuk fallback
+            const currentKana = (window.currentItem && window.currentItem.char) 
+                               || (window.currentItem && window.currentItem.kanaSeq && window.currentItem.kanaSeq[0]) 
+                               || '';
+            btn.dataset.kana = currentKana;
+        }
+
+
+        // --- TTS minimal aman untuk mobile (tetap dipertahankan untuk fleksibilitas) ---
         function ttsSpeak(text, lang = 'ja-JP') {
             if (!text || !('speechSynthesis' in window)) return;
+            // Taat toggle suara
+            const audioOn = qs('#audToggle')?.checked ?? true;
+            if (!audioOn) return;
+
             try {
                 const u = new SpeechSynthesisUtterance(text);
                 u.lang = lang; u.rate = 0.9; u.pitch = 1.0;
@@ -1555,9 +1754,7 @@
             const romaji = (cur.romaji || cur.romajiSeq || '').trim();
 
             const isR2K = /r2k/i.test(qType);
-            const isAudio = /audio/i.test(qType);
-            const isK2R = /k2r/i.test(qType);
-
+            
             if (isR2K) return romaji || kana;         // romaji → kana: bacakan romaji
             return kana || romaji || ''; // default: bacakan kana
         }
@@ -1672,25 +1869,32 @@
             state.test.rangeMode = mode; // Save current mode
             save(); // Save state immediately when rangeMode changes
 
-            if(mode === 'range'){
+            // Disable/hide range controls if a special subset (all, confusion, srs_due) is active
+            const isSpecialSubsetActive = (state.test.subset === 'all' || state.test.subset === 'confusion' || state.test.subset === 'srs_due');
+
+            if (isSpecialSubsetActive) {
+                setEnabled(elRangeMode, false);
+                setEnabled(elFrom, false); 
+                setEnabled(elTo, false);
+                if (elToWrap) elToWrap.hidden = true; 
+                setEnabled(elSingle, false); 
+            } else if(mode === 'range'){
+                setEnabled(elRangeMode, true);
                 setEnabled(elFrom, true); 
                 setEnabled(elTo, true);
                 if (elToWrap) elToWrap.hidden = false; // Show the wrapper for elTo
                 setEnabled(elSingle, false); 
             }else if(mode === 'single'){
+                setEnabled(elRangeMode, true);
                 setEnabled(elFrom, false); 
                 setEnabled(elTo, false);
                 if (elToWrap) elToWrap.hidden = true; // Hide the wrapper for elTo
                 setEnabled(elSingle, true); 
-            } else { // Fallback for 'all' or other modes (e.g., when a preset chip is active)
-                setEnabled(elFrom, false);
-                setEnabled(elTo, false);
-                if (elToWrap) elToToWrap.hidden = true;
-                setEnabled(elSingle, false);
             }
             ensureValidRange(); // Ensure range is valid after UI update
             updateTestInfo(); // Update test info text
         }
+
 
         function ensureValidRange() {
             if (!elFrom || !elTo || elFrom.hidden || elTo.hidden) return; // Only validate if range is visible
@@ -1730,6 +1934,19 @@
 
         // Ambil subset dari UI
         function getChosenSubset(){
+            // Prioritas 1: subset dari chip (mis. 'all', 'confusion', 'srs_due', atau group key)
+            if (state.test.subset === 'all') {
+                return ALL_ROMAJI;
+            } else if (state.test.subset === 'confusion') {
+                return _confuseTopPairs(state.test.set);
+            } else if (state.test.subset === 'srs_due') {
+                return getDueReviewItems(state.test.set).map(item => item.romaji);
+            } else if (GROUPS.some(g => g.key === state.test.subset)) { // Jika subset adalah group key
+                const grp = GROUPS.find(g => g.key === state.test.subset);
+                return romajiFromGroup(grp);
+            }
+
+            // Prioritas 2: subset dari range/single group selector jika tidak ada chip khusus aktif
             if (!elRangeMode) return null; // Ensure element exists
 
             const mode = elRangeMode.value; // 'range' | 'single'
@@ -1741,7 +1958,7 @@
                 if(i1 < 0 || i2 < 0) return null;
                 const lo = Math.min(i1,i2), hi = Math.max(i1,i2);
                 let pool = [];
-                for(let i=lo;i<=hi;i++){ pool = pool = pool.concat(romajiFromGroup(GROUPS[i])); }
+                for(let i=lo;i<=hi;i++){ pool = pool.concat(romajiFromGroup(GROUPS[i])); }
                 return pool;
             }
 
@@ -1781,7 +1998,7 @@
             allKanaChip.textContent = t('all_kana_label');
             allKanaChip.onclick = () => { 
                 state.test.subset = 'all'; 
-                state.test.rangeMode = 'range'; // Reset to range, then hide via updateRangeUI
+                // state.test.rangeMode = 'range'; // Reset to range, then hide via updateRangeUI
                 save(); 
                 buildSubsetChips(); 
                 updateRangeUI(); // This will effectively hide range selects for 'all' or 'confusion' etc.
@@ -1793,7 +2010,8 @@
                 const button = document.createElement('button');
                 button.type = 'button';
                 button.className = 'chip';
-                button.textContent = key.replace(/-/g, ' → '); // Display preset key nicely
+                // Jika preset JFT Drill, gunakan label yang lebih deskriptif
+                button.textContent = key === 'jft-drill' ? t('jft_drill_label') : key.replace(/-/g, ' → ');
                 button.dataset.preset = key;
                 button.onclick = () => applyPreset(key);
                 frag.appendChild(button);
@@ -1807,7 +2025,7 @@
             confuseChip.textContent = t('confuse_train_label');
             confuseChip.onclick = () => { 
                 state.test.subset = 'confusion'; 
-                state.test.rangeMode = 'range'; // Reset to range, then hide via updateRangeUI
+                // state.test.rangeMode = 'range'; // Reset to range, then hide via updateRangeUI
                 save(); 
                 buildSubsetChips(); 
                 updateRangeUI(); 
@@ -1822,7 +2040,7 @@
             reviewChip.textContent = t('review_today_label');
             reviewChip.onclick = () => { 
                 state.test.subset = 'srs_due'; 
-                state.test.rangeMode = 'range'; // Reset to range, then hide via updateRangeUI
+                // state.test.rangeMode = 'range'; // Reset to range, then hide via updateRangeUI
                 save(); 
                 buildSubsetChips(); 
                 updateRangeUI(); 
@@ -1851,7 +2069,7 @@
                 labels = _confuseTopPairs(state.test.set);
                 if (labels.length === 0) {
                     showCustomAlert('Tidak ada pasangan tertukar yang cukup untuk dilatih.');
-                    // P2.7: Guard for empty pool
+                    // Guard for empty pool
                     qs('#btnStart').disabled = true;
                     return;
                 }
@@ -1859,7 +2077,7 @@
                 const dueItems = getDueReviewItems(state.test.set);
                 if (dueItems.length === 0) {
                     showCustomAlert(t('no_due_today'));
-                    // P2.7: Guard for empty pool
+                    // Guard for empty pool
                     qs('#btnStart').disabled = true;
                     return;
                 }
@@ -1874,7 +2092,7 @@
 
             if(!uniquePoolItems.length){ 
                 showCustomAlert('Pilih subset atau rentang yang valid.'); 
-                // P2.7: Guard for empty pool
+                // Guard for empty pool
                 qs('#btnStart').disabled = true;
                 return; 
             }
@@ -1921,7 +2139,7 @@
             const answerModeSelect = qs('#answerMode');
             const qTypeSelect = qs('#qType');
             const sylPerItemControl = qs('#sylPerItemControl');
-            const btnReplayAudio = qs('#btnReplayAudio');
+            const btnReplayAudio = qs('#btnReplayAudio'); // Audio button (now handled by .btn-audio-current)
 
             const mode = answerModeSelect?.value; // Use optional chaining
             const qType = qTypeSelect?.value; // Use optional chaining
@@ -1944,12 +2162,17 @@
                 sylPerItemControl.hidden = !(qType === 'seq' || qType === 'kseq');
             }
 
-            // Atur visibilitas dan disabled state untuk #btnReplayAudio
-            // PATCH: Tombol replay audio hanya muncul dan aktif untuk tipe listening
-            if (btnReplayAudio) {
-                const isAudio = AUDIO_TYPES.has(qType);
-                btnReplayAudio.hidden = !isAudio;
-                btnReplayAudio.disabled = !isAudio;
+            // Atur visibilitas dan disabled state untuk tombol audio di .btn-audio-current
+            // Note: The audio button is now part of the .question flex container.
+            // We just control its data-kana and visibility via bindAudioButtonToCurrent and its parent logic.
+            const audioButton = qs('.btn-audio-current');
+            if (audioButton) {
+                // The visibility is handled by the question content itself now,
+                // and bindAudioButtonToCurrent will ensure it plays the correct sound.
+                // We ensure it's generally visible, and only hide it if explicitly not an audio type
+                const isAudioQType = qType.startsWith('audio');
+                audioButton.hidden = !isAudioQType;
+                audioButton.disabled = !isAudioQType;
             }
 
             // Tampilkan wrapper yang sesuai
@@ -2004,67 +2227,68 @@
             if(state.test.total>=state.test.target){ finishTest(); return; }
             if(!testPool.length){ 
                 qs('#qKana').textContent='Selesai!'; 
-                // P2.7: Tampilkan empty state jika testPool kosong
+                // Tampilkan empty state jika testPool kosong
                 if (qs('#testArea')) qs('#testArea').hidden = true;
                 if (qs('#testEmptyState')) qs('#testEmptyState').hidden = false;
                 return; 
             } 
             
-            currentItem = testPool[qIndex % testPool.length]; 
-            const qType=state.test.qType; 
+            // Perbaikan spread object di currentItem
+            const newCurrentItem = testPool[qIndex % testPool.length];
+            const qType = state.test.qType;
+
+            if (qType === 'seq') {
+                const seqData = makeSequence(buildPoolLabels(), state.test.set, state.test.sylPerItem);
+                currentItem = { ...newCurrentItem, romaji: seqData.romaji, char: seqData.kana, qType: qType };
+            } else if (qType === 'kseq') {
+                const seqData = makeKanaSequence(buildPoolLabels(), state.test.set, state.test.sylPerItem);
+                currentItem = { ...newCurrentItem, kanaSeq: seqData.kana, romajiSeq: seqData.romaji, qType: qType };
+            } else {
+                currentItem = { ...newCurrentItem, qType: qType }; // Untuk soal single char
+            }
+
             const ansEl=qs('#ans'); 
             if(ansEl) ansEl.value='';
             
-            // ---- JANGAN auto-play audio di sini ----
-            // Tampilkan tombol 🔊 hanya untuk tipe listening
-            const qTypeVal = qs('#qType')?.value || state?.test?.qType;
-            const replayBtn = qs('#btnReplayAudio'); // FIX: deklarasi lokal agar tidak undefined
-            if (replayBtn) {
-                const isAudio = AUDIO_TYPES.has(qTypeVal);
-                replayBtn.hidden = !isAudio;
-                replayBtn.disabled = !isAudio;
-            }
+            const qKanaElement = qs('#qKana');
+            if (qKanaElement) qKanaElement.classList.remove('correct-answer', 'wrong-answer');
+
 
             if (qType.startsWith('audio')) {
-                if (qs('#qKana')) {
-                    qs('#qKana').textContent='Dengar & jawab';
-                    qs('#qKana').style.fontSize='24px';
+                if (qKanaElement) {
+                    qKanaElement.textContent='Dengar & jawab';
+                    qKanaElement.style.fontSize='24px';
                 }
             } else if(qType==='seq'){
-                const seqData = makeSequence(buildPoolLabels(), state.test.set, state.test.sylPerItem);
-                currentItem = { ...currentItem, romaji: seqData.romaji, char: seqData.kana, qType: qType };
-                if (qs('#qKana')) {
-                    qs('#qKana').textContent=`Romaji: ${escapeHTML(seqData.romaji)}`;
-                    qs('#qKana').style.fontSize='28px';
+                if (qKanaElement) {
+                    qKanaElement.textContent=`Romaji: ${escapeHTML(currentItem.romaji)}`;
+                    qKanaElement.style.fontSize='28px';
                 }
             }
             else if(qType==='kseq'){
-                const seqData = makeKanaSequence(buildPoolLabels(), state.test.set, state.test.sylPerItem); // Pass buildPoolLabels() result
-                currentItem = { ...currentItem, kanaSeq: seqData.kana, romajiSeq: seqData.romaji, qType: qType };
-                if (qs('#qKana')) {
-                    qs('#qKana').textContent = escapeHTML(seqData.kana);
-                    qs('#qKana').style.fontSize = '48px';
+                if (qKanaElement) {
+                    qKanaElement.textContent = escapeHTML(currentItem.kanaSeq);
+                    qKanaElement.style.fontSize = '48px';
                 }
             }
             else if(qType==='k2r'){
-                if (qs('#qKana')) {
-                    qs('#qKana').textContent=escapeHTML(currentItem.char);
-                    qs('#qKana').style.fontSize='64px';
+                if (qKanaElement) {
+                    qKanaElement.textContent=escapeHTML(currentItem.char);
+                    qKanaElement.style.fontSize='64px';
                 }
             }
             else { // r2k
-                if (qs('#qKana')) {
-                    qs('#qKana').textContent=escapeHTML(currentItem.romaji);
-                    qs('#qKana').style.fontSize='36px';
+                if (qKanaElement) {
+                    qKanaElement.textContent=escapeHTML(currentItem.romaji);
+                    qKanaElement.style.fontSize='36px';
                 }
             }
 
             if(qs('#answerMode')?.value === 'mc') { // Use optional chaining
-                // P0.1: Ensure mcWrap is visible and styled correctly
                 const mcWrap = qs('#mcWrap');
                 if (mcWrap) {
                     mcWrap.hidden = false;
-                    mcWrap.style.display = 'grid';
+                    mcWrap.style.display = 'grid'; // Pastikan display benar untuk grid
                 }
                 const typeWrap = qs('#typeWrap');
                 if (typeWrap) {
@@ -2078,7 +2302,6 @@
                     buildMC_r2k(currentItem);
                 }
             } else {
-                // P0.1: Ensure typeWrap is visible and mcWrap is hidden for type mode
                 const mcWrap = qs('#mcWrap');
                 if (mcWrap) {
                     mcWrap.hidden = true;
@@ -2105,30 +2328,27 @@
         }
 
         // Panggil afterRenderQuestion() di akhir fungsi render soalmu.
-        function afterRenderQuestion(){
+        window.afterRenderQuestion = function(){
             const qType = (qs('#qType')?.value || window.state?.test?.qType || '').toLowerCase();
-            const btn = qs('#btnReplayAudio');
-            if (btn){
+            const btnAudioCurrent = qs('.btn-audio-current'); // Menggunakan class
+            
+            if (btnAudioCurrent){
                 const isAudioType = qType.includes('audio');
-                btn.hidden    = !isAudioType;
-                btn.disabled = !isAudioType;
+                btnAudioCurrent.hidden = !isAudioType;
+                btnAudioCurrent.disabled = !isAudioType;
             }
+            // Setelah currentItem terpasang, panggil bindAudioButtonToCurrent();
+            bindAudioButtonToCurrent();
+            // Panggil enforceInputDiscipline
+            enforceInputDiscipline();
             // TIDAK ada pemanggilan ttsSpeak/playAudio di sini.
-        }
+        };
 
 
         function chooseMC(idx){
-            // Generic fallback (selaraskan dengan struktur soalmu):
             const cq = window.state?.test?.current || window.currentQuestion || currentItem;
             if (!cq) return;
             
-            // Ambil jawaban benar dari state/soal aktif (sesuai struktur projekmu)
-            // Misal:
-            // const correctIdx = currentQuestion.correctIndex;
-            // const picked = index;
-            // kemudian jalankan logika penilaian yang sudah ada (increment score, efek benar/salah, next, dsb)
-
-            // Menggunakan logika yang sudah ada di mcPick/finalizeAnswer
             const qType = state.test.qType;
             let correct = false;
             let pickedValue = null;
@@ -2171,7 +2391,7 @@
 
         function romajiEquals(a,b){
             if (!a || !b) return false;
-            if (a === b) return true;
+            if (a === b) true; // Cepat keluar jika sama persis
             const canon = (t)=> {
                 let text = t.toLowerCase();
                 text = text.replace(/wo/g,'o');
@@ -2193,20 +2413,22 @@
                 const norm = normalizeRomaji(valRaw);
                 normalizedInput = norm;
                 correct = romajiEquals(norm, currentItem.romaji);
+                // Hanya konversi ke kana jika itu audio_k2r, untuk tujuan review feedback
                 if (qType === 'audio_k2r') userKanaForReview = romajiStringToKana(norm, state.test.set);
             }
-            else if(qType==='seq' || qType==='audio_r2k'){
-                const expectedKana = currentItem.char;
-                if (qType === 'audio_r2k') {
-                    const romajiToConvert = normalizeRomaji(valRaw);
-                    userKanaForReview = romajiStringToKana(romajiToConvert, state.test.set);
-                    correct = (userKanaForReview === (state.test.set==='hira'? HIRA_MAP.get(currentItem.romaji): KATA_MAP.get(currentItem.romaji)));
-                } else {
-                    const rawSeq = normalizeRomajiSequence(valRaw);
-                    userKanaForReview = romajiStringToKana(rawSeq, state.test.set);
-                    correct = (userKanaForReview === expectedKana);
-                }
+            else if(qType==='seq'){
+                const expectedKana = currentItem.char; // Kana dari seqData.kana
+                const rawSeq = normalizeRomajiSequence(valRaw);
+                userKanaForReview = romajiStringToKana(rawSeq, state.test.set);
+                correct = (userKanaForReview === expectedKana);
                 normalizedInput = userKanaForReview;
+            }
+            else if(qType==='audio_r2k'){ // Romaji -> Kana, user ketik Romaji, kita konversi ke Kana
+                const expectedKana = (state.test.set==='hira'? HIRA_MAP.get(currentItem.romaji): KATA_MAP.get(currentItem.romaji));
+                const romajiToConvert = normalizeRomaji(valRaw);
+                userKanaForReview = romajiStringToKana(romajiToConvert, state.test.set);
+                correct = (userKanaForReview === expectedKana);
+                normalizedInput = romajiToConvert; // Normalized romaji input
             }
             else if(qType==='kseq'){
                 const expectedRomajiSeq = currentItem.romajiSeq;
@@ -2250,7 +2472,8 @@
 
             } else {
                 state.test.correctStreak=0;
-                wrongList.push({...currentItem, ...extra});
+                // Rapikan push ke wrong list (kalau sebelumnya ada {.currentItem, .extra})
+                wrongList.push({ ...currentItem, ...extra }); // Corrected spread
                 clickTone('bad');
                 if (qKanaElement) qKanaElement.classList.add('wrong-answer');
                 let feedbackMsg = t('feedback_wrong', escapeHTML(currentKanaChar), escapeHTML(currentRomaji), escapeHTML(userInput));
@@ -2278,7 +2501,8 @@
                         wrongKanaChar = null;
                     }
                 } else if (state.test.qType === 'kseq') {
-                    wrongKanaChar = null;
+                    // Untuk kseq, romajiSeq adalah target, jadi userKana tidak relevan untuk confusion log
+                    wrongKanaChar = null; 
                 }
 
                 if (wrongKanaChar && correctKanaCharToLog && wrongKanaChar !== correctKanaCharToLog) {
@@ -2300,124 +2524,126 @@
 
             updateProgress();
             if(state.test.total>=state.test.target){ finishTest(); return; }
-            qIndex=(qIndex+1)%testPool.length; // P0.1: Ensure qIndex is updated
-            save(); // P0.1: Save state after each answer
+            qIndex=(qIndex+1)%testPool.length; 
+            save();
             renderStats();
-            nextQ(); // P0.1: Move to next question
+            nextQ(); 
         }
 
+        // Perbaikan utilitas shuffle:
         function shuffleReturn(arr){ const a=[...arr]; shuffle(a); return a; }
 
+        // Ganti total buildMC_k2r(item) (Kana→Romaji = opsi ROMAJI saja):
         function buildMC_k2r(item){
-            const poolLabels = buildPoolLabels();
-            const currentSet = state.test.set;
+            const set = state?.test?.set || 'hira'; // 'hira' | 'kata'
+            const map = set==='hira' ? HIRA_MAP : KATA_MAP;
+
             const targetRomaji = item.romaji;
-            const targetKanaChar = (currentSet === 'hira' ? HIRA_MAP.get(targetRomaji) : KATA_MAP.get(targetRomaji));
+            const targetKana   = map.get(targetRomaji);
+            const ALL_R = Array.from(map.keys()); // semua romaji dalam set
 
-            let decoys = [];
-
-            const confusionMaps = currentSet === 'hira' ? HIRA_MAP : KATA_MAP;
-            const romajiToKanaKey = (r) => {
-                let char = confusionMaps.get(r);
-                if (!char) {
-                    if (r === 'dji') char = currentSet === 'hira' ? 'ぢ' : 'ヂ';
-                    else if (r === 'dzu') char = currentSet === 'hira' ? 'づ' : 'ヅ';
-                }
-                return char;
-            }
-            const kanaToRomajiKey = (kana) => {
-                for (const r of ALL_ROMAJI) {
-                    if (romajiToKanaKey(r) === kana) return r;
+            // Helper: dari kana -> romaji (pakai map inverse)
+            const kanaToRomaji = (kana)=>{
+                for (const r of ALL_R){ if (map.get(r)===kana) return r; }
+                // Handle dji/dzu jika mereka tidak langsung di map (jika menggunakan alias)
+                if (set === 'hira') {
+                    if (kana === 'ぢ') return 'dji';
+                    if (kana === 'づ') return 'dzu';
+                } else { // kata
+                    if (kana === 'ヂ') return 'dji';
+                    if (kana === 'ヅ') return 'dzu';
                 }
                 return null;
-            }
+            };
 
-
-            const confusionPairs = Object.entries(state.confusionLog[currentSet] || {})
-                .filter(([pairStr]) => pairStr.includes(targetKanaChar))
-                .sort(([, countA], [, countB]) => countB - countA)
-                .map(([pairStr]) => {
-                    const [k1, k2] = pairStr.split('|');
-                    return k1 === targetKanaChar ? k2 : k1;
-                })
-                .filter(confusedKana => confusedKana !== targetKanaChar);
-
-            const confusedRomajiDecoys = confusionPairs.map(kanaToRomajiKey).filter(r => r !== null && r !== targetRomaji);
-            decoys.push(...shuffleReturn(confusedRomajiDecoys).slice(0, 2));
-
-            const availablePoolRomaji = poolLabels.filter(r => r !== targetRomaji && !decoys.includes(r));
-            const sameLen = availablePoolRomaji.filter(r => r.length === targetRomaji.length);
-            
-            decoys.push(...shuffleReturn(sameLen).slice(0, Math.max(0, 3 - decoys.length)));
-            
-            if (decoys.length < 3) {
-                decoys.push(...shuffleReturn(availablePoolRomaji).slice(0, Math.max(0, 3 - decoys.length)));
-            }
-
-            const finalOptions = [targetRomaji, ...decoys].slice(0,4);
-            const uniq = [...new Set(finalOptions)];
-            while (uniq.length < 4) {
-                const fallback = ALL_ROMAJI.find(r => !uniq.includes(r) && r !== targetRomaji);
-                if (!fallback) break;
-                uniq.push(fallback);
-            }
-            shuffle(uniq);
-            mcMap = {A:uniq[0], B:uniq[1], C:uniq[2], D:uniq[3]};
-            setMCText({A:`A. ${escapeHTML(mcMap.A)}`,B:`B. ${escapeHTML(mcMap.B)}`,C:`C. ${escapeHTML(mcMap.C)}`,D:`D. ${escapeHTML(mcMap.D)}`});
-        }
-
-        function buildMC_r2k(item){
-            const poolLabels = buildPoolLabels();
-            const currentSet = state.test.set;
-            const map = currentSet === 'hira' ? HIRA_MAP : KATA_MAP;
-
-            const correctRomaji = item.romaji;
-            const correctKana = map.get(correctRomaji);
-
-            if (!correctKana) {
-                console.warn(`Cannot find kana for romaji: ${correctRomaji} in set: ${currentSet}`);
-                mcMap={A:'-',B:'-',C:'-',D:'-'};
-                setMCText({A:`A. ${escapeHTML(mcMap.A)}`,B:`B. ${escapeHTML(mcMap.B)}`,C:`C. ${escapeHTML(mcMap.C)}`,D:`D. ${escapeHTML(mcMap.D)}`});
-                return;
-            }
-            
             let decoys = [];
 
-            const confusionPairs = Object.entries(state.confusionLog[currentSet] || {})
-                .filter(([pairStr]) => pairStr.includes(correctKana))
-                .sort(([, countA], [, countB]) => countB - countA)
-                .map(([pairStr]) => {
-                    const [k1, k2] = pairStr.split('|');
-                    return k1 === correctKana ? k2 : k1;
-                })
-                .filter(confusedKana => confusedKana !== targetKanaChar);
+            // 1) Confusion pairs -> ubah ke romaji
+            const confusedKana = Object.entries(state.confusionLog?.[set]||{})
+                .filter(([pair])=> pair.includes(targetKana))
+                .sort(([,a],[,b])=> b-a)
+                .map(([pair])=> { const [k1,k2]=pair.split('|'); return k1===targetKana ? k2 : k1; })
+                .filter(k => k && k!==targetKana);
 
-            decoys.push(...shuffleReturn(confusionPairs).slice(0, 2));
+            const confusedRomaji = confusedKana.map(kanaToRomaji).filter(r => r && r!==targetRomaji);
+            decoys.push(...shuffleReturn(confusedRomaji).slice(0,2));
 
-            const similarChoicesFunc = currentSet === 'hira' ? similarChoicesHira : similarChoicesKata;
-            if (decoys.length < 3) {
-                const sim = similarChoicesFunc(correctKana).filter(kana => !decoys.includes(kana));
-                decoys.push(...shuffleReturn(sim).slice(0, Math.max(0, 3 - decoys.length)));
-            }
-            
-            const allAvailableKanaInPool = poolLabels
-                .map(r => map.get(r))
-                .filter(c => c && c !== correctKana && !decoys.includes(c));
-            
-            decoys.push(...shuffleReturn(allAvailableKanaInPool).slice(0, Math.max(0, 3 - decoys.length)));
+            // 2) Tambah romaji dengan panjang sama
+            const available = ALL_R.filter(r => r!==targetRomaji && !decoys.includes(r));
+            const sameLen   = available.filter(r => r.length===targetRomaji.length);
+            decoys.push(...shuffleReturn(sameLen).slice(0, Math.max(0, 3 - decoys.length))); // Tambah Math.max(0, ...)
 
-            const finalOptions = [correctKana, ...decoys].slice(0,4);
-            const uniq = [...new Set(finalOptions)];
-            while (uniq.length < 4) {
-                const fallbackKana = ALL_ROMAJI.map(r => map.get(r))
-                                                            .find(c => c && !uniq.includes(c));
-                if (!fallbackKana) break;
-                uniq.push(fallbackKana);
+            // 3) Fallback
+            if (decoys.length < 3) decoys.push(...shuffleReturn(available).slice(0, Math.max(0, 3 - decoys.length))); // Tambah Math.max(0, ...)
+
+            // Final 4 opsi romaji unik
+            const options = [targetRomaji, ...decoys].slice(0,4);
+            const uniq = Array.from(new Set(options));
+            while (uniq.length < 4){
+                const fb = ALL_R.find(r => !uniq.includes(r) && r!==targetRomaji);
+                if (!fb) break; uniq.push(fb);
             }
             shuffle(uniq);
-            mcMap={A:uniq[0],B:uniq[1],C:uniq[2],D:uniq[3]};
-            setMCText({A:`A. ${escapeHTML(mcMap.A)}`,B:`B. ${escapeHTML(mcMap.B)}`,C:`C. ${escapeHTML(mcMap.C)}`,D:`D. ${escapeHTML(mcMap.D)}`});
+
+            mcMap = {A:uniq[0], B:uniq[1], C:uniq[2], D:uniq[3]};
+            setMCText({A:`A. ${escapeHTML(uniq[0])}`, B:`B. ${escapeHTML(uniq[1])}`, C:`C. ${escapeHTML(uniq[2])}`, D:`D. ${escapeHTML(uniq[3])}`});
         }
+        
+        // Ganti total buildMC_r2k(item) (Romaji→Kana = opsi KANA saja):
+        function buildMC_r2k(item){
+            const set = state?.test?.set || 'hira';
+            const map = set==='hira' ? HIRA_MAP : KATA_MAP;
+
+            const correctRomaji = item.romaji;
+            const correctKana   = map.get(correctRomaji);
+            if (!correctKana){
+                console.warn('Cannot map romaji -> kana', correctRomaji, set);
+                mcMap = {A:'-',B:'-',C:'-',D:'-'};
+                setMCText({A:'A. -',B:'B. -',C:'C. -',D:'D. -'}); 
+                return;
+            }
+
+            // Semua kana dari pool (gunakan semua kana yang ada di map untuk opsi)
+            const ALL_R = Array.from(map.keys());
+            const allKanaInPool = ALL_R.map(r => map.get(r)).filter(Boolean);
+
+            let decoys = [];
+
+            // 1) Confusion pairs langsung KANA
+            const confusedKana = Object.entries(state.confusionLog?.[set]||{})
+                .filter(([pair])=> pair.includes(correctKana))
+                .sort(([,a],[,b])=> b-a)
+                .map(([pair])=> { const [k1,k2]=pair.split('|'); return k1===correctKana ? k2 : k1; })
+                .filter(k => k && k!==correctKana);
+
+            decoys.push(...shuffleReturn(confusedKana).slice(0,2));
+
+            // 2) Similar shape (opsional, jika helper tersedia)
+            if (typeof similarChoicesHira==='function' || typeof similarChoicesKata==='function'){
+                const similarFn = set==='hira' ? similarChoicesHira : similarChoicesKata;
+                const similar = (similarFn?.(correctKana)||[]).filter(k=>k && !decoys.includes(k) && !allKanaInPool.includes(k)); // Pastikan unik dan ada di pool
+                decoys.push(...shuffleReturn(similar).slice(0, Math.max(0, 3 - decoys.length)));
+            }
+
+            // 3) Fallback kana random (dari pool yang tersedia)
+            if (decoys.length < 3){
+                const rest = allKanaInPool.filter(k => k!==correctKana && !decoys.includes(k));
+                decoys.push(...shuffleReturn(rest).slice(0, Math.max(0, 3 - decoys.length)));
+            }
+
+            // Final 4 opsi KANA unik
+            const options = [correctKana, ...decoys].slice(0,4);
+            const uniq = Array.from(new Set(options));
+            while (uniq.length < 4){
+                const fb = allKanaInPool.find(k => k && !uniq.includes(k) && k!==correctKana);
+                if (!fb) break; uniq.push(fb);
+            }
+            shuffle(uniq);
+
+            mcMap = {A:uniq[0], B:uniq[1], C:uniq[2], D:uniq[3]};
+            setMCText({A:`A. ${escapeHTML(uniq[0])}`, B:`B. ${escapeHTML(uniq[1])}`, C:`C. ${escapeHTML(uniq[2])}`, D:`D. ${escapeHTML(uniq[3])}`});
+        }
+
 
         function setMCText(map){ ['A','B','C','D'].forEach(k=>{ const el=qs('#opt'+k); if(el) el.textContent=map[k]; }); }
 
@@ -2437,8 +2663,9 @@
                 return t('confuse_train_label');
             } else if (state.test.subset === 'srs_due') {
                 return t('review_today_label');
+            } else if (state.test.subset === 'jft-drill') { // New JFT Drill label
+                return t('jft_drill_label');
             }
-
             // Fallback to range/single mode if no specific chip is active
             if(elRangeMode?.value === 'range'){ // Use optional chaining
                 if (!elFrom || !elTo || elFrom.selectedIndex < 0 || elTo.selectedIndex < 0) return 'Rentang tidak valid';
@@ -2489,6 +2716,24 @@
             renderReview();
             updatePointsAndLevelDisplay();
             renderStats();
+            // Setelah tes selesai, tawarkan "Latih yang Membingungkan"
+            showCustomConfirm('Tes selesai! Apakah kamu ingin melatih pasangan yang membingungkan?', (confirmed) => {
+                if (confirmed) {
+                    state.test.subset = 'confusion';
+                    state.test.target = 20; // Default 20 soal untuk latihan ulang
+                    state.test.qType = 'k2r'; // Default k2r untuk confusion
+                    state.test.mode = 'mc'; // Default MC
+                    save();
+                    // Update UI controls
+                    qs('#testCount').value = state.test.target;
+                    qs('#qType').value = state.test.qType;
+                    qs('#answerMode').value = state.test.mode;
+                    buildSubsetChips(); // Rebuild chips to set 'confusion' as active
+                    updateRangeUI(); // Update range UI (will hide range controls)
+                    updateTestInfo(); // Update info text
+                    startTest();
+                }
+            });
         }
 
         function renderReview(){
@@ -2590,8 +2835,14 @@
                 return _confuseTopPairs(state.test.set);
             } else if (state.test.subset === 'srs_due') {
                 return getDueReviewItems(state.test.set).map(item => item.romaji);
+            } else if (state.test.subset === 'jft-drill') { // Handle JFT Drill preset
+                // Rentang kana umum (aiueo → ra/ro, plus dakuon dasar)
+                const jftGroups = GROUPS.filter(g => 
+                    (g.key >= 'aiueo' && g.key <= 'r') || // aiueo -> ra/ri/ru/re/ro
+                    (g.key >= 'g' && g.key <= 'd') // ga-go, za-zo, da-do
+                );
+                return jftGroups.flatMap(g => romajiFromGroup(g));
             }
-
             // Fallback to range/single mode logic
             if(elRangeMode?.value === 'range'){ // Use optional chaining
                 if (!elFrom || !elTo || elFrom.selectedIndex < 0 || elTo.selectedIndex < 0) return [];
@@ -2626,8 +2877,8 @@
 
             const rangeMode = elRangeMode.value;
             
-            // Determine if a specific subset chip (not 'all', 'confusion', 'srs_due') is active
-            const isSpecificSubsetActive = state.test.subset !== 'all' && state.test.subset !== 'confusion' && state.test.subset !== 'srs_due';
+            // Determine if a specific subset chip is active (excluding 'all', 'confusion', 'srs_due')
+            const isSpecificSubsetActive = (state.test.subset !== 'all' && state.test.subset !== 'confusion' && state.test.subset !== 'srs_due' && state.test.subset !== 'jft-drill');
 
             // If a specific subset chip is selected, the rangeMode should reflect that.
             if (isSpecificSubsetActive) {
@@ -2653,17 +2904,61 @@
             'base-all': ['aiueo','w'],
             'dakuon-all': ['g','p'],
             'youon-all': ['ky','py'],
+            // Preset JFT Drill
+            'jft-drill': {
+                set: 'hira',
+                qType: 'k2r',
+                mode: 'mc',
+                target: 20,
+                rangeFrom: 'aiueo',
+                rangeTo: 'r', // aiueo sampai ra/ri/ru/re/ro
+                includeDakuon: ['g', 'z', 'd'], // ga-go, za-zo, da-do
+            }
         };
 
         function applyPreset(key){
             const preset = QUICK_PRESETS[key];
             if (!preset) return;
 
-            if (qs('#rangeMode')) qs('#rangeMode').value = 'range';
-            updateRangeUI(); // This will show #testFrom and #testTo
-            if (qs('#testFrom')) qs('#testFrom').value = preset[0];
-            if (qs('#testTo')) qs('#testTo').value = preset[1];
-            ensureValidRange(); // Ensures from/to are valid and saves them
+            // Handle JFT Drill specifically
+            if (key === 'jft-drill') {
+                state.test.set = preset.set;
+                state.test.qType = preset.qType;
+                state.test.mode = preset.mode;
+                state.test.target = preset.target;
+                state.test.subset = 'jft-drill'; // Set subset to activate specific logic in buildPoolLabels
+                // Update UI controls
+                qs('#testSet').value = preset.set;
+                qs('#qType').value = preset.qType;
+                qs('#answerMode').value = preset.mode;
+                qs('#testCount').value = preset.target;
+                // Force select range mode to 'range' (temporarily for UI display, then hide via updateRangeUI)
+                if (qs('#rangeMode')) qs('#rangeMode').value = 'range'; 
+                // Fill the actual range selects so the range label is correct, even if they're inert
+                if (qs('#testFrom')) qs('#testFrom').value = preset.rangeFrom;
+                if (qs('#testTo')) qs('#testTo').value = preset.rangeTo;
+
+                // For JFT Drill's specific dakuon inclusion, we handle this in buildPoolLabels.
+                // We don't need to manipulate range inputs for dakuon directly here.
+                
+                // Set the rangeMode value in state (though it will be ignored by updateRangeUI due to subset='jft-drill')
+                state.test.rangeMode = 'range'; 
+                save();
+                buildSubsetChips(); // Rebuild chips to activate preset
+                updateRangeUI(); // Update range UI (will hide range controls as 'jft-drill' is a special subset)
+            } else {
+                // For other presets
+                if (qs('#rangeMode')) qs('#rangeMode').value = 'range';
+                updateRangeUI(); // This will show #testFrom and #testTo
+                if (qs('#testFrom')) qs('#testFrom').value = preset[0];
+                if (qs('#testTo')) qs('#testTo').value = preset[1];
+                ensureValidRange(); // Ensures from/to are valid and saves them
+                
+                // Clear subset if a range preset is selected, so range controls are visible
+                state.test.subset = ''; 
+                save();
+                buildSubsetChips(); // Rebuild to clear active state on 'all', 'confusion', 'srs_due'
+            }
             updateTestInfo(); // Update test info text
             clickTone('click');
         }
@@ -3088,6 +3383,22 @@
             return { romaji: romajiSequence.join(''), kana: kanaSequence };
         }
 
+        // C. Input discipline (mode ketik = romaji only)
+        function enforceInputDiscipline(){
+            const input = document.querySelector('#ans'); if(!input) return;
+            const qt = (document.querySelector('#qType')?.value || state?.test?.qType || '').toLowerCase();
+
+            input.oninput = (e)=>{
+                let v = e.target.value;
+                // Untuk k2r/audio_k2r/seq/kseq -> drop semua kana supaya jawaban tetap romaji murni:
+                // Menggunakan regex yang lebih inklusif untuk Kana
+                if (qt==='k2r' || qt==='audio_k2r' || qt==='seq' || qt==='kseq'){
+                    v = v.replace(/[ぁ-んァ-ンー゛゜]/g,'');
+                }
+                e.target.value = v;
+            };
+        }
+
 
         // ---------- UTILS ----------
         function shuffle(arr){ for(let i=arr.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [arr[i],arr[j]]=[arr[j],arr[i]]; } }
@@ -3126,7 +3437,7 @@
             safe.test.mode = ['type', 'mc'].includes(safe.test.mode) ? safe.test.mode : 'type';
             safe.test.qType = ['k2r', 'r2k', 'seq', 'audio_k2r', 'audio_r2k', 'kseq'].includes(safe.test.qType) ? safe.test.qType : 'k2r'; 
             safe.test.rangeMode = ['range', 'single'].includes(safe.test.rangeMode) ? safe.test.rangeMode : 'range';
-            safe.test.subset = ['all', ...GROUPS.map(g => g.key), 'confusion', 'srs_due'].includes(safe.test.subset) ? safe.test.subset : 'all';
+            safe.test.subset = ['all', ...GROUPS.map(g => g.key), 'confusion', 'srs_due', 'jft-drill'].includes(safe.test.subset) ? safe.test.subset : 'all'; // Updated for JFT Drill
 
             if (!safe.confusionLog) safe.confusionLog = {hira:{}, kata:{}};
             if (typeof safe.confusionLog.hira !== 'object') safe.confusionLog.hira = {};
@@ -3308,7 +3619,15 @@
                 // Hotkey Replay (R) — aktif hanya saat TIDAK fokus input & bukan mode ketik
                 if (String(e.key).toLowerCase() === 'r') {
                     e.preventDefault();
-                    playCurrentQuestionAudio?.();
+                    // Panggil fungsi playKanaAudio atau ttsSpeak tergantung konteks
+                    const currentKana = (window.currentItem && window.currentItem.char) 
+                                     || (window.currentItem && window.currentItem.kanaSeq && window.currentItem.kanaSeq[0]) 
+                                     || '';
+                    if (currentKana) {
+                        playKanaAudio(currentKana);
+                    } else {
+                        playCurrentQuestionAudio?.(); // Fallback to TTS if no specific kana for audio element
+                    }
                     return;
                 }
 
@@ -3324,7 +3643,7 @@
             if (e.key === 'Enter' && !(mode === 'mc' && !inText)) {
                 // Enter = Cek hanya relevan di mode ketik, dan saat fokus bukan di tombol lain
                 const btn = qs('#btnCheck');
-                if (btn && isTypingMode && inText) { e.preventDefault(); btn.click(); }
+                if (btn && isTypingMode && !btn.hidden) { e.preventDefault(); btn.click(); } // Pastikan tombol tidak hidden
                 return;
             }
             if (e.key === 'ArrowRight') {
@@ -3397,7 +3716,7 @@
                 if (actualKey) {
                     state.test.subset = actualKey;
                     // If a subset chip is selected, the rangeMode should reflect that.
-                    if (actualKey === 'all' || actualKey === 'confusion' || actualKey === 'srs_due') {
+                    if (actualKey === 'all' || actualKey === 'confusion' || actualKey === 'srs_due' || actualKey === 'jft-drill') {
                         state.test.rangeMode = 'range'; // Treat these as 'range' mode, but with specific selection logic
                     } else {
                         state.test.rangeMode = 'single'; // Treat group chips as 'single'
@@ -3435,14 +3754,8 @@
             updateTestInfo(); // Update test info text
         });
 
-        // Hubungkan ke tombol 🔊 (sekali saja)
-        on('#btnReplayAudio','click', () => {
-            // Jika tombol hidden/disabled (non-audio), abaikan
-            const btn = qs('#btnReplayAudio');
-            if (btn?.hidden || btn?.disabled) return;
-            playCurrentQuestionAudio();
-        });
-
+        // Hubungkan ke tombol 🔊 (sekali saja) - kini menggunakan .btn-audio-current
+        // Logic ini sekarang berada di `bindAudioButtonToCurrent()` yang dipanggil di `afterRenderQuestion`
 
         bind('#exportBtn', 'click', exportProgress);
         bind('#importBtn', 'click', () => { qs('#importFile')?.click(); });
@@ -3536,6 +3849,10 @@
 
             bind('#sidebarToggle', 'click', toggleSidebar);
             bind('#closeSidebar', 'click', closeSidebar);
+            // Close sidebar when any link inside it is clicked
+            qsa('#sidebar .menu a').forEach(link => {
+                link.addEventListener('click', closeSidebar);
+            });
             document.addEventListener('keydown', (e) => {
                 if (e.key === 'Escape' && qs('#sidebar')?.classList.contains('is-open')) {
                     closeSidebar();
@@ -3544,7 +3861,7 @@
 
             // --- NEW JS ROUTER ---
             // PAGES now reference actual HTML files for full page reloads
-            const PAGES = ["index.html","index2.html","index3.html","index4.html","index5.html","index6.html"];
+            const PAGES = ["index.html","index2.html","index3.html","index4.html","index5.html","index6.html","index7.html"]; // Added index7.html
             const $menu  = document.querySelectorAll('#sidebar [href]');
 
             // Active state for sidebar links
@@ -3583,4 +3900,3 @@
     </script>
 </body>
 </html>
-�

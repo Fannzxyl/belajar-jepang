@@ -263,9 +263,10 @@
         <ul class="menu">
             <li><a href="index.html">📘 Latihan</a></li>
             <li><a href="index2.html">🗂️ Flashcard</a></li>
-            <li><a href="index3.html">🧮 Tabel Kana</a></li>
+            <li><a href="index3.html" class="active">🧮 Tabel Kana</a></li>
             <li><a href="index4.html">🗒️ Kosakata</a></li>
             <li><a href="index5.html">💬 Ungkapan</a></li>
+            <li><a href="index7.html">🧠 Tebak Arti</a></li> <!-- Penambahan: Item menu "Tebak Arti" -->
             <li><a href="index6.html">✍️ Menulis</a></li>
         </ul>
     </nav>
@@ -319,6 +320,19 @@
             <div id="tableContainer" class="kana-table-wrapper">
                 <!-- Tabel akan digenerate oleh JavaScript di sini -->
             </div>
+        </div>
+
+        <div class="spacer"></div>
+
+        <!-- Penambahan: CTA card "Tebak Arti" -->
+        <div class="card" id="cta-tebak-arti">
+          <h2><i class="fa-solid fa-brain icon"></i> Tebak Arti (JP→ID)</h2>
+          <div class="small">Kuis arti Jepang → Indonesia (A–D). Pilih kategori & jumlah soal.</div>
+          <div class="spacer"></div>
+          <div class="row" style="gap:8px;flex-wrap:wrap">
+            <a class="btn primary" href="index7.html"><i class="fa-solid fa-play"></i> Mulai Tebak Arti</a>
+            <a class="btn ghost" href="index7.html#kategori"><i class="fa-solid fa-list"></i> Pilih Kategori</a>
+          </div>
         </div>
     </main>
 
@@ -378,8 +392,8 @@
             ['rya','リャ'], ['ryu','リュ'], ['ryo','リョ'],
             ['gya','ギャ'], ['gyu','ギョ'], ['ja','ジャ'],
             ['ju','ジュ'], ['jo','ジョ'], ['bya','ビャ'],
-            ['byu','ビュ'], ['byo','ビョ'], ['pya','ピャ'],
-            ['pyu','ピュ'], ['pyo','ピョ']
+            ['byu','ビュ'], ['byo','ビョ'],
+            ['pya','ピャ'], ['pyu','ピュ'], ['pyo','ピョ']
         ]);
 
         // Struktur Tabel
