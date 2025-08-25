@@ -15,7 +15,7 @@
     <meta property="og:image" content="https://alfan.github.io/kana-trainer/kana-trainer-preview.png">
 
     <!-- Twitter -->
-    <meta name="twitter:card" content="summary_large_image">
+    <meta property="twitter:card" content="summary_large_image">
     <meta property="twitter:url" content="https://alfan.github.io/kana-trainer/">
     <meta property="twitter:title" content="Pelatih Kana Jepang — v9">
     <meta property="twitter:description" content="Pelatih Kana Jepang v9 — latihan interaktif, audio pelafalan, tes adaptif, Pomodoro, progress, tema pastel/kontras. Progres tersimpan lokal. Mulai gratis sekarang.">
@@ -49,6 +49,10 @@
             --space: 12px;
             --radius-clamp: 14px; /* Renamed to avoid conflict with --radius */
             --maxw: 760px; /* pas buat 720p */
+
+            /* New header variables */
+            --headerPadX: 12px;
+            --headerPadY: 8px;
         }
         [data-theme="hc"]{
             --bg:#0a0f1a; --panel:#0f1626; --soft:#0c1220; --ink:#e6efff; --muted:#9fb0cc;
@@ -98,6 +102,8 @@
             transition: background-color var(--transition-duration) ease-out, color var(--transition-duration) ease-out;
             /* PATCH 6: Hilangkan overflow horizontal global */
             overflow-x: hidden; 
+            /* Aman area bawah (browser bar) */
+            padding-bottom: env(safe-area-inset-bottom);
         }
         /* Override gradients if lite mode is active */
         [data-lite="1"] body {
@@ -118,26 +124,29 @@
             margin-inline:auto; 
             padding: clamp(10px, 2vw, 16px); 
         }
-        header{position:sticky;top:0;z-index:30;background:linear-gradient(180deg, rgba(255,255,255,.92), rgba(255,255,255,.72));backdrop-filter: blur(8px);border-bottom:1px solid var(--border); padding-top:env(safe-area-inset-top);
+        /* Removed old header styles, replaced by .topbar */
+        /* header{position:sticky;top:0;z-index:30;background:linear-gradient(180deg, rgba(255,255,255,.92), rgba(255,255,255,.72));backdrop-filter: blur(8px);border-bottom:1px solid var(--border); padding-top:env(safe-area-inset-top);
         transition: background var(--transition-duration) ease-out, backdrop-filter var(--transition-duration) ease-out, border-bottom-color var(--transition-duration) ease-out;}
-        [data-theme="hc"] header{background:linear-gradient(180deg, rgba(15,22,38,.86), rgba(15,22,38,.66))}
+        [data-theme="hc"] header{background:linear-gradient(180deg, rgba(15,22,38,.86), rgba(15,22,38,.66))} */
         
-        .brand{
+        /* Removed .brand styles, replaced by .topbar .title */
+        /* .brand{
             display:flex;
             align-items:center;
             gap:12px;
             justify-content: space-between;
             flex-wrap: wrap;
-        }
+        } */
 
-        header .header-controls-row {
+        /* Removed header .header-controls-row styles, replaced by .settings-compact */
+        /* header .header-controls-row {
             margin-left: 0;
             gap: 6px;
             flex-wrap: wrap;
             justify-content: flex-end;
             margin-top: 0;
             flex-basis: auto;
-        }
+        } */
         
         /* Main Navigation (now handled by JS router, but keeping styles for consistency) */
         .main-nav {
@@ -160,7 +169,8 @@
         }
 
 
-        @media (max-width: 767px) {
+        /* Removed @media (max-width: 767px) header styles */
+        /* @media (max-width: 767px) {
             header { position: static; } 
             .brand {
                 flex-direction: column;
@@ -178,19 +188,17 @@
                 flex-grow: 1;
                 min-width: unset;
             }
-        }
+        } */
 
-        /* Logo positioning for header */
-        /* Removed .header-logo-container CSS as per P1.3 */
-        /* Adjust brand padding to make space for the logo */
-        header .brand {
-            padding-right: 60px; /* Make space for the logo on the right */
+        /* Removed Logo positioning for header styles */
+        /* header .brand {
+            padding-right: 60px; 
         }
         @media (max-width: 767px) {
             header .brand {
-                padding-left: 16px; /* Reset padding for mobile if needed, or adjust */
+                padding-left: 16px; 
             }
-        }
+        } */
 
 
         h1{font-size:20px;margin:0}
@@ -249,6 +257,17 @@
         }
         .btn.ghost{background:transparent;outline:1px solid var(--border); color: var(--ink);}
         .btn:focus-visible{outline:none; box-shadow:var(--ring); outline-offset: 3px;}
+        .btn.outline {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--ink);
+        }
+        .btn.sm {
+            min-height: 36px;
+            padding: 0 12px;
+            font-size: 12px;
+        }
+
 
         .seg{display:flex;border:1px solid var(--border);border-radius:12px;overflow:hidden; transition: border-color var(--transition-duration) ease-out;}
         .seg button{
@@ -535,7 +554,7 @@
         }
 
         /* Ensure main containers don't over-expand */
-        .wrap, main, header {
+        .wrap, main {
             width: 100%;
             max-width: 100%;
         }
@@ -608,12 +627,12 @@
         }
 
         /* PATCH: Center subtitle "Hiragana • Katakana … Writer" */
-        header .brand > div:nth-child(2){
+        /* header .brand > div:nth-child(2){
           flex: 1 1 auto;
           text-align: center;
         }
         header .brand h1{ margin-bottom: 4px; }
-        header .brand .small{ display:block; }
+        header .brand .small{ display:block; } */ /* Removed, now part of .topbar .title */
 
         /* New styles for sidebar */
         .sidebar {
@@ -639,11 +658,12 @@
             left: 0;
         }
 
-        .sidebar-toggle-btn {
+        /* Removed .sidebar-toggle-btn styles, now part of .topbar .icon-btn */
+        /* .sidebar-toggle-btn {
             position: fixed;
             top: 16px;
             left: 16px;
-            z-index: 1001; /* Above sidebar */
+            z-index: 1001; 
             background: var(--btn);
             border: 1px solid var(--border);
             border-radius: 50%;
@@ -655,41 +675,45 @@
             cursor: pointer;
             box-shadow: var(--shadow);
             transition: all 0.3s ease-in-out;
-        }
+        } */
 
-        .sidebar-toggle-btn:hover {
+        /* .sidebar-toggle-btn:hover {
             background: var(--soft);
         }
 
         .sidebar-toggle-btn i {
             color: var(--ink);
             font-size: 20px;
-        }
+        } */
 
         /* Adjust main content when sidebar is open on desktop */
-        @media (min-width: 768px) {
+        @media (min-width: 860px) { /* Changed from 768px to 860px for consistency with new header breakpoint */
             body.sidebar-open {
                 padding-left: 280px;
             }
-            .sidebar-toggle-btn {
-                left: 16px; /* Stays on the left */
+            /* .sidebar-toggle-btn {
+                left: 16px;
             }
             .sidebar.is-open + .sidebar-toggle-btn {
-                left: 296px; /* Moves with the sidebar */
+                left: 296px;
+            } */
+            /* In desktop, the sidebar is always open, so the toggle button is hidden */
+            .icon-btn {
+                display: none;
             }
         }
 
         /* Ensure header content is not hidden by sidebar toggle button */
-        header .brand {
+        /* header .brand {
             position: relative;
             z-index: 1002;
-            padding-left: 60px; /* Space for the toggle button */
+            padding-left: 60px; 
         }
         @media (max-width: 767px) {
             header .brand {
-                padding-left: calc(16px + env(safe-area-inset-left)); /* Reset padding for mobile if needed, or adjust */
+                padding-left: calc(16px + env(safe-area-inset-left)); 
             }
-        }
+        } */ /* Removed, now handled by .topbar */
 
         /* --- NEW CSS FOR SIDEBAR AND ROUTING --- */
         .sidebar .menu { list-style:none; margin:0; padding:0; }
@@ -736,7 +760,8 @@
 
         /* UI Responsive 720p */
         /* Header container */
-        header .brand > div:nth-child(2){
+        /* Removed old brand/h1/tag/small styles, now part of .topbar */
+        /* header .brand > div:nth-child(2){
             display:flex; flex-wrap:wrap; align-items:center; gap:.5rem;
             flex: 1 1 auto;
             text-align: center;
@@ -744,18 +769,18 @@
         header .brand h1{
             font-size: clamp(20px, 4.5vw, 28px);
             line-height:1.2;
-            margin-bottom: 0; /* Remove default margin */
+            margin-bottom: 0; 
         }
         header .brand .tag {
             font-size: clamp(10px, 2.8vw, 12px);
-            margin-left: 0.5rem; /* Space between title and badge */
+            margin-left: 0.5rem; 
         }
         header .brand .small {
             font-size: clamp(10px, 2.8vw, 12px);
-            display: block; /* Ensure it stays on its own line */
-            width: 100%; /* Take full width */
-            margin-top: 4px; /* Space from title/badge */
-        }
+            display: block; 
+            width: 100%; 
+            margin-top: 4px; 
+        } */
 
         /* Tombol besar (“Mulai Tes”, “Lewati”) */
         @media (max-width: 360px) {
@@ -796,20 +821,21 @@
         }
 
         /* Sidebar FAB (tombol hamburger bulat) */
-        .sidebar-toggle-btn {
-            inset-inline-start: 8px; /* Equivalent to left */
-            inset-block-start: 8px; /* Equivalent to top */
-            z-index: 50; /* Lower z-index to avoid covering controls */
-        }
+        /* Removed .sidebar-toggle-btn styles, now handled by .topbar .icon-btn */
+        /* .sidebar-toggle-btn {
+            inset-inline-start: 8px; 
+            inset-block-start: 8px; 
+            z-index: 50; 
+        } */
         /* Adjust header padding for sidebar toggle button */
-        header .brand {
-            padding-left: calc(60px + env(safe-area-inset-left)); /* Make space for the toggle button */
+        /* header .brand {
+            padding-left: calc(60px + env(safe-area-inset-left)); 
         }
         @media (max-width: 767px) {
             header .brand {
-                padding-left: calc(16px + env(safe-area-inset-left)); /* Reset padding for mobile if needed, or adjust */
+                padding-left: calc(16px + env(safe-area-inset-left)); 
             }
-        }
+        } */ /* Removed, now handled by .topbar */
 
         /* P2.6: Lite Mode - disable animations for feedback classes */
         [data-lite="1"] #qKana.correct-answer,
@@ -1496,9 +1522,26 @@
                 const b = document.createElement('button'); b.type='button';
                 b.className='kana' + (mastered.includes(r) ? ' mastered' : '');
                 b.innerHTML=`<div class="jp">${escapeHTML(ch)}</div><div class="ro">${escapeHTML(r)}</div>`; // Escape kana/romaji
-                b.title=t('learn_tile_tooltip');
-                // PATCH: Gunakan ttsSpeak untuk tile pembelajaran
-                b.onclick=()=> ttsSpeak(ch, 'ja-JP'); 
+                
+                // Perbaikan: Tap = tandai hafal, Long-press = batal
+                b.title = 'Ketuk = tandai hafal • Tahan = batal';
+
+                b.addEventListener('click', () => {
+                  toggleMaster(r, set);             // hijaukan / tambah poin
+                });
+
+                // long-press untuk uncheck (mobile & desktop)
+                let pressTimer;
+                const startLP = () => { pressTimer = setTimeout(() => uncheck(r, set), 500); };
+                const cancelLP = () => { clearTimeout(pressTimer); };
+
+                b.addEventListener('mousedown', startLP);
+                b.addEventListener('mouseup', cancelLP);
+                b.addEventListener('mouseleave', cancelLP);
+                b.addEventListener('touchstart', startLP, { passive:true });
+                b.addEventListener('touchend', cancelLP);
+                b.addEventListener('touchcancel', cancelLP);
+
                 frag.appendChild(b);
             });
             box.appendChild(frag);
@@ -1617,7 +1660,7 @@
                 tile.className='kana' + (mastered.includes(r) ? ' mastered' : '');
                 tile.innerHTML=`<div class="jp">${escapeHTML(ch)}</div><div class="ro">${escapeHTML(r)}</div>`; // Escape kana/romaji
                 tile.title=t('learn_tile_tooltip');
-                // PATCH: Gunakan ttsSpeak untuk tile pembelajaran
+                // Di bagian "Belajar", tile tetap memutar audio saat di-tap
                 tile.onclick=()=> ttsSpeak(ch, 'ja-JP'); 
                 frag.appendChild(tile);
             });
@@ -2488,7 +2531,7 @@
 
                 if (state.test.qType === 'r2k' || state.test.qType === 'audio_r2k') {
                     wrongKanaChar = extra.chosen;
-                } else if (state.test.qType === 'k2r' || state.test.qType === 'audio_k2r') {
+                } else if (state.test.qType === 'k2r' || state.test.qType === 'audio_r2k') {
                     const userRomajiNormalized = normalizeRomaji(extra.typed || extra.chosen);
                     wrongKanaChar = romajiStringToKana(userRomajiNormalized, currentSet);
                 } else if (state.test.qType === 'seq') {
@@ -3847,7 +3890,10 @@
             showOnboarding();
             setInterval(renderStats, 5000);
 
-            bind('#sidebarToggle', 'click', toggleSidebar);
+            // Bind new header menu button
+            document.getElementById('menuBtn')?.addEventListener('click', () => {
+                (window.openSidebar || window.toggleSidebar || toggleSidebar)(); // Fallback to local toggleSidebar
+            });
             bind('#closeSidebar', 'click', closeSidebar);
             // Close sidebar when any link inside it is clicked
             qsa('#sidebar .menu a').forEach(link => {
