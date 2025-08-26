@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="id" data-theme="pastel" class="no-js">
 <head>
@@ -444,6 +445,8 @@
             display:grid; 
             gap: clamp(10px, 2vw, 14px);
             grid-template-columns: 1fr 1fr; /* 2 kolom di HP */
+            max-width: 520px; /* Tetap pertahankan agar tidak terlalu lebar di desktop */
+            margin: 0 auto; /* Tengah */
         }
         @media (min-width: 860px){ 
             .mc-grid{ grid-template-columns: repeat(4, 1fr); } 
@@ -598,7 +601,6 @@
         .progress, .seg { max-width: 100%; }
 
         /* Fix select with background-icon so it's consistent */
-        /* DEDUPLIKASI: Aturan ini sudah ada di atas, sisakan satu. */
         select{ background-origin:content-box; padding-right:36px; }
 
 
@@ -667,14 +669,7 @@
             box-shadow: var(--shadow);
             transition: all 0.3s ease-in-out;
         }
-
-        /* DEDUPLIKASI .sidebar-toggle-btn */
-        /* Hanya sisakan satu aturan z-index */
-        /* .sidebar-toggle-btn {
-            z-index: 50; 
-        } */
-
-
+        
         .sidebar-toggle-btn:hover {
             background: var(--soft);
         }
@@ -859,13 +854,11 @@
         }
 
         /* UI/UX Mobile-First: Navbar bawah yang sticky (opsional) */
-        .bottom-bar{
-            position: sticky; bottom: 0; left: 0; right: 0;
-            padding: 10px; background: #0e0e0eE6; backdrop-filter: blur(6px);
-            display:flex; gap:10px; justify-content: space-between;
-            z-index: 40; /* Above main content, below modals */
-        }
-        .bottom-bar .btn{ flex:1; min-height:46px; border-radius:12px; }
+        <!-- <div class="bottom-bar">
+            <button class="btn primary">Beranda</button>
+            <button class="btn">Tes Cepat</button>
+            <button class="btn">Progres</button>
+        </div> -->
 
     </style>
 </head>
@@ -894,7 +887,7 @@
             <li><a href="index3.html">🧮 Tabel Kana</a></li>
             <li><a href="index4.html">🗒️ Kosakata</a></li>
             <li><a href="index5.html">💬 Ungkapan</a></li>
-            <li><a href="index7.html" onclick="closeSidebar()">🧠 Tebak Arti</a></li>
+            <li><a href="index7.html">🧠 Tebak Arti</a></li>
             <li><a href="index6.html">✍️ Menulis</a></li>
         </ul>
     </nav>
@@ -998,12 +991,7 @@
                         <!-- Updated: subsetChips now has a sticky label -->
                         <div id="subsetChips">
                             <div class="chips-title">Pilih cepat:</div>
-                            <button class="chip" data-preset="aiueo-m" type="button">aiueo → m</button>
-                            <button class="chip" data-preset="base-all" type="button">Dasar semua</button>
-                            <button class="chip" data-preset="dakuon-all" type="button">Dakuon</button>
-                            <button class="chip" data-preset="youon-all" type="button">Youon</button>
-                            <button class="chip" data-preset="jft-drill" type="button">JFT Drill</button>
-                            <!-- Original chips will be added by JS renderAll -> buildSubsetChips() -->
+                            <!-- Chips for presets, special subsets, and individual groups will be added by JS renderAll -> buildSubsetChips() -->
                         </div>
                         <select id="testSet" class="input" aria-label="Pilih set tes">
                             <option value="hira">Hiragana</option>
@@ -1462,13 +1450,14 @@
             ['シ','ツ'], ['ソ','ン'], ['ク','ケ'], ['フ','ワ'], ['ヂ','ジ'], ['ヅ','ズ'],
             ['ノ','メ'], ['イ','リ'], ['エ','ヱ'], ['ネ','レ'], ['ア','マ'], ['ム','厶']
         ];
+        // FIX: Perbaiki karakter yang salah di CONFUSE_HIRA
         const CONFUSE_HIRA = [
-            ['ぬ','मे'], 
-            ['れ','ね'], // FIX: Ubah 'ne' menjadi 'ね'
-            ['う','ra'], 
-            ['ち','sa'], 
-            ['つ','te'], 
-            ['ヲ','wa'] 
+            ['ぬ','め'], 
+            ['れ','ね'], 
+            ['う','ら'], 
+            ['ち','さ'], 
+            ['つ','て'], 
+            ['を','わ'] 
         ];
         
         function similarChoicesKata(correct){
@@ -1663,7 +1652,7 @@
 
         function isMCActive() {
             const area = qs('#testArea');
-            const mode = qs('#answerMode')?.value || (window.state?.test?.mode);
+            const mode = qs('#answerMode')?.value || (state?.test?.mode); // FIX: Use state?.test?.mode
             return !!area && !area.hidden && mode === 'mc';
         }
         const keyToOptIndex = (k) => {
@@ -1676,11 +1665,8 @@
         };
 
         // --- Audio: utilitas playKanaAudio (langsung ke <audio> element) ---
+        // FIX: Implementasi getAudioSrcForKana
         function getAudioSrcForKana(kana) {
-            // Placeholder: Implementasi ini harus sesuai dengan aset audio Anda
-            // Contoh: './audio/hira/a.mp3'
-            // Anda perlu memiliki folder 'audio' dengan subfolder 'hira' dan 'kata',
-            // serta file audio untuk setiap karakter.
             const set = state.test.set; // 'hira' atau 'kata'
             if (!kana) return '';
 
@@ -1702,16 +1688,14 @@
             }
             if (!romaji) return ''; // Tidak ditemukan romaji yang cocok
 
-            // Sesuaikan path file audio Anda di sini
-            // Contoh: './audio/hira/a.mp3'
-            // Jika ada dakuon/youon yang punya file khusus, sesuaikan
+            // Normalisasi romaji untuk nama file audio yang umum (misalnya, dji -> ji, dzu -> zu, wo -> o)
             let audioFileName = romaji;
-            if (romaji === 'dji' && set === 'hira') audioFileName = 'dji_hira'; // Contoh penamaan khusus
-            if (romaji === 'dzu' && set === 'hira') audioFileName = 'dzu_hira';
-            if (romaji === 'dji' && set === 'kata') audioFileName = 'dji_kata';
-            if (romaji === 'dzu' && set === 'kata') audioFileName = 'dzu_kata';
-
-            return `./audio/${set}/${audioFileName}.mp3`; // Sesuaikan path jika berbeda
+            if (audioFileName === 'dji') audioFileName = 'ji';
+            if (audioFileName === 'dzu') audioFileName = 'zu';
+            if (audioFileName === 'wo') audioFileName = 'o';
+            
+            // Asumsikan struktur folder: ./audio/{hira|kata}/{romaji}.mp3
+            return `./audio/${set}/${audioFileName}.mp3`;
         }
 
         function playKanaAudio(kana) {
@@ -1741,16 +1725,16 @@
             btn.onclick = (e) => {
                 e.preventDefault();
                 // Pastikan ambil kana soal saat ini:
-                const kana = (window.currentItem?.char) // Gunakan optional chaining
-                          || (window.currentItem?.kanaSeq?.[0]) // Gunakan optional chaining
+                const kana = (currentItem?.char) // Gunakan optional chaining
+                          || (currentItem?.kanaSeq?.[0]) // Gunakan optional chaining
                           || btn.dataset.kana 
                           || '';
                 playKanaAudio(kana);
             };
 
             // Set data-kana di tombol saat ini untuk fallback
-            const currentKana = (window.currentItem && window.currentItem.char) 
-                               || (window.currentItem && window.currentItem.kanaSeq && window.currentItem.kanaSeq[0]) 
+            const currentKana = (currentItem && currentItem.char) 
+                               || (currentItem && currentItem.kanaSeq && currentItem.kanaSeq[0]) 
                                || '';
             btn.dataset.kana = currentKana;
         }
@@ -1775,8 +1759,8 @@
 
         function getReplayTextForCurrentQuestion() {
             // Ambil tipe & data aktif dari state/DOM
-            const qType = qs('#qType')?.value || window.state?.test?.qType || '';
-            const cur = (window.state?.test?.current) || window.currentQuestion || currentItem || {};
+            const qType = qs('#qType')?.value || state?.test?.qType || ''; // FIX: Use state?.test?.qType
+            const cur = currentItem || {}; // FIX: Simplify to currentItem
             const kana = (cur.char || cur.kanaSeq || qs('#qKana')?.textContent || '').trim();
             const romaji = (cur.romaji || cur.romajiSeq || '').trim();
 
@@ -1791,7 +1775,7 @@
             const audioOn = qs('#audToggle')?.checked ?? true;
             if (!audioOn) return;
 
-            const qType = qs('#qType')?.value || window.state?.test?.qType || '';
+            const qType = qs('#qType')?.value || state?.test?.qType || ''; // FIX: Use state?.test?.qType
             const text = getReplayTextForCurrentQuestion();
             // Gunakan suara Jepang meskipun teks romaji — terdengar lebih natural untuk jp
             ttsSpeak(text, 'ja-JP');
@@ -1898,9 +1882,9 @@
             save(); // Save state immediately when rangeMode changes
 
             // Disable/hide range controls if a special subset (all, confusion, srs_due, jft-drill) is active
-            const isSpecialSubsetActive = (state.test.subset === 'all' || state.test.subset === 'confusion' || state.test.subset === 'srs_due' || state.test.subset === 'jft-drill' || GROUPS.some(g => g.key === state.test.subset));
+            const isSpecialSubsetActive = (state.test.subset === 'all' || state.test.subset === 'confusion' || state.test.subset === 'srs_due' || state.test.subset === 'jft-drill' || state.test.subset === 'base-all' || state.test.subset === 'dakuon-all' || state.test.subset === 'youon-all');
 
-            if (isSpecialSubsetActive && state.test.subset !== '') { // Only hide if an actual special subset is selected
+            if (isSpecialSubsetActive) { // Only hide if an actual special subset is selected
                 setEnabled(elRangeMode, false);
                 setEnabled(elFrom, false); 
                 setEnabled(elTo, false);
@@ -1984,11 +1968,24 @@
             if (state.test.subset === 'jft-drill') {
                 // Rentang kana umum (aiueo → ra/ro, plus dakuon dasar)
                 const jftGroups = GROUPS.filter(g => 
-                    (g.key >= 'aiueo' && g.key <= 'r') || // aiueo -> ra/ri/ru/re/ro
+                    (GROUPS.indexOf(g) >= GROUPS.findIndex(gr=>gr.key==='aiueo') && GROUPS.indexOf(g) <= GROUPS.findIndex(gr=>gr.key==='r')) || // aiueo -> ra/ri/ru/re/ro
                     (g.key === 'g' || g.key === 'z' || g.key === 'd') // ga-go, za-zo, da-do
                 );
                 return jftGroups.flatMap(g => romajiFromGroup(g));
             }
+            if (state.test.subset === 'base-all') {
+                const baseGroups = GROUPS.filter(g => g.list === BASE);
+                return baseGroups.flatMap(g => romajiFromGroup(g));
+            }
+            if (state.test.subset === 'dakuon-all') {
+                const dakuonGroups = GROUPS.filter(g => g.list === DAKUON);
+                return dakuonGroups.flatMap(g => romajiFromGroup(g));
+            }
+            if (state.test.subset === 'youon-all') {
+                const youonGroups = GROUPS.filter(g => g.list === YOUON);
+                return youonGroups.flatMap(g => romajiFromGroup(g));
+            }
+
 
             // 2) ELSE (tidak ada chip khusus) – gunakan state.test.rangeMode
             if (state.test.rangeMode === 'range') {
@@ -2008,10 +2005,9 @@
             return ALL_ROMAJI;
         }
 
-        // Moved buildSubsetChips definition here to ensure it's defined before renderAll
+        // FIX: Rebuild buildSubsetChips to apply data-subset-type and data-group-key dynamically
         function buildSubsetChips(){
             const box=qs('#subsetChips');
-            // Preserve the chips-title div
             const existingTitle = box.querySelector('.chips-title');
             if (existingTitle) {
                 box.innerHTML = ''; // Clear only chips, keep title
@@ -2031,40 +2027,57 @@
             allKanaChip.className = 'chip' + (state.test.subset === 'all' ? ' active' : '');
             allKanaChip.setAttribute('aria-pressed', state.test.subset === 'all');
             allKanaChip.textContent = t('all_kana_label');
-            allKanaChip.onclick = () => { 
-                state.test.subset = 'all'; 
-                // state.test.rangeMode = 'range'; // Reset to range, then hide via updateRangeUI
-                save(); 
-                buildSubsetChips(); 
-                updateRangeUI(); // This will effectively hide range selects for 'all' or 'confusion' etc.
-            };
+            allKanaChip.dataset.subsetType = 'all'; // <-- ADDED
             frag.appendChild(allKanaChip);
 
-            // QUICK_PRESETS chips
-            // Filter out 'jft-drill' from QUICK_PRESETS as it's added explicitly
+            // QUICK_PRESETS chips (these are range presets like aiueo-m)
             for (const key in QUICK_PRESETS) {
-                if (key === 'jft-drill') continue; // Skip JFT drill here
+                // JFT drill handled as a special subset type, not a range preset
+                // base-all, dakuon-all, youon-all also handled as subsetType
+                if (key === 'jft-drill' || key === 'base-all' || key === 'dakuon-all' || key === 'youon-all') {
+                    continue; 
+                }
                 const button = document.createElement('button');
                 button.type = 'button';
-                button.className = 'chip';
+                button.className = 'chip'; 
                 button.textContent = key.replace(/-/g, ' → ');
                 button.dataset.preset = key;
-                button.onclick = () => applyPreset(key);
                 frag.appendChild(button);
             }
-            
-            // Add JFT Drill chip separately to ensure it's always there
+
+            // Add dynamic chips for 'base-all', 'dakuon-all', 'youon-all' (which are not simple range presets)
+            const baseAllChip = document.createElement('button');
+            baseAllChip.type = 'button';
+            baseAllChip.className = 'chip' + (state.test.subset === 'base-all' ? ' active' : '');
+            baseAllChip.setAttribute('aria-pressed', state.test.subset === 'base-all');
+            baseAllChip.textContent = 'Dasar semua';
+            baseAllChip.dataset.subsetType = 'base-all';
+            frag.appendChild(baseAllChip);
+
+            const dakuonAllChip = document.createElement('button');
+            dakuonAllChip.type = 'button';
+            dakuonAllChip.className = 'chip' + (state.test.subset === 'dakuon-all' ? ' active' : '');
+            dakuonAllChip.setAttribute('aria-pressed', state.test.subset === 'dakuon-all');
+            dakuonAllChip.textContent = 'Dakuon';
+            dakuonAllChip.dataset.subsetType = 'dakuon-all';
+            frag.appendChild(dakuonAllChip);
+
+            const youonAllChip = document.createElement('button');
+            youonAllChip.type = 'button';
+            youonAllChip.className = 'chip' + (state.test.subset === 'youon-all' ? ' active' : '');
+            youonAllChip.setAttribute('aria-pressed', state.test.subset === 'youon-all');
+            youonAllChip.textContent = 'Youon';
+            youonAllChip.dataset.subsetType = 'youon-all';
+            frag.appendChild(youonAllChip);
+
+
+            // Add JFT Drill chip
             const jftDrillChip = document.createElement('button');
             jftDrillChip.type = 'button';
             jftDrillChip.className = 'chip' + (state.test.subset === 'jft-drill' ? ' active' : '');
             jftDrillChip.setAttribute('aria-pressed', state.test.subset === 'jft-drill');
             jftDrillChip.textContent = t('jft_drill_label');
-            jftDrillChip.onclick = () => {
-                state.test.subset = 'jft-drill';
-                save();
-                buildSubsetChips();
-                updateRangeUI();
-            };
+            jftDrillChip.dataset.subsetType = 'jft-drill'; // <-- ADDED
             frag.appendChild(jftDrillChip);
 
 
@@ -2074,13 +2087,7 @@
             confuseChip.className = 'chip' + (state.test.subset === 'confusion' ? ' active' : '');
             confuseChip.setAttribute('aria-pressed', state.test.subset === 'confusion');
             confuseChip.textContent = t('confuse_train_label');
-            confuseChip.onclick = () => { 
-                state.test.subset = 'confusion'; 
-                // state.test.rangeMode = 'range'; // Reset to range, then hide via updateRangeUI
-                save(); 
-                buildSubsetChips(); 
-                updateRangeUI(); 
-            };
+            confuseChip.dataset.subsetType = 'confusion'; // <-- ADDED
             frag.appendChild(confuseChip);
 
             // Add "Review Today" chip
@@ -2089,14 +2096,19 @@
             reviewChip.className = 'chip' + (state.test.subset === 'srs_due' ? ' active' : '');
             reviewChip.setAttribute('aria-pressed', state.test.subset === 'srs_due');
             reviewChip.textContent = t('review_today_label');
-            reviewChip.onclick = () => { 
-                state.test.subset = 'srs_due'; 
-                // state.test.rangeMode = 'range'; // Reset to range, then hide via updateRangeUI
-                save(); 
-                buildSubsetChips(); 
-                updateRangeUI(); 
-            };
+            reviewChip.dataset.subsetType = 'srs_due'; // <-- ADDED
             frag.appendChild(reviewChip);
+
+            // Add individual group chips dynamically (e.g., 'aiueo', 'k', 's')
+            GROUPS.forEach(g => {
+                const groupChip = document.createElement('button');
+                groupChip.type = 'button';
+                groupChip.className = 'chip' + (state.test.subset === g.key ? ' active' : ''); // Active if this group is the current subset
+                groupChip.setAttribute('aria-pressed', state.test.subset === g.key);
+                groupChip.textContent = g.label;
+                groupChip.dataset.groupKey = g.key; // Use a specific data attribute for group keys
+                frag.appendChild(groupChip);
+            });
 
             box.appendChild(frag);
         }
@@ -2116,11 +2128,16 @@
             const req = Math.max(1, parseInt(qs('#testCount').value,10)||10);
             
             // 1. Panggil getChosenSubset() untuk mendapatkan label
-            let labels = getChosenSubset(); 
+            let labels = getChosenSubset(); // FIX: Sekarang ini adalah sumber kebenaran untuk pool item
 
             // 2. Membangun uniquePoolItems dari labels (filter char yang undefined)
             let uniquePoolItems = labels.map(r => ({ romaji: r, char: (set === 'hira' ? HIRA_MAP : KATA_MAP).get(r) }));
             uniquePoolItems = uniquePoolItems.filter(item => item.char !== undefined); // Filter out items that don't have a corresponding Kana
+            
+            // FIX: Menghapus blok redundan ini karena getChosenSubset sudah menanganinya
+            // if (state.test.subset === 'base-all') { ... }
+            // else if (state.test.subset === 'dakuon-all') { ... }
+            // else if (state.test.subset === 'youon-all') { ... }
 
             if(!uniquePoolItems.length){ 
                 showCustomAlert('Tidak ada item untuk subset ini. Pakai chip "Semua Kana" ya.'); 
@@ -2364,11 +2381,15 @@
 
             // Panggil afterRenderQuestion() di akhir fungsi render soalmu.
             afterRenderQuestion();
+            // FIX: Otomatis putar audio jika mode listening
+            if (AUDIO_TYPES.has(qType)) {
+                playCurrentQuestionAudio();
+            }
         }
 
         // Panggil afterRenderQuestion() di akhir fungsi render soalmu.
         window.afterRenderQuestion = function(){
-            const qType = (qs('#qType')?.value || window.state?.test?.qType || '').toLowerCase();
+            const qType = (qs('#qType')?.value || state?.test?.qType || '').toLowerCase(); // FIX: Use state?.test?.qType
             const btnAudioCurrent = qs('.btn-audio-current'); // Menggunakan class
             
             if (btnAudioCurrent){
@@ -2385,7 +2406,7 @@
 
 
         function chooseMC(idx){
-            const cq = window.state?.test?.current || window.currentQuestion || currentItem;
+            const cq = currentItem; // FIX: Simplify to currentItem
             if (!cq) return;
             
             const qType = state.test.qType;
@@ -2725,6 +2746,12 @@
                 return t('review_today_label');
             } else if (state.test.subset === 'jft-drill') {
                 return t('jft_drill_label');
+            } else if (state.test.subset === 'base-all') {
+                return 'Dasar semua';
+            } else if (state.test.subset === 'dakuon-all') {
+                return 'Dakuon';
+            } else if (state.test.subset === 'youon-all') {
+                return 'Youon';
             } else {
                 // Check if a group chip is active (e.g., 'k', 's', 'm')
                 const activeGroupChip = GROUPS.find(g => g.key === state.test.subset);
@@ -2881,7 +2908,11 @@
             });
             shuffle(testPool);
 
-            poolIdx = buildPoolLabels().map(r=>ALL_ROMAJI.indexOf(r)).filter(x=>x>=0);
+            // FIX: Menggunakan getChosenSubset() untuk poolIdx atau langsung dari wrongList.
+            // PoolIdx tidak lagi relevan jika pool dibuat langsung dari wrongList.
+            // Menghapus penggunaan buildPoolLabels.
+            // poolIdx = getChosenSubset().map(r=>ALL_ROMAJI.indexOf(r)).filter(x=>x>=0);
+            
             state.test.total=0; state.test.score=0; state.test.correctStreak=0; state.test.target = Math.min(20, testPool.length); qIndex=0; 
             closeCelebrate(); 
             if (qs('#testArea')) qs('#testArea').hidden=false; 
@@ -2896,84 +2927,29 @@
         });
 
         /**
-         * Mengembalikan array romaji untuk fitur tertentu (review/confusion/seq).
-         * Disinkronkan dengan logika baru: ketika subset bukan chip khusus,
-         * gunakan state.test.rangeMode & rentang/single seperti di A.1.
-         * JANGAN dipakai untuk penentuan awal labels soal reguler (pakai getChosenSubset()).
-         * @returns {string[]} Array of romaji labels.
+         * FIX: Fungsi ini dihapus karena getChosenSubset() lebih universal dan buildPoolLabels
+         *      sebelumnya memiliki tujuan yang tumpang tindih atau tidak jelas.
+         *      Jika ada kebutuhan khusus untuk poolLabels, harus didefinisikan ulang secara terpisah.
          */
-        function buildPoolLabels(){
-            // Jika ada chip subset khusus yang aktif, gunakan itu.
-            if (state.test.subset === 'all') {
-                return ALL_ROMAJI;
-            } else if (state.test.subset === 'confusion') {
-                return _confuseTopPairs(state.test.set);
-            } else if (state.test.subset === 'srs_due') {
-                return getDueReviewItems(state.test.set).map(item => item.romaji);
-            } else if (state.test.subset === 'jft-drill') {
-                const jftGroups = GROUPS.filter(g => 
-                    (g.key >= 'aiueo' && g.key <= 'r') ||
-                    (g.key === 'g' || g.key === 'z' || g.key === 'd')
-                );
-                return jftGroups.flatMap(g => romajiFromGroup(g));
-            } else {
-                // Jika tidak ada chip khusus aktif, gunakan mode rentang/single yang aktif.
-                if (state.test.rangeMode === 'range') {
-                    const labels = rangeLabels(state.test.rangeFrom, state.test.rangeTo);
-                    return labels.length > 0 ? labels : ALL_ROMAJI; // Fallback jika kosong
-                } else if (state.test.rangeMode === 'single') {
-                    const singleGroup = GROUPS.find(g => g.key === state.test.singleGroup);
-                    if (singleGroup) {
-                        const labels = romajiFromGroup(singleGroup);
-                        return labels.length > 0 ? labels : ALL_ROMAJI; // Fallback jika kosong
-                    }
-                    return ALL_ROMAJI; // Fallback jika grup tunggal tidak ditemukan
-                }
-            }
-            // Fallback default jika tidak ada kondisi yang cocok
-            return ALL_ROMAJI; 
-        }
+        // function buildPoolLabels(){
+        //     // ... (kode lama buildPoolLabels) ...
+        //     return getChosenSubset(); // Hanya mengembalikan hasil dari getChosenSubset
+        // }
 
         function rangeLabels(fromKey,toKey){ const a=GROUPS.findIndex(g=>g.key===fromKey); const b=GROUPS.findIndex(g=>g.key===toKey); if(a<0||b<0) return []; const [from,to] = a<=b? [a,b]:[b,a]; return GROUPS.slice(from,to+1).flatMap(g=> g.idx.map(i=> g.list[i]) ); }
-        // function currentPoolLabels(){ return testPool.map(x=>x.romaji); } // No longer directly used
-        // function currentPoolChars(){ return testPool.map(x=>x.char); } // No longer directly used
-
-        // This function is now mostly redundant as updateRangeUI handles visibility.
-        // Keeping it for now but might remove if it causes conflicts.
-        function toggleRangeInputs() {
-            // This function is now largely handled by updateRangeUI, but keep it for consistency if other parts call it.
-            // Ensure elements are initialized before trying to access their values
-            if (!elRangeMode || !elFrom || !elTo || !elSingle || !elToWrap) return;
-
-            const rangeMode = elRangeMode.value;
-            
-            // Determine if a specific subset chip is active (excluding 'all', 'confusion', 'srs_due')
-            const isSpecialSubsetActive = (state.test.subset !== 'all' && state.test.subset !== 'confusion' && state.test.subset !== 'srs_due' && state.test.subset !== 'jft-drill' && !GROUPS.some(g => g.key === state.test.subset));
-
-            // If a specific subset chip is selected, the rangeMode should reflect that.
-            if (isSpecialSubsetActive) {
-                // When a specific chip (like a group chip or confusion/srs_due) is active,
-                // we should hide the range/single group selector and show the corresponding
-                // elements as if rangeMode was set internally.
-                if (elRangeMode) { elRangeMode.setAttribute('inert', ''); elRangeMode.hidden = true; }
-                setEnabled(elFrom, false);
-                setEnabled(elTo, false);
-                if (elToWrap) elToWrap.hidden = true;
-                setEnabled(elSingle, false); // No single group for specific chips as the chip itself defines the selection
-            } else {
-                if (elRangeMode) { elRangeMode.removeAttribute('inert'); elRangeMode.hidden = false; }
-                updateRangeUI(); // Apply range mode logic based on elRangeMode.value
-            }
-            updateTestInfo(); // Update test info text after range inputs are toggled
-        }
+        
+        // FIX: Fungsi toggleRangeInputs dihapus karena redundan, updateRangeUI sudah menanganinya.
+        // function toggleRangeInputs() {
+        //     // ... (kode lama toggleRangeInputs) ...
+        // }
 
 
         // New: Quick Presets
         const QUICK_PRESETS = {
             'aiueo-m': ['aiueo', 'm'], // a i u e o → ma mi mu me mo
-            'base-all': ['aiueo','w'],
-            'dakuon-all': ['g','p'],
-            'youon-all': ['ky','py'],
+            'base-all': ['aiueo','w'], // This will be used in buildPoolLabels now
+            'dakuon-all': ['g','p'], // This will be used in buildPoolLabels now
+            'youon-all': ['ky','py'], // This will be used in buildPoolLabels now
             // Preset JFT Drill is handled as a special subset in getChosenSubset()
             // so we don't need to define its range here for applyPreset directly.
             // The JFT Drill chip will set state.test.subset = 'jft-drill'
@@ -2989,15 +2965,15 @@
             // so this `if (key === 'jft-drill')` block in applyPreset is no longer strictly needed
             // if the chip itself handles the state.test.subset change.
             // However, if presets could be triggered by other means, this logic would be valid.
-            if (key === 'jft-drill') {
-                state.test.subset = 'jft-drill';
-                state.test.set = 'hira'; // Default for JFT Drill
-                state.test.qType = 'k2r'; // Default for JFT Drill
-                state.test.mode = 'mc'; // Default for JFT Drill
-                state.test.target = 20; // Default for JFT Drill
-                // The range inputs will be hidden by updateRangeUI due to the 'jft-drill' subset.
+            if (key === 'jft-drill' || key === 'base-all' || key === 'dakuon-all' || key === 'youon-all') {
+                state.test.subset = key; // Set the subset for these special cases
+                state.test.set = 'hira'; // Default for these presets
+                state.test.qType = 'k2r'; // Default for these presets
+                state.test.mode = 'mc'; // Default for these presets
+                state.test.target = 20; // Default for these presets
+                // The range inputs will be hidden by updateRangeUI due to the subset.
             } else {
-                // For other range presets
+                // For other range presets (e.g., aiueo-m)
                 state.test.rangeMode = 'range'; // Ensure it's in range mode
                 if (qs('#rangeMode')) qs('#rangeMode').value = 'range';
                 updateRangeUI(); // This will show #testFrom and #testTo
@@ -3489,8 +3465,8 @@
             safe.test.mode = ['type', 'mc'].includes(safe.test.mode) ? safe.test.mode : 'type';
             safe.test.qType = ['k2r', 'r2k', 'seq', 'audio_k2r', 'audio_r2k', 'kseq'].includes(safe.test.qType) ? safe.test.qType : 'k2r'; 
             safe.test.rangeMode = ['range', 'single'].includes(safe.test.rangeMode) ? safe.test.rangeMode : 'range';
-            safe.test.subset = ['all', ...GROUPS.map(g => g.key), 'confusion', 'srs_due', 'jft-drill'].includes(safe.test.subset) ? safe.test.subset : 'all'; // Updated for JFT Drill
-
+            safe.test.subset = ['all', 'base-all', 'dakuon-all', 'youon-all', ...GROUPS.map(g => g.key), 'confusion', 'srs_due', 'jft-drill'].includes(safe.test.subset) ? safe.test.subset : 'all'; // Updated for JFT Drill
+            
             if (!safe.confusionLog) safe.confusionLog = {hira:{}, kata:{}};
             if (typeof safe.confusionLog.hira !== 'object') safe.confusionLog.hira = {};
             if (typeof safe.confusionLog.kata !== 'object') safe.confusionLog.kata = {};
@@ -3646,62 +3622,68 @@
         on('#optC','click',()=>chooseMC(2));
         on('#optD','click',()=>chooseMC(3));
 
-        // Tambahan pengaman di input agar “r” benar-benar tidak bocor ke listener global:
+        // FIX: Perbaikan Hotkey Enter dan stopPropagation
         on('#ans','keydown',(e)=>{
-            // Saat mengetik di input, jangan biarkan keydown bubbling ke listener global
-            // supaya hotkey (mis. 'r') tidak pernah tertembak.
-            e.stopPropagation();
+            if (e.key === 'Enter') {
+                e.preventDefault(); // Mencegah form submit default jika ada
+                const btnCheck = qs('#btnCheck');
+                if (btnCheck && !btnCheck.hidden) {
+                    btnCheck.click();
+                }
+            }
+            // Penting: Menghentikan propagasi untuk semua event keydown dari input #ans.
+            // Ini mencegah hotkey global (seperti 'r', 'ArrowRight', 'Enter' dari global)
+            // terpicu saat pengguna berinteraksi dengan input jawaban.
+            e.stopPropagation(); 
         });
 
-        // Ganti handler hotkey supaya tidak mengganggu input
+        // Ganti handler hotkey global agar tidak mengganggu input
         document.addEventListener('keydown', (e) => {
             const tag = (document.activeElement?.tagName || '').toLowerCase();
-            const inText = tag === 'input' || tag === 'textarea' || document.activeElement?.isContentEditable;
+            const inAnyInput = tag === 'input' || tag === 'textarea' || document.activeElement?.isContentEditable;
 
-            // Cek mode jawaban saat ini
-            const mode = (qs('#answerMode')?.value || (window.state?.test?.mode) || 'type').toLowerCase();
-            const isTypingMode = mode === 'type';
+            // Hotkey Replay (R) — aktif hanya saat TIDAK fokus input manapun dan area tes terlihat
+            const testAreaVisible = !qs('#testArea')?.hidden;
+            if (String(e.key).toLowerCase() === 'r' && !inAnyInput && testAreaVisible) { // FIX: Added testAreaVisible
+                e.preventDefault();
+                const currentKana = (currentItem && currentItem.char) // FIX: Simplified to currentItem
+                                 || (currentItem && currentItem.kanaSeq && currentItem.kanaSeq[0]) 
+                                 || '';
+                if (currentKana) {
+                    playKanaAudio(currentKana);
+                } else {
+                    playCurrentQuestionAudio?.(); // Fallback to TTS if no specific kana for audio element
+                }
+                return;
+            }
 
-            // --- 1) Lindungi mode KETIK: biarkan semua huruf (termasuk 'r') masuk ke input ---
-            if (isTypingMode && inText) {
-                // IZINKAN pengetikan normal; JANGAN proses hotkey apa pun di bawah
-                // Kecuali: Enter & ArrowRight kita handle di bawah khusus input
-            } else {
-                // --- 2) Hotkey global hanya saat TIDAK mengetik ---
-                // Hotkey Replay (R) — aktif hanya saat TIDAK fokus input & bukan mode ketik
-                if (String(e.key).toLowerCase() === 'r') {
+            // MCQ: A/B/C/D atau 1/2/3/4 (aktif hanya saat TIDAK fokus input manapun dan area tes terlihat)
+            const answerModeMC = (qs('#answerMode')?.value === 'mc');
+
+            if (testAreaVisible && answerModeMC && !inAnyInput) {
+                const k = String(e.key).toLowerCase();
+                const idx = (k==='a'||k==='1')?0:(k==='b'||k==='2')?1:(k==='c'||k==='3')?2:(k==='d'||k==='4')?3:-1;
+                if (idx >= 0) {
                     e.preventDefault();
-                    // Panggil fungsi playKanaAudio atau ttsSpeak tergantung konteks
-                    const currentKana = (window.currentItem && currentItem.char) 
-                                     || (window.currentItem && currentItem.kanaSeq && currentItem.kanaSeq[0]) 
-                                     || '';
-                    if (currentKana) {
-                        playKanaAudio(currentKana);
-                    } else {
-                        playCurrentQuestionAudio?.(); // Fallback to TTS if no specific kana for audio element
-                    }
+                    chooseMC?.(idx);
                     return;
                 }
+            }
 
-                // MCQ: A/B/C/D atau 1/2/3/4
-                if (mode === 'mc') {
-                    const k = String(e.key).toLowerCase();
-                    const idx = (k==='a'||k==='1')?0:(k==='b'||k==='2')?1:(k==='c'||k==='3')?2:(k==='d'||k==='4')?3:-1;
-                    if (idx >= 0) { e.preventDefault(); chooseMC?.(idx); return; }
+            // ArrowRight (Lewati) - bisa dari mana saja, asalkan ada tombol skip DAN area tes terlihat
+            if (e.key === 'ArrowRight' && testAreaVisible) { // FIX: Added testAreaVisible
+                const btnSkip = qs('#btnSkip');
+                if (btnSkip && !btnSkip.hidden) {
+                    e.preventDefault();
+                    btnSkip.click();
                 }
+                return;
             }
+            
+            // Global Enter key handling telah dihapus/disederhanakan di sini
+            // karena penanganan untuk input #ans sudah dipindahkan secara lokal,
+            // dan tombol Enter pada input lain tidak boleh memicu submit jawaban tes.
 
-            // --- 3) Enter & ArrowRight boleh jalan kapan pun sesuai fungsinya ---
-            if (e.key === 'Enter' && !(mode === 'mc' && !inText)) {
-                // Enter = Cek hanya relevan di mode ketik, dan saat fokus bukan di tombol lain
-                const btn = qs('#btnCheck');
-                if (btn && isTypingMode && !btn.hidden) { e.preventDefault(); btn.click(); } // Pastikan tombol tidak hidden
-                return;
-            }
-            if (e.key === 'ArrowRight') {
-                const skip = qs('#btnSkip'); if (skip) { e.preventDefault(); skip.click(); }
-                return;
-            }
         }, { passive:false });
 
 
@@ -3745,67 +3727,46 @@
         bind('#pPause', 'click', pausePomo);
         bind('#pReset', 'click', resetPomo);
 
-        // Event listener for subset chips (modified to exclude preset chips which have their own click handlers)
-        qsa('#subsetChips .chip:not([data-preset])').forEach?.(chip => { // Added optional chaining
-            chip.addEventListener('click', (e) => {
-                const clickedChip = e.target.closest('.chip');
-                if (!clickedChip) return;
+        // FIX: Replaced multiple subset chip listeners with a single delegated listener
+        bind('#subsetChips', 'click', (e) => {
+            const clickedChip = e.target.closest('.chip');
+            if (!clickedChip) return;
 
-                let actualKey = '';
-                if (clickedChip.textContent === t('all_kana_label')) {
-                    actualKey = 'all';
-                } else if (clickedChip.textContent === t('confuse_train_label')) {
-                    actualKey = 'confusion';
-                } else if (clickedChip.textContent === t('review_today_label')) {
-                    actualKey = 'srs_due';
-                } else {
-                    // Check if the clicked chip corresponds to a group key (e.g., 'a i u e o' for 'aiueo')
-                    const foundGroup = GROUPS.find(g => g.label === clickedChip.textContent);
-                    if (foundGroup) {
-                        actualKey = foundGroup.key;
-                    }
-                }
+            const presetKey = clickedChip.dataset.preset;      // For 'aiueo-m', 'base-all', etc.
+            const subsetType = clickedChip.dataset.subsetType; // For 'all', 'confusion', 'srs_due', 'jft-drill', 'base-all', 'dakuon-all', 'youon-all'
+            const groupKey = clickedChip.dataset.groupKey;     // For individual group chips like 'aiueo', 'k', 's'
 
-                if (actualKey) {
-                    state.test.subset = actualKey;
-                    // If a subset chip is selected, update rangeMode accordingly
-                    // 'all', 'confusion', 'srs_due', 'jft-drill' are special cases (logic handled in getChosenSubset)
-                    // Group chips should implicitly set rangeMode to 'single'
-                    if (actualKey === 'all' || actualKey === 'confusion' || actualKey === 'srs_due' || actualKey === 'jft-drill') {
-                        state.test.rangeMode = 'range'; // These implicitly use a "range" logic for selection
-                    } else if (GROUPS.some(g => g.key === actualKey)) {
-                        state.test.rangeMode = 'single';
-                        state.test.singleGroup = actualKey; // Also set the single group
-                        if (elSingle) elSingle.value = actualKey; // Update UI for single group
-                    } else {
-                        // If it's not a special chip or a group chip, clear subset and default to range
-                        state.test.subset = '';
-                        state.test.rangeMode = 'range';
-                    }
-                    save();
-                    buildSubsetChips(); // Rebuild to update active state
-                    updateRangeUI(); // Apply range mode logic after subset change
-                    updateTestInfo(); // Update test info text
-                    clickTone('click');
-                } else {
-                     // If no actualKey found, it means it's likely a preset that's not 'jft-drill'
-                    // For presets like 'aiueo-m', we want to clear the subset to enable range controls.
-                    if (clickedChip.dataset.preset && clickedChip.dataset.preset !== 'jft-drill') {
-                        state.test.subset = '';
-                        save();
-                        buildSubsetChips();
-                        updateRangeUI();
-                        updateTestInfo();
-                        clickTone('click');
-                    }
-                }
-            });
+            if (presetKey) {
+                // Handle presets like 'aiueo-m', 'base-all', 'dakuon-all', 'youon-all'
+                applyPreset(presetKey);
+            } else if (subsetType) {
+                // Handle special subset types like 'all', 'confusion', 'srs_due', 'jft-drill'
+                state.test.subset = subsetType;
+                state.test.rangeMode = 'range'; // Reset to range (range controls will be hidden by updateRangeUI)
+                if (elRangeMode) elRangeMode.value = 'range'; // Update UI for rangeMode select
+            } else if (groupKey) {
+                // Handle individual group chips (e.g., 'aiueo', 'k', 's')
+                state.test.subset = groupKey;
+                state.test.rangeMode = 'single'; // Selecting a group implies single group mode
+                state.test.singleGroup = groupKey; // Set the single group value
+                if (elSingle) elSingle.value = groupKey; // Update UI for single group select
+                if (elRangeMode) elRangeMode.value = 'single'; // Update UI for rangeMode select
+            } else {
+                // Fallback for any other unhandled chip click, perhaps reset to default
+                state.test.subset = ''; // No specific subset selected
+                state.test.rangeMode = 'range';
+                if (elRangeMode) elRangeMode.value = 'range';
+            }
+            save();
+            buildSubsetChips(); // Rebuild to update active states
+            updateRangeUI();    // Apply range mode logic based on new state
+            updateTestInfo();   // Update test info text
+            clickTone('click');
         });
         
-        // Bind click handlers for the new preset chips
-        qsa('#subsetChips .chip[data-preset]').forEach?.(ch=>{ // Added optional chaining
-            ch.addEventListener('click', ()=>applyPreset(ch.dataset.preset));
-        });
+        // Removed old explicit bindings for subset chips:
+        // qsa('#subsetChips .chip:not([data-preset])').forEach?.(chip => { ... });
+        // qsa('#subsetChips .chip[data-preset]').forEach?.(ch=>{ ... });
 
 
         bind('#answerMode', 'change', (e) => { 
@@ -3859,7 +3820,7 @@
 
         // Sinkron UI Mode (Ketik vs MC)
         function applyAnswerModeUI(){
-            const mode = (qs('#answerMode')?.value || window.state?.test?.mode || 'type').toLowerCase();
+            const mode = (qs('#answerMode')?.value || state?.test?.mode || 'type').toLowerCase(); // FIX: Use state?.test?.mode
             const typeWrap = qs('#typeWrap');
             const mcWrap = qs('#mcWrap');
             if (!typeWrap || !mcWrap) return;
@@ -3868,7 +3829,7 @@
             mcWrap.hidden = !isMC;
         }
         on('#answerMode','change',()=>{
-            window.state.test.mode = qs('#answerMode').value;
+            state.test.mode = qs('#answerMode').value; // FIX: Use state.test.mode
             typeof save === 'function' && save();
             applyAnswerModeUI();
         });
