@@ -80,11 +80,9 @@
         }
         .phrase-item {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
+            flex-direction: column; /* Ubah menjadi kolom agar AI contoh ada di bawah */
             padding: 16px 8px;
             border-bottom: 1px solid var(--border);
-            cursor: pointer;
             transition: background-color var(--transition-duration) ease-out;
         }
         .phrase-item:hover {
@@ -92,6 +90,13 @@
         }
         .phrase-item:last-child {
             border-bottom: none;
+        }
+        .phrase-main-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            cursor: pointer; /* Agar bisa diklik untuk play audio */
         }
         .phrase-jp {
             font-family: 'Noto Sans JP', sans-serif;
@@ -102,10 +107,66 @@
             text-align: right;
             font-size: 16px;
         }
-        .phrase-item i {
+        .phrase-actions {
+            display: flex;
+            gap: 8px; /* Jarak antar tombol */
+            margin-left: 16px; /* Jarak dari phrase-id */
+            flex-shrink: 0;
+        }
+        .phrase-actions .btn-small {
+            min-height: 36px;
+            padding: 0 10px;
+            font-size: 13px;
+            border-radius: 8px;
+            background: var(--soft);
             color: var(--muted);
-            margin-left: 16px;
-            font-size: 18px;
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+        }
+        .phrase-actions .btn-small:hover {
+            background: var(--btn);
+            color: var(--ink);
+        }
+        .phrase-ai-examples {
+            margin-top: 12px;
+            padding: 12px;
+            background: var(--soft);
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            font-size: 14px;
+            line-height: 1.5;
+            display: none; /* Default hidden */
+            opacity: 0;
+            max-height: 0;
+            overflow: hidden;
+            transition: opacity var(--transition-duration) ease-out, max-height var(--transition-duration) ease-out;
+        }
+        .phrase-ai-examples.show {
+            display: block; /* Tampilkan block saat show */
+            opacity: 1;
+            max-height: 500px; /* Nilai max-height yang cukup besar untuk transisi */
+        }
+        .phrase-ai-examples p {
+            margin: 0 0 8px 0;
+        }
+        .phrase-ai-examples p:last-child {
+            margin-bottom: 0;
+        }
+        .phrase-ai-examples .loading-spinner {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--muted);
+            justify-content: center;
+        }
+        .phrase-ai-examples .loading-spinner .fa-spinner {
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
 
         /* === Sidebar === */
@@ -136,12 +197,12 @@
     </style>
 </head>
 <body>
-    <!-- Toggle Button -->
+    <!-- Tombol untuk membuka/menutup sidebar -->
     <button id="sidebarToggle" class="sidebar-toggle-btn" aria-label="Toggle Sidebar">
       <i class="fa-solid fa-bars"></i>
     </button>
 
-    <!-- Sidebar -->
+    <!-- Sidebar navigasi -->
     <nav id="sidebar" class="sidebar">
       <div class="row" style="justify-content: space-between; align-items: center;">
         <h3 style="margin:0;">Navigasi</h3>
@@ -155,9 +216,10 @@
         <li><a href="index2.html">🗂️ Flashcard</a></li>
         <li><a href="index3.html">🧮 Tabel Kana</a></li>
         <li><a href="index4.html">🗒️ Kosakata</a></li>
-        <li><a href="index5.html">💬 Ungkapan</a></li>
-        <li><a href="index7.html">🧠 Tebak Arti</a></li> <!-- Penambahan: Item menu "Tebak Arti" -->
+        <li><a href="index5.html" class="active">💬 Ungkapan</a></li>
+        <li><a href="index7.html">🧠 Tebak Arti</a></li>
         <li><a href="index6.html">✍️ Menulis</a></li>
+        <li><a href="index8.html">📚 Pelatih Membaca</a></li> <!-- Menambahkan link ke index8.html -->
       </ul>
     </nav>
 
@@ -180,23 +242,13 @@
                     <div class="small">Ungkapan Sehari-hari</div>
                 </div>
             </div>
-             <!-- NAVIGASI UTAMA LAMA - DISEMBUYIKAN -->
-             <!-- <nav class="main-nav">
-                <div class="row">
-                    <a href="index.html" class="btn ghost"><i class="fa-solid fa-home"></i> Latihan</a>
-                    <a href="index2.html" class="btn ghost"><i class="fa-solid fa-clone"></i> Flashcard</a>
-                    <a href="index3.html" class="btn ghost"><i class="fa-solid fa-table"></i> Tabel Kana</a>
-                    <a href="index4.html" class="btn ghost"><i class="fa-solid fa-book-open"></i> Kosakata</a>
-                    <a href="index5.html" class="btn primary"><i class="fa-solid fa-comments"></i> Ungkapan</a>
-                </div>
-            </nav> -->
         </div>
     </header>
 
     <main class="wrap">
         <div class="card">
             <h2><i class="fa-solid fa-comments icon"></i> Ungkapan (表現)</h2>
-            <div class="small">Daftar ungkapan umum yang berguna dalam percakapan sehari-hari. Klik untuk mendengarkan.</div>
+            <div class="small">Daftar ungkapan umum yang berguna dalam percakapan sehari-hari. Klik pada ungkapan untuk mendengarkan. Klik "Contoh AI" untuk melihat penggunaan dalam kalimat.</div>
         </div>
 
         <div class="spacer"></div>
@@ -223,7 +275,9 @@
 
     <script>
         // DATA UNGKAPAN
-        const phrases = [
+        // Menghapus duplikasi dan memastikan setiap frase unik
+        const uniquePhrases = new Map();
+        [
             { jp: 'おはようございます', id: 'Selamat pagi' },
             { jp: 'こんにちは', id: 'Selamat siang / Halo' },
             { jp: 'こんばんは', id: 'Selamat malam' },
@@ -273,7 +327,7 @@
             { jp: 'つかれました', id: 'Saya lelah' },
             { jp: 'ねむいです', id: 'Saya mengantuk' },
             { jp: 'おなかがすきました', id: 'Saya lapar' },
-            { jp: 'のどがかわきました', id: 'Saya haus' },
+            { jp: 'нодоがかわきました', id: 'Saya haus' },
             { jp: 'またあした', id: 'Sampai jumpa besok' },
             { jp: 'またこんど', id: 'Sampai jumpa lain kali' },
             { jp: 'おだいじに', id: 'Semoga cepat sembuh' },
@@ -331,11 +385,9 @@
             { jp: 'タバコをすいますか', id: 'Apakah Anda merokok?' },
             { jp: 'はい、すいます', id: 'Ya, saya merokok' },
             { jp: 'いいえ、すいません', id: 'Tidak, saya tidak merokok' },
-            { jp: 'ごめんください', id: 'Permisi (saat mengetuk pintu atau memanggil seseorang)' },
             { jp: 'おひさしぶりです', id: 'Lama tidak bertemu' },
             { jp: 'おげんきでしたか', id: 'Apa kabar (setelah lama tidak bertemu)?' },
             { jp: 'おかげさまで', id: 'Berkat Anda / Puji syukur' },
-            { jp: 'どうしましたか', id: 'Ada apa? / Apa yang terjadi?' },
             { jp: 'なんでもないです', id: 'Tidak apa-apa' },
             { jp: 'がっかりしました', id: 'Saya kecewa' },
             { jp: 'うれしいです', id: 'Saya senang' },
@@ -343,10 +395,190 @@
             { jp: 'こわいです', id: 'Saya takut' },
             { jp: 'たのしみです', id: 'Saya menantikannya' },
             { jp: 'しんぱいです', id: 'Saya khawatir' },
-        ];
+            // Ungkapan tambahan yang sering dipakai sehari-hari (diperiksa dan duplikasi dihapus)
+            { jp: 'いってらっしゃい', id: 'Hati-hati di jalan' },
+            { jp: 'おかえり', id: 'Selamat datang kembali (kasual)' },
+            { jp: 'おしえてください', id: 'Tolong ajari saya' },
+            { jp: 'またね', id: 'Sampai jumpa lagi (kasual)' },
+            { jp: 'いいえ', id: 'Tidak' },
+            { jp: 'もういちどおねがいします', id: 'Tolong sekali lagi' },
+            { jp: 'ゆっくりおねがいします', id: 'Tolong perlahan-lahan' },
+            { jp: 'もちろん', id: 'Tentu saja' },
+            { jp: 'おなまえは？', id: 'Siapa nama Anda?' },
+            { jp: 'わたしは [nama] です', id: 'Nama saya [nama]' },
+            { jp: 'いくらですか？', id: 'Berapa harganya?' },
+            { jp: 'おいしい', id: 'Enak (kasual)' },
+            { jp: 'たのしい', id: 'Menyenangkan (kasual)' },
+            { jp: 'さむい', id: 'Dingin (kasual)' },
+            { jp: 'あつい', id: 'Panas (kasual)' },
+            { jp: 'がんばって', id: 'Semangat (kasual)' },
+            { jp: 'おめでとう', id: 'Selamat (kasual)' },
+            { jp: 'よかった', id: 'Syukurlah / Bagus!' },
+            { jp: 'だめです', id: 'Tidak boleh / Salah' },
+            { jp: 'すきです', id: 'Saya suka' },
+            { jp: 'きらいです', id: 'Saya tidak suka' },
+            { jp: 'ほんとうに？', id: 'Benarkah?' },
+            { jp: 'うそ！', id: 'Bohong! / Tidak mungkin!' },
+            { jp: 'ちょっとまってください', id: 'Tolong tunggu sebentar' },
+            { jp: 'もうすこし', id: 'Sedikit lagi' },
+            { jp: 'これでいいですか', id: 'Apakah ini sudah cukup / benar?' },
+            { jp: 'はい、いいです', id: 'Ya, sudah cukup / benar' },
+            { jp: 'いいえ、だめです', id: 'Tidak, tidak boleh / salah' },
+            { jp: 'おねがい', id: 'Tolong (kasual)' },
+            { jp: 'ごめん', id: 'Maaf (kasual)' },
+            { jp: 'どうも', id: 'Terima kasih (sangat kasual)' },
+            { jp: 'じゃあね', id: 'Dah (kasual)' },
+            { jp: 'バイバイ', id: 'Bye-bye' },
+            { jp: 'おつかれ', id: 'Kerja bagus (kasual, ke teman/rekan)' },
+            { jp: 'がんばるね', id: 'Aku akan berusaha (kasual)' },
+            { jp: 'よろしく', id: 'Mohon bantuannya (kasual)' },
+            { jp: 'どうぞよろしく', id: 'Senang berkenalan (kasual)' },
+            { jp: 'いかがですか', id: 'Bagaimana?' },
+            { jp: 'げんき？', id: 'Apa kabar? (kasual)' },
+            { jp: 'うん、げんき', id: 'Ya, baik (kasual)' },
+            { jp: 'ちょっと', id: 'Sebentar / Agak...' },
+            { jp: 'ぜんぜん', id: 'Sama sekali tidak' },
+            { jp: 'まさか！', id: 'Tidak mungkin! / Jangan-jangan!' },
+            { jp: 'すごい！', id: 'Hebat! / Keren!' },
+            { jp: 'なるほど', id: 'Begitu ya / Saya mengerti' },
+            { jp: 'しらない', id: 'Saya tidak tahu' },
+            { jp: 'やめてください', id: 'Tolong hentikan' },
+            { jp: 'やめろ！', id: 'Hentikan! (kasar)' },
+            { jp: 'いいよ', id: 'Baiklah / Tidak apa-apa (kasual)' },
+            { jp: 'だめだ', id: 'Tidak boleh (kasual)' },
+            { jp: 'しんじて', id: 'Percayalah' },
+            { jp: 'うそつき！', id: 'Pembohong!' },
+            { jp: 'がんばろう！', id: 'Ayo semangat!' },
+            { jp: 'がんばります！', id: 'Saya akan berusaha!' },
+            { jp: 'よかったね', id: 'Syukurlah ya / Bagus ya' },
+        ].forEach(phrase => uniquePhrases.set(phrase.jp, phrase));
+
+        const phrases = Array.from(uniquePhrases.values());
 
         // Elemen DOM
         const phraseList = document.getElementById('phraseList');
+
+        // --- INTEGRASI API GEMINI ---
+        // Menggunakan API Key yang Anda berikan
+        const GEMINI_API_KEY = "AIzaSyCZVyGLZrlJW-bQFSYfIgVgWhVWQ6icaeE"; 
+        const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${GEMINI_API_KEY}`;
+
+        // Cache untuk menyimpan hasil Gemini agar tidak perlu memanggil API berulang
+        const geminiCache = new Map();
+
+        // Fungsi untuk menangani percobaan ulang dengan exponential backoff
+        async function fetchWithExponentialBackoff(url, options, retries = 3, delay = 1000) {
+            for (let i = 0; i < retries; i++) {
+                try {
+                    const response = await fetch(url, options);
+                    if (response.status === 429 && i < retries - 1) { // Too Many Requests
+                        await new Promise(resolve => setTimeout(resolve, delay));
+                        delay *= 2; // Gandakan delay
+                        continue;
+                    }
+                    return response;
+                } catch (error) {
+                    if (i < retries - 1) {
+                        await new Promise(resolve => setTimeout(resolve, delay));
+                        delay *= 2;
+                        continue;
+                    }
+                    throw error;
+                }
+            }
+            throw new Error('Gagal melakukan fetch setelah beberapa percobaan.');
+        }
+
+        async function fetchAIExamples(phraseItemEl, jpPhrase) {
+            const aiExamplesDiv = phraseItemEl.querySelector('.phrase-ai-examples');
+            const toggleButton = phraseItemEl.querySelector('.btn-toggle-ai-examples');
+
+            // Toggle visibility
+            const isShowing = aiExamplesDiv.classList.contains('show');
+            if (isShowing) {
+                aiExamplesDiv.classList.remove('show');
+                toggleButton.innerHTML = '<i class="fa-solid fa-lightbulb"></i> Contoh AI';
+                return;
+            }
+
+            // Tampilkan spinner dan status loading
+            aiExamplesDiv.innerHTML = `<div class="loading-spinner"><i class="fa-solid fa-spinner fa-spin"></i> Memuat contoh...</div>`;
+            aiExamplesDiv.classList.add('show');
+            toggleButton.innerHTML = '<i class="fa-solid fa-lightbulb"></i> Sembunyikan Contoh';
+
+            // Cek cache
+            if (geminiCache.has(jpPhrase)) {
+                aiExamplesDiv.innerHTML = geminiCache.get(jpPhrase);
+                return;
+            }
+
+            // Prompt untuk Gemini
+            const prompt = `Generate 2 short example sentences in Japanese using the phrase '${jpPhrase}'. Also provide the Indonesian translation for each sentence. Format the output as follows:
+[Japanese Sentence 1]
+[Indonesian Translation 1]
+
+[Japanese Sentence 2]
+[Indonesian Translation 2]
+
+Do not include any other text, greetings, or explanations.`;
+
+            try {
+                const response = await fetchWithExponentialBackoff(GEMINI_API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{
+                            parts: [{ text: prompt }]
+                        }],
+                        safetySettings: [
+                            { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_NONE" },
+                            { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_NONE" },
+                            { category: "HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold: "BLOCK_NONE" },
+                            { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_NONE" },
+                        ],
+                    })
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    console.error('Gemini API Error:', errorData);
+                    throw new Error(errorData.error.message || 'Terjadi kesalahan saat menghubungi API.');
+                }
+
+                const result = await response.json();
+                let generatedText = result.candidates?.[0]?.content?.parts?.[0]?.text || '';
+
+                // Periksa apakah respons kosong atau tidak valid
+                if (!generatedText.trim()) {
+                    generatedText = 'Tidak dapat menghasilkan contoh. Respons API kosong atau tidak valid.';
+                }
+
+                // Format output
+                const lines = generatedText.split('\n').filter(line => line.trim() !== '');
+                let formattedHtml = '';
+                if (lines.length >= 2) {
+                    for (let i = 0; i < lines.length; i += 2) {
+                        const jpLine = lines[i];
+                        const idLine = lines[i+1] || '';
+                        if (jpLine) {
+                            formattedHtml += `<p class="phrase-jp" style="font-size: 16px; margin-bottom: 4px;">${jpLine}</p>`;
+                            if (idLine) {
+                                formattedHtml += `<p class="small" style="color: var(--ink); margin-bottom: 12px;">${idLine}</p>`;
+                            }
+                        }
+                    }
+                } else {
+                    formattedHtml = `<p>Tidak dapat menghasilkan contoh. Format respons tidak sesuai: ${generatedText}</p>`;
+                }
+
+                aiExamplesDiv.innerHTML = formattedHtml;
+                geminiCache.set(jpPhrase, formattedHtml); // Simpan ke cache
+
+            } catch (error) {
+                console.error('Fetch Error:', error);
+                aiExamplesDiv.innerHTML = `<p style="color:var(--warn);">Error: ${error.message}. Coba lagi nanti.</p>`;
+            }
+        }
 
         function renderPhraseList() {
             phraseList.innerHTML = '';
@@ -354,12 +586,43 @@
                 const li = document.createElement('li');
                 li.className = 'phrase-item';
                 li.innerHTML = `
-                    <div class="phrase-jp">${phrase.jp}</div>
-                    <div class="phrase-id">${phrase.id}</div>
-                    <i class="fa-solid fa-volume-up"></i>
+                    <div class="phrase-main-info" data-jp="${phrase.jp}">
+                        <div class="phrase-jp">${phrase.jp}</div>
+                        <div class="phrase-id">${phrase.id}</div>
+                        <div class="phrase-actions">
+                            <button class="btn-small" aria-label="Putar audio ungkapan ${phrase.jp}">
+                                <i class="fa-solid fa-volume-up"></i>
+                            </button>
+                            <button class="btn-small btn-toggle-ai-examples" aria-label="Lihat contoh AI untuk ${phrase.jp}">
+                                <i class="fa-solid fa-lightbulb"></i> Contoh AI
+                            </button>
+                        </div>
+                    </div>
+                    <div class="phrase-ai-examples" aria-live="polite">
+                        <!-- Contoh AI akan dimuat di sini -->
+                    </div>
                 `;
-                li.addEventListener('click', () => speak(phrase.jp));
                 phraseList.appendChild(li);
+
+                // Tambahkan listener klik untuk tombol audio secara langsung
+                li.querySelector('.phrase-actions .btn-small:first-child').addEventListener('click', (e) => {
+                    e.stopPropagation(); // Mencegah event click bubbling ke phrase-main-info
+                    speak(phrase.jp);
+                });
+
+                // Tambahkan listener klik untuk tombol contoh AI
+                li.querySelector('.btn-toggle-ai-examples').addEventListener('click', (e) => {
+                    e.stopPropagation(); // Mencegah event click bubbling
+                    fetchAIExamples(li, phrase.jp);
+                });
+
+                // Tambahkan listener klik untuk div info utama (untuk memutar audio jika tidak ada tombol yang diklik)
+                li.querySelector('.phrase-main-info').addEventListener('click', (e) => {
+                    // Hanya putar audio jika click bukan dari tombol mana pun
+                    if (!e.target.closest('.phrase-actions')) {
+                        speak(phrase.jp);
+                    }
+                });
             });
         }
 

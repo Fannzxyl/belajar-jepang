@@ -1,0 +1,1468 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Pelatih Membaca (JP)</title>
+    <meta name="description" content="Latih kemampuan membaca hiragana, katakana, dan kanji dengan filter subset kana." />
+    <meta name="theme-color" content="#1a1a1a">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <style>
+        /* CSS Variabel (konsisten dengan index7.html) */
+        :root {
+            --bg: #1a1a1a;
+            --panel: #2a2a2a;
+            --text: #e0e0e0;
+            --muted: #a0a0a0;
+            --border: rgba(255, 255, 255, 0.1);
+            --primary: #6b8bff;
+            --secondary: #3dd8b5;
+            --success: #2fb875;
+            --warning: #ff7b7b;
+            --radius: 12px;
+            --space: 12px;
+            --maxw: 760px; /* Target HP 720p */
+            --shadow: 0 4px 12px rgba(0,0,0,0.3);
+            --transition-duration: 0.2s;
+        }
+
+        /* Base Styles (konsisten dengan index7.html) */
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            background-color: var(--bg);
+            color: var(--text);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-x: hidden;
+            transition: background-color var(--transition-duration) ease, color var(--transition-duration) ease;
+        }
+
+        .container {
+            width: 100%;
+            max-width: var(--maxw);
+            margin-inline: auto;
+            padding: clamp(var(--space), 4vw, 24px);
+            display: flex;
+            flex-direction: column;
+            gap: var(--space);
+        }
+
+        @media (min-width: 860px) {
+            .container {
+                max-width: 1100px; /* Lebar lebih besar untuk desktop */
+            }
+        }
+
+        .card {
+            background: var(--panel);
+            border-radius: var(--radius);
+            padding: clamp(var(--space), 3vw, 20px);
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            transition: background-color var(--transition-duration) ease, border-color var(--transition-duration) ease, box-shadow var(--transition-duration) ease;
+        }
+
+        h1 {
+            font-size: clamp(24px, 6vw, 32px);
+            margin: 0 0 8px;
+            text-align: center;
+        }
+
+        .subtitle {
+            font-size: clamp(14px, 3vw, 16px);
+            color: var(--muted);
+            text-align: center;
+            margin-bottom: var(--space);
+        }
+
+        .btn {
+            min-height: 48px; /* Ramah jempol */
+            padding: 0 16px;
+            border-radius: var(--radius);
+            border: none;
+            cursor: pointer;
+            font-size: clamp(14px, 3.5vw, 16px);
+            font-weight: 500;
+            transition: all var(--transition-duration) ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            text-decoration: none;
+            flex-grow: 1;
+        }
+        .btn.primary {
+            background: var(--primary);
+            color: #fff;
+        }
+        .btn.secondary {
+            background: var(--panel);
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+        .btn:hover:not(:disabled) {
+            opacity: 0.9;
+        }
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0,0,0,0);
+            white-space: nowrap;
+            border: 0;
+        }
+        .text-center {
+            text-align: center;
+        }
+        .spacer {
+            height: var(--space);
+        }
+
+        /* Toast Message (konsisten dengan index7.html) */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(0, 0, 0, 0.8);
+            color: #fff;
+            padding: 10px 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+            max-width: calc(100% - 40px);
+            text-align: center;
+        }
+        .toast.show {
+            opacity: 1;
+        }
+        .toast.warn {
+            background-color: var(--warning);
+            color: #333;
+        }
+
+        /* === Sidebar === (konsisten dengan index7.html) */
+        .sidebar{
+            position:fixed; top:0; left:-300px; width:280px; height:100%;
+            background:var(--panel); box-shadow:var(--shadow); z-index:1000;
+            transition:left .3s ease-in-out; padding:20px; padding-top:calc(20px + env(safe-area-inset-top));
+            display:flex; flex-direction:column; gap:10px; overflow-y:auto; border-right:1px solid var(--border);
+        }
+        .sidebar.is-open{ left:0; }
+        .sidebar .menu{ list-style:none; margin:0; padding:0; }
+        .sidebar .menu li a{ display:flex; gap:.5rem; align-items:center; padding:.75rem 1rem; border-radius:12px; color:var(--text); text-decoration:none; }
+        .sidebar .menu li a:hover{ background: rgba(255, 255, 255, 0.08); }
+        .sidebar .menu li a.active{ background:rgba(107,139,255,.18); font-weight:600; }
+        .sidebar-toggle-btn{
+            position:fixed; top:16px; left:16px; z-index:1001; background:var(--panel); border:1px solid var(--border);
+            border-radius:50%; width:44px; height:44px; display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:var(--shadow);
+        }
+        .sidebar-toggle-btn i{ color:var(--text); font-size:20px; }
+        @media (min-width:768px){ body.sidebar-open{ padding-left:280px; } }
+        @media (max-width:640px){ .sidebar{ width:84vw; max-width:320px; } }
+        /* Biar header gak ketutup tombol */
+        header .brand{ position:relative; z-index:1002; padding-left:60px; }
+        @media (max-width:767px){
+            header .brand{ padding-left:0; }
+            .sidebar-toggle-btn{ top:calc(16px + env(safe-area-inset-top)); }
+        }
+
+        /* --- Reading Trainer Specific Styles (rdg-) --- */
+        .rdg-control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: var(--space);
+        }
+
+        .rdg-control-group label {
+            font-size: clamp(14px, 3.5vw, 16px);
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .rdg-control-group input[type="range"] {
+            flex-grow: 1;
+            -webkit-appearance: none;
+            appearance: none;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            outline: none;
+            transition: background 0.2s ease;
+        }
+        .rdg-control-group input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--primary);
+            cursor: pointer;
+            box-shadow: 0 0 0 3px rgba(107, 139, 255, 0.2);
+        }
+        .rdg-control-group input[type="range"]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--primary);
+            cursor: pointer;
+            box-shadow: 0 0 0 3px rgba(107, 139, 255, 0.2);
+        }
+        .rdg-control-group input[type="number"] {
+            width: 60px;
+            height: 36px;
+            padding: 4px 8px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: var(--bg);
+            color: var(--text);
+            font-size: clamp(14px, 3.5vw, 16px);
+            text-align: center;
+            -moz-appearance: textfield;
+        }
+        .rdg-control-group input[type="number"]::-webkit-outer-spin-button,
+        .rdg-control-group input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        .rdg-output-area {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 16px;
+            min-height: 200px;
+            font-family: 'Noto Sans JP', sans-serif;
+            font-size: clamp(16px, 4vw, 20px);
+            line-height: 1.8;
+            word-break: break-word;
+            white-space: pre-wrap;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        /* Script Selector */
+        .rdg-script-selector {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: var(--space);
+        }
+        .rdg-script-selector button {
+            flex-grow: 1;
+            padding: 10px 15px;
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            background: var(--panel);
+            color: var(--text);
+            cursor: pointer;
+            transition: all var(--transition-duration) ease;
+        }
+        .rdg-script-selector button.active {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: #fff;
+        }
+        .rdg-script-selector button:hover {
+            opacity: 0.9;
+        }
+
+        /* Subset Checkboxes */
+        .rdg-subset-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: var(--space);
+        }
+        .rdg-subset-controls .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            font-size: clamp(14px, 3.5vw, 16px);
+        }
+        .rdg-subset-controls input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+            border: 1px solid var(--border);
+            background: var(--bg);
+            appearance: none;
+            -webkit-appearance: none;
+            display: grid;
+            place-content: center;
+            flex-shrink: 0;
+            transition: all 0.2s ease;
+        }
+        .rdg-subset-controls input[type="checkbox"]::before {
+            content: "\f00c"; /* Font Awesome check icon */
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            font-size: 14px;
+            color: #fff;
+            transform: scale(0);
+            transition: transform 0.1s ease-in-out;
+        }
+        .rdg-subset-controls input[type="checkbox"]:checked {
+            background-color: var(--primary);
+            border-color: var(--primary);
+        }
+        .rdg-subset-controls input[type="checkbox"]:checked::before {
+            transform: scale(1);
+        }
+        .rdg-subset-controls input[type="checkbox"]:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .rdg-slider-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+            color: var(--muted);
+            font-size: clamp(12px, 3vw, 14px);
+        }
+        .rdg-slider-control span {
+            min-width: 30px; /* Lebar minimum untuk persentase */
+            text-align: right;
+        }
+
+        /* Tooltip */
+        .tooltip-container {
+            position: relative;
+            display: inline-block;
+        }
+        .tooltip-icon {
+            color: var(--muted);
+            font-size: 0.9em;
+            margin-left: 4px;
+            cursor: help;
+        }
+        .tooltip-text {
+            visibility: hidden;
+            background-color: rgba(0,0,0,0.85);
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 8px 12px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%; /* Atas elemen */
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.3s;
+            white-space: nowrap;
+            font-size: 0.8em;
+        }
+        .tooltip-text::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: rgba(0,0,0,0.85) transparent transparent transparent;
+        }
+        .tooltip-container:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .rdg-action-buttons {
+            display: flex;
+            gap: var(--space);
+            margin-top: var(--space);
+            flex-wrap: wrap;
+        }
+
+        /* Preset Buttons */
+        .rdg-preset-buttons {
+            display: flex;
+            gap: 8px;
+            margin-bottom: var(--space);
+            flex-wrap: wrap;
+        }
+        .rdg-preset-buttons .btn {
+            flex-grow: 1;
+        }
+    </style>
+</head>
+<body>
+    <!-- Toggle Button -->
+    <button id="sidebarToggle" class="sidebar-toggle-btn" aria-label="Toggle Sidebar">
+      <i class="fa-solid fa-bars"></i>
+    </button>
+
+    <!-- Sidebar -->
+    <nav id="sidebar" class="sidebar">
+      <div class="row" style="justify-content: space-between; align-items: center;">
+        <h3 style="margin:0;">Navigasi</h3>
+        <button class="btn secondary" id="closeSidebar" aria-label="Tutup Sidebar">
+          <i class="fa-solid fa-times"></i>
+        </button>
+      </div>
+      <hr style="border:none;border-top:1px solid var(--border);width:100%;">
+      <ul class="menu">
+        <li><a href="index.html">� Latihan</a></li>
+        <li><a href="index2.html">🗂️ Flashcard</a></li>
+        <li><a href="index3.html">🧮 Tabel Kana</a></li>
+        <li><a href="index4.html">🗒️ Kosakata</a></li>
+        <li><a href="index5.html">💬 Ungkapan</a></li>
+        <li><a href="index7.html">🧠 Tebak Arti</a></li>
+        <li><a href="index6.html">✍️ Menulis</a></li>
+        <li><a href="index8.html" class="active">📚 Pelatih Membaca</a></li> <!-- New: Reading Trainer -->
+      </ul>
+    </nav>
+
+    <div class="container">
+        <header class="card">
+            <h1>Pelatih Membaca Bahasa Jepang</h1>
+            <p class="subtitle">Hasilkan teks Hiragana, Katakana, atau Kanji dengan filter karakter.</p>
+        </header>
+
+        <section class="card">
+            <h2>Pengaturan Teks</h2>
+
+            <div class="rdg-control-group">
+                <h3>Preset Cepat</h3>
+                <div class="rdg-preset-buttons">
+                    <button class="btn secondary" data-preset="beginner">Pemula</button>
+                    <button class="btn secondary" data-preset="intermediate">Menengah</button>
+                    <button class="btn secondary" data-preset="advanced">Lanjutan</button>
+                </div>
+            </div>
+            
+            <div class="rdg-control-group">
+                <label for="rdg-script-select">Pilih Skrip:</label>
+                <div id="rdg-script-selector" class="rdg-script-selector">
+                    <button data-script="hiragana">Hiragana</button>
+                    <button data-script="katakana">Katakana</button>
+                    <button data-script="mixed">Campuran</button>
+                    <button data-script="furigana">Kanji + Furigana</button>
+                </div>
+            </div>
+
+            <div class="rdg-control-group">
+                <h3>Filter Subset Kana</h3>
+                <div class="rdg-subset-controls">
+                    <label class="checkbox-item tooltip-container">
+                        <input type="checkbox" id="rdg-subset-gojuon" checked data-subset="gojuon">
+                        Dasar (gojūon)
+                        <i class="fa-solid fa-circle-question tooltip-icon"></i>
+                        <span class="tooltip-text">Hiragana/Katakana dasar (a, ka, sa, ta, na, ha, ma, ya, ra, wa, n).</span>
+                    </label>
+                    <label class="checkbox-item tooltip-container">
+                        <input type="checkbox" id="rdg-subset-dakuon" data-subset="dakuon">
+                        Dakuon (が/ざ/だ/ば)
+                        <i class="fa-solid fa-circle-question tooltip-icon"></i>
+                        <span class="tooltip-text">Karakter dengan tanda "dakuten" (ga, za, da, ba, pa, dll.).</span>
+                    </label>
+                    <label class="checkbox-item tooltip-container">
+                        <input type="checkbox" id="rdg-subset-handakuon" data-subset="handakuon">
+                        Handakuon (ぱ行)
+                        <i class="fa-solid fa-circle-question tooltip-icon"></i>
+                        <span class="tooltip-text">Karakter dengan tanda "handakuten" (pa, pi, pu, pe, po).</span>
+                    </label>
+                    <label class="checkbox-item tooltip-container">
+                        <input type="checkbox" id="rdg-subset-youon" data-subset="youon">
+                        Youon (きゃ/しゃ/…)
+                        <i class="fa-solid fa-circle-question tooltip-icon"></i>
+                        <span class="tooltip-text">Kombinasi karakter (kya, shu, cho, nya, hya, mya, rya, gya, ja, bya, pya, dll.).</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="rdg-control-group">
+                <h3>Pengaturan Lanjutan</h3>
+                <div class="rdg-slider-control tooltip-container">
+                    <label for="rdg-sokuon-slider">Sokuon っ (frekuensi):</label>
+                    <input type="range" id="rdg-sokuon-slider" min="0" max="40" step="5" value="10">
+                    <span id="rdg-sokuon-display">10%</span>
+                    <i class="fa-solid fa-circle-question tooltip-icon"></i>
+                    <span class="tooltip-text">Frekuensi injeksi karakter "っ" (tsu kecil) untuk suara ganda.</span>
+                </div>
+                <div class="rdg-slider-control tooltip-container">
+                    <label for="rdg-choon-slider">Chōon ー (frekuensi):</label>
+                    <input type="range" id="rdg-choon-slider" min="0" max="60" step="5" value="20" disabled>
+                    <span id="rdg-choon-display">20%</span>
+                    <i class="fa-solid fa-circle-question tooltip-icon"></i>
+                    <span class="tooltip-text">Frekuensi injeksi karakter "ー" (garis panjang) untuk vokal panjang (khusus Katakana).</span>
+                </div>
+            </div>
+
+            <div class="rdg-control-group">
+                <label for="rdg-paragraph-count">Jumlah Paragraf:</label>
+                <input type="number" id="rdg-paragraph-count" min="1" max="10" value="3">
+            </div>
+            <div class="rdg-control-group">
+                <label for="rdg-sentence-per-paragraph">Kalimat per Paragraf:</label>
+                <input type="number" id="rdg-sentence-per-paragraph" min="2" max="10" value="4">
+            </div>
+            <div class="rdg-control-group">
+                <label for="rdg-target-length">Panjang Target Kata (per kalimat):</label>
+                <input type="number" id="rdg-target-length" min="5" max="20" value="10">
+            </div>
+
+            <div class="rdg-action-buttons">
+                <button class="btn primary" id="rdg-generate-btn"><i class="fa-solid fa-sync-alt"></i> Hasilkan Teks</button>
+                <button class="btn secondary" id="rdg-copy-btn"><i class="fa-solid fa-copy"></i> Salin</button>
+                <button class="btn secondary" id="rdg-speak-btn"><i class="fa-solid fa-volume-up"></i> Bicara</button>
+            </div>
+        </section>
+
+        <section class="card">
+            <h2>Hasil Teks</h2>
+            <div id="rdg-output" class="rdg-output-area" contenteditable="true">
+                <!-- Hasil teks akan muncul di sini -->
+                <p>Klik "Hasilkan Teks" untuk memulai!</p>
+            </div>
+        </section>
+    </div>
+
+    <div id="toastMessage" class="toast"></div>
+
+    <script>
+        // --- CONSTANTS & DATA ---
+        const DICTIONARY = [
+            // Contoh kata (N5-ish). Idealnya ini bank kata yang lebih besar dan terstruktur.
+            // Format: { j: 'Kanji', k: 'kana' }
+            { j: '学校', k: 'がっこう' }, { j: '先生', k: 'せんせい' }, { j: '学生', k: 'がくせい' },
+            { j: '日本', k: 'にほん' }, { j: '日本語', k: 'にほんご' }, { j: '私', k: 'わたし' },
+            { j: 'あなた', k: 'あなた' }, { j: '食べる', k: 'たべる' }, { j: '飲む', k: 'のむ' },
+            { j: '行く', k: 'いく' }, { j: '来る', k: 'くる' }, { j: '読む', k: 'よむ' },
+            { j: '書く', k: 'かく' }, { j: '聞く', k: 'きく' }, { j: '話す', k: 'はなす' },
+            { j: '見る', k: 'みる' }, { j: '買う', k: 'かう' }, { j: '小さい', k: 'ちいさい' },
+            { j: '大きい', k: 'おおきい' }, { j: '高い', k: 'たかい' }, { j: '安い', k: 'やすい' },
+            { j: '新しい', k: 'あたらしい' }, { j: '古い', k: 'ふるい' }, { j: '猫', k: 'ねこ' },
+            { j: '犬', k: 'いぬ' }, { j: '魚', k: 'さかな' }, { j: '鳥', k: 'とり' },
+            { j: '木', k: 'き' }, { j: '花', k: 'はな' }, { j: '水', k: 'みず' },
+            { j: 'お茶', k: 'おちゃ' }, { j: 'ご飯', k: 'ごはん' }, { j: 'パン', k: 'パン' },
+            { j: '駅', k: 'えき' }, { j: '電車', k: 'でんしゃ' }, { j: '車', k: 'くるま' },
+            { j: '今', k: 'いま' }, { j: '時間', k: 'じかん' }, { j: '友達', k: 'ともだち' },
+            { j: '家族', k: 'かぞく' }, { j: '父', k: 'ちち' }, { j: '母', k: 'はは' },
+            { j: '兄', k: 'あに' }, { j: '姉', k: 'あね' }, { j: '弟', k: 'おとうと' },
+            { j: '妹', k: 'いもうと' }, { j: '男の子', k: 'おとこのこ' }, { j: '女の子', k: 'おんなのこ' },
+            { j: '本', k: 'ほん' }, { j: 'ペン', k: 'ペン' }, { j: '鉛筆', k: 'えんぴつ' },
+            { j: '消しゴム', k: 'けしゴム' }, { j: 'ノート', k: 'ノート' }, { j: '机', k: 'つくえ' },
+            { j: '椅子', k: 'いす' }, { j: '時計', k: 'とけい' }, { j: '電話', k: 'でんわ' },
+            { j: '窓', k: 'まど' }, { j: 'ドア', k: 'ドア' }, { j: '傘', k: 'かさ' },
+            { j: '靴', k: 'くつ' }, { j: '服', k: 'ふく' }, { j: '帽子', k: 'ぼうし' },
+            { j: '眼鏡', k: 'めがね' }, { j: '手', k: 'て' }, { j: '足', k: 'あし' },
+            { j: '目', k: 'め' }, { j: '耳', k: 'みみ' }, { j: '口', k: 'くち' },
+            { j: '鼻', k: 'はな' }, { j: '頭', k: 'あたま' }, { j: '髪', k: 'かみ' },
+            { j: '顔', k: 'かお' }, { j: '体', k: 'からだ' }, { j: '心', k: 'こころ' },
+            { j: '家', k: 'いえ' }, { j: '部屋', k: 'へや' }, { j: '朝', k: 'あさ' },
+            { j: '昼', k: 'ひる' }, { j: '夜', k: 'よる' }, { j: '今日', k: 'きょう' },
+            { j: '明日', k: 'あした' }, { j: '昨日', k: 'きのう' }, { j: '週', k: 'しゅう' },
+            { j: '月', k: 'つき' }, { j: '年', k: 'とし' }, { j: '毎日', k: 'まいにち' },
+            { j: '毎週', k: 'まいしゅう' }, { j: '毎月', k: 'まいつき' }, { j: '毎年', k: 'まいとし' },
+            { j: '何', k: 'なに' }, { j: 'どこ', k: 'どこ' }, { j: 'いつ', k: 'いつ' },
+            { j: '誰', k: 'だれ' }, { j: 'なぜ', k: 'なぜ' }, { j: 'どう', k: 'どう' },
+            { j: 'いくら', k: 'いくら' }, { j: '一', k: 'いち' }, { j: '二', k: 'に' },
+            { j: '三', k: 'さん' }, { j: '四', k: 'よん' }, { j: '五', k: 'ご' },
+            { j: '六', k: 'ろく' }, { j: '七', k: 'なな' }, { j: '八', k: 'はち' },
+            { j: '九', k: 'きゅう' }, { j: '十', k: 'じゅう' }, { j: '百', k: 'ひゃく' },
+            { j: '千', k: 'せん' }, { j: '万', k: 'まん' }, { j: '円', k: 'えん' },
+            { j: 'はい', k: 'はい' }, { j: 'いいえ', k: 'いいえ' }, { j: 'おはよう', k: 'おはよう' },
+            { j: 'こんにちは', k: 'こんにちは' }, { j: 'こんばんは', k: 'こんばんは' },
+            { j: 'ありがとう', k: 'ありがとう' }, { j: 'すみません', k: 'すみません' },
+            { j: 'ごめんなさい', k: 'ごめんなさい' }, { j: 'おやすみ', k: 'おやすみ' },
+            { j: 'さようなら', k: 'さようなら' }, { j: '大丈夫', k: 'だいじょうぶ' },
+            { j: '綺麗', k: 'きれい' }, { j: '静か', k: 'しずか' }, { j: '便利', k: 'べんり' },
+            { j: '簡単', k: 'かんたん' }, { j: '大好き', k: 'だいすき' }, { j: '有名', k: 'ゆうめい' },
+            { j: '元気', k: 'げんき' }, { j: '好き', k: 'すき' }, { j: '嫌い', k: 'きらい' },
+            { j: '難しい', k: 'むずかしい' }, { j: '楽しい', k: 'たのしい' }, { j: '忙しい', k: 'いそがしい' },
+            { j: '寒い', k: 'さむい' }, { j: '暑い', k: 'あつい' }, { j: '面白い', k: 'おもしろい' },
+            { j: '美味しい', k: 'おいしい' }, { j: '甘い', k: 'あまい' }, { j: '辛い', k: 'からい' },
+            { j: '酸っぱい', k: 'すっぱい' }, { j: '苦い', k: 'にがい' }, { j: '重い', k: 'おもい' },
+            { j: '軽い', k: 'かるい' }, { j: '狭い', k: 'せまい' }, { j: '広い', k: 'ひろい' },
+            { j: '遠い', k: 'とおい' }, { j: '近い', k: 'ちかい' }, { j: '早い', k: 'はやい' },
+            { j: '遅い', k: 'おそい' }, { j: '速い', k: 'はやい' }, { j: '遅い', k: 'おそい' },
+            { j: '強い', k: 'つよい' }, { j: '弱い', k: 'よわい' }, { j: '良い', k: 'よい' },
+            { j: '悪い', k: 'わるい' }, { j: '多い', k: 'おおい' }, { j: '少ない', k: 'すくない' },
+            { j: 'ながい', k: 'ながい' }, { j: '短い', k: 'みじかい' }, { j: '新しい', k: 'あたらしい' },
+            { j: '古い', k: 'ふるい' }, { j: '美しい', k: 'うつくしい' }, { j: '可愛い', k: 'かわいい' },
+            { j: '怖い', k: 'こわい' }, { j: '眠い', k: 'ねむい' }, { j: '忙しい', k: 'いそがしい' },
+            { j: '暇', k: 'ひま' }, { j: '好き', k: 'すき' }, { j: '嫌い', k: 'きらい' },
+            { j: '上手', k: 'じょうず' }, { j: '下手', k: 'へた' }, { j: '便利', k: 'べんり' },
+            { j: '不便', k: 'ふべん' }, { j: '結構', k: 'けっこう' }, { j: '結構です', k: 'けっこうです' },
+            { j: '大丈夫', k: 'だいじょうぶ' }, { j: '問題', k: 'もんだい' }, { j: '質問', k: 'しつもん' },
+            { j: '答え', k: 'こたえ' }, { j: '分かる', k: 'わかる' }, { j: '分かる', k: 'わかる' },
+            { j: 'できる', k: 'できる' }, { j: 'できない', k: 'できない' }, { j: '使う', k: 'つかう' },
+            { j: '作る', k: 'つくる' }, { j: '売る', k: 'うる' }, { j: '買う', k: 'かう' },
+            { j: '勉強', k: 'べんきょう' }, { j: '運動', k: 'うんどう' }, { j: '仕事', k: 'しごと' },
+            { j: '休み', k: 'やすみ' }, { j: '旅行', k: 'りょこう' }, { j: '音楽', k: 'おんがく' },
+            { j: '映画', k: 'えいが' }, { j: 'テレビ', k: 'テレビ' }, { j: 'ラジオ', k: 'ラジオ' },
+            { j: '新聞', k: 'しんぶん' }, { j: '雑誌', k: 'ざっし' }, { j: '漫画', k: 'まんが' },
+            { j: 'ゲーム', k: 'ゲーム' }, { j: 'スポーツ', k: 'スポーツ' }, { j: '料理', k: 'りょうり' },
+            { j: '食べる', k: 'たべる' }, { j: '飲む', k: 'のむ' }, { j: '行く', k: 'いく' },
+            { j: '来る', k: 'くる' }, { j: '帰る', k: 'かえる' }, { j: '寝る', k: 'ねる' },
+            { j: '起きる', k: 'おきる' }, { j: '座る', k: 'すわる' }, { j: '立つ', k: 'たつ' },
+            { j: '歩く', k: 'あるく' }, { j: '走る', k: 'はしる' }, { j: '泳ぐ', k: 'およぐ' },
+            { j: '歌う', k: 'うたう' }, { j: '踊る', k: 'おどる' }, { j: '描く', k: 'かく' },
+            { j: '話す', k: 'はなす' }, { j: '聞く', k: 'きく' }, { j: '見る', k: 'みる' },
+            { j: '書く', k: 'かく' }, { j: '読む', k: 'よむ' }, { j: '買う', k: 'かう' },
+            { j: '売る', k: 'うる' }, { j: '教える', k: 'おしえる' }, { j: '習う', k: 'ならう' },
+            { j: '学ぶ', k: 'まなぶ' }, { j: '働く', k: 'はたらく' }, { j: '遊ぶ', k: 'あそぶ' },
+            { j: '開ける', k: 'あける' }, { j: '閉める', k: 'しめる' }, { j: '出す', k: 'だす' },
+            { j: '入れる', k: 'いれる' }, { j: '貸す', k: 'かす' }, { j: '借りる', k: 'かりる' },
+            { j: '送る', k: 'おくる' }, { j: 'もらう', k: 'もらう' }, { j: 'あげる', k: 'あげる' },
+            { j: 'くれる', k: 'くれる' }, { j: '待つ', k: 'まつ' }, { j: '急ぐ', k: 'いそぐ' },
+            { j: '死ぬ', k: 'しぬ' }, { j: '生きる', k: 'いきる' }, { j: '始まる', k: 'はじまる' },
+            { j: '終わる', k: 'おわる' }, { j: 'つける', k: 'つける' }, { j: '消す', k: 'けす' },
+            { j: '使う', k: 'つかう' }, { j: '止まる', k: 'とまる' }, { j: '止める', k: 'とめる' },
+            { j: '降る', k: 'ふる' }, { j: '晴れる', k: 'はれる' }, { j: '曇る', k: 'くもる' },
+            { j: '吹く', k: 'ふく' }, { j: '鳴く', k: 'なく' }, { j: '咲く', k: 'さく' },
+            { j: '枯れる', k: 'かれる' }, { j: '咲く', k: 'さく' }, { j: '枯れる', k: 'かれる' },
+            { j: '立つ', k: 'たつ' }, { j: '座る', k: 'すわる' }, { j: '歩く', k: 'あるく' },
+            { j: '走る', k: 'はしる' }, { j: '泳ぐ', k: 'およぐ' }, { j: '歌う', k: 'うたう' },
+            { j: '踊る', k: 'おどる' }, { j: '描く', k: 'かく' }, { j: '話す', k: 'はなす' },
+            { j: '聞く', k: 'きく' }, { j: '見る', k: 'みる' }, { j: '書く', k: 'かく' },
+            { j: '読む', k: 'よむ' }, { j: '買う', k: 'かう' }, { j: '売る', k: 'うる' },
+            { j: '教える', k: 'おしえる' }, { j: '習う', k: 'ならう' }, { j: '学ぶ', k: 'まなぶ' },
+            { j: '働く', k: 'はたらく' }, { j: '遊ぶ', k: 'あそぶ' }, { j: '開ける', k: 'あける' },
+            { j: '閉める', k: 'しめる' }, { j: '出す', k: 'だす' }, { j: '入れる', k: 'いれる' },
+            { j: '貸す', k: 'かす' }, { j: '借りる', k: 'かりる' }, { j: '送る', k: 'おくる' },
+            { j: 'もらう', k: 'もらう' }, { j: 'あげる', k: 'あげる' }, { j: 'くれる', k: 'くれる' },
+            { j: '待つ', k: 'まつ' }, { j: '急ぐ', k: 'いそぐ' }, { j: '死ぬ', k: 'しぬ' },
+            { j: '生きる', k: 'いきる' }, { j: '始まる', k: 'はじまる' }, { j: '終わる', k: 'おわる' },
+            { j: 'つける', k: 'つける' }, { j: '消す', k: 'けす' }, { j: '使う', k: 'つかう' },
+            { j: '止まる', k: 'とまる' }, { j: '止める', k: 'とめる' }, { j: '降る', k: 'ふる' },
+            { j: '晴れる', k: 'はれる' }, { j: '曇る', k: 'くもる' }, { j: '吹く', k: 'ふく' },
+            { j: '鳴く', k: 'なく' }, { j: '咲く', k: 'さく' }, { j: '枯れる', k: 'かれる' }
+        ];
+
+        // Kana character definitions
+        const HIRA_BASE = 'あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみむめもやゆよらりるれろわをん';
+        const KATA_BASE = 'アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン';
+        const HIRA_SMALL_VOWELS = 'ぁぃぅぇぉ';
+        const KATA_SMALL_VOWELS = 'ァィゥェォ';
+        const HIRA_SMALL_YO = 'ゃゅょ';
+        const KATA_SMALL_YO = 'ャュョ';
+        const HIRA_DAKUON = 'がぎぐげござじずぜぞだぢづでどばびぶべぼ';
+        const KATA_DAKUON = 'ガギグゲゴザジズゼゾダヂヅデドバビブベボ';
+        const HIRA_HANDAKUON = 'ぱぴぷぺぽ';
+        const KATA_HANDAKUON = 'パピプペポ';
+        const HIRA_SOKUON = 'っ';
+        const KATA_SOKUON = 'ッ';
+        const CHOON = 'ー'; // Long vowel mark, Katakana only
+
+        // Valid Sokuon preceding characters (k, s, t, p lines ONLY)
+        const SOKUON_VALID_NEXT_HIRA_START = 'かきくけこさしすせそたちつてとぱぴぷぺぽ';
+        const SOKUON_VALID_NEXT_KATA_START = 'カキクケコサシスセソタチツテトパピプペポ';
+        
+        // Samakan definisi PUNCTUATION
+        const PUNCTUATION = '。、「」、・？！'; // Punctuation always allowed
+
+        // --- GLOBAL STATE ---
+        const state = {
+            script: localStorage.getItem('rdg.script') || 'hiragana',
+            subset: JSON.parse(localStorage.getItem('rdg.subset') || '{"gojuon":true,"dakuon":false,"handakuon":false,"youon":false}'),
+            sokuonProb: +(localStorage.getItem('rdg.sokuonProb') || 10), // 0-40%
+            choonProb: +(localStorage.getItem('rdg.choonProb') || 20),   // 0-60%
+            paragraphCount: +(localStorage.getItem('rdg.paragraphCount') || 3),
+            sentencePerParagraph: +(localStorage.getItem('rdg.sentencePerParagraph') || 4),
+            targetLength: +(localStorage.getItem('rdg.targetLength') || 10),
+        };
+
+        // --- DOM ELEMENTS ---
+        const rdgScriptSelector = document.getElementById('rdg-script-selector');
+        const rdgPresetButtons = document.querySelector('.rdg-preset-buttons'); // New
+        const rdgSubsetControls = document.querySelector('.rdg-subset-controls');
+        const rdgSubsetGojuon = document.getElementById('rdg-subset-gojuon');
+        const rdgSubsetDakuon = document.getElementById('rdg-subset-dakuon');
+        const rdgSubsetHandakuon = document.getElementById('rdg-subset-handakuon');
+        const rdgSubsetYouon = document.getElementById('rdg-subset-youon');
+        const rdgSokuonSlider = document.getElementById('rdg-sokuon-slider');
+        const rdgSokuonDisplay = document.getElementById('rdg-sokuon-display');
+        const rdgChoonSlider = document.getElementById('rdg-choon-slider');
+        const rdgChoonDisplay = document.getElementById('rdg-choon-display');
+        const rdgParagraphCount = document.getElementById('rdg-paragraph-count');
+        const rdgSentencePerParagraph = document.getElementById('rdg-sentence-per-paragraph');
+        const rdgTargetLength = document.getElementById('rdg-target-length');
+        const rdgGenerateBtn = document.getElementById('rdg-generate-btn');
+        const rdgCopyBtn = document.getElementById('rdg-copy-btn');
+        const rdgSpeakBtn = document.getElementById('rdg-speak-btn');
+        const rdgOutput = document.getElementById('rdg-output');
+        const toastMessageEl = document.getElementById('toastMessage');
+
+        // --- UTILITY FUNCTIONS ---
+
+        /**
+         * Mengacak elemen dalam array.
+         * @param {Array} arr - Array yang akan diacak.
+         */
+        function shuffle(arr) {
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+        }
+
+        /**
+         * Mengacak array dan mengembalikan array baru (tidak mengubah array asli).
+         * @param {Array} arr - Array yang akan diacak.
+         * @returns {Array} Array baru yang sudah diacak.
+         */
+        function shuffleReturn(arr) {
+            const a = [...arr];
+            shuffle(a);
+            return a;
+        }
+
+        /**
+         * Menampilkan pesan toast.
+         * @param {string} message - Pesan yang akan ditampilkan.
+         * @param {string} type - Tipe pesan ('info' atau 'warn').
+         * @param {number} duration - Durasi pesan dalam ms.
+         */
+        let toastTimeout;
+        function showToast(message, type = 'info', duration = 2500) {
+            clearTimeout(toastTimeout);
+            toastMessageEl.textContent = message;
+            toastMessageEl.className = 'toast show';
+            if (type === 'warn') {
+                toastMessageEl.classList.add('warn');
+            } else {
+                toastMessageEl.classList.remove('warn');
+            }
+
+            toastTimeout = setTimeout(() => {
+                toastMessageEl.classList.remove('show');
+            }, duration);
+        }
+
+        /**
+         * Mengubah karakter Hiragana menjadi Katakana.
+         * @param {string} char - Karakter Hiragana.
+         * @returns {string} Karakter Katakana yang sesuai.
+         */
+        function toKatakana(char) {
+            const code = char.charCodeAt(0);
+            if (code >= 0x3041 && code <= 0x3096) { // Hiragana range
+                return String.fromCharCode(code + 0x60); // Offset ke Katakana
+            }
+            return char;
+        }
+
+        /**
+         * Mengubah karakter Katakana menjadi Hiragana.
+         * @param {string} char - Karakter Katakana.
+         * @returns {string} Karakter Hiragana yang sesuai.
+         */
+        function toHiragana(char) {
+            const code = char.charCodeAt(0);
+            if (code >= 0x30A1 && code <= 0x30F6) { // Katakana range
+                return String.fromCharCode(code - 0x60); // Offset ke Hiragana
+            }
+            return char;
+        }
+
+        /**
+         * Mengecek apakah karakter adalah Hiragana.
+         * @param {string} char - Karakter untuk dicek.
+         * @returns {boolean} True jika Hiragana.
+         */
+        function isHiragana(char) {
+            return char.charCodeAt(0) >= 0x3040 && char.charCodeAt(0) <= 0x309F;
+        }
+
+        /**
+         * Mengecek apakah karakter adalah Katakana.
+         * @param {string} char - Karakter untuk dicek.
+         * @returns {boolean} True jika Katakana.
+         */
+        function isKatakana(char) {
+            return char.charCodeAt(0) >= 0x30A0 && char.charCodeAt(0) <= 0x30FF;
+        }
+
+        /**
+         * Mengecek apakah karakter adalah Kana (Hiragana atau Katakana).
+         * @param {string} char - Karakter untuk dicek.
+         * @returns {boolean} True jika Kana.
+         */
+        function isKana(char) {
+            return isHiragana(char) || isKatakana(char);
+        }
+
+        /**
+         * Mengecek apakah karakter adalah Kanji.
+         * @param {string} char - Karakter untuk dicek.
+         * @returns {boolean} True jika Kanji.
+         */
+        function isKanji(char) {
+            return char.charCodeAt(0) >= 0x4E00 && char.charCodeAt(0) <= 0x9FFF;
+        }
+
+        /**
+         * Mengecek apakah karakter adalah tanda baca Jepang.
+         * @param {string} char - Karakter untuk dicek.
+         * @returns {boolean} True jika tanda baca.
+         */
+        function isPunctuation(char) {
+            return PUNCTUATION.includes(char) || char === ' ' || char === '\n';
+        }
+
+        /**
+         * Mengecek apakah karakter adalah kana kecil (ゃゅょぁぃぅぇぉ).
+         * @param {string} char - Karakter untuk dicek.
+         * @returns {boolean} True jika kana kecil.
+         */
+        function isKanaSmall(char) {
+            return HIRA_SMALL_YO.includes(char) || KATA_SMALL_YO.includes(char) ||
+                   HIRA_SMALL_VOWELS.includes(char) || KATA_SMALL_VOWELS.includes(char);
+        }
+
+        // ---- SMART RANDOM HELPERS ----
+        const VEND = /[るむくぶぐすつぬ]$/;     // heuristik kata kerja (akhir kana godan/ichidan)
+        const IADJ = /い$/;                       // heuristik i-keiyoushi
+        const TIME_WORDS = ['きょう','あした','きのう','まいにち','あさ','ひる','よる'];
+        const PLACES = ['がっこう','いえ','へや','えき','まち','こうえん'];
+        const PARTICLES = { topic:'は', obj:'を', loc:'で', dir:'へ', time:'に' };
+
+        function randChoice(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+
+        // Ambil satu kata dari DICTIONARY yang lolos whitelist + cocok heuristik
+        function pickWord(filterFn, allow, script){
+          const pool = shuffleReturn(DICTIONARY).filter(it=>{
+            const k = it.k;
+            if (!wordAllowed(k, allow, script)) return false;
+            return filterFn(k, it);
+          });
+          return pool.length ? pool[0] : null;
+        }
+
+        // Cek ada youon/dakuon/chōon di suatu string (untuk satisfy slider/checkbox)
+        const HAS_YOUON = /[ゃゅょャュョぁぃぅぇぉァィゥェォ]/;
+        const HAS_DAKUON = /[がぎぐげござじずぜぞだぢづでどばびぶべぼガギグゲゴザジズゼゾダヂヅデドバビブベボ]/;
+        const HAS_CHOON  = /ー/;
+
+        // Bangun satu kalimat dengan pola acak
+        function generateSmartSentence(allow, script){
+          // kandidat isi kalimat
+          const subj = pickWord((k)=>!VEND.test(k) && !IADJ.test(k), allow, script) || {k:'わたし'};
+          const obj  = pickWord((k)=>!VEND.test(k) && !IADJ.test(k), allow, script) || {k:'ほん'};
+          const verb = pickWord((k)=>VEND.test(k), allow, script) || {k:'よむ'};
+          const place= pickWord((k)=>!VEND.test(k) && !IADJ.test(k), allow, script) || {k:'いえ'};
+          const adj  = pickWord((k)=>IADJ.test(k), allow, script) || {k:'たのしい'};
+          const time = randChoice(TIME_WORDS);
+
+          const templates = [
+            // T1: [Time]に [Subj]は [Place]で [Obj]を [Verb]。
+            () => `${time}${PARTICLES.time}${subj.k}${PARTICLES.topic}${place.k}${PARTICLES.loc}${obj.k}${PARTICLES.obj}${verb.k}`,
+            // T2: [Subj]は [Obj]を [Verb]。
+            () => `${subj.k}${PARTICLES.topic}${obj.k}${PARTICLES.obj}${verb.k}`,
+            // T3: [Subj]は [Place]へ [Verb]。
+            () => `${subj.k}${PARTICLES.topic}${place.k}${PARTICLES.dir}${verb.k}`,
+            // T4: [Subj]は [Adj]です。
+            () => `${subj.k}${PARTICLES.topic}${adj.k}です`
+          ];
+          let sentence = randChoice(templates)();
+
+          // injeksi sokuon/choon sesuai slider (fungsi kamu yang ada)
+          sentence = injectSokuon(sentence, state.sokuonProb/100, script);
+          if (script !== 'hiragana') sentence = injectChoon(sentence, state.choonProb/100);
+
+          return sentence; // Jangan tambahkan maru di sini, akan ditambahkan di composeSentence
+        }
+
+        // --- CORE LOGIC ---
+
+        /**
+         * Membangun daftar karakter yang diizinkan (whitelist) berdasarkan pengaturan subset.
+         * @param {object} settings - Objek pengaturan subset dari state.
+         * @returns {{setHira: Set<string>, setKata: Set<string>, allowYouon: boolean, allowSokuon: boolean, allowChoon: boolean}} Whitelist karakter dan flag izin.
+         */
+        function buildWhitelist(settings) {
+            const setHira = new Set();
+            const setKata = new Set();
+
+            if (settings.gojuon) {
+                HIRA_BASE.split('').forEach(c => setHira.add(c));
+                KATA_BASE.split('').forEach(c => setKata.add(c));
+            }
+            if (settings.dakuon) {
+                HIRA_DAKUON.split('').forEach(c => setHira.add(c));
+                KATA_DAKUON.split('').forEach(c => setKata.add(c));
+            }
+            if (settings.handakuon) {
+                HIRA_HANDAKUON.split('').forEach(c => setHira.add(c));
+                KATA_HANDAKUON.split('').forEach(c => setKata.add(c));
+            }
+            if (settings.youon) {
+                HIRA_SMALL_YO.split('').forEach(c => setHira.add(c));
+                KATA_SMALL_YO.split('').forEach(c => setKata.add(c));
+                HIRA_SMALL_VOWELS.split('').forEach(c => setHira.add(c)); // Untuk kasus seperti ふぁ、てぃ
+                KATA_SMALL_VOWELS.split('').forEach(c => setKata.add(c));
+            }
+
+            // Tanda baca selalu diizinkan
+            PUNCTUATION.split('').forEach(c => { setHira.add(c); setKata.add(c); });
+
+            return {
+                setHira,
+                setKata,
+                allowYouon: settings.youon,
+                allowSokuon: settings.sokuonProb > 0,
+                allowChoon: settings.choonProb > 0
+            };
+        }
+
+        /**
+         * Memeriksa apakah sebuah kata (dalam kana) diizinkan berdasarkan whitelist.
+         * Untuk Furigana, akan memeriksa bagian 'rt' (kana).
+         * @param {string} wordKana - Kata dalam bentuk Kana (atau furigana 'rt').
+         * @param {object} allow - Objek whitelist dari buildWhitelist.
+         * @param {string} script - Skrip yang sedang aktif ('hiragana', 'katakana', 'mixed', 'furigana').
+         * @returns {boolean} True jika kata diizinkan.
+         */
+        function wordAllowed(wordKana, allow, script) {
+            for (let i = 0; i < wordKana.length; i++) {
+                const char = wordKana[i];
+
+                if (isKanji(char) || isPunctuation(char)) {
+                    continue; // Kanji dan tanda baca selalu diizinkan
+                }
+
+                // Cek Youon
+                if (isKanaSmall(char) && !allow.allowYouon) {
+                    // Jika ini kana kecil dan youon tidak diizinkan, maka tolak.
+                    return false;
+                }
+
+                // Cek Chōon
+                if (char === CHOON) {
+                    if (isHiragana(char) || !allow.allowChoon) { 
+                        return false; 
+                    }
+                    continue; 
+                }
+
+                // Cek kana lainnya
+                if (isHiragana(char)) {
+                    if (!allow.setHira.has(char)) return false;
+                } else if (isKatakana(char)) {
+                    if (!allow.setKata.has(char)) return false;
+                } else {
+                    // Karakter lain yang bukan kanji, kana, atau tanda baca (e.g., romaji, simbol tak dikenal)
+                    // Untuk kesederhanaan, kita bisa mengabaikannya atau menolaknya.
+                }
+            }
+            return true;
+        }
+
+        /**
+         * Memfilter kamus berdasarkan whitelist yang diizinkan.
+         * @param {Array<object>} dict - Kamus asli.
+         * @param {object} allow - Objek whitelist dari buildWhitelist.
+         * @param {string} script - Skrip yang sedang aktif.
+         * @returns {Array<object>} Kamus yang sudah difilter.
+         */
+        function filterDictionary(dict, allow, script) {
+            const filtered = dict.filter(item => {
+                const kanaToCheck = item.k; // Selalu cek kana (furigana atau hiragana/katakana)
+
+                // Jika script adalah Hiragana atau Katakana tunggal, pastikan item.k sesuai
+                if (script === 'hiragana') {
+                    for (const char of kanaToCheck) {
+                        if (isKatakana(char) || (isKanji(char) && item.j !== item.k)) return false; // Tolak katakana atau kanji dengan furigana
+                    }
+                } else if (script === 'katakana') {
+                    for (const char of kanaToCheck) {
+                        if (isHiragana(char) || (isKanji(char) && item.j !== item.k)) return false; // Tolak hiragana atau kanji dengan furigana
+                    }
+                }
+                // 'mixed' dan 'furigana' membolehkan campuran atau kanji.
+
+                return wordAllowed(kanaToCheck, allow, script);
+            });
+            
+            return filtered;
+        }
+
+        /**
+         * Menginjeksikan Sokuon (っ/ッ) ke dalam kalimat.
+         * @param {string} sentence - Kalimat asli.
+         * @param {number} probability - Probabilitas injeksi (0-1).
+         * @param {string} scriptType - 'hiragana' atau 'katakana' atau 'mixed'.
+         * @returns {string} Kalimat dengan Sokuon yang diinjeksikan.
+         */
+        function injectSokuon(sentence, probability, scriptType) {
+            if (probability === 0) return sentence;
+
+            let result = '';
+            for (let i = 0; i < sentence.length; i++) {
+                const char = sentence[i];
+                result += char;
+
+                // Jangan injeksi sokuon di awal kata, jika karakter saat ini bukan kana,
+                // atau jika karakter berikutnya bukan kana
+                if (i === sentence.length - 1 || !isKana(sentence[i]) || !isKana(sentence[i+1])) continue;
+
+                const nextChar = sentence[i + 1];
+                let isValidNextForSokuon = false;
+                let sokuonChar = HIRA_SOKUON;
+
+                if (isHiragana(nextChar) && SOKUON_VALID_NEXT_HIRA_START.includes(nextChar)) {
+                    isValidNextForSokuon = true;
+                    sokuonChar = HIRA_SOKUON;
+                } else if (isKatakana(nextChar) && SOKUON_VALID_NEXT_KATA_START.includes(nextChar)) {
+                    isValidNextForSokuon = true;
+                    sokuonChar = KATA_SOKUON;
+                }
+
+                if (isValidNextForSokuon && Math.random() < probability) {
+                    // Hindari duplikasi sokuon (e.g., がっっこう)
+                    if (result.length > 0 && (result[result.length - 1] === HIRA_SOKUON || result[result.length - 1] === KATA_SOKUON)) {
+                        continue;
+                    }
+                    result += sokuonChar;
+                }
+            }
+            return result;
+        }
+
+        /**
+         * Menginjeksikan Chōon (ー) ke dalam Katakana.
+         * @param {string} sentence - Kalimat asli (diasumsikan Katakana).
+         * @param {number} probability - Probabilitas injeksi (0-1).
+         * @returns {string} Kalimat dengan Chōon yang diinjeksikan.
+         */
+        function injectChoon(sentence, probability) {
+            if (probability === 0) return sentence;
+
+            let result = '';
+            for (let i = 0; i < sentence.length; i++) {
+                const char = sentence[i];
+                result += char;
+
+                // Hanya untuk Katakana dan jika bukan karakter terakhir
+                if (isKatakana(char) && i < sentence.length - 1) {
+                    const nextChar = sentence[i+1];
+                    
+                    const isVowelKatakana = ['ア', 'イ', 'ウ', 'エ', 'オ', 'ァ', 'ィ', 'ゥ', 'ェ', 'ォ'].includes(char);
+                    const isNextCharVowelKatakana = ['ア', 'イ', 'ウ', 'エ', 'オ', 'ァ', 'ィ', 'ゥ', 'ェ', 'ォ'].includes(nextChar);
+
+                    if (isVowelKatakana && isNextCharVowelKatakana && Math.random() < probability) {
+                        // Injeksi Chōon jika karakter saat ini adalah vokal Katakana
+                        // dan karakter berikutnya adalah vokal yang sama,
+                        // atau kombinasi vokal umum yang membentuk vokal panjang.
+                        if (char === nextChar) { // Contoh: カア -> カー
+                            result += CHOON;
+                            i++; // Lompat karakter berikutnya karena sudah diganti dengan chōon
+                        } else if ((char === 'エ' && nextChar === 'イ') || (char === 'オ' && nextChar === 'ウ')) {
+                            // Contoh umum: エイ -> エー, オウ -> オー
+                            result += CHOON;
+                            i++;
+                        }
+                    }
+                }
+            }
+            return result;
+        }
+
+        /**
+         * Menggabungkan kata-kata menjadi sebuah kalimat, dengan menerapkan injeksi sokuon/choon.
+         * @param {Array<object>} words - Array objek kata { j: 'Kanji', k: 'kana' }.
+         * @param {object} allow - Objek whitelist dan flag izin.
+         * @param {string} script - Skrip yang sedang aktif.
+         * @returns {string} Kalimat yang sudah digenerate.
+         */
+        function composeSentence(words, allow, script) {
+            let sentenceParts = [];
+            for (const wordObj of words) {
+                let currentWord = wordObj.k; // Default menggunakan kana
+
+                if (script === 'furigana') {
+                    // Render furigana jika ada kanji
+                    if (wordObj.j && wordObj.j !== wordObj.k) {
+                        currentWord = `<ruby>${wordObj.j}<rt>${wordObj.k}</rt></ruby>`;
+                    } else {
+                        currentWord = wordObj.k; // Jika tidak ada kanji, tampilkan kana saja
+                    }
+                } else if (script === 'hiragana') {
+                    currentWord = wordObj.k.split('').map(toHiragana).join('');
+                } else if (script === 'katakana') {
+                    currentWord = wordObj.k.split('').map(toKatakana).join('');
+                }
+                // 'mixed' akan menggunakan apa adanya dari item.k (bisa hiragana/katakana)
+
+                sentenceParts.push(currentWord);
+            }
+
+            let sentence = sentenceParts.join(''); // Tanpa spasi untuk bahasa Jepang
+
+            // Terapkan injeksi sokuon dan chōon
+            if (allow.allowSokuon) {
+                sentence = injectSokuon(sentence, state.sokuonProb / 100, script);
+            }
+            if (allow.allowChoon && (script === 'katakana' || script === 'mixed' || script === 'furigana')) {
+                // Choon hanya untuk Katakana. Jika mixed/furigana, hanya bagian Katakana yang akan terpengaruh.
+                // Untuk kesederhanaan, kita akan mencoba injeksi pada seluruh kalimat dan mengandalkan injectChoon
+                // untuk hanya memodifikasi karakter Katakana.
+                sentence = injectChoon(sentence, state.choonProb / 100);
+            }
+
+            return sentence + '。'; // Akhiri kalimat dengan maru
+        }
+
+        /**
+         * Memastikan kalimat mengandung fitur tertentu jika diaktifkan.
+         * @param {string} sentence - Kalimat yang akan dicek.
+         * @param {boolean} needYouon - True jika Youon harus ada.
+         * @param {boolean} needDakuon - True jika Dakuon/Handakuon harus ada.
+         * @param {boolean} needChoon - True jika Chōon harus ada.
+         * @returns {boolean} True jika kalimat memenuhi syarat fitur yang dibutuhkan.
+         */
+        function mustHaveFeature(sentence, needYouon, needDakuon, needChoon){
+            if (needYouon && !HAS_YOUON.test(sentence)) return false;
+            if (needDakuon && !HAS_DAKUON.test(sentence)) return false;
+            if (needChoon && !HAS_CHOON.test(sentence))  return false;
+            return true;
+        }
+
+        /**
+         * Fungsi utama untuk menghasilkan teks berdasarkan pengaturan saat ini.
+         */
+        function generateText() {
+            const currentSettings = {
+                gojuon: rdgSubsetGojuon.checked,
+                dakuon: rdgSubsetDakuon.checked,
+                handakuon: rdgSubsetHandakuon.checked,
+                youon: rdgSubsetYouon.checked,
+                sokuonProb: state.sokuonProb,
+                choonProb: state.choonProb,
+            };
+
+            // Validasi: minimal satu kategori subset harus aktif
+            const activeSubsets = Object.keys(currentSettings).filter(key => key !== 'sokuonProb' && key !== 'choonProb' && currentSettings[key]);
+            if (activeSubsets.length === 0) {
+                // Aktifkan Gojuon secara otomatis jika semua dimatikan
+                rdgSubsetGojuon.checked = true;
+                currentSettings.gojuon = true;
+                state.subset.gojuon = true;
+                localStorage.setItem('rdg.subset', JSON.stringify(state.subset));
+                showToast("Subset terlalu sempit — diaktifkan kembali 'Dasar (gojūon)'.", 'warn');
+            }
+
+            const allowedChars = buildWhitelist(currentSettings);
+            const filteredDict = filterDictionary(DICTIONARY, allowedChars, state.script);
+
+            // Optional: Default targetLength to a smaller value if hiragana only and dictionary is small
+            if (state.script === 'hiragana' && filteredDict.length < state.targetLength && state.targetLength > 8) {
+                state.targetLength = 8;
+                rdgTargetLength.value = 8;
+                localStorage.setItem('rdg.targetLength', 8);
+                showToast("Panjang target kata disesuaikan menjadi 8 karena kamus terbatas untuk Hiragana.", 'info');
+            }
+
+
+            if (filteredDict.length < state.targetLength) {
+                rdgOutput.innerHTML = `<p style="color:var(--muted); text-align:center;">
+                    Kamus tidak cukup untuk subset ini, atau pengaturan filter terlalu ketat.<br>
+                    Coba luaskan filter subset atau kurangi panjang target.
+                </p>`;
+                showToast("Kamus tidak cukup untuk subset ini. Coba luaskan filter.", 'warn');
+                return;
+            }
+
+            let fullTextHtml = '';
+            for (let p = 0; p < state.paragraphCount; p++) {
+                let paragraphText = '';
+                for (let s = 0; s < state.sentencePerParagraph; s++) {
+                    let sent;
+                    let attempts = 0;
+                    const maxAttempts = 20; // Batasi percobaan untuk menghindari infinite loop
+
+                    do {
+                        sent = generateSmartSentence(allowedChars, state.script);
+                        attempts++;
+                        if (attempts > maxAttempts) {
+                            console.warn("Max attempts reached for generating feature-rich sentence. Proceeding with current sentence.");
+                            break; // Keluar dari loop jika terlalu banyak percobaan
+                        }
+                    } while(!mustHaveFeature(
+                        sent,
+                        state.subset.youon,
+                        state.subset.dakuon || state.subset.handakuon, // Dakuon atau Handakuon
+                        (state.script!=='hiragana' && state.choonProb>0)
+                    ));
+                    paragraphText += sent + '。'; // Tambahkan maru di sini
+                }
+                fullTextHtml += `<p>${paragraphText}</p>`;
+            }
+
+            rdgOutput.innerHTML = fullTextHtml;
+        }
+
+        /**
+         * Menyalin teks hasil ke clipboard.
+         */
+        function copyText() {
+            const textToCopy = rdgOutput.innerText; // Menggunakan innerText untuk mendapatkan teks tanpa tag ruby
+            const tempTextArea = document.createElement('textarea');
+            tempTextArea.value = textToCopy;
+            document.body.appendChild(tempTextArea);
+            tempTextArea.select();
+            document.execCommand('copy'); // Fallback for some environments
+            document.body.removeChild(tempTextArea);
+            showToast('Teks berhasil disalin!', 'info');
+        }
+
+        /**
+         * Memutar teks hasil menggunakan Speech Synthesis.
+         */
+        function speakText() {
+            const textToSpeak = rdgOutput.innerText;
+            if (!('speechSynthesis' in window)) {
+                showToast('Maaf, browser Anda tidak mendukung fitur suara.', 'warn');
+                return;
+            }
+            speechSynthesis.cancel(); // Hentikan pembicaraan sebelumnya
+            const utterance = new SpeechSynthesisUtterance(textToSpeak);
+            utterance.lang = 'ja-JP';
+            utterance.rate = 0.9;
+            speechSynthesis.speak(utterance);
+        }
+
+        // --- UI UPDATE & EVENT HANDLERS ---
+
+        /**
+         * Memperbarui tampilan slider Sokuon dan Chōon.
+         */
+        function updateSliderDisplays() {
+            rdgSokuonDisplay.textContent = `${state.sokuonProb}%`;
+            rdgChoonDisplay.textContent = `${state.choonProb}%`;
+        }
+
+        /**
+         * Memperbarui status slider Chōon (disabled jika Hiragana).
+         */
+        function updateChoonSliderState() {
+            const isHiraganaScript = state.script === 'hiragana';
+            rdgChoonSlider.disabled = isHiraganaScript;
+            if (isHiraganaScript) {
+                rdgChoonSlider.closest('.rdg-slider-control').style.opacity = '0.6';
+                rdgChoonSlider.closest('.rdg-slider-control').style.cursor = 'not-allowed';
+            } else {
+                rdgChoonSlider.closest('.rdg-slider-control').style.opacity = '1';
+                rdgChoonSlider.closest('.rdg-slider-control').style.cursor = 'default';
+            }
+        }
+
+        /**
+         * Menginisialisasi UI kontrol dari localStorage.
+         */
+        function initializeUI() {
+            // Script Selector
+            Array.from(rdgScriptSelector.children).forEach(btn => {
+                if (btn.dataset.script === state.script) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+
+            // Subset Checkboxes
+            rdgSubsetGojuon.checked = state.subset.gojuon;
+            rdgSubsetDakuon.checked = state.subset.dakuon;
+            rdgSubsetHandakuon.checked = state.subset.handakuon;
+            rdgSubsetYouon.checked = state.subset.youon;
+
+            // Sliders
+            rdgSokuonSlider.value = state.sokuonProb;
+            rdgChoonSlider.value = state.choonProb;
+            updateSliderDisplays();
+            updateChoonSliderState();
+
+            // Number inputs
+            rdgParagraphCount.value = state.paragraphCount;
+            rdgSentencePerParagraph.value = state.sentencePerParagraph;
+            rdgTargetLength.value = state.targetLength;
+        }
+
+        /**
+         * Mengikat semua event listener.
+         */
+        function bindEventListeners() {
+            // Script selector
+            rdgScriptSelector.addEventListener('click', (e) => {
+                const targetBtn = e.target.closest('button');
+                if (targetBtn) {
+                    Array.from(rdgScriptSelector.children).forEach(btn => btn.classList.remove('active'));
+                    targetBtn.classList.add('active');
+                    state.script = targetBtn.dataset.script;
+                    localStorage.setItem('rdg.script', state.script);
+                    updateChoonSliderState(); // Update chōon slider state based on new script
+                }
+            });
+
+            // Subset checkboxes
+            rdgSubsetControls.addEventListener('change', (e) => {
+                const targetCheckbox = e.target;
+                if (targetCheckbox.type === 'checkbox' && targetCheckbox.dataset.subset) {
+                    state.subset[targetCheckbox.dataset.subset] = targetCheckbox.checked;
+                    localStorage.setItem('rdg.subset', JSON.stringify(state.subset));
+                }
+            });
+
+            // Sliders
+            rdgSokuonSlider.addEventListener('input', (e) => {
+                state.sokuonProb = parseInt(e.target.value, 10);
+                localStorage.setItem('rdg.sokuonProb', state.sokuonProb);
+                updateSliderDisplays();
+            });
+            rdgChoonSlider.addEventListener('input', (e) => {
+                state.choonProb = parseInt(e.target.value, 10);
+                localStorage.setItem('rdg.choonProb', state.choonProb);
+                updateSliderDisplays();
+            });
+
+            // Number inputs
+            rdgParagraphCount.addEventListener('change', (e) => {
+                state.paragraphCount = parseInt(e.target.value, 10);
+                localStorage.setItem('rdg.paragraphCount', state.paragraphCount);
+            });
+            rdgSentencePerParagraph.addEventListener('change', (e) => {
+                state.sentencePerParagraph = parseInt(e.target.value, 10);
+                localStorage.setItem('rdg.sentencePerParagraph', state.sentencePerParagraph);
+            });
+            rdgTargetLength.addEventListener('change', (e) => {
+                state.targetLength = parseInt(e.target.value, 10);
+                localStorage.setItem('rdg.targetLength', state.targetLength);
+            });
+
+            // Preset buttons
+            rdgPresetButtons.addEventListener('click', (e) => {
+                const targetBtn = e.target.closest('button');
+                if (targetBtn && targetBtn.dataset.preset) {
+                    applyPreset(targetBtn.dataset.preset);
+                    generateText(); // Generate text immediately after applying preset
+                }
+            });
+
+            // Action buttons
+            rdgGenerateBtn.addEventListener('click', generateText);
+            rdgCopyBtn.addEventListener('click', copyText);
+            rdgSpeakBtn.addEventListener('click', speakText);
+        }
+
+        /**
+         * Menerapkan preset pengaturan ke state dan UI.
+         * @param {string} presetName - Nama preset ('beginner', 'intermediate', 'advanced').
+         */
+        function applyPreset(presetName) {
+            let newScript, newSubset, newSokuonProb, newChoonProb, newTargetLength;
+
+            switch (presetName) {
+                case 'beginner':
+                    newScript = 'hiragana';
+                    newSubset = { gojuon: true, dakuon: false, handakuon: false, youon: false };
+                    newSokuonProb = 0;
+                    newChoonProb = 0;
+                    newTargetLength = 6;
+                    break;
+                case 'intermediate':
+                    newScript = 'mixed';
+                    newSubset = { gojuon: true, dakuon: true, handakuon: false, youon: true };
+                    newSokuonProb = 10;
+                    newChoonProb = 10;
+                    newTargetLength = 8;
+                    break;
+                case 'advanced':
+                    newScript = 'furigana';
+                    newSubset = { gojuon: true, dakuon: true, handakuon: true, youon: true };
+                    newSokuonProb = 20;
+                    newChoonProb = 30;
+                    newTargetLength = 10;
+                    break;
+                default:
+                    return;
+            }
+
+            // Update state
+            state.script = newScript;
+            state.subset = newSubset;
+            state.sokuonProb = newSokuonProb;
+            state.choonProb = newChoonProb;
+            state.targetLength = newTargetLength;
+
+            // Save to localStorage
+            localStorage.setItem('rdg.script', state.script);
+            localStorage.setItem('rdg.subset', JSON.stringify(state.subset));
+            localStorage.setItem('rdg.sokuonProb', state.sokuonProb);
+            localStorage.setItem('rdg.choonProb', state.choonProb);
+            localStorage.setItem('rdg.targetLength', state.targetLength);
+
+            // Update UI to reflect new state
+            initializeUI();
+        }
+
+        // --- SIDEBAR JS (konsisten dengan index7.html) ---
+        (() => {
+            const sidebar  = document.getElementById('sidebar');
+            const toggle   = document.getElementById('sidebarToggle');
+            const closeBtn = document.getElementById('closeSidebar');
+
+            function open(){ sidebar.classList.add('is-open'); document.body.classList.add('sidebar-open'); }
+            function close(){ sidebar.classList.remove('is-open'); document.body.classList.remove('sidebar-open'); }
+
+            toggle?.addEventListener('click', open);
+            closeBtn?.addEventListener('click', close);
+
+            document.addEventListener('click', (e)=>{
+                if(!sidebar.classList.contains('is-open')) return;
+                const hit = sidebar.contains(e.target) || toggle.contains(e.target);
+                if(!hit) close();
+            });
+            document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') close(); });
+
+            document.querySelectorAll('#sidebar a').forEach(a=>{
+                const href = a.getAttribute('href');
+                if(href && location.pathname.endsWith(href)) {
+                    a.classList.add('active');
+                } else {
+                    a.classList.remove('active');
+                }
+            });
+        })();
+
+        // --- INITIALIZATION ---
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeUI();
+            bindEventListeners();
+            // Generate initial text on load for a better first experience
+            generateText(); 
+        });
+    </script>
+</body>
+</html>

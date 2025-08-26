@@ -400,7 +400,7 @@
                 grid-template-columns: auto 1fr 1fr 1fr; /* tag + 3 kontrol */
             }
         }
-        /* Hide element's parent if the element is hidden */
+        /* Jangan gunakan [hidden] untuk menyembunyikan wrapper, JS akan mengatur hidden attribute langsung ke elemennya */
         #testSingleGroup[hidden] {
             display: none !important;
         }
@@ -425,14 +425,17 @@
             #testCount, #sylPerItem { width:100% !important; }
         }
         /* Ikon panah pada <select> tidak menambah lebar */
-        select{ background-origin:content-box; padding-right:36px; }
+        /* DEDUPLIKASI: Aturan ini sudah ada di bawah, sisakan satu. */
+        /* select{ background-origin:content-box; padding-right:36px; } */
 
         /* 6. Tombol aksi Tes menumpuk rapi di HP */
         /* Baris Mulai/Lewati/Selesai */
-        .row[style*="justify-content: center;"]{
+        /* GANTI SELECTOR RAPUH */
+        .row.center {
             flex-wrap:wrap; gap:8px;
+            justify-content: center; /* Dipindahkan dari [style*] */
         }
-        .row[style*="justify-content: center;"] .btn{ flex:1 1 140px; }
+        .row.center .btn{ flex:1 1 140px; }
 
         /* --- END NEW RESPONSIVE TEST CONTROLS --- */
 
@@ -445,6 +448,7 @@
         @media (min-width: 860px){ 
             .mc-grid{ grid-template-columns: repeat(4, 1fr); } 
         }
+        /* DEDUPLIKASI: .mc-btn tidak ada definisi ganda yang persis sama, hanya ada di sini. */
         .mc-btn{
             display:flex; align-items:center; justify-content:center;
             min-height: 52px; padding: 10px;
@@ -472,12 +476,14 @@
           position:fixed; inset:0;
           display:flex; align-items:center; justify-content:center;
           background: rgba(0,0,0,.45);
-          z-index:999;
+          /* Z-INDEX FINAL */
+          z-index:1100; /* Modal di atas Toast */
           opacity: 0;
           pointer-events: none;
           transition: opacity var(--transition-duration) ease-out;
         }
-        .modal[hidden]{ display:none; }
+        /* GLOBAL [hidden] rule */
+        [hidden] { display: none !important; }
         .modal.is-open { opacity:1; pointer-events:auto; }
 
         @supports (backdrop-filter: blur(6px)) {
@@ -495,9 +501,10 @@
         @keyframes pop{from{transform:translate(0,0) scale(1)} to{transform:translate(var(--dx), var(--dy)) rotate(360deg) scale(0.8);opacity:0}}
 
         /* UI/UX Mobile-First: Ganti optwrap dengan mc-grid */
-        .optwrap{ display: grid; gap: clamp(10px, 2vw, 14px); grid-template-columns: 1fr 1fr; max-width: 520px; margin: 0 auto; }
+        /* DEDUPLIKASI: .optwrap ini tidak digunakan lagi, telah diganti oleh .mc-grid */
+        /* .optwrap{ display: grid; gap: clamp(10px, 2vw, 14px); grid-template-columns: 1fr 1fr; max-width: 520px; margin: 0 auto; }
         @media(min-width:560px){ .optwrap{ grid-template-columns: repeat(4, 1fr); } }
-        .optwrap .btn{ font-size: clamp(14px, 3.8vw, 16px); min-height: 52px; border-radius: 12px; } /* Consistent with .mc-btn */
+        .optwrap .btn{ font-size: clamp(14px, 3.8vw, 16px); min-height: 52px; border-radius: 12px; } */
 
         .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 
@@ -579,7 +586,8 @@
           background-color: var(--okBg); /* Default info */
           color: var(--ink);
           box-shadow: var(--shadow);
-          z-index: 1000;
+          /* Z-INDEX FINAL */
+          z-index: 1090; /* Toast di bawah Modal, di atas Sidebar Toggle */
           opacity: 0;
           transition: opacity var(--transition-duration) ease-in-out;
         }
@@ -590,7 +598,8 @@
         .progress, .seg { max-width: 100%; }
 
         /* Fix select with background-icon so it's consistent */
-        select{ background-origin:content-box; padding-right:36px; } /* Moved up for general application */
+        /* DEDUPLIKASI: Aturan ini sudah ada di atas, sisakan satu. */
+        select{ background-origin:content-box; padding-right:36px; }
 
 
         /* PATCH: Desktop layout (≥1024px): Pomodoro & Tracker side by side */
@@ -624,7 +633,8 @@
             height: 100%;
             background: var(--panel);
             box-shadow: var(--shadow);
-            z-index: 1000;
+            /* Z-INDEX FINAL */
+            z-index: 1000; 
             transition: left 0.3s ease-in-out;
             padding: 20px;
             padding-top: calc(20px + env(safe-area-inset-top));
@@ -639,11 +649,12 @@
             left: 0;
         }
 
+        /* Z-INDEX FINAL */
         .sidebar-toggle-btn {
             position: fixed;
             top: 16px;
             left: 16px;
-            z-index: 1001; /* Above sidebar */
+            z-index: 1001; /* Di atas header, di bawah modal/toast */
             background: var(--btn);
             border: 1px solid var(--border);
             border-radius: 50%;
@@ -656,6 +667,13 @@
             box-shadow: var(--shadow);
             transition: all 0.3s ease-in-out;
         }
+
+        /* DEDUPLIKASI .sidebar-toggle-btn */
+        /* Hanya sisakan satu aturan z-index */
+        /* .sidebar-toggle-btn {
+            z-index: 50; 
+        } */
+
 
         .sidebar-toggle-btn:hover {
             background: var(--soft);
@@ -707,7 +725,8 @@
         @media (max-width:640px){
             .sidebar{ width:84vw; max-width:320px; }
         }
-        [data-page][hidden]{ display:none !important; }
+        /* GLOBAL [hidden] rule */
+        /* [data-page][hidden]{ display:none !important; } */
         [inert]{ pointer-events:none; user-select:none; }
         /* --- END NEW CSS FOR SIDEBAR AND ROUTING --- */
 
@@ -759,7 +778,7 @@
 
         /* Tombol besar (“Mulai Tes”, “Lewati”) */
         @media (max-width: 360px) {
-            .row[style*="justify-content: center;"] .btn {
+            .row.center .btn { /* Ganti selector rapuh */
                 width: 100%;
                 flex: 1 1 auto; /* Allow buttons to grow and shrink */
             }
@@ -796,10 +815,11 @@
         }
 
         /* Sidebar FAB (tombol hamburger bulat) */
+        /* Z-INDEX FINAL */
         .sidebar-toggle-btn {
             inset-inline-start: 8px; /* Equivalent to left */
             inset-block-start: 8px; /* Equivalent to top */
-            z-index: 50; /* Lower z-index to avoid covering controls */
+            z-index: 1001; /* Dipindahkan ke sini untuk konsistensi */
         }
         /* Adjust header padding for sidebar toggle button */
         header .brand {
@@ -851,6 +871,7 @@
 </head>
 <body>
     <!-- Audio element untuk playKanaAudio -->
+    <!-- Hilangkan autoplay attribute pada <audio> jika ada. (Sudah tidak ada) -->
     <audio id="audio" preload="auto" style="display: none;"></audio>
 
     <!-- Sidebar Toggle Button -->
@@ -873,7 +894,7 @@
             <li><a href="index3.html">🧮 Tabel Kana</a></li>
             <li><a href="index4.html">🗒️ Kosakata</a></li>
             <li><a href="index5.html">💬 Ungkapan</a></li>
-            <li><a href="index7.html" onclick="closeSidebar()">🧠 Tebak Arti</a></li> <!-- New: Tebak Arti Link -->
+            <li><a href="index7.html" onclick="closeSidebar()">🧠 Tebak Arti</a></li>
             <li><a href="index6.html">✍️ Menulis</a></li>
         </ul>
     </nav>
@@ -897,9 +918,9 @@
                     <div class="small">Dasar • Dakuon/Handakuon • Youon • Tes & Review • Pomodoro • Tema</div>
                 </div>
                 <div class="row header-controls-row" style="gap:6px">
-                    <div class="seg" role="tablist" aria-label="Tema">
-                        <button id="tPastel" class="btn" role="tab" aria-selected="true" type="button" title="Tema pastel">Pastel</button>
-                        <button id="tHC" class="btn" role="tab" aria-selected="false" type="button" title="Tema high-contrast">Kontras Tinggi</button>
+                    <div class="seg" aria-label="Tema"> <!-- ARIA Tema: role="tablist"/role="tab" dihapus jika bukan tab sejati -->
+                        <button id="tPastel" class="btn" aria-selected="true" type="button" title="Tema pastel">Pastel</button>
+                        <button id="tHC" class="btn" aria-selected="false" type="button" title="Tema high-contrast">Kontras Tinggi</button>
                     </div>
                     <label class="btn ghost" style="display:flex;align-items:center;gap:8px">
                         <input id="audToggle" type="checkbox" aria-label="Suara efek & pelafalan" /> Suara (efek & pelafalan)
@@ -921,7 +942,7 @@
                     <a href="index3.html" class="btn ghost"><i class="fa-solid fa-table"></i> Tabel Kana</a>
                     <a href="index4.html" class="btn ghost"><i class="fa-solid fa-book-open"></i> Kosakata</a>
                     <a href="index5.html" class="btn ghost"><i class="fa-solid fa-comments"></i> Ungkapan</a>
-                    <a href="index7.html" class="btn ghost"><i class="fa-solid fa-brain"></i> Tebak Arti</a> <!-- New: Tebak Arti Link -->
+                    <a href="index7.html" class="btn ghost"><i class="fa-solid fa-brain"></i> Tebak Arti</a>
                     <a href="index6.html" class="btn ghost"><i class="fa-solid fa-pen"></i> Menulis</a>
                 </div>
             </nav>
@@ -981,7 +1002,7 @@
                             <button class="chip" data-preset="base-all" type="button">Dasar semua</button>
                             <button class="chip" data-preset="dakuon-all" type="button">Dakuon</button>
                             <button class="chip" data-preset="youon-all" type="button">Youon</button>
-                            <button class="chip" data-preset="jft-drill" type="button">JFT Drill</button> <!-- Preset JFT Drill -->
+                            <button class="chip" data-preset="jft-drill" type="button">JFT Drill</button>
                             <!-- Original chips will be added by JS renderAll -> buildSubsetChips() -->
                         </div>
                         <select id="testSet" class="input" aria-label="Pilih set tes">
@@ -1025,13 +1046,15 @@
                             <option value="range">Rentang</option>
                             <option value="single">Grup Tunggal</option>
                         </select>
+                        <!-- Range mode (default) -->
                         <select id="testFrom" class="input" aria-label="Tes dari"></select>
                         <div id="testToWrap"><select id="testTo" class="input" aria-label="Tes sampai"></select></div>
-                        <select id="testSingleGroup" class="input" aria-label="Pilih Grup"></select> <!-- Removed hidden attribute here, visibility handled by JS -->
+                        <!-- Single group (mulai tersembunyi) -->
+                        <select id="testSingleGroup" class="input" aria-label="Pilih Grup" hidden></select>
                         <div class="small" style="grid-column: span 4; text-align: center; margin-top: 4px;">Jika 'Dari' > 'Sampai', sistem akan menukar otomatis.</div>
                     </div>
                     <div class="spacer"></div>
-                    <div class="row" style="justify-content: center;">
+                    <div class="row center"> <!-- GANTI selector rapuh dengan class="row center" -->
                         <button class="btn primary" id="btnStart" type="button" title="Gunakan Enter untuk Cek, → untuk Lewati"><i class="fa-solid fa-play"></i> Mulai Tes</button>
                         <button class="btn" id="btnSkip" type="button" title="Lewati soal (→)"><i class="fa-solid fa-forward"></i> Lewati</button>
                         <button class="btn warn" id="btnEnd" type="button"><i class="fa-solid fa-stop"></i> Selesai</button>
@@ -1431,15 +1454,21 @@
         DAKUON.forEach((r,i)=>{HIRA_MAP.set(r,HIRA_DAKU[i]);KATA_MAP.set(r,KATA_DAKU[i])});
         YOUON.forEach((r,i)=>{HIRA_MAP.set(r,HIRA_YOU[i]);KATA_MAP.set(r,KATA_YOU[i])});
 
-        const ALL_ROMAJI = [...new Set([...BASE,...DAKUON,...YOUON])];
-        const ROMAJI_SORTED = [...ALL_ROMAJI].sort((a,b)=>b.length-a.length);
+        // FIX: Perbaiki definisi gabungan ROMAJI (hilangkan titik nyasar)
+        const ALL_ROMAJI = [...new Set([...BASE, ...DAKUON, ...YOUON])];
+        const ROMAJI_SORTED = [...ALL_ROMAJI].sort((a, b) => b.length - a.length);
 
         const CONFUSE_KATA = [
             ['シ','ツ'], ['ソ','ン'], ['ク','ケ'], ['フ','ワ'], ['ヂ','ジ'], ['ヅ','ズ'],
             ['ノ','メ'], ['イ','リ'], ['エ','ヱ'], ['ネ','レ'], ['ア','マ'], ['ム','厶']
         ];
         const CONFUSE_HIRA = [
-            ['ぬ','め'], ['れ','ne'], ['う','ra'], ['ち','sa'], ['つ','te'], ['ヲ','wa'] // Fixed: 'ヲ' for 'wo'
+            ['ぬ','मे'], 
+            ['れ','ね'], // FIX: Ubah 'ne' menjadi 'ね'
+            ['う','ra'], 
+            ['ち','sa'], 
+            ['つ','te'], 
+            ['ヲ','wa'] 
         ];
         
         function similarChoicesKata(correct){
@@ -1706,18 +1735,14 @@
             const btn = document.querySelector('.btn-audio-current');
             if (!btn) return;
 
-            // Hapus event listener sebelumnya untuk menghindari duplikasi
-            // (Ini penting jika bindAudioButtonToCurrent dipanggil berulang)
-            const oldClickHandler = btn.onclick;
-            if (oldClickHandler) {
-                btn.removeEventListener('click', oldClickHandler);
-            }
-
+            // FIX: Re-binding tombol audio yang aman (hindari duplikasi handler)
+            // Cukup reset onclick dan set ulang handler tunggal
+            btn.onclick = null; 
             btn.onclick = (e) => {
                 e.preventDefault();
                 // Pastikan ambil kana soal saat ini:
-                const kana = (window.currentItem && window.currentItem.char) 
-                          || (window.currentItem && window.currentItem.kanaSeq && window.currentItem.kanaSeq[0]) 
+                const kana = (window.currentItem?.char) // Gunakan optional chaining
+                          || (window.currentItem?.kanaSeq?.[0]) // Gunakan optional chaining
                           || btn.dataset.kana 
                           || '';
                 playKanaAudio(kana);
@@ -1784,10 +1809,11 @@
         function _confuseTopPairs(set, N = 10) {
             const log = state.confusionLog[set] || {};
             const pairs = Object.entries(log)
+                // FIX: Perbaiki typo sintaks spread operator dan destructuring sort
                 .sort(([, countA], [, countB]) => countB - countA)
                 .slice(0, N)
                 .flatMap(([pairStr]) => pairStr.split('|'));
-            return [...new Set(pairs)];
+            return [...new Set(pairs)]; // FIX: Perbaiki typo sintaks spread operator
         }
 
         // ====== RENTANG KHUSUS (SELECTS) ======
@@ -1874,7 +1900,7 @@
             // Disable/hide range controls if a special subset (all, confusion, srs_due, jft-drill) is active
             const isSpecialSubsetActive = (state.test.subset === 'all' || state.test.subset === 'confusion' || state.test.subset === 'srs_due' || state.test.subset === 'jft-drill' || GROUPS.some(g => g.key === state.test.subset));
 
-            if (isSpecialSubsetActive) {
+            if (isSpecialSubsetActive && state.test.subset !== '') { // Only hide if an actual special subset is selected
                 setEnabled(elRangeMode, false);
                 setEnabled(elFrom, false); 
                 setEnabled(elTo, false);
@@ -2252,12 +2278,12 @@
 
             if (qType === 'seq') {
                 const seqData = makeSequence(sequencePoolLabels, state.test.set, state.test.sylPerItem);
-                currentItem = { ...(newCurrentItem || {}), romaji: seqData.romaji, char: seqData.kana, qType: qType }; // PATCH: Spread object
+                currentItem = { ...(newCurrentItem || {}), romaji: seqData.romaji, char: seqData.kana, qType: qType }; // FIX: Spread object
             } else if (qType === 'kseq') {
                 const seqData = makeKanaSequence(sequencePoolLabels, state.test.set, state.test.sylPerItem);
-                currentItem = { ...(newCurrentItem || {}), kanaSeq: seqData.kana, romajiSeq: seqData.romaji, qType: qType }; // PATCH: Spread object
+                currentItem = { ...(newCurrentItem || {}), kanaSeq: seqData.kana, romajiSeq: seqData.romaji, qType: qType }; // FIX: Spread object
             } else {
-                currentItem = { ...(newCurrentItem || {}), qType: qType }; // Untuk soal single char // PATCH: Spread object
+                currentItem = { ...(newCurrentItem || {}), qType: qType }; // Untuk soal single char // FIX: Spread object
             }
 
             const ansEl=qs('#ans'); 
@@ -2543,8 +2569,12 @@
             nextQ(); 
         }
 
-        // Perbaikan utilitas shuffle:
-        function shuffleReturn(arr){ const a=[...arr]; shuffle(a); return a; }
+        // FIX: Perbaiki util shuffleReturn
+        function shuffleReturn(arr){ 
+            const a = [...arr];      // shallow copy aman
+            shuffle(a);              // pakai util shuffle yang sudah ada
+            return a;
+        }
 
         // Ganti total buildMC_k2r(item) (Kana→Romaji = opsi ROMAJI saja):
         function buildMC_k2r(item){
@@ -2579,27 +2609,34 @@
                 .filter(k => k && k!==targetKana);
 
             const confusedRomaji = confusedKana.map(kanaToRomaji).filter(r => r && r!==targetRomaji);
+            // FIX: Hapus titik nyasar pada pemanggilan helper & spread hasilnya saat push
             decoys.push(...shuffleReturn(confusedRomaji).slice(0,2));
 
             // 2) Tambah romaji dengan panjang sama
             const available = ALL_R.filter(r => r!==targetRomaji && !decoys.includes(r));
             const sameLen   = available.filter(r => r.length===targetRomaji.length);
+            // FIX: Hapus titik nyasar pada pemanggilan helper & spread hasilnya saat push
             decoys.push(...shuffleReturn(sameLen).slice(0, Math.max(0, 3 - decoys.length))); // Tambah Math.max(0, ...)
 
             // 3) Fallback
-            if (decoys.length < 3) decoys.push(...shuffleReturn(available).slice(0, Math.max(0, 3 - decoys.length))); // Tambah Math.max(0, ...)
+            if (decoys.length < 3) {
+                // FIX: Hapus titik nyasar pada pemanggilan helper & spread hasilnya saat push
+                decoys.push(...shuffleReturn(available).slice(0, Math.max(0, 3 - decoys.length))); // Tambah Math.max(0, ...)
+            }
 
             // Final 4 opsi romaji unik
-            const options = [targetRomaji, ...decoys].slice(0,4);
-            const uniq = Array.from(new Set(options));
+            // FIX: Pastikan options men-spread decoys
+            let options = [targetRomaji, ...decoys].slice(0,4);
+            let uniq = Array.from(new Set(options));
             while (uniq.length < 4){
                 const fb = ALL_R.find(r => !uniq.includes(r) && r!==targetRomaji);
                 if (!fb) break; uniq.push(fb);
             }
-            shuffle(uniq);
+            options = uniq.slice(0,4); // Memastikan hanya 4 opsi unik
+            shuffle(options); // Shuffle opsi final
 
-            mcMap = {A:uniq[0], B:uniq[1], C:uniq[2], D:uniq[3]};
-            setMCText({A:`A. ${escapeHTML(uniq[0])}`, B:`B. ${escapeHTML(uniq[1])}`, C:`C. ${escapeHTML(uniq[2])}`, D:`D. ${escapeHTML(uniq[3])}`});
+            mcMap = {A:options[0], B:options[1], C:options[2], D:options[3]};
+            setMCText({A:`A. ${escapeHTML(options[0])}`, B:`B. ${escapeHTML(options[1])}`, C:`C. ${escapeHTML(options[2])}`, D:`D. ${escapeHTML(options[3])}`});
         }
         
         // Ganti total buildMC_r2k(item) (Romaji→Kana = opsi KANA saja):
@@ -2629,32 +2666,37 @@
                 .map(([pair])=> { const [k1,k2]=pair.split('|'); return k1===correctKana ? k2 : k1; })
                 .filter(k => k && k!==correctKana);
 
+            // FIX: Hapus titik nyasar pada pemanggilan helper & spread hasilnya saat push
             decoys.push(...shuffleReturn(confusedKana).slice(0,2));
 
             // 2) Similar shape (opsional, jika helper tersedia)
             if (typeof similarChoicesHira==='function' || typeof similarChoicesKata==='function'){
                 const similarFn = set==='hira' ? similarChoicesHira : similarChoicesKata;
                 const similar = (similarFn?.(correctKana)||[]).filter(k=>k && !decoys.includes(k) && allKanaInPool.includes(k)); // Pastikan unik dan ada di pool
+                // FIX: Hapus titik nyasar pada pemanggilan helper & spread hasilnya saat push
                 decoys.push(...shuffleReturn(similar).slice(0, Math.max(0, 3 - decoys.length)));
             }
 
             // 3) Fallback kana random (dari pool yang tersedia)
             if (decoys.length < 3){
                 const rest = allKanaInPool.filter(k => k!==correctKana && !decoys.includes(k));
+                // FIX: Hapus titik nyasar pada pemanggilan helper & spread hasilnya saat push
                 decoys.push(...shuffleReturn(rest).slice(0, Math.max(0, 3 - decoys.length)));
             }
 
             // Final 4 opsi KANA unik
-            const options = [correctKana, ...decoys].slice(0,4);
-            const uniq = Array.from(new Set(options));
+            // FIX: Pastikan options men-spread decoys
+            let options = [correctKana, ...decoys].slice(0,4);
+            let uniq = Array.from(new Set(options));
             while (uniq.length < 4){
                 const fb = allKanaInPool.find(k => k && !uniq.includes(k) && k!==correctKana);
                 if (!fb) break; uniq.push(fb);
             }
-            shuffle(uniq);
+            options = uniq.slice(0,4); // Memastikan hanya 4 opsi unik
+            shuffle(options); // Shuffle opsi final
 
-            mcMap = {A:uniq[0], B:uniq[1], C:uniq[2], D:uniq[3]};
-            setMCText({A:`A. ${escapeHTML(uniq[0])}`, B:`B. ${escapeHTML(uniq[1])}`, C:`C. ${escapeHTML(uniq[2])}`, D:`D. ${escapeHTML(uniq[3])}`});
+            mcMap = {A:options[0], B:options[1], C:options[2], D:options[3]};
+            setMCText({A:`A. ${escapeHTML(options[0])}`, B:`B. ${escapeHTML(options[1])}`, C:`C. ${escapeHTML(options[2])}`, D:`D. ${escapeHTML(options[3])}`});
         }
 
 

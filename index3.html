@@ -266,8 +266,9 @@
             <li><a href="index3.html" class="active">🧮 Tabel Kana</a></li>
             <li><a href="index4.html">🗒️ Kosakata</a></li>
             <li><a href="index5.html">💬 Ungkapan</a></li>
-            <li><a href="index7.html">🧠 Tebak Arti</a></li> <!-- Penambahan: Item menu "Tebak Arti" -->
+            <li><a href="index7.html">🧠 Tebak Arti</a></li>
             <li><a href="index6.html">✍️ Menulis</a></li>
+            <li><a href="index8.html">📚 Pelatih Membaca</a></li> <!-- Menambahkan link ke index8.html -->
         </ul>
     </nav>
 
@@ -349,6 +350,8 @@
             ['ya','や'], ['yu','ゆ'], ['yo','よ'],
             ['ra','ら'], ['ri','り'], ['ru','る'], ['re','れ'], ['ro','ろ'],
             ['wa','わ'], ['wo','を'], ['n','ん'],
+            ['wi','ゐ'], // Huruf historis
+            ['we','ゑ'], // Huruf historis
             ['ga','が'], ['gi','ぎ'], ['gu','ぐ'], ['ge','げ'], ['go','ご'],
             ['za','ざ'], ['ji','じ'], ['zu','ず'], ['ze','ぜ'], ['zo','ぞ'],
             ['da','だ'], ['dji','ぢ'], ['dzu','づ'], ['de','で'], ['do','ど'],
@@ -357,9 +360,9 @@
             ['kya','きゃ'], ['kyu','きゅ'], ['kyo','きょ'],
             ['sha','しゃ'], ['shu','しゅ'], ['sho','しょ'],
             ['cha','ちゃ'], ['chu','ちゅ'], ['cho','ちょ'],
-            ['nya','にゃ'], ['nyu','にょ'], ['nyo','にょ'],
+            ['nya','にゃ'], ['nyu','にゅ'], ['nyo','にょ'], // Dikoreksi
             ['hya','ひゃ'], ['hyu','ひゅ'], ['hyo','ひょ'],
-            ['mya','みゃ'], ['myu','みょ'], ['myo','みょ'],
+            ['mya','みゃ'], ['myu','みゅ'], ['myo','みょ'], // Dikoreksi
             ['rya','りゃ'], ['ryu','りゅ'], ['ryo','りょ'],
             ['gya','ぎゃ'], ['gyu','ぎゅ'], ['gyo','ぎょ'],
             ['ja','じゃ'], ['ju','じゅ'], ['jo','じょ'],
@@ -378,6 +381,8 @@
             ['ya','ヤ'], ['yu','ユ'], ['yo','ヨ'],
             ['ra','ラ'], ['ri','リ'], ['ru','ル'], ['re','レ'], ['ro','ロ'],
             ['wa','ワ'], ['wo','ヲ'], ['n','ン'],
+            ['wi','ヰ'], // Huruf historis
+            ['we','ヱ'], // Huruf historis
             ['ga','ガ'], ['gi','ギ'], ['gu','グ'], ['ge','ゲ'], ['go','ゴ'],
             ['za','ザ'], ['ji','ジ'], ['zu','ズ'], ['ze','ゼ'], ['zo','ゾ'],
             ['da','ダ'], ['dji','ヂ'], ['dzu','ヅ'], ['de','デ'], ['do','ド'],
@@ -390,15 +395,24 @@
             ['hya','ヒャ'], ['hyu','ヒュ'], ['hyo','ヒョ'],
             ['mya','ミャ'], ['myu','ミュ'], ['myo','ミョ'],
             ['rya','リャ'], ['ryu','リュ'], ['ryo','リョ'],
-            ['gya','ギャ'], ['gyu','ギョ'], ['ja','ジャ'],
-            ['ju','ジュ'], ['jo','ジョ'], ['bya','ビャ'],
-            ['byu','ビュ'], ['byo','ビョ'],
+            ['gya','ギャ'], ['gyu','ギュ'], ['gyo','ギョ'], // Dikoreksi/Ditambahkan
+            ['ja','ジャ'], ['ju','ジュ'], ['jo','ジョ'],
+            ['bya','ビャ'], ['byu','ビュ'], ['byo','ビョ'],
             ['pya','ピャ'], ['pyu','ピュ'], ['pyo','ピョ']
         ]);
 
         // Struktur Tabel
         const VOWELS = ['a', 'i', 'u', 'e', 'o'];
         const BASE_CONSONANTS = ['', 'k', 's', 't', 'n', 'h', 'm', 'y', 'r', 'w'];
+
+        // Alias untuk pengecualian gojuuon
+        const ROMAJI_ALIASES = new Map([
+          ['si','shi'],
+          ['ti','chi'],
+          ['tu','tsu'],
+          ['hu','fu']
+        ]);
+
         const DAKUON_CONSONANTS = ['g', 'z', 'd', 'b', 'p'];
         const YOUON_CONSONANTS = ['ky', 'sh', 'ch', 'ny', 'hy', 'my', 'ry', 'gy', 'j', 'by', 'py'];
         const YOUON_VOWELS = ['a', 'u', 'o'];
@@ -431,15 +445,22 @@
             BASE_CONSONANTS.forEach(c => {
                 html += `<tr><th>${c.toUpperCase()}</th>`;
                 VOWELS.forEach(v => {
-                    const romaji = c + v;
-                    const kana = kanaMap.get(romaji);
-                    if (['yi', 'ye', 'wi', 'wu', 'we'].includes(romaji)) {
-                            html += '<td class="empty-cell"></td>';
-                    } else if (kana) {
-                        html += `<td data-kana="${kana}"><div class="kana-char">${kana}</div><div class="romaji-char">${romaji}</div></td>`;
-                    } else {
-                        html += '<td class="empty-cell"></td>'; // Tambahkan sel kosong untuk romaji yang tidak ada
-                    }
+                  let romaji = c + v;
+                  if (ROMAJI_ALIASES.has(romaji)) romaji = ROMAJI_ALIASES.get(romaji);
+
+                  const kana = kanaMap.get(romaji);
+
+                  // Kosongkan hanya yang benar-benar tidak ada di kana modern
+                  if (['yi','ye','wu'].includes(romaji)) {
+                    html += '<td class="empty-cell"></td>';
+                  } else if (kana) {
+                    html += `<td data-kana="${kana}">
+                               <div class="kana-char">${kana}</div>
+                               <div class="romaji-char">${romaji}</div>
+                             </td>`;
+                  } else {
+                    html += '<td class="empty-cell"></td>';
+                  }
                 });
                 html += '</tr>';
             });

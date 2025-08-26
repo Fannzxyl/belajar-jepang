@@ -3,8 +3,8 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <title>Flashcard Kana Jepang — Latihan</title>
-    <meta name="description" content="Latih Hiragana & Katakana dengan metode flashcard interaktif. Balik kartu untuk melihat jawaban, navigasi mudah, dan pilih set kana yang ingin dipelajari." />
+    <title>Flashcard Kana Jepang — Latihan AI</title>
+    <meta name="description" content="Latih Hiragana & Katakana dengan flashcard interaktif yang didukung AI untuk pelafalan dan contoh kalimat." />
     <meta name="theme-color" content="#7a6cff">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -70,7 +70,19 @@
         .btn:active{transform:translateY(1px)}
         .btn.primary{ background:linear-gradient(135deg, var(--pri), var(--sec)); color:white; }
         .btn.ghost{background:transparent;outline:1px solid var(--border); color: var(--ink);}
+        .btn.ok   { background: var(--okBg);  color: var(--ok); }
+        .btn.warn { background: var(--warnBg); color: var(--warn); }
         .btn:focus-visible{outline:none; box-shadow:var(--ring); outline-offset: 3px;}
+        /* Animasi denyut untuk tombol mikrofon saat mendengarkan */
+        .btn.primary.listening {
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(122, 108, 255, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(122, 108, 255, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(122, 108, 255, 0); }
+        }
+
         select{ width:100%;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--soft);color:var(--ink); transition: border-color var(--transition-duration) ease-out, background-color var(--transition-duration) ease-out, box-shadow var(--transition-duration) ease-out; -webkit-appearance: none; -moz-appearance: none; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2376849c' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; background-size: 16px; padding-right: 36px; }
         select:focus { border-color: var(--pri); outline: none; box-shadow: var(--ring); }
         .spacer{height:10px}
@@ -124,6 +136,83 @@
         #cardCounter {
             font-size: 14px;
             color: var(--muted);
+        }
+
+        /* Area feedback AI */
+        #aiFeedbackArea {
+            margin-top: 16px;
+            padding: 12px;
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            background: var(--soft);
+            min-height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: var(--ink);
+            font-size: 14px;
+            transition: background-color var(--transition-duration) ease-out, border-color var(--transition-duration) ease-out;
+        }
+        #aiFeedbackArea.correct {
+            background-color: var(--okBg);
+            border-color: var(--ok);
+            color: var(--ok);
+            font-weight: 600;
+        }
+        #aiFeedbackArea.wrong {
+            background-color: var(--warnBg);
+            border-color: var(--warn);
+            color: var(--warn);
+            font-weight: 600;
+        }
+        #aiFeedbackArea .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-left-color: var(--pri);
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Contoh AI */
+        .ai-examples-section {
+            margin-top: 16px;
+            padding: 12px;
+            background: var(--soft);
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            font-size: 14px;
+            line-height: 1.5;
+            display: none; /* Default hidden */
+            opacity: 0;
+            max-height: 0;
+            overflow: hidden;
+            transition: opacity var(--transition-duration) ease-out, max-height var(--transition-duration) ease-out;
+        }
+        .ai-examples-section.show {
+            display: block; /* Tampilkan block saat show */
+            opacity: 1;
+            max-height: 500px; /* Nilai max-height yang cukup besar untuk transisi */
+        }
+        .ai-examples-section p {
+            margin: 0 0 8px 0;
+        }
+        .ai-examples-section p:last-child {
+            margin-bottom: 0;
+        }
+        .ai-examples-section .loading-spinner {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--muted);
+            justify-content: center;
+        }
+        .ai-examples-section .loading-spinner .fa-spinner {
+            animation: spin 1s linear infinite;
         }
 
         /* === Sidebar === */
@@ -183,7 +272,7 @@
             <li><a href="index3.html">🧮 Tabel Kana</a></li>
             <li><a href="index4.html">🗒️ Kosakata</a></li>
             <li><a href="index5.html">💬 Ungkapan</a></li>
-            <li><a href="index7.html">🧠 Tebak Arti</a></li> <!-- Penambahan: Item menu "Tebak Arti" -->
+            <li><a href="index7.html">🧠 Tebak Arti</a></li>
             <li><a href="index6.html">✍️ Menulis</a></li>
         </ul>
     </nav>
@@ -204,19 +293,9 @@
                 </svg>
                 <div>
                     <h1>Pelatih Kana Jepang</h1>
-                    <div class="small">Flashcard untuk menghafal Hiragana & Katakana</div>
+                    <div class="small">Flashcard dengan dukungan AI</div>
                 </div>
             </div>
-             <!-- NAVIGASI UTAMA (OLD - HIDDEN) -->
-             <nav class="main-nav">
-                <div class="row">
-                    <a href="index.html" class="btn ghost"><i class="fa-solid fa-home"></i> Latihan</a>
-                    <a href="index2.html" class="btn primary"><i class="fa-solid fa-clone"></i> Flashcard</a>
-                    <a href="index3.html" class="btn ghost"><i class="fa-solid fa-table"></i> Tabel Kana</a>
-                    <a href="index4.html" class="btn ghost"><i class="fa-solid fa-book-open"></i> Kosakata</a>
-                    <a href="index5.html" class="btn ghost"><i class="fa-solid fa-comments"></i> Ungkapan</a>
-                </div>
-            </nav>
         </div>
     </header>
 
@@ -257,6 +336,28 @@
 
         <div class="spacer"></div>
 
+        <div class="row" style="justify-content: center; gap: 8px;">
+            <button id="speakAndCheckBtn" class="btn primary"><i class="fa-solid fa-microphone"></i> Ucapkan & Cek</button>
+            <button id="aiExamplesBtn" class="btn"><i class="fa-solid fa-lightbulb"></i> Contoh AI</button>
+        </div>
+        
+        <div id="aiFeedbackArea" aria-live="polite" style="margin-top: 10px;">
+            <!-- Umpan balik AI untuk pelafalan akan muncul di sini -->
+        </div>
+
+        <div class="ai-examples-section" id="aiExamplesSection" aria-live="polite">
+            <!-- Contoh kalimat AI akan dimuat di sini -->
+        </div>
+
+        <div class="spacer"></div>
+
+        <div class="row" style="justify-content: center; gap: 8px;">
+            <button id="markCorrectBtn" class="btn ok"><i class="fa-solid fa-check"></i> Benar</button>
+            <button id="markIncorrectBtn" class="btn warn"><i class="fa-solid fa-times"></i> Salah</button>
+        </div>
+
+        <div class="spacer"></div>
+
         <!-- Penambahan: CTA card "Tebak Arti" -->
         <div class="card" id="cta-tebak-arti">
           <h2><i class="fa-solid fa-brain icon"></i> Tebak Arti (JP→ID)</h2>
@@ -291,6 +392,7 @@
         let deck = [];
         let currentIndex = 0;
         let currentSet = 'hira';
+        let incorrectCards = new Map(); // Untuk SRS sederhana
 
         // Elemen DOM
         const flashcard = document.getElementById('flashcard');
@@ -301,6 +403,291 @@
         const cardCounter = document.getElementById('cardCounter');
         const setSelection = document.getElementById('setSelection');
         const shuffleBtn = document.getElementById('shuffleBtn');
+        const speakAndCheckBtn = document.getElementById('speakAndCheckBtn');
+        const aiExamplesBtn = document.getElementById('aiExamplesBtn');
+        const aiFeedbackArea = document.getElementById('aiFeedbackArea');
+        const aiExamplesSection = document.getElementById('aiExamplesSection');
+        const markCorrectBtn = document.getElementById('markCorrectBtn');
+        const markIncorrectBtn = document.getElementById('markIncorrectBtn');
+
+        // --- INTEGRASI API GEMINI ---
+        const GEMINI_API_KEY = "AIzaSyCZVyGLZrlJW-bQFSYfIgVgWhVWQ6icaeE"; 
+        const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${GEMINI_API_KEY}`;
+        const geminiCache = new Map(); // Cache untuk contoh AI
+
+        // Fungsi untuk menangani percobaan ulang dengan exponential backoff
+        async function fetchWithExponentialBackoff(url, options, retries = 3, delay = 1000) {
+            for (let i = 0; i < retries; i++) {
+                try {
+                    const response = await fetch(url, options);
+                    if (response.status === 429 && i < retries - 1) { // Too Many Requests
+                        await new Promise(resolve => setTimeout(resolve, delay));
+                        delay *= 2; // Gandakan delay
+                        continue;
+                    }
+                    return response;
+                } catch (error) {
+                    if (i < retries - 1) {
+                        await new Promise(resolve => setTimeout(resolve, delay));
+                        delay *= 2;
+                        continue;
+                    }
+                    throw error;
+                }
+            }
+            throw new Error('Gagal melakukan fetch setelah beberapa percobaan.');
+        }
+
+        // Fungsi untuk memperbarui area umpan balik AI
+        function updateAiFeedback(message, type = 'info') {
+            aiFeedbackArea.classList.remove('correct', 'wrong');
+            aiFeedbackArea.innerHTML = ''; 
+
+            if (message === 'loading') {
+                aiFeedbackArea.innerHTML = '<div class="spinner"></div><span style="margin-left: 8px;">Mendengarkan...</span>';
+            } else if (message) {
+                aiFeedbackArea.textContent = message;
+                if (type === 'correct') {
+                    aiFeedbackArea.classList.add('correct');
+                } else if (type === 'wrong') {
+                    aiFeedbackArea.classList.add('wrong');
+                }
+            }
+        }
+
+        // --- FITUR 1: Pengenalan Suara (Speech Recognition) ---
+        let recognition;
+        let isRecognizing = false;
+        let hasSpoken = false; // Flag untuk melacak apakah ada suara terdeteksi
+
+        function initializeSpeechRecognition() {
+            if (!('SpeechRecognition' in window || 'webkitSpeechRecognition' in window)) {
+                showCustomAlert('Maaf, browser Anda tidak mendukung Speech Recognition. Pastikan Anda menggunakan Chrome atau browser modern lainnya.');
+                speakAndCheckBtn.disabled = true;
+                return;
+            }
+
+            // Periksa izin mikrofon secara lebih proaktif
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                showCustomAlert('Akses mikrofon tidak tersedia. Pastikan browser Anda memiliki izin untuk mengakses mikrofon di pengaturan sistem Anda.');
+                speakAndCheckBtn.disabled = true;
+                return;
+            }
+
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            recognition = new SpeechRecognition();
+            recognition.lang = 'ja-JP'; // Mengatur bahasa ke Jepang
+            recognition.interimResults = false;
+            recognition.maxAlternatives = 1;
+
+            recognition.onstart = () => {
+                isRecognizing = true;
+                hasSpoken = false; // Reset flag
+                speakAndCheckBtn.innerHTML = '<i class="fa-solid fa-microphone-alt-slash"></i> Berhenti';
+                speakAndCheckBtn.classList.add('listening'); // Tambahkan kelas untuk animasi
+                updateAiFeedback('loading');
+            };
+
+            recognition.onresult = async (event) => {
+                hasSpoken = true; // Suara terdeteksi
+                const transcript = event.results[0][0].transcript;
+                const currentRomaji = deck[currentIndex].romaji;
+                console.log(`Anda mengucapkan: ${transcript}, yang seharusnya: ${currentRomaji}`);
+
+                // Kirim transkrip ke Gemini untuk verifikasi
+                await verifyPronunciationWithGemini(transcript, currentRomaji);
+            };
+
+            recognition.onerror = (event) => {
+                isRecognizing = false;
+                speakAndCheckBtn.innerHTML = '<i class="fa-solid fa-microphone"></i> Ucapkan & Cek';
+                speakAndCheckBtn.classList.remove('listening'); // Hapus animasi
+                console.error('Speech recognition error:', event.error);
+                // Pesan error spesifik jika izin ditolak atau masalah jaringan
+                if (event.error === 'not-allowed') {
+                    updateAiFeedback('Akses mikrofon ditolak. Izinkan browser menggunakan mikrofon di pengaturan situs.', 'wrong');
+                } else if (event.error === 'network') {
+                    updateAiFeedback('Terjadi masalah jaringan saat pengenalan suara. Periksa koneksi internet Anda.', 'wrong');
+                } else {
+                    updateAiFeedback(`Error pengenalan suara: ${event.error}`, 'wrong');
+                }
+            };
+
+            recognition.onend = () => {
+                isRecognizing = false;
+                speakAndCheckBtn.innerHTML = '<i class="fa-solid fa-microphone"></i> Ucapkan & Cek';
+                speakAndCheckBtn.classList.remove('listening'); // Hapus animasi
+
+                // Hanya tampilkan pesan 'tidak ada suara' jika onresult belum pernah dipanggil
+                if (!hasSpoken && aiFeedbackArea.innerHTML.includes('Mendengarkan...')) {
+                    updateAiFeedback('Tidak ada suara terdeteksi atau mikrofon terlalu sunyi. Pastikan izin mikrofon sudah diberikan dan Anda berbicara dengan jelas.', 'wrong');
+                }
+            };
+        }
+
+        async function verifyPronunciationWithGemini(userTranscript, expectedRomaji) {
+            // Ubah userTranscript menjadi lowercase untuk perbandingan yang lebih baik
+            const cleanUserTranscript = userTranscript.toLowerCase().trim();
+            const cleanExpectedRomaji = expectedRomaji.toLowerCase().trim();
+
+            // Verifikasi langsung di klien jika transkrip sama persis dengan romaji yang diharapkan
+            if (cleanUserTranscript === cleanExpectedRomaji) {
+                updateAiFeedback(`Benar! Pelafalan Anda tepat untuk '${expectedRomaji}'.`, 'correct');
+                return; // Tidak perlu memanggil Gemini jika sudah jelas benar
+            }
+            
+            // Jika tidak sama persis, baru kirim ke Gemini untuk analisis lebih lanjut
+            const prompt = `Pengguna mencoba mengucapkan karakter Jepang dengan romaji '${expectedRomaji}'. Transkripsi yang dideteksi adalah '${userTranscript}'. Bandingkan transkripsi ini secara ketat dengan romaji yang diharapkan. Jawab 'YA' jika pelafalan **sangat akurat dan mirip persis** dengan romaji yang diharapkan. Jawab 'TIDAK' jika tidak, dan berikan saran singkat dalam bahasa Indonesia mengapa tidak akurat atau cara memperbaikinya (jika 'TIDAK').`;
+
+            try {
+                const response = await fetchWithExponentialBackoff(GEMINI_API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{
+                            parts: [{ text: prompt }]
+                        }],
+                        safetySettings: [
+                            { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_NONE" },
+                            { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_NONE" },
+                            { category: "HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold: "BLOCK_NONE" },
+                            { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_NONE" },
+                        ],
+                    })
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error.message || 'Terjadi kesalahan saat menghubungi API.');
+                }
+
+                const result = await response.json();
+                let geminiResponse = result.candidates?.[0]?.content?.parts?.[0]?.text || 'Tidak dapat memverifikasi pelafalan.';
+
+                if (geminiResponse.toUpperCase().includes('YA')) {
+                    updateAiFeedback(`Benar! Pelafalan Anda tepat untuk '${expectedRomaji}'.`, 'correct');
+                } else if (geminiResponse.toUpperCase().includes('TIDAK')) {
+                    const feedbackMatch = geminiResponse.match(/TIDAK\s*(.*)/i);
+                    const feedback = feedbackMatch && feedbackMatch[1].trim() ? feedbackMatch[1].trim() : 'Coba lagi, perhatikan bunyi vokal dan konsonan.';
+                    updateAiFeedback(`Salah. ${feedback}`, 'wrong');
+                } else {
+                    // Fallback jika Gemini tidak mengikuti format YA/TIDAK
+                    updateAiFeedback(`Umpan balik AI: ${geminiResponse}`, 'info');
+                }
+
+            } catch (error) {
+                console.error('Error verifying pronunciation with Gemini:', error);
+                updateAiFeedback(`Error verifikasi AI: ${error.message}`, 'wrong');
+            }
+        }
+
+        // --- FITUR 2: Pembuatan Contoh Kalimat Dinamis ---
+        let isFetchingExamples = false;
+
+        async function fetchAIExamples(kana) {
+            if (isFetchingExamples) return;
+
+            // Toggle visibility
+            const isShowing = aiExamplesSection.classList.contains('show');
+            if (isShowing) {
+                aiExamplesSection.classList.remove('show');
+                aiExamplesBtn.innerHTML = '<i class="fa-solid fa-lightbulb"></i> Contoh AI';
+                return;
+            }
+
+            isFetchingExamples = true;
+            aiExamplesSection.innerHTML = `<div class="loading-spinner"><i class="fa-solid fa-spinner fa-spin"></i> Memuat contoh...</div>`;
+            aiExamplesSection.classList.add('show');
+            aiExamplesBtn.innerHTML = '<i class="fa-solid fa-lightbulb"></i> Sembunyikan Contoh';
+
+            // Cek cache
+            if (geminiCache.has(kana)) {
+                aiExamplesSection.innerHTML = geminiCache.get(kana);
+                isFetchingExamples = false;
+                return;
+            }
+
+            const prompt = `Berikan 2 contoh kata atau kalimat pendek dalam bahasa Jepang menggunakan karakter '${kana}'. Sertakan juga terjemahan bahasa Indonesianya untuk setiap contoh. Format output sebagai berikut:
+[Kalimat Jepang 1]
+[Terjemahan Indonesia 1]
+
+[Kalimat Jepang 2]
+[Terjemahan Indonesia 2]
+
+Jangan sertakan teks lain, salam, atau penjelasan.`;
+
+            try {
+                const response = await fetchWithExponentialBackoff(GEMINI_API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{
+                            parts: [{ text: prompt }]
+                        }],
+                        safetySettings: [
+                            { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_NONE" },
+                            { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_NONE" },
+                            { category: "HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold: "BLOCK_NONE" },
+                            { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_NONE" },
+                        ],
+                    })
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error.message || 'Terjadi kesalahan saat menghubungi API.');
+                }
+
+                const result = await response.json();
+                let generatedText = result.candidates?.[0]?.content?.parts?.[0]?.text || '';
+
+                if (!generatedText.trim()) {
+                    generatedText = 'Tidak dapat menghasilkan contoh. Respons API kosong atau tidak valid.';
+                }
+
+                const lines = generatedText.split('\n').filter(line => line.trim() !== '');
+                let formattedHtml = '';
+                if (lines.length >= 2) {
+                    for (let i = 0; i < lines.length; i += 2) {
+                        const jpLine = lines[i];
+                        const idLine = lines[i+1] || '';
+                        if (jpLine) {
+                            formattedHtml += `<p style="font-family: 'Noto Sans JP', sans-serif; font-size: 16px; margin-bottom: 4px;">${jpLine}</p>`;
+                            if (idLine) {
+                                formattedHtml += `<p class="small" style="color: var(--ink); margin-bottom: 12px;">${idLine}</p>`;
+                            }
+                        }
+                    }
+                } else {
+                    formattedHtml = `<p>Tidak dapat menghasilkan contoh. Format respons tidak sesuai: ${generatedText}</p>`;
+                }
+
+                aiExamplesSection.innerHTML = formattedHtml;
+                geminiCache.set(kana, formattedHtml); // Simpan ke cache
+
+            } catch (error) {
+                console.error('Fetch Error (AI Examples):', error);
+                aiExamplesSection.innerHTML = `<p style="color:var(--warn);">Error: ${error.message}. Coba lagi nanti.</p>`;
+            } finally {
+                isFetchingExamples = false;
+            }
+        }
+
+        // --- FITUR 3: Sistem Pengulangan Berjarak Sederhana ---
+        function markCard(isCorrect) {
+            const currentCardIdentifier = deck[currentIndex].kana + deck[currentIndex].romaji;
+            if (isCorrect) {
+                // Jika benar, hapus dari daftar kartu salah
+                if (incorrectCards.has(currentCardIdentifier)) {
+                    incorrectCards.delete(currentCardIdentifier);
+                }
+            } else {
+                // Jika salah, tambahkan ke daftar kartu salah (atau perbarui jumlah kesalahan)
+                incorrectCards.set(currentCardIdentifier, (incorrectCards.get(currentCardIdentifier) || 0) + 1);
+            }
+            // Lanjutkan ke kartu berikutnya
+            nextCard();
+        }
 
         function createDeck() {
             deck = [];
@@ -348,11 +735,16 @@
                 deck.push({ kana: kanaMap.get(romaji), romaji: romaji });
             });
 
-            updateCard();
+            shuffleDeck(); // Acak saat deck dibuat atau diubah
         }
 
         function updateCard() {
-            if (deck.length === 0) return;
+            if (deck.length === 0) {
+                cardFront.textContent = 'N/A';
+                cardBack.textContent = 'N/A';
+                cardCounter.textContent = '0 / 0';
+                return;
+            }
 
             const card = deck[currentIndex];
             cardFront.textContent = card.kana;
@@ -361,40 +753,123 @@
             
             // Reset flip state
             flashcard.classList.remove('is-flipped');
+            // Sembunyikan contoh AI saat kartu berubah
+            if (aiExamplesSection.classList.contains('show')) {
+                aiExamplesSection.classList.remove('show');
+                aiExamplesBtn.innerHTML = '<i class="fa-solid fa-lightbulb"></i> Contoh AI';
+            }
+            updateAiFeedback(''); // Bersihkan feedback pelafalan
+        }
+
+        function nextCard() {
+            currentIndex = (currentIndex + 1) % deck.length;
+            updateCard();
+        }
+
+        function prevCard() {
+            currentIndex = (currentIndex - 1 + deck.length) % deck.length;
+            updateCard();
         }
 
         function shuffleDeck() {
-            for (let i = deck.length - 1; i > 0; i--) {
+            // Gabungkan kartu yang salah kembali ke deck utama untuk dipelajari lagi, dengan prioritas lebih tinggi (sederhana)
+            let tempDeck = [...deck]; // Buat salinan deck asli
+
+            Array.from(incorrectCards.keys()).forEach(identifier => {
+                const originalCard = deck.find(card => (card.kana + card.romaji) === identifier);
+                if (originalCard) {
+                    // Tambahkan kartu yang salah ke bagian awal tempDeck agar muncul lebih cepat
+                    for(let i=0; i < incorrectCards.get(identifier); i++) { // Lebih sering jika salah berkali-kali
+                        tempDeck.unshift(originalCard);
+                    }
+                }
+            });
+
+            // Acak tempDeck
+            for (let i = tempDeck.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
-                [deck[i], deck[j]] = [deck[j], deck[i]];
+                [tempDeck[i], tempDeck[j]] = [tempDeck[j], tempDeck[i]];
             }
+            deck = tempDeck; // Perbarui deck utama dengan deck yang sudah diacak (termasuk kartu salah)
+
             currentIndex = 0;
             updateCard();
         }
+
+        // Fungsi alert kustom (menggantikan window.alert)
+        function showCustomAlert(message) {
+            const alertBox = document.createElement('div');
+            alertBox.style.cssText = `
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background-color: var(--panel);
+                color: var(--ink);
+                padding: 20px;
+                border-radius: var(--radius);
+                box-shadow: var(--shadow);
+                z-index: 1000;
+                text-align: center;
+                border: 1px solid var(--border);
+                max-width: 80%;
+            `;
+            alertBox.innerHTML = `
+                <p>${message}</p>
+                <button style="
+                    background-color: var(--pri);
+                    color: white;
+                    border: none;
+                    padding: 10px 20px;
+                    border-radius: 8px;
+                    cursor: pointer;
+                    margin-top: 15px;
+                    font-weight: 500;
+                ">OK</button>
+            `;
+            document.body.appendChild(alertBox);
+
+            alertBox.querySelector('button').addEventListener('click', () => {
+                document.body.removeChild(alertBox);
+            });
+        }
+
 
         // Event Listeners
         flashcard.addEventListener('click', () => {
             flashcard.classList.toggle('is-flipped');
         });
 
-        nextBtn.addEventListener('click', () => {
-            currentIndex = (currentIndex + 1) % deck.length;
-            updateCard();
-        });
-
-        prevBtn.addEventListener('click', () => {
-            currentIndex = (currentIndex - 1 + deck.length) % deck.length;
-            updateCard();
-        });
+        nextBtn.addEventListener('click', nextCard);
+        prevBtn.addEventListener('click', prevCard);
         
         setSelection.addEventListener('change', createDeck);
         shuffleBtn.addEventListener('click', shuffleDeck);
 
+        speakAndCheckBtn.addEventListener('click', () => {
+            if (isRecognizing) {
+                recognition.stop();
+            } else {
+                recognition.start();
+            }
+        });
+
+        aiExamplesBtn.addEventListener('click', () => {
+            if (deck.length > 0) {
+                fetchAIExamples(deck[currentIndex].kana);
+            } else {
+                showCustomAlert('Tidak ada kartu di dek untuk menghasilkan contoh.');
+            }
+        });
+
+        markCorrectBtn.addEventListener('click', () => markCard(true));
+        markIncorrectBtn.addEventListener('click', () => markCard(false));
+
         document.addEventListener('keydown', (e) => {
             if (e.key === 'ArrowRight') {
-                nextBtn.click();
+                nextCard();
             } else if (e.key === 'ArrowLeft') {
-                prevBtn.click();
+                prevCard();
             } else if (e.key === ' ') { // Spasi untuk membalik kartu
                 e.preventDefault();
                 flashcard.click();
@@ -404,6 +879,7 @@
         // Inisialisasi
         document.addEventListener('DOMContentLoaded', () => {
             createDeck();
+            initializeSpeechRecognition();
             
             // Sidebar wiring
             const sidebar = document.getElementById('sidebar');
@@ -438,3 +914,4 @@
     </script>
 </body>
 </html>
+    

@@ -29,6 +29,8 @@
             --btnText:#e6efff;
             --border:rgba(230,239,255,.12);
             --ring: 0 0 0 3px rgba(143,168,255,.35);
+            --okBg:#1a3a2e;
+            --warnBg:#3a1a1a;
             --iconColor: var(--ink);
         }
         *{box-sizing:border-box}
@@ -191,6 +193,20 @@
         #fcPrompt{ word-break:keep-all }
         #fcFeedback.ok{ color:var(--ok) }
         #fcFeedback.bad{ color:var(--warn) }
+        #fcFeedback .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-left-color: var(--pri);
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            vertical-align: middle;
+            margin-right: 8px;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
 
         /* Form look & feel */
         input, select, textarea, input[type="number"], input[type="text"]{
@@ -234,11 +250,12 @@
             <li><a href="index.html">📘 Latihan</a></li>
             <li><a href="index2.html">🗂️ Flashcard</a></li>
             <li><a href="index3.html">🧮 Tabel Kana</a></li>
-            <li><a href="index4.html">🗒️ Kosakata</a></li>
+            <li><a href="index4.html" class="active">🗒️ Kosakata</a></li>
             <li><a href="index5.html">💬 Ungkapan</a></li>
             <!-- Penambahan: Item menu "Tebak Arti" -->
             <li><a href="index7.html">🧠 Tebak Arti</a></li>
             <li><a href="index6.html">✍️ Menulis</a></li>
+            <li><a href="index8.html">📚 Pelatih Membaca</a></li> <!-- Menambahkan link ke index8.html -->
         </ul>
     </nav>
 
@@ -319,11 +336,13 @@
                     <option value="jp_ro">JP → Romaji (ketik romaji)</option>
                     <option value="idn_jp">Arti → JP (ketik kana/kanji)</option>
                     <option value="ro_jp">Romaji → JP (ketik kana/kanji)</option>
+                    <option value="ai_gen_jp_idn">AI Gen: JP → Arti (ketik arti)</option> <!-- New AI mode -->
                 </select>
                 <select id="fcSource" class="input" aria-label="Sumber kartu">
                     <option value="filter">Dari hasil filter</option>
                     <option value="fav">Hanya favorit</option>
                     <option value="rand20">Acak 20</option>
+                    <option value="ai_gen">AI Generate (Kategori Aktif)</option> <!-- New AI source -->
                 </select>
                 <button class="btn primary" id="fcStart">Mulai</button>
             </div>
@@ -406,7 +425,7 @@
             { id: 'gakkou', kana: 'がっこう', kanji: '学校', romaji: 'gakkou', arti: 'Sekolah', kategori: 'tempat' },
             { id: 'eki', kana: 'えき', kanji: '駅', romaji: 'eki', arti: 'Stasiun', kategori: 'tempat' },
             { id: 'ie/uchi', kana: 'いえ / うち', kanji: '家', romaji: 'ie / uchi', arti: 'Rumah', kategori: 'tempat' },
-            { id: 'kaisha', kana: 'かいしゃ', kanji: '会社', romaji: 'kaisha', arti: 'Kantor / Perusahaan', kategori: 'tempat' },
+            { id: 'kaisha', kana: 'かいしゃ', kanji: '会社', romaji: 'kaishain', arti: 'Kantor / Perusahaan', kategori: 'tempat' },
             { id: 'ginkou', kana: 'ぎんこう', kanji: '銀行', romaji: 'ginkou', arti: 'Bank', kategori: 'tempat' },
             { id: 'byouin', kana: 'びょういん', kanji: '病院', romaji: 'byouin', arti: 'Rumah sakit', kategori: 'tempat' },
             { id: 'resutoran', kana: 'レストラン', kanji: '', romaji: 'resutoran', arti: 'Restoran', kategori: 'tempat' },
@@ -789,6 +808,12 @@
             const fcProg   = document.getElementById('fcProgress');
             const fcFeed   = document.getElementById('fcFeedback');
 
+            // --- Gemini API Configuration ---
+            // Replace with your actual API key.
+            // If left empty, Canvas will automatically provide it in runtime in the fetch call.
+            const GEMINI_API_KEY = "AIzaSyCZVyGLZrlJW-bQFSYfIgVgWhVWQ6icaeE"; 
+            const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${GEMINI_API_KEY}`;
+
             // Ambil list sesuai pilihan sumber
             function getPool(){
                 let list = (window.currentFilteredVocab && currentFilteredVocab.length) ? currentFilteredVocab.slice() : (vocabulary || []);
@@ -804,7 +829,8 @@
                     'jp_idn': { q: item.kanji || item.kana, accept: [item.arti] },
                     'jp_ro' : { q: item.kanji || item.kana, accept: [item.romaji] },
                     'idn_jp': { q: item.arti,                accept: [item.kanji || item.kana] },
-                    'ro_jp' : { q: item.romaji,              accept: [item.kanji || item.kana] }
+                    'ro_jp' : { q: item.romaji,              accept: [item.kanji || item.kana] },
+                    'ai_gen_jp_idn': { q: item.kana, accept: [item.arti] } // For AI generated questions
                 }[fcMode.value];
                 // Add kana as an alternative answer for JP questions if kanji is the primary
                 if (fcMode.value === 'idn_jp' || fcMode.value === 'ro_jp') {
@@ -819,14 +845,44 @@
 
             function updateProg(){ fcProg.textContent = `${Math.min(idx, deck.length)} / ${deck.length}`; }
 
-            function showCard(){
+            async function showCard(){
                 const it = deck[idx];
                 if(!it){ finish(); return; }
-                const qa = buildQA(it);
-                fcPrompt.textContent = qa.q;
-                fcInput.value = ''; fcInput.focus();
-                fcFeed.textContent = ''; fcFeed.className = 'small center';
-                fcNext.disabled = true;
+
+                if (fcSource.value === 'ai_gen') { // Check fcSource value
+                    fcPrompt.innerHTML = '<div class="spinner"></div><span>Membuat soal AI...</span>';
+                    fcInput.value = ''; fcInput.disabled = true;
+                    fcCheck.disabled = true; fcReveal.disabled = true; fcNext.disabled = true;
+                    fcFeed.textContent = '';
+                    
+                    try {
+                        const generatedQuestion = await generateQuestionWithAI(activeCategory);
+                        deck[idx] = { // Update current item with AI-generated data
+                            id: generatedQuestion.id,
+                            kana: generatedQuestion.kana,
+                            kanji: generatedQuestion.kanji,
+                            romaji: generatedQuestion.romaji,
+                            arti: generatedQuestion.arti,
+                            kategori: generatedQuestion.kategori
+                        };
+                        const qa = buildQA(deck[idx]);
+                        fcPrompt.textContent = qa.q;
+                        fcInput.disabled = false;
+                        fcCheck.disabled = false; fcReveal.disabled = false;
+                        fcInput.focus();
+                    } catch (error) {
+                        console.error("Error generating AI question:", error);
+                        fcPrompt.textContent = 'Gagal membuat soal AI. Coba lagi.';
+                        fcInput.disabled = false;
+                        fcCheck.disabled = false; fcReveal.disabled = false;
+                    }
+                } else {
+                    const qa = buildQA(it);
+                    fcPrompt.textContent = qa.q;
+                    fcInput.value = ''; fcInput.focus();
+                    fcFeed.textContent = ''; fcFeed.className = 'small center';
+                    fcNext.disabled = true;
+                }
                 updateProg();
             }
 
@@ -862,9 +918,18 @@
                 updateProg();
             }
 
-            fcStart.addEventListener('click', () => {
-                const pool = getPool();
+            fcStart.addEventListener('click', async () => {
+                let pool = [];
+                if (fcSource.value === 'ai_gen') {
+                    // Start with a dummy pool for AI generation mode
+                    // We'll generate questions one by one in showCard()
+                    pool = Array(10).fill({ id: 'ai_placeholder', kategori: activeCategory }); // Generate 10 AI questions
+                } else {
+                    pool = getPool();
+                }
+                
                 if(!pool.length){ fcArea.hidden = false; fcPrompt.textContent = 'Kosong. Atur filter atau tambahkan favorit dulu ya 🙏'; fcFeed.textContent = ''; return; }
+                
                 deck = shuffle(pool).slice(0, Math.min(30, pool.length)); // Limit to 30 for a reasonable quiz length
                 idx = 0; correct = 0; fcArea.hidden = false; showCard();
             });
@@ -877,6 +942,90 @@
             });
 
             function shuffle(a){ for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+
+            // --- Gemini API Call Function ---
+            async function generateQuestionWithAI(category, retries = 0) {
+                const prompt = `Generate a Japanese vocabulary word related to the category "${category}", its romaji, kanji (if applicable, otherwise use kana), and Indonesian meaning. Provide the output in JSON format, like this: {"id": "unique_id", "kana": "kana_form", "kanji": "kanji_form", "romaji": "romaji_form", "arti": "indonesian_meaning", "kategori": "category_name"}. Ensure the word is not too common but still useful for a beginner.`;
+                
+                const payload = {
+                    contents: [{ role: "user", parts: [{ text: prompt }] }],
+                    generationConfig: {
+                        responseMimeType: "application/json",
+                        responseSchema: {
+                            type: "OBJECT",
+                            properties: {
+                                "id": { "type": "STRING" },
+                                "kana": { "type": "STRING" },
+                                "kanji": { "type": "STRING" },
+                                "romaji": { "type": "STRING" },
+                                "arti": { "type": "STRING" },
+                                "kategori": { "type": "STRING" }
+                            },
+                            "propertyOrdering": ["id", "kana", "kanji", "romaji", "arti", "kategori"]
+                        }
+                    }
+                };
+
+                try {
+                    const response = await fetch(GEMINI_API_URL, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        console.error('Gemini API Error:', errorData);
+                        if (response.status === 429 && retries < 5) { // Too Many Requests
+                            const delay = Math.pow(2, retries) * 1000; // 1s, 2s, 4s, ...
+                            await new Promise(resolve => setTimeout(resolve, delay));
+                            return generateQuestionWithAI(category, retries + 1);
+                        }
+                        throw new Error(errorData.error.message || 'Terjadi kesalahan saat menghubungi API.');
+                    }
+
+                    const result = await response.json();
+                    if (result.candidates && result.candidates.length > 0 &&
+                        result.candidates[0].content && result.candidates[0].content.parts &&
+                        result.candidates[0].content.parts.length > 0) {
+                        const jsonText = result.candidates[0].content.parts[0].text;
+                        const parsedJson = JSON.parse(jsonText);
+                        // Ensure 'id' is unique, or generate one if missing/duplicate
+                        if (!parsedJson.id || vocabulary.some(v => v.id === parsedJson.id)) {
+                            parsedJson.id = `ai_gen_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+                        }
+                        return parsedJson;
+                    } else {
+                        console.warn("Unexpected API response structure:", result);
+                        throw new Error("Failed to parse AI-generated question.");
+                    }
+                } catch (error) {
+                    console.error('Fetch Error:', error);
+                    throw new Error(`Network or API issue: ${error.message}`);
+                }
+            }
+
+            // --- Update fcMode and fcSource change listeners ---
+            fcMode.addEventListener('change', () => {
+                // If AI generation mode is selected, force AI_GEN source
+                if (fcMode.value === 'ai_gen_jp_idn') {
+                    fcSource.value = 'ai_gen';
+                    fcSource.disabled = true;
+                } else {
+                    fcSource.disabled = false;
+                }
+            });
+
+            fcSource.addEventListener('change', () => {
+                // If AI_GEN source is selected, force AI generation mode
+                if (fcSource.value === 'ai_gen') {
+                    fcMode.value = 'ai_gen_jp_idn';
+                    fcMode.disabled = true;
+                } else {
+                    fcMode.disabled = false;
+                }
+            });
+
         })();
     </script>
 </body>

@@ -43,6 +43,7 @@
             radial-gradient(900px 420px at 110% -30%, rgba(22,198,161,.12), transparent),
             var(--bg);color:var(--ink);
             transition: background-color var(--transition-duration) ease-out, color var(--transition-duration) ease-out;
+            line-height: 1.6; /* Tambahan untuk keterbacaan */
         }
         .wrap{
             max-width: 960px;
@@ -63,6 +64,7 @@
         .card{background:var(--panel);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px;border:1px solid var(--border);
         transition: background-color var(--transition-duration) ease-out, border-color var(--transition-duration) ease-out, box-shadow var(--transition-duration) ease-out;}
         .card h2{font-size:16px;margin:0 0 10px 0; display: flex; align-items: center; gap: 8px;}
+        .card h3{font-size:14px; margin: 16px 0 8px 0; color: var(--muted);}
         .card h2 .icon { color: var(--iconColor); transition: color var(--transition-duration) ease-out;}
         .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
         .btn{ min-height:52px; padding: 0 16px; border-radius: 12px; border: none; cursor: pointer; font-size: 14px; font-weight: 500; transition: all var(--transition-duration) ease-out; color: var(--ink); background: var(--btn); display: flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none; }
@@ -73,10 +75,10 @@
         .btn.warn { background: var(--warnBg); color: var(--ink); } /* Diperbarui: Menggunakan variabel --warnBg */
         .btn:focus-visible{outline:none; box-shadow:var(--ring); outline-offset: 3px;}
         .spacer{height:16px}
-        /* Sembunyikan nav/header lama kalau ada */
+        /* Hilangkan nav lama (kalau ada) */
         .main-nav{ display:none !important; }
 
-        select{ width:100%;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--soft);color:var(--ink); transition: border-color var(--transition-duration) ease-out, background-color var(--transition-duration) ease-out, box-shadow var(--transition-duration) ease-out; -webkit-appearance: none; -moz-appearance: none; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2376849c' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; background-size: 16px; padding-right: 36px; }
+        select{ width:100%;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--soft);color:var(--ink); transition: border-color var(--transition-duration) ease-out, background-color var(--transition-duration) ease-out, box-shadow var(--transition-duration) ease-out; -webkit-appearance: none; -moz-appearance: none; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2376849c' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; background-size: 16px; padding-right: 36px; }
         select:focus { border-color: var(--pri); outline: none; box-shadow: var(--ring); }
 
         /* Style khusus untuk Latihan Menulis */
@@ -106,6 +108,46 @@
             transition: opacity var(--transition-duration) ease-out;
         }
         .writer-ghost.hidden { display:none; }
+
+        /* Feedback Area */
+        #feedbackArea {
+            margin-top: 16px;
+            padding: 12px;
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            background: var(--soft);
+            min-height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: var(--ink);
+            font-size: 14px;
+            transition: background-color var(--transition-duration) ease-out, border-color var(--transition-duration) ease-out;
+        }
+        #feedbackArea.correct {
+            background-color: var(--okBg);
+            border-color: var(--ok);
+            color: var(--ok);
+            font-weight: 600;
+        }
+        #feedbackArea.wrong {
+            background-color: var(--warnBg);
+            border-color: var(--warn);
+            color: var(--warn);
+            font-weight: 600;
+        }
+        #feedbackArea .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-left-color: var(--pri);
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
 
         /* === Sidebar === */
         .sidebar{
@@ -145,6 +187,85 @@
             header .brand{ padding-left:0; }
             .sidebar-toggle-btn{ top:calc(16px + env(safe-area-inset-top)); }
         }
+
+        /* Media Queries untuk Responsivitas */
+
+        /* Untuk layar kecil (ponsel), e.g., lebar < 768px */
+        @media (max-width: 767px) {
+            .wrap {
+                padding: 12px; /* Mengurangi padding wrap di mobile */
+                padding-left: calc(12px + env(safe-area-inset-left));
+                padding-right: calc(12px + env(safe-area-inset-right));
+            }
+            .card {
+                padding: 12px; /* Mengurangi padding kartu di mobile */
+            }
+            .card h2 {
+                font-size: 18px; /* Mengurangi ukuran judul kartu */
+            }
+            h1 {
+                font-size: 18px; /* Mengurangi ukuran judul utama */
+            }
+            .small {
+                font-size: 11px; /* Mengurangi ukuran teks kecil */
+            }
+            .btn {
+                min-height: 48px; /* Mengurangi tinggi tombol */
+                padding: 0 12px;
+                font-size: 13px; /* Mengurangi ukuran font tombol */
+            }
+            .main-nav .row {
+                gap: 6px; /* Mengurangi jarak antar tombol navigasi */
+            }
+            .seg button {
+                padding: 10px 12px; /* Mengurangi padding tombol segmen */
+                font-size: 13px;
+            }
+            .kana-table th, .kana-table td {
+                padding: 6px 4px; /* Mengurangi padding sel tabel di mobile */
+                min-width: 45px; /* Minimal lebar sel tabel di mobile */
+            }
+            .kana-char {
+                font-size: 20px; /* Mengurangi ukuran font karakter Kana */
+            }
+            .romaji-char {
+                font-size: 10px; /* Mengurangi ukuran font karakter Romaji */
+            }
+        }
+
+        /* Untuk layar sedang (tablet, laptop kecil), e.g., 768px - 1023px */
+        @media (min-width: 768px) and (max-width: 1023px) {
+            .wrap {
+                padding: 24px;
+            }
+            .kana-table th, .kana-table td {
+                padding: 8px 6px;
+                min-width: 60px;
+            }
+            .kana-char {
+                font-size: 26px;
+            }
+            .romaji-char {
+                font-size: 12px;
+            }
+        }
+
+        /* Untuk layar besar (laptop, desktop), e.g., >= 1024px */
+        @media (min-width: 1024px) {
+            .main-nav .row {
+                justify-content: flex-end; /* Navigasi rata kanan di layar besar */
+            }
+            .kana-table th, .kana-table td {
+                padding: 10px;
+                min-width: 70px;
+            }
+            .kana-char {
+                font-size: 28px;
+            }
+            .romaji-char {
+                font-size: 12px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -169,7 +290,8 @@
             <li><a href="index4.html">🗒️ Kosakata</a></li>
             <li><a href="index5.html">💬 Ungkapan</a></li>
             <li><a href="index7.html">🧠 Tebak Arti</a></li> <!-- Penambahan: Item menu "Tebak Arti" -->
-            <li><a href="index6.html">✍️ Menulis</a></li>
+            <li><a href="index6.html" class="active">✍️ Menulis</a></li>
+            <li><a href="index8.html">📚 Pelatih Membaca</a></li> <!-- Menambahkan link ke index8.html -->
         </ul>
     </nav>
 
@@ -242,6 +364,7 @@
                 <div style="flex:1"></div>
                 <button class="btn" id="undoStroke" type="button" title="Undo (Ctrl+Z)"><i class="fa-solid fa-undo"></i></button>
                 <button class="btn warn" id="clearCanvas" type="button"><i class="fa-solid fa-trash-alt"></i> Hapus Semua</button>
+                <button class="btn primary" id="checkDrawingBtn" type="button"><i class="fa-solid fa-robot"></i> Cek Gambar</button> <!-- New button -->
                 <button class="btn primary" id="savePNG" type="button"><i class="fa-solid fa-download"></i> Simpan PNG</button>
             </div>
 
@@ -252,6 +375,10 @@
                 <div id="writerGhost" class="writer-ghost" aria-hidden="true">あ</div>
             </div>
             <div class="small center" style="margin-top: 8px;">Tips: Tarik cepat untuk garis tipis, pelan untuk lebih tebal.</div>
+            
+            <div id="feedbackArea" aria-live="polite">
+                <!-- Umpan balik dari AI akan muncul di sini -->
+            </div>
         </div>
 
         <div class="spacer"></div>
@@ -279,6 +406,7 @@
         const KATA_DAKU = ['ガ','ギ','グ','ゲ','ゴ','ザ','ジ','ズ','ゼ','ゾ','ダ','ヂ','ヅ','デ','ド','バ','ビ','ブ','ベ','ボ','パ','ピ','プ','ペ','ポ'];
         const HIRA_YOU = ['きゃ','きゅ','きょ','しゃ','しゅ','しょ','ちゃ','ちゅ','ちょ','にゃ','にゅ','にょ','ひゃ','ひゅ','ひょ','みゃ','みゅ','みょ','りゃ','りゅ','りょ','ぎゃ','ぎゅ','ぎょ','じゃ','じゅ','じょ','びゃ','びゅ','びょ','ぴゃ','ぴゅ','ぴょ'];
         const KATA_YOU = ['キャ','キュ','キョ','シャ','シュ','ショ','チャ','チュ','チョ','ニャ','ニュ','ニョ','ヒャ','ヒュ','ヒョ','ミャ','ミュ','ミョ','リャ','リュ','リョ','ギャ','ギュ','ギョ','ジャ','ジュ','ジョ','ビャ','ビュ','ビョ','ピャ','ピュ','ピョ'];
+        
         const HIRA_MAP = new Map();
         const KATA_MAP = new Map();
         BASE.forEach((r,i)=>{HIRA_MAP.set(r,HIRA_BASE[i]);KATA_MAP.set(r,KATA_BASE[i])});
@@ -458,19 +586,28 @@
         }
         function writerUndo() { if(!wStrokes.length) return; wStrokes.pop(); writerRedrawAll(); }
         function writerClear() { wStrokes.length = 0; writerRedrawAll(); }
-        function writerSavePNG() {
-            if (!wCanvas) return;
+        
+        // Modified to get base64 image data
+        function getCanvasBase64Image() {
+            if (!wCanvas) return '';
             const tmp = document.createElement('canvas');
             tmp.width = wCanvas.width; tmp.height = wCanvas.height;
             const tctx = tmp.getContext('2d');
-            if (!tctx) return;
+            if (!tctx) return '';
+            // Isi latar belakang dengan warna panel untuk gambar yang diekspor
             tctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--panel').trim();
             tctx.fillRect(0,0,tmp.width,tmp.height);
             tctx.drawImage(wCanvas, 0, 0);
-            const url = tmp.toDataURL('image/png');
+            return tmp.toDataURL('image/png').split(',')[1]; // Ambil hanya bagian base64
+        }
+
+        function writerSavePNG() {
+            if (!wCanvas) return;
+            const url = `data:image/png;base64,${getCanvasBase64Image()}`;
             const a = document.createElement('a');
             a.href = url; a.download = `kana-${state.writer.kana}-${state.writer.set}.png`; a.click(); URL.revokeObjectURL(a.href);
         }
+
         function writerFillKanaOptions() {
             const sel = qs('#writeKana');
             if (!sel) return;
@@ -511,12 +648,16 @@
             saveState();
             writerFillKanaOptions();
             writerSetGhostChar();
+            writerClear(); // Clear canvas on new character
+            updateFeedback(''); // Clear feedback
         }
         function writerRandom() {
             state.writer.kana = ALL_ROMAJI[Math.floor(Math.random()*ALL_ROMAJI.length)];
             saveState();
             writerFillKanaOptions();
             writerSetGhostChar();
+            writerClear(); // Clear canvas on new character
+            updateFeedback(''); // Clear feedback
         }
         function writerBindEvents() {
             if (_writerBound) return;
@@ -529,11 +670,11 @@
                 wCanvas.addEventListener('pointercancel', writerEnd);
                 wCanvas.addEventListener('pointerleave', writerEnd);
             }
-            bind('#writeSet', 'change', (e)=>{ state.writer.set=e.target.value; saveState(); writerFillKanaOptions(); writerSetGhostChar(); writerClear(); });
-            bind('#writeKana', 'change', (e)=>{ state.writer.kana=e.target.value; saveState(); writerSetGhostChar(); writerClear(); });
-            bind('#writePrev', 'click', ()=>{ writerPick(-1); writerClear(); });
-            bind('#writeNext', 'click', ()=>{ writerPick(1); writerClear(); });
-            bind('#writeRand', 'click', ()=>{ writerRandom(); writerClear(); });
+            bind('#writeSet', 'change', (e)=>{ state.writer.set=e.target.value; saveState(); writerFillKanaOptions(); writerSetGhostChar(); writerClear(); updateFeedback(''); });
+            bind('#writeKana', 'change', (e)=>{ state.writer.kana=e.target.value; saveState(); writerSetGhostChar(); writerClear(); updateFeedback(''); });
+            bind('#writePrev', 'click', ()=>{ writerPick(-1); });
+            bind('#writeNext', 'click', ()=>{ writerPick(1); });
+            bind('#writeRand', 'click', ()=>{ writerRandom(); });
             bind('#writeSpeak', 'click', ()=>{ speak(writerCurrentChar()); });
             bind('#penSize', 'input', (e)=>{ state.writer.penSize = parseInt(e.target.value,10)||10; saveState(); });
             bind('#gridToggle', 'change', (e)=>{ state.writer.grid = e.target.checked; saveState(); writerSetGrid(state.writer.grid); writerRedrawAll(); });
@@ -543,6 +684,10 @@
             bind('#undoStroke', 'click', writerUndo);
             bind('#clearCanvas', 'click', writerClear);
             bind('#savePNG', 'click', writerSavePNG);
+            
+            // New: Bind checkDrawingBtn
+            bind('#checkDrawingBtn', 'click', checkDrawing);
+
             document.addEventListener('keydown', (e)=>{
                 if((e.ctrlKey||e.metaKey) && e.key.toLowerCase()==='z'){
                     e.preventDefault();
@@ -552,11 +697,9 @@
                 if (e.key === 'ArrowLeft') {
                     e.preventDefault();
                     writerPick(-1);
-                    writerClear();
                 } else if (e.key === 'ArrowRight') {
                     e.preventDefault();
                     writerPick(1);
-                    writerClear();
                 }
             });
             window.addEventListener('resize', writerSetupCanvasSize);
@@ -574,6 +717,179 @@
             writerInitDOMRefs();
             writerBindEvents();
             writerApplyUIFromState();
+        }
+
+        // --- GEMINI API INTEGRATION ---
+        const GEMINI_API_KEY = "AIzaSyDPx9WcKSl0Rz6tPyHQR1Cq56t-Bi8w7PI"; // API Key provided by the user
+        const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${GEMINI_API_KEY}`;
+        const feedbackArea = qs('#feedbackArea');
+        let isCheckingDrawing = false;
+
+        function updateFeedback(message, type = 'info') {
+            if (!feedbackArea) return;
+            feedbackArea.classList.remove('correct', 'wrong');
+            feedbackArea.innerHTML = ''; // Clear previous content
+
+            if (message === 'loading') {
+                feedbackArea.innerHTML = '<div class="spinner"></div><span style="margin-left: 8px;">Menganalisis gambar...</span>';
+            } else if (message) {
+                feedbackArea.textContent = message;
+                if (type === 'correct') {
+                    feedbackArea.classList.add('correct');
+                } else if (type === 'wrong') {
+                    feedbackArea.classList.add('wrong');
+                }
+            }
+        }
+
+        async function callGeminiVisionAPI(prompt, base64ImageData, retries = 0) {
+            const payload = {
+                contents: [
+                    {
+                        role: "user",
+                        parts: [
+                            { text: prompt },
+                            {
+                                inlineData: {
+                                    mimeType: "image/png",
+                                    data: base64ImageData
+                                }
+                            }
+                        ]
+                    }
+                ],
+            };
+
+            try {
+                const response = await fetch(GEMINI_API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    console.error('Gemini API Error:', errorData);
+                    // Implement exponential backoff
+                    if (response.status === 429 && retries < 5) { // Too Many Requests
+                        const delay = Math.pow(2, retries) * 1000; // 1s, 2s, 4s, ...
+                        await new Promise(resolve => setTimeout(resolve, delay));
+                        return callGeminiVisionAPI(prompt, base64ImageData, retries + 1);
+                    }
+                    throw new Error(errorData.error.message || 'Terjadi kesalahan saat menghubungi API.');
+                }
+
+                const result = await response.json();
+                if (result.candidates && result.candidates.length > 0 &&
+                    result.candidates[0].content && result.candidates[0].content.parts &&
+                    result.candidates[0].content.parts.length > 0) {
+                    return result.candidates[0].content.parts[0].text;
+                } else {
+                    console.warn("Struktur respons API tidak terduga:", result);
+                    return "Maaf, saya tidak bisa memahami respons dari AI.";
+                }
+            } catch (error) {
+                console.error('Fetch Error:', error);
+                throw new Error(`Terjadi masalah: ${error.message}`);
+            }
+        }
+
+        async function checkDrawing() {
+            if (isCheckingDrawing) return; // Prevent multiple clicks
+
+            const expectedKana = writerCurrentChar();
+            if (!expectedKana) {
+                showCustomAlert('Pilih karakter Kana terlebih dahulu.');
+                return;
+            }
+
+            const base64ImageData = getCanvasBase64Image();
+            if (!base64ImageData || base64ImageData.length < 100) { // Check if canvas is mostly empty
+                showCustomAlert('Kanvas kosong! Silakan gambar karakter terlebih dahulu.');
+                return;
+            }
+
+            isCheckingDrawing = true;
+            updateFeedback('loading');
+            qs('#checkDrawingBtn').disabled = true; // Disable button during check
+
+            const prompt = `Is this a drawing of the Japanese character '${expectedKana}'? Answer with 'YES' if it is clearly that character, 'NO' if it is not, and briefly explain why.`;
+
+            try {
+                const geminiResponse = await callGeminiVisionAPI(prompt, base64ImageData);
+                console.log("Gemini Response:", geminiResponse);
+
+                let isCorrect = false;
+                let feedbackMessage = "Tidak dapat menentukan.";
+
+                // Simple keyword matching for "YES" or "NO"
+                if (geminiResponse.toUpperCase().includes('YES')) {
+                    isCorrect = true;
+                    feedbackMessage = `Benar! Gambar Anda terlihat seperti '${expectedKana}'.`;
+                    // Try to extract more details if available
+                    const explanationMatch = geminiResponse.match(/YES\s*(.*)/i);
+                    if (explanationMatch && explanationMatch[1].trim()) {
+                        feedbackMessage += ` ${explanationMatch[1].trim()}`;
+                    }
+                } else if (geminiResponse.toUpperCase().includes('NO')) {
+                    isCorrect = false;
+                    feedbackMessage = `Salah. Gambar Anda tidak terlihat seperti '${expectedKana}'.`;
+                    const explanationMatch = geminiResponse.match(/NO\s*(.*)/i);
+                    if (explanationMatch && explanationMatch[1].trim()) {
+                        feedbackMessage += ` ${explanationMatch[1].trim()}`;
+                    }
+                } else {
+                    // Fallback if Gemini doesn't follow the exact YES/NO format
+                    feedbackMessage = `Umpan balik AI: ${geminiResponse}`;
+                }
+
+                updateFeedback(feedbackMessage, isCorrect ? 'correct' : 'wrong');
+
+            } catch (error) {
+                console.error('Error during AI check:', error);
+                updateFeedback(`Terjadi kesalahan saat memeriksa gambar: ${error.message}`, 'wrong');
+            } finally {
+                isCheckingDrawing = false;
+                qs('#checkDrawingBtn').disabled = false; // Re-enable button
+            }
+        }
+
+        // Fungsi alert kustom (menggantikan window.alert)
+        function showCustomAlert(message) {
+            const alertBox = document.createElement('div');
+            alertBox.style.cssText = `
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background-color: var(--panel);
+                color: var(--ink);
+                padding: 20px;
+                border-radius: var(--radius);
+                box-shadow: var(--shadow);
+                z-index: 1000;
+                text-align: center;
+                border: 1px solid var(--border);
+                max-width: 80%;
+            `;
+            alertBox.innerHTML = `
+                <p>${message}</p>
+                <button style="
+                    background-color: var(--pri);
+                    color: white;
+                    border: none;
+                    padding: 10px 20px;
+                    border-radius: 8px;
+                    cursor: pointer;
+                    margin-top: 15px;
+                    font-weight: 500;
+                ">OK</button>
+            `;
+            document.body.appendChild(alertBox);
+
+            alertBox.querySelector('button').addEventListener('click', () => {
+                document.body.removeChild(alertBox);
+            });
         }
 
         // Inisialisasi

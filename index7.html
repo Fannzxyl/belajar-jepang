@@ -467,7 +467,7 @@
             grid-template-columns: 1fr auto; /* Slider + number input */
             align-items: center;
         }
-        @media(min-width:860px){ 
+        @media(min-width:860px){
             .controls{ grid-template-columns: 1fr auto; } /* Keep 1fr auto for desktop */
         }
 
@@ -536,6 +536,22 @@
             text-align: center;
             margin-bottom: var(--space);
         }
+        /* Spinner for AI generation */
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-left-color: var(--primary);
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            vertical-align: middle;
+            margin-right: 8px;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
 
         /* === Sidebar === */
         .sidebar{
@@ -587,6 +603,7 @@
         <li><a href="index5.html">💬 Ungkapan</a></li>
         <li><a href="index7.html" class="active">🧠 Tebak Arti</a></li> <!-- Penambahan: Item menu "Tebak Arti" -->
         <li><a href="index6.html">✍️ Menulis</a></li>
+        <li><a href="index8.html">📚 Pelatih Membaca</a></li> <!-- Menambahkan link ke index8.html -->
       </ul>
     </nav>
 
@@ -661,6 +678,9 @@
     </div>
 
     <div id="toastMessage" class="toast"></div>
+
+    <!-- Tambahkan elemen audio di sini -->
+    <audio id="audio" preload="auto"></audio>
 
     <script>
         // Dataset Awal
@@ -787,7 +807,8 @@
             { jp: "英語", romaji: "eigo", id: "Bahasa Inggris", audio: "eigo", cat: "Dasar" },
             { jp: "日本語", romaji: "nihongo", id: "Bahasa Jepang", audio: "nihongo", cat: "Dasar" },
             { jp: "寝る", romaji: "neru", id: "tidur", audio: "neru", cat: "Dasar" },
-            { jp: "起きる", romaji: "okiru", cat: "bangun", audio: "okiru", cat: "Dasar" },
+            // ITEM INI SUDAH DIPERBAIKI:
+            { jp: "起きる", romaji: "okiru", id: "bangun", audio: "okiru", cat: "Dasar" },
             { jp: "勉強する", romaji: "benkyou suru", id: "belajar", audio: "benkyou-suru", cat: "Kerja" },
             { jp: "働く", romaji: "hataraku", id: "bekerja", audio: "hataraku", cat: "Kerja" },
             { jp: "遊ぶ", romaji: "asobu", id: "bermain", audio: "asobu", cat: "Dasar" },
@@ -912,7 +933,7 @@
         const retakeWrongBtn = document.getElementById('retakeWrongBtn');
         const restartQuizBtn = document.getElementById('restartQuizBtn');
         const toggleRomajiHintEl = document.getElementById('toggleRomajiHint');
-        const audioEl = document.getElementById('audio');
+        const audioEl = document.getElementById('audio'); // Audio element
         const toastMessageEl = document.getElementById('toastMessage');
 
         // --- Utility Functions ---
@@ -976,44 +997,37 @@
         }
 
         /**
-         * Memutar audio dari item saat ini.
+         * Memutar audio dari item saat ini atau nama audio yang diberikan.
+         * @param {string|null} name - Nama file audio (tanpa ekstensi) atau null untuk item saat ini.
          */
-        function playCurrentAudio() {
-            const currentItem = state.quizItems[state.currentQuestionIndex];
-            if (!currentItem || !currentItem.audio) {
-                console.warn("Tidak ada audio untuk item ini.");
+        function playAudioByName(name = null) {
+            if (!audioEl) {
+                console.error("Elemen audio tidak ditemukan!");
                 return;
             }
-            const audioSrc = getAudioSrcFor(currentItem);
+
+            let audioSrc = '';
+            if (name) {
+                audioSrc = `./assets/audio/${name}.mp3`;
+            } else {
+                const currentItem = state.quizItems[state.currentQuestionIndex];
+                if (!currentItem || !currentItem.audio) {
+                    console.warn("Tidak ada audio untuk item ini.");
+                    return;
+                }
+                audioSrc = `./assets/audio/${currentItem.audio}.mp3`;
+            }
+
             if (audioSrc) {
-                // Hanya set src jika berbeda untuk menghindari reload yang tidak perlu
                 if (audioEl.src !== audioSrc) {
                     audioEl.src = audioSrc;
-                    audioEl.load(); // Memastikan audio dimuat ulang jika src berubah
+                    audioEl.load();
                 }
                 audioEl.currentTime = 0; // Mulai dari awal
                 audioEl.play().catch(e => console.warn("Audio play blocked:", e)); // Tangani jika browser memblokir autoplay
             }
         }
 
-        /**
-         * Memutar audio kana dari romaji.
-         * @param {string} romaji - Romaji dari kana yang akan diputar.
-         */
-        function playKanaAudioFromRomaji(romaji) {
-            const item = ITEMS.find(i => i.romaji === romaji);
-            if (item) {
-                const audioSrc = getAudioSrcFor(item);
-                if (audioSrc) {
-                    if (audioEl.src !== audioSrc) {
-                        audioEl.src = audioSrc;
-                        audioEl.load();
-                    }
-                    audioEl.currentTime = 0;
-                    audioEl.play().catch(e => console.warn("Audio play blocked:", e));
-                }
-            }
-        }
 
         // --- Quiz Logic ---
 
@@ -1121,6 +1135,7 @@
             }
 
             nextQuestionBtn.disabled = false; // Aktifkan tombol Next
+            skipQuestionBtn.disabled = false; // Pastikan tombol skip aktif agar bisa kembali ke pengaturan dari halaman kuis
             updateProgress();
         }
 
@@ -1200,7 +1215,7 @@
                             <div class="wrong-item-id">→ ${item.correctId}</div>
                             <div class="wrong-item-id" style="font-size: smaller;">(Pilihanmu: ${item.yourChoice})</div>
                         </div>
-                        <button class="btn-audio wrong-item-audio-btn" aria-label="Putar audio ${item.jp}" data-audio-romaji="${item.audio}">
+                        <button class="btn-audio wrong-item-audio-btn" aria-label="Putar audio ${item.jp}" data-audio="${item.audio}">
                             <i class="fa-solid fa-volume-up"></i>
                         </button>
                     `;
@@ -1210,12 +1225,9 @@
                 // Bind audio buttons for wrong answers
                 wrongAnswersListEl.querySelectorAll('.wrong-item-audio-btn').forEach(btn => {
                     btn.addEventListener('click', () => {
-                        const audioRomaji = btn.dataset.audioRomaji;
-                        if (audioRomaji) {
-                            const tempItem = ITEMS.find(i => i.audio === audioRomaji);
-                            if (tempItem) {
-                                playKanaAudioFromRomaji(tempItem.romaji); // Menggunakan helper untuk memutar audio
-                            }
+                        const audioName = btn.dataset.audio;
+                        if (audioName) {
+                            playAudioByName(audioName); // Menggunakan helper untuk memutar audio
                         }
                     });
                 });
@@ -1230,8 +1242,8 @@
                 showToast("Tidak ada soal salah untuk dilatih ulang.", 'info');
                 return;
             }
-            // Gunakan kategori yang sama dari state sebelumnya
-            const previousCategory = state.cat; 
+            // Simpan kategori yang sama dari state sebelumnya untuk tampilan di hasil
+            // const previousCategory = state.cat; // Variabel ini sudah dihapus
 
             state.quizItems = shuffleReturn(state.wrongAnswers.map(item => ({
                 jp: item.jp,
@@ -1264,6 +1276,7 @@
             state.quizItems = [];
             state.totalQuestionsInQuiz = 0;
             updateProgress(); // Untuk mereset tampilan progress bar
+            updateAvailableQuestionCount(); // Pastikan tombol start diperbarui jika ada perubahan kategori
         }
 
         /**
@@ -1280,6 +1293,12 @@
             } else {
                 state.quizItems = shuffleReturn(pool).slice(0, state.count);
                 state.totalQuestionsInQuiz = state.count;
+            }
+
+            // Guard: Jika tidak ada item yang dipilih sama sekali
+            if (state.quizItems.length === 0) {
+                showToast("Tidak ada item yang tersedia untuk kuis di kategori ini. Silakan pilih kategori lain.", 'warn');
+                return;
             }
 
             state.currentQuestionIndex = 0;
@@ -1437,7 +1456,7 @@
         }
 
         // --- Event Listeners ---
-        playAudioBtn.addEventListener('click', playCurrentAudio);
+        playAudioBtn.addEventListener('click', () => playAudioByName(null)); // Memutar audio item saat ini
         nextQuestionBtn.addEventListener('click', nextQuestion);
         skipQuestionBtn.addEventListener('click', skipQuestion);
         retakeWrongBtn.addEventListener('click', retakeWrongOnly);
@@ -1451,21 +1470,33 @@
             });
         });
 
-        toggleRomajiHintEl.addEventListener('change', (e) => {
-            state.showRomajiHint = e.target.checked;
-            questionRomajiEl.classList.toggle('hidden', !state.showRomajiHint);
-        });
-
-        // Initial Setup
-        document.addEventListener('DOMContentLoaded', () => {
-            // Restore romaji hint state from localStorage if available
-            const savedRomajiHint = localStorage.getItem('quiz.showRomajiHint');
-            if (savedRomajiHint !== null) {
-                state.showRomajiHint = JSON.parse(savedRomajiHint);
-                toggleRomajiHintEl.checked = state.showRomajiHint;
+        // Satukan event listener untuk toggle Romaji Hint
+        if (toggleRomajiHintEl) {
+            // set awal dari localStorage
+            const saved = localStorage.getItem('romaji_hint');
+            if (saved !== null) {
+                toggleRomajiHintEl.checked = saved === '1';
+                state.showRomajiHint = toggleRomajiHintEl.checked; // Pastikan state juga terbarui
+            }
+            // Terapkan status awal ke UI jika ada soal yang ditampilkan
+            if (!quizPageEl.classList.contains('hidden')) {
                 questionRomajiEl.classList.toggle('hidden', !state.showRomajiHint);
             }
 
+            // listener TUNGGAL
+            toggleRomajiHintEl.addEventListener('change', (e) => {
+                state.showRomajiHint = e.target.checked;
+                localStorage.setItem('romaji_hint', state.showRomajiHint ? '1' : '0');
+                // Terapkan status baru ke UI jika ada soal yang ditampilkan
+                if (!quizPageEl.classList.contains('hidden')) {
+                    questionRomajiEl.classList.toggle('hidden', !state.showRomajiHint);
+                }
+            });
+        }
+
+
+        // Initial Setup
+        document.addEventListener('DOMContentLoaded', () => {
             renderCategoryChips(state.cat);
             bindQuestionCountControls();
             bindKeys();
@@ -1473,13 +1504,6 @@
             quizSettingsEl.classList.remove('hidden');
             quizPageEl.classList.add('hidden');
             resultPageEl.classList.add('hidden');
-        });
-
-        // Simpan status romaji hint saat berubah
-        toggleRomajiHintEl.addEventListener('change', (e) => {
-            state.showRomajiHint = e.target.checked;
-            localStorage.setItem('quiz.showRomajiHint', JSON.stringify(state.showRomajiHint));
-            questionRomajiEl.classList.toggle('hidden', !state.showRomajiHint);
         });
 
         // --- SIDEBAR JS ---
@@ -1517,4 +1541,3 @@
     </script>
 </body>
 </html>
-    
