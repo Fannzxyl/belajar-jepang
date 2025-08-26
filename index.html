@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="id" data-theme="pastel" class="no-js">
 <head>
@@ -853,7 +852,7 @@
             flex-shrink: 0; /* Prevent shrinking */
         }
 
-        /* UI/UX Mobile-First: Navbar bawah yang sticky (opsional) */
+        /* UI/UX Mobile-First: Bottom Bar (opsional) */
         <!-- <div class="bottom-bar">
             <button class="btn primary">Beranda</button>
             <button class="btn">Tes Cepat</button>
@@ -889,6 +888,7 @@
             <li><a href="index5.html">💬 Ungkapan</a></li>
             <li><a href="index7.html">🧠 Tebak Arti</a></li>
             <li><a href="index6.html">✍️ Menulis</a></li>
+            <li><a href="index8.html">📚 Pelatih Membaca</a></li> <!-- Added link to index8.html -->
         </ul>
     </nav>
 
@@ -2928,8 +2928,8 @@
 
         /**
          * FIX: Fungsi ini dihapus karena getChosenSubset() lebih universal dan buildPoolLabels
-         *      sebelumnya memiliki tujuan yang tumpang tindih atau tidak jelas.
-         *      Jika ada kebutuhan khusus untuk poolLabels, harus didefinisikan ulang secara terpisah.
+         * sebelumnya memiliki tujuan yang tumpang tindih atau tidak jelas.
+         * Jika ada kebutuhan khusus untuk poolLabels, harus didefinisikan ulang secara terpisah.
          */
         // function buildPoolLabels(){
         //     // ... (kode lama buildPoolLabels) ...
@@ -2986,8 +2986,8 @@
             }
             save(); // Save state after applying preset
             buildSubsetChips(); // Rebuild to clear active state on 'all', 'confusion', 'srs_due' or set current preset chip active
-            updateRangeUI(); // Re-apply UI state based on new subset/rangeMode
-            updateTestInfo(); // Update test info text
+            updateRangeUI();    // Apply range mode logic based on new state
+            updateTestInfo();   // Update test info text
             clickTone('click');
         }
         
@@ -3900,7 +3900,7 @@
 
             // --- NEW JS ROUTER ---
             // PAGES now reference actual HTML files for full page reloads
-            const PAGES = ["index.html","index2.html","index3.html","index4.html","index5.html","index6.html","index7.html"]; // Added index7.html
+            const PAGES = ["index.html","index2.html","index3.html","index4.html","index5.html","index6.html","index7.html","index8.html"]; // Added index8.html
             const $menu  = document.querySelectorAll('#sidebar [href]');
 
             // Active state for sidebar links

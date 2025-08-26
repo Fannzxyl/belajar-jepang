@@ -552,9 +552,9 @@
 
     <div id="toastMessage" class="toast"></div>
 
-    <script>
+    <script type="module">
         // --- CONSTANTS & DATA ---
-        // PASTIKAN BLOK INI HANYA ADA SEKALI DI index8.html
+        // Deduplikasi entri kamus yang identik
         const DICTIONARY = [
             // Contoh kata (N5-ish). Idealnya ini bank kata yang lebih besar dan terstruktur.
             // Format: { j: 'Kanji', k: 'kana' }
@@ -609,32 +609,29 @@
             { j: '酸っぱい', k: 'すっぱい' }, { j: '苦い', k: 'にがい' }, { j: '重い', k: 'おもい' },
             { j: '軽い', k: 'かるい' }, { j: '狭い', k: 'せまい' }, { j: '広い', k: 'ひろい' },
             { j: '遠い', k: 'とおい' }, { j: '近い', k: 'ちかい' }, { j: '早い', k: 'はやい' },
-            { j: '遅い', k: 'おそい' }, { j: '速い', k: 'はやい' }, { j: '遅い', k: 'おそい' },
+            { j: '遅い', k: 'おそい' }, { j: '速い', k: 'はやい' }, 
             { j: '強い', k: 'つよい' }, { j: '弱い', k: 'よわい' }, { j: '良い', k: 'よい' },
             { j: '悪い', k: 'わるい' }, { j: '多い', k: 'おおい' }, { j: '少ない', k: 'すくない' },
-            { j: 'ながい', k: 'ながい' }, { j: '短い', k: 'みじかい' }, { j: '新しい', k: 'あたらしい' },
-            { j: '古い', k: 'ふるい' }, { j: '美しい', k: 'うつくしい' }, { j: '可愛い', k: 'かわいい' },
-            { j: '怖い', k: 'こわい' }, { j: '眠い', k: 'ねむい' }, { j: '忙しい', k: 'いそがしい' },
-            { j: '暇', k: 'ひま' }, { j: '好き', k: 'すき' }, { j: '嫌い', k: 'きらい' },
-            { j: '上手', k: 'じょうず' }, { j: '下手', k: 'へた' }, { j: '便利', k: 'べんり' },
+            { j: 'ながい', k: 'ながい' }, { j: '短い', k: 'みじかい' }, 
+            { j: '美しい', k: 'うつくしい' }, { j: '可愛い', k: 'かわいい' },
+            { j: '怖い', k: 'こわい' }, { j: '眠い', k: 'ねむい' }, 
+            { j: '暇', k: 'ひま' }, 
+            { j: '上手', k: 'じょうず' }, { j: '下手', k: 'へた' }, 
             { j: '不便', k: 'ふべん' }, { j: '結構', k: 'けっこう' }, { j: '結構です', k: 'けっこうです' },
-            { j: '大丈夫', k: 'だいじょうぶ' }, { j: '問題', k: 'もんだい' }, { j: '質問', k: 'しつもん' },
-            { j: '答え', k: 'こたえ' }, { j: '分かる', k: 'わかる' }, { j: '分かる', k: 'わかる' },
+            { j: '問題', k: 'もんだい' }, { j: '質問', k: 'しつもん' },
+            { j: '答え', k: 'こたえ' }, { j: '分かる', k: 'わかる' }, 
             { j: 'できる', k: 'できる' }, { j: 'できない', k: 'できない' }, { j: '使う', k: 'つかう' },
-            { j: '作る', k: 'つくる' }, { j: '売る', k: 'うる' }, { j: '買う', k: 'かう' },
+            { j: '作る', k: 'つくる' }, { j: '売る', k: 'うる' }, 
             { j: '勉強', k: 'べんきょう' }, { j: '運動', k: 'うんどう' }, { j: '仕事', k: 'しごと' },
             { j: '休み', k: 'やすみ' }, { j: '旅行', k: 'りょこう' }, { j: '音楽', k: 'おんがく' },
             { j: '映画', k: 'えいが' }, { j: 'テレビ', k: 'テレビ' }, { j: 'ラジオ', k: 'ラジオ' },
             { j: '新聞', k: 'しんぶん' }, { j: '雑誌', k: 'ざっし' }, { j: '漫画', k: 'まんが' },
             { j: 'ゲーム', k: 'ゲーム' }, { j: 'スポーツ', k: 'スポーツ' }, { j: '料理', k: 'りょうり' },
-            { j: '食べる', k: 'たべる' }, { j: '飲む', k: 'のむ' }, { j: '行く', k: 'いく' },
-            { j: '来る', k: 'くる' }, { j: '帰る', k: 'かえる' }, { j: '寝る', k: 'ねる' },
+            { j: '帰る', k: 'かえる' }, { j: '寝る', k: 'ねる' },
             { j: '起きる', k: 'おきる' }, { j: '座る', k: 'すわる' }, { j: '立つ', k: 'たつ' },
             { j: '歩く', k: 'あるく' }, { j: '走る', k: 'はしる' }, { j: '泳ぐ', k: 'およぐ' },
             { j: '歌う', k: 'うたう' }, { j: '踊る', k: 'おどる' }, { j: '描く', k: 'かく' },
-            { j: '話す', k: 'はなす' }, { j: '聞く', k: 'きく' }, { j: '見る', k: 'みる' },
-            { j: '書く', k: 'かく' }, { j: '読む', k: 'よむ' }, { j: '買う', k: 'かう' },
-            { j: '売る', k: 'うる' }, { j: '教える', k: 'おしえる' }, { j: '習う', k: 'ならう' },
+            { j: '教える', k: 'おしえる' }, { j: '習う', k: 'ならう' },
             { j: '学ぶ', k: 'まなぶ' }, { j: '働く', k: 'はたらく' }, { j: '遊ぶ', k: 'あそぶ' },
             { j: '開ける', k: 'あける' }, { j: '閉める', k: 'しめる' }, { j: '出す', k: 'だす' },
             { j: '入れる', k: 'いれる' }, { j: '貸す', k: 'かす' }, { j: '借りる', k: 'かりる' },
@@ -642,11 +639,14 @@
             { j: 'くれる', k: 'くれる' }, { j: '待つ', k: 'まつ' }, { j: '急ぐ', k: 'いそぐ' },
             { j: '死ぬ', k: 'しぬ' }, { j: '生きる', k: 'いきる' }, { j: '始まる', k: 'はじまる' },
             { j: '終わる', k: 'おわる' }, { j: 'つける', k: 'つける' }, { j: '消す', k: 'けす' },
-            { j: '使う', k: 'つかう' }, { j: '止まる', k: 'とまる' }, { j: '止める', k: 'とめる' },
+            { j: '止まる', k: 'とまる' }, { j: '止める', k: 'とめる' },
             { j: '降る', k: 'ふる' }, { j: '晴れる', k: 'はれる' }, { j: '曇る', k: 'くもる' },
             { j: '吹く', k: 'ふく' }, { j: '鳴く', k: 'なく' }, { j: '咲く', k: 'さく' },
-            { j: '枯れる', k: 'かれる' }, { j: '咲く', k: 'さく' }, { j: '枯れる', k: 'かれる' }
-        ];
+            { j: '枯れる', k: 'かれる' }
+        ].filter((item, index, self) => 
+            index === self.findIndex((t) => (t.j === item.j && t.k === item.k))
+        );
+
 
         // Kana character definitions
         const HIRA_BASE = 'あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみむめもやゆよらりるれろわをん';
@@ -833,6 +833,16 @@
                    HIRA_SMALL_VOWELS.includes(char) || KATA_SMALL_VOWELS.includes(char);
         }
 
+        /**
+         * Memastikan kalimat berakhiran tanda baca Jepang (。, ？, ！).
+         * Jika tidak, menambahkan "。" di akhir.
+         * @param {string} s - Kalimat input.
+         * @returns {string} Kalimat dengan tanda baca akhir yang terjamin.
+         */
+        function ensureSentenceEnding(s) {
+            return /[。？！]$/.test(s) ? s : (s + '。');
+        }
+
         // ---- SMART RANDOM HELPERS ----
         const VEND = /[るむくぶぐすつぬ]$/;     // heuristik kata kerja (akhir kana godan/ichidan)
         const IADJ = /い$/;                       // heuristik i-keiyoushi
@@ -860,11 +870,11 @@
         // Bangun satu kalimat dengan pola acak
         function generateSmartSentence(allow, script){
           // kandidat isi kalimat
-          const subj = pickWord((k)=>!VEND.test(k) && !IADJ.test(k), allow, script) || {k:'わたし'};
-          const obj  = pickWord((k)=>!VEND.test(k) && !IADJ.test(k), allow, script) || {k:'ほん'};
-          const verb = pickWord((k)=>VEND.test(k), allow, script) || {k:'よむ'};
-          const place= pickWord((k)=>!VEND.test(k) && !IADJ.test(k), allow, script) || {k:'いえ'};
-          const adj  = pickWord((k)=>IADJ.test(k), allow, script) || {k:'たのしい'};
+          const subj = pickWord((k)=>!VEND.test(k) && !IADJ.test(k), allow, script) || {j:'私',k:'わたし'};
+          const obj  = pickWord((k)=>!VEND.test(k) && !IADJ.test(k), allow, script) || {j:'本',k:'ほん'};
+          const verb = pickWord((k)=>VEND.test(k), allow, script) || {j:'読む',k:'よむ'};
+          const place= pickWord((k)=>!VEND.test(k) && !IADJ.test(k), allow, script) || {j:'家',k:'いえ'};
+          const adj  = pickWord((k)=>IADJ.test(k), allow, script) || {j:'楽しい',k:'たのしい'};
           const time = randChoice(TIME_WORDS);
 
           const templates = [
@@ -883,8 +893,36 @@
           sentence = injectSokuon(sentence, state.sokuonProb/100, script);
           if (script !== 'hiragana') sentence = injectChoon(sentence, state.choonProb/100);
 
-          return sentence; // Jangan tambahkan maru di sini, akan ditambahkan di composeSentence
+          return ensureSentenceEnding(sentence); // Pastikan kalimat berakhiran tanda baca
         }
+
+        /**
+         * Menghasilkan kalimat dalam mode Furigana, memastikan panjang target terpenuhi.
+         * @param {object} allowedChars - Objek whitelist karakter yang diizinkan.
+         * @returns {string} Kalimat HTML dengan <ruby> untuk Furigana.
+         */
+        function generateFuriganaSentence(allowedChars) {
+            // Ambil kamus yang sudah difilter sesuai subset & script “furigana”
+            const filtered = filterDictionary(DICTIONARY, allowedChars, 'furigana');
+            if (filtered.length === 0) return '。';
+
+            const parts = [];
+            let accLen = 0;
+            const maxLoops = 200; // Guard untuk mencegah infinite loop
+            let loops = 0;
+
+            // targetLength = jumlah karakter kana (rt) kira-kira
+            while (accLen < state.targetLength && loops < maxLoops) {
+                loops++;
+                const w = filtered[Math.floor(Math.random() * filtered.length)];
+                parts.push(w);
+                accLen += w.k.length; // Akumulasi panjang kana
+            }
+
+            let s = composeSentence(parts, allowedChars, 'furigana'); // menambahkan 。 di dalamnya
+            return s;
+        }
+
 
         // --- CORE LOGIC ---
 
@@ -1195,7 +1233,11 @@
                     const maxAttempts = 20; // Batasi percobaan untuk menghindari infinite loop
 
                     do {
-                        sent = generateSmartSentence(allowedChars, state.script);
+                        if (state.script === 'furigana') {
+                            sent = generateFuriganaSentence(allowedChars);
+                        } else {
+                            sent = generateSmartSentence(allowedChars, state.script); // sudah diakhiri tanda baca via ensureSentenceEnding
+                        }
                         attempts++;
                         if (attempts > maxAttempts) {
                             console.warn("Max attempts reached for generating feature-rich sentence. Proceeding with current sentence.");
@@ -1207,7 +1249,7 @@
                         state.subset.dakuon || state.subset.handakuon, // Dakuon atau Handakuon
                         (state.script!=='hiragana' && state.choonProb>0)
                     ));
-                    paragraphText += sent; // Maru ditambahkan di akhir fungsi composeSentence jika diperlukan
+                    paragraphText += sent; 
                 }
                 fullTextHtml += `<p>${paragraphText}</p>`;
             }
@@ -1218,15 +1260,24 @@
         /**
          * Menyalin teks hasil ke clipboard.
          */
-        function copyText() {
-            const textToCopy = rdgOutput.innerText; // Menggunakan innerText untuk mendapatkan teks tanpa tag ruby
-            const tempTextArea = document.createElement('textarea');
-            tempTextArea.value = textToCopy;
-            document.body.appendChild(tempTextArea);
-            tempTextArea.select();
-            document.execCommand('copy'); // Fallback for some environments
-            document.body.removeChild(tempTextArea);
-            showToast('Teks berhasil disalin!', 'info');
+        async function copyText() {
+            const textToCopy = rdgOutput.innerText || '';
+            try {
+                if (navigator.clipboard && window.isSecureContext) {
+                    await navigator.clipboard.writeText(textToCopy);
+                } else {
+                    const tempTextArea = document.createElement('textarea');
+                    tempTextArea.value = textToCopy;
+                    document.body.appendChild(tempTextArea);
+                    tempTextArea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(tempTextArea);
+                }
+                showToast('Teks berhasil disalin!', 'info');
+            } catch (e) {
+                console.error(e);
+                showToast('Gagal menyalin teks.', 'warn');
+            }
         }
 
         /**
@@ -1492,655 +1543,6 @@
             bindEventListeners();
             // Generate initial text on load for a better first experience
             generateText(); 
-        });
-    </script>
-</body>
-</html>
-2. index9.html (Baru: Tantangan Konversi Kana)
-
-File ini akan menjadi menu "gacor" lainnya yang Anda minta. Ini akan memungkinkan Anda melatih konversi Hiragana ke Katakana dan sebaliknya. DICTIONARY dan fungsi utilitas lainnya dideklarasikan ulang di sini agar halaman ini dapat berfungsi secara mandiri.
-
-code
-Html
-download
-content_copy
-expand_less
-IGNORE_WHEN_COPYING_START
-IGNORE_WHEN_COPYING_END
---- START OF FILE index9.html ---
-
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <title>Tantangan Konversi Kana (JP)</title>
-    <meta name="description" content="Latih konversi Hiragana dan Katakana." />
-    <meta name="theme-color" content="#1a1a1a">
-
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-    <style>
-        /* CSS Variabel (konsisten dengan index7.html) */
-        :root {
-            --bg: #1a1a1a;
-            --panel: #2a2a2a;
-            --text: #e0e0e0;
-            --muted: #a0a0a0;
-            --border: rgba(255, 255, 255, 0.1);
-            --primary: #6b8bff;
-            --secondary: #3dd8b5;
-            --success: #2fb875;
-            --warning: #ff7b7b;
-            --radius: 12px;
-            --space: 12px;
-            --maxw: 760px; /* Target HP 720p */
-            --shadow: 0 4px 12px rgba(0,0,0,0.3);
-            --transition-duration: 0.2s;
-        }
-
-        /* Base Styles (konsisten dengan index7.html) */
-        * {
-            box-sizing: border-box;
-        }
-        body {
-            font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            min-height: 100vh;
-            background-color: var(--bg);
-            color: var(--text);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            overflow-x: hidden;
-            transition: background-color var(--transition-duration) ease, color var(--transition-duration) ease;
-        }
-
-        .container {
-            width: 100%;
-            max-width: var(--maxw);
-            margin-inline: auto;
-            padding: clamp(var(--space), 4vw, 24px);
-            display: flex;
-            flex-direction: column;
-            gap: var(--space);
-        }
-
-        @media (min-width: 860px) {
-            .container {
-                max-width: 1100px; /* Lebar lebih besar untuk desktop */
-            }
-        }
-
-        .card {
-            background: var(--panel);
-            border-radius: var(--radius);
-            padding: clamp(var(--space), 3vw, 20px);
-            box-shadow: var(--shadow);
-            border: 1px solid var(--border);
-            transition: background-color var(--transition-duration) ease, border-color var(--transition-duration) ease, box-shadow var(--transition-duration) ease;
-        }
-
-        h1 {
-            font-size: clamp(24px, 6vw, 32px);
-            margin: 0 0 8px;
-            text-align: center;
-        }
-
-        .subtitle {
-            font-size: clamp(14px, 3vw, 16px);
-            color: var(--muted);
-            text-align: center;
-            margin-bottom: var(--space);
-        }
-
-        .btn {
-            min-height: 48px; /* Ramah jempol */
-            padding: 0 16px;
-            border-radius: var(--radius);
-            border: none;
-            cursor: pointer;
-            font-size: clamp(14px, 3.5vw, 16px);
-            font-weight: 500;
-            transition: all var(--transition-duration) ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            text-decoration: none;
-            flex-grow: 1;
-        }
-        .btn.primary {
-            background: var(--primary);
-            color: #fff;
-        }
-        .btn.secondary {
-            background: var(--panel);
-            color: var(--text);
-            border: 1px solid var(--border);
-        }
-        .btn:hover:not(:disabled) {
-            opacity: 0.9;
-        }
-        .btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        .hidden {
-            display: none !important;
-        }
-        .sr-only {
-            position: absolute;
-            width: 1px;
-            height: 1px;
-            padding: 0;
-            margin: -1px;
-            overflow: hidden;
-            clip: rect(0,0,0,0);
-            white-space: nowrap;
-            border: 0;
-        }
-        .text-center {
-            text-align: center;
-        }
-        .spacer {
-            height: var(--space);
-        }
-
-        /* Toast Message (konsisten dengan index7.html) */
-        .toast {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background-color: rgba(0, 0, 0, 0.8);
-            color: #fff;
-            padding: 10px 15px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-            z-index: 1000;
-            opacity: 0;
-            transition: opacity 0.3s ease-in-out;
-            max-width: calc(100% - 40px);
-            text-align: center;
-        }
-        .toast.show {
-            opacity: 1;
-        }
-        .toast.warn {
-            background-color: var(--warning);
-            color: #333;
-        }
-
-        /* === Sidebar === (konsisten dengan index7.html) */
-        .sidebar{
-            position:fixed; top:0; left:-300px; width:280px; height:100%;
-            background:var(--panel); box-shadow:var(--shadow); z-index:1000;
-            transition:left .3s ease-in-out; padding:20px; padding-top:calc(20px + env(safe-area-inset-top));
-            display:flex; flex-direction:column; gap:10px; overflow-y:auto; border-right:1px solid var(--border);
-        }
-        .sidebar.is-open{ left:0; }
-        .sidebar .menu{ list-style:none; margin:0; padding:0; }
-        .sidebar .menu li a{ display:flex; gap:.5rem; align-items:center; padding:.75rem 1rem; border-radius:12px; color:var(--text); text-decoration:none; }
-        .sidebar .menu li a:hover{ background: rgba(255, 255, 255, 0.08); }
-        .sidebar .menu li a.active{ background:rgba(107,139,255,.18); font-weight:600; }
-        .sidebar-toggle-btn{
-            position:fixed; top:16px; left:16px; z-index:1001; background:var(--panel); border:1px solid var(--border);
-            border-radius:50%; width:44px; height:44px; display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:var(--shadow);
-        }
-        .sidebar-toggle-btn i{ color:var(--text); font-size:20px; }
-        @media (min-width:768px){ body.sidebar-open{ padding-left:280px; } }
-        @media (max-width:640px){ .sidebar{ width:84vw; max-width:320px; } }
-        /* Biar header gak ketutup tombol */
-        header .brand{ position:relative; z-index:1002; padding-left:60px; }
-        @media (max-width:767px){
-            header .brand{ padding-left:0; }
-            .sidebar-toggle-btn{ top:calc(16px + env(safe-area-inset-top)); }
-        }
-
-        /* Kana Conversion Specific Styles */
-        .kc-display-word {
-            font-family: 'Noto Sans JP', sans-serif;
-            font-size: clamp(32px, 8vw, 48px);
-            text-align: center;
-            margin: var(--space) 0;
-            padding: var(--space);
-            background: var(--bg);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            min-height: 100px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            word-break: break-all;
-        }
-
-        .kc-input-group {
-            display: flex;
-            gap: 8px;
-            margin-bottom: var(--space);
-        }
-
-        .kc-input-group input[type="text"] {
-            flex-grow: 1;
-            padding: 12px 16px;
-            border-radius: var(--radius);
-            border: 1px solid var(--border);
-            background: var(--bg);
-            color: var(--text);
-            font-size: clamp(16px, 4vw, 20px);
-            font-family: 'Noto Sans JP', sans-serif;
-            outline: none;
-            transition: border-color 0.2s ease;
-        }
-        .kc-input-group input[type="text"]:focus {
-            border-color: var(--primary);
-        }
-
-        .kc-feedback {
-            margin-top: var(--space);
-            padding: 10px;
-            border-radius: var(--radius);
-            text-align: center;
-            font-weight: 600;
-            min-height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .kc-feedback.success {
-            background-color: rgba(47, 184, 117, 0.2); /* var(--success) with transparency */
-            color: var(--success);
-        }
-        .kc-feedback.error {
-            background-color: rgba(255, 123, 123, 0.2); /* var(--warning) with transparency */
-            color: var(--warning);
-        }
-
-        .kc-action-buttons {
-            display: flex;
-            gap: var(--space);
-            margin-top: var(--space);
-            flex-wrap: wrap;
-        }
-    </style>
-</head>
-<body>
-    <!-- Toggle Button -->
-    <button id="sidebarToggle" class="sidebar-toggle-btn" aria-label="Toggle Sidebar">
-      <i class="fa-solid fa-bars"></i>
-    </button>
-
-    <!-- Sidebar -->
-    <nav id="sidebar" class="sidebar">
-      <div class="row" style="justify-content: space-between; align-items: center;">
-        <h3 style="margin:0;">Navigasi</h3>
-        <button class="btn secondary" id="closeSidebar" aria-label="Tutup Sidebar">
-          <i class="fa-solid fa-times"></i>
-        </button>
-      </div>
-      <hr style="border:none;border-top:1px solid var(--border);width:100%;">
-      <ul class="menu">
-        <li><a href="index.html">📖 Latihan</a></li>
-        <li><a href="index2.html">🗂️ Flashcard</a></li>
-        <li><a href="index3.html">🧮 Tabel Kana</a></li>
-        <li><a href="index4.html">🗒️ Kosakata</a></li>
-        <li><a href="index5.html">💬 Ungkapan</a></li>
-        <li><a href="index7.html">🧠 Tebak Arti</a></li>
-        <li><a href="index6.html">✍️ Menulis</a></li>
-        <li><a href="index8.html">📚 Pelatih Membaca</a></li>
-        <li><a href="index9.html" class="active">🔄 Konversi Kana</a></li> <!-- New: Kana Conversion Challenge -->
-      </ul>
-    </nav>
-
-    <div class="container">
-        <header class="card">
-            <h1>Tantangan Konversi Kana</h1>
-            <p class="subtitle">Konversikan kata antara Hiragana dan Katakana.</p>
-        </header>
-
-        <section class="card">
-            <h2>Tantangan</h2>
-            <div id="kc-display-word" class="kc-display-word"></div>
-            
-            <div class="kc-input-group">
-                <input type="text" id="kc-user-input" placeholder="Ketik jawaban Anda di sini...">
-                <button class="btn primary" id="kc-check-btn"><i class="fa-solid fa-check"></i> Cek</button>
-            </div>
-
-            <div id="kc-feedback" class="kc-feedback"></div>
-
-            <div class="kc-action-buttons">
-                <button class="btn secondary" id="kc-speak-btn"><i class="fa-solid fa-volume-up"></i> Bicara</button>
-                <button class="btn secondary" id="kc-stop-btn"><i class="fa-solid fa-stop"></i> Stop Bicara</button> <!-- New Stop Button for index9.html -->
-                <button class="btn secondary" id="kc-next-btn"><i class="fa-solid fa-forward"></i> Kata Berikutnya</button>
-            </div>
-        </section>
-    </div>
-
-    <div id="toastMessage" class="toast"></div>
-
-    <script>
-        // --- CONSTANTS & DATA (Diulang di sini agar index9.html bisa berdiri sendiri) ---
-        // Dalam proyek yang lebih besar, ini sebaiknya diimpor dari file JS terpisah.
-        const DICTIONARY = [
-            { j: '学校', k: 'がっこう' }, { j: '先生', k: 'せんせい' }, { j: '学生', k: 'がくせい' },
-            { j: '日本', k: 'にほん' }, { j: '日本語', k: 'にほんご' }, { j: '私', k: 'わたし' },
-            { j: 'あなた', k: 'あなた' }, { j: '食べる', k: 'たべる' }, { j: '飲む', k: 'のむ' },
-            { j: '行く', k: 'いく' }, { j: '来る', k: 'くる' }, { j: '読む', k: 'よむ' },
-            { j: '書く', k: 'かく' }, { j: '聞く', k: 'きく' }, { j: '話す', k: 'はなす' },
-            { j: '見る', k: 'みる' }, { j: '買う', k: 'かう' }, { j: '小さい', k: 'ちいさい' },
-            { j: '大きい', k: 'おおきい' }, { j: '高い', k: 'たかい' }, { j: '安い', k: 'やすい' },
-            { j: '新しい', k: 'あたらしい' }, { j: '古い', k: 'ふるい' }, { j: '猫', k: 'ねこ' },
-            { j: '犬', k: 'いぬ' }, { j: '魚', k: 'さかな' }, { j: '鳥', k: 'とり' },
-            { j: '木', k: 'き' }, { j: '花', k: 'はな' }, { j: '水', k: 'みず' },
-            { j: 'お茶', k: 'おちゃ' }, { j: 'ご飯', k: 'ごはん' }, { j: 'パン', k: 'パン' },
-            { j: '駅', k: 'えき' }, { j: '電車', k: 'でんしゃ' }, { j: '車', k: 'くるま' },
-            { j: '今', k: 'いま' }, { j: '時間', k: 'じかん' }, { j: '友達', k: 'ともだち' },
-            { j: '家族', k: 'かぞく' }, { j: '父', k: 'ちち' }, { j: '母', k: 'はは' },
-            { j: '兄', k: 'あに' }, { j: '姉', k: 'あね' }, { j: '弟', k: 'おとうと' },
-            { j: '妹', k: 'いもうと' }, { j: '男の子', k: 'おとこのこ' }, { j: '女の子', k: 'おんなのこ' },
-            { j: '本', k: 'ほん' }, { j: 'ペン', k: 'ペン' }, { j: '鉛筆', k: 'えんぴつ' },
-            { j: '消しゴム', k: 'けしゴム' }, { j: 'ノート', k: 'ノート' }, { j: '机', k: 'つくえ' },
-            { j: '椅子', k: 'いす' }, { j: '時計', k: 'とけい' }, { j: '電話', k: 'でんわ' },
-            { j: '窓', k: 'まど' }, { j: 'ドア', k: 'ドア' }, { j: '傘', k: 'かさ' },
-            { j: '靴', k: 'くつ' }, { j: '服', k: 'ふく' }, { j: '帽子', k: 'ぼうし' },
-            { j: '眼鏡', k: 'めがね' }, { j: '手', k: 'て' }, { j: '足', k: 'あし' },
-            { j: '目', k: 'め' }, { j: '耳', k: 'みみ' }, { j: '口', k: 'くち' },
-            { j: '鼻', k: 'はな' }, { j: '頭', k: 'あたま' }, { j: '髪', k: 'かみ' },
-            { j: '顔', k: 'かお' }, { j: '体', k: 'からだ' }, { j: '心', k: 'こころ' },
-            { j: '家', k: 'いえ' }, { j: '部屋', k: 'へや' }, { j: '朝', k: 'あさ' },
-            { j: '昼', k: 'ひる' }, { j: '夜', k: 'よる' }, { j: '今日', k: 'きょう' },
-            { j: '明日', k: 'あした' }, { j: '昨日', k: 'きのう' }, { j: '週', k: 'しゅう' },
-            { j: '月', k: 'つき' }, { j: '年', k: 'とし' }, { j: '毎日', k: 'まいにち' },
-            { j: '毎週', k: 'まいしゅう' }, { j: '毎月', k: 'まいつき' }, { j: '毎年', k: 'まいとし' },
-            { j: '何', k: 'なに' }, { j: 'どこ', k: 'どこ' }, { j: 'いつ', k: 'いつ' },
-            { j: '誰', k: 'だれ' }, { j: 'なぜ', k: 'なぜ' }, { j: 'どう', k: 'どう' },
-            { j: 'いくら', k: 'いくら' }, { j: '一', k: 'いち' }, { j: '二', k: 'に' },
-            { j: '三', k: 'さん' }, { j: '四', k: 'よん' }, { j: '五', k: 'ご' },
-            { j: '六', k: 'ろく' }, { j: '七', k: 'なな' }, { j: '八', k: 'はち' },
-            { j: '九', k: 'きゅう' }, { j: '十', k: 'じゅう' }, { j: '百', k: 'ひゃく' },
-            { j: '千', k: 'せん' }, { j: '万', k: 'まん' }, { j: '円', k: 'えん' },
-            { j: 'はい', k: 'はい' }, { j: 'いいえ', k: 'いいえ' }, { j: 'おはよう', k: 'おはよう' },
-            { j: 'こんにちは', k: 'こんにちは' },
-            { j: 'こんばんは', k: 'こんばんは' },
-            { j: 'ありがとう', k: 'ありがとう' }, { j: 'すみません', k: 'すみません' },
-            { j: 'ごめんなさい', k: 'ごめんなさい' }, { j: 'おやすみ', k: 'おやすみ' },
-            { j: 'さようなら', k: 'さようなら' }, { j: '大丈夫', k: 'だいじょうぶ' },
-            { j: '綺麗', k: 'きれい' }, { j: '静か', k: 'しずか' }, { j: '便利', k: 'べんり' },
-            { j: '簡単', k: 'かんたん' }, { j: '大好き', k: 'だいすき' }, { j: '有名', k: 'ゆうめい' },
-            { j: '元気', k: 'げんき' }, { j: '好き', k: 'すき' }, { j: '嫌い', k: 'きらい' },
-            { j: '難しい', k: 'むずかしい' }, { j: '楽しい', k: 'たのしい' }, { j: '忙しい', k: 'いそがしい' },
-            { j: '寒い', k: 'さむい' }, { j: '暑い', k: 'あつい' }, { j: '面白い', k: 'おもしろい' },
-            { j: '美味しい', k: 'おいしい' }, { j: '甘い', k: 'あまい' }, { j: '辛い', k: 'からい' },
-            { j: '酸っぱい', k: 'すっぱい' }, { j: '苦ai', k: 'にがい' }, { j: '重い', k: 'おもい' },
-            { j: '軽い', k: 'かるい' }, { j: '狭い', k: 'せまい' }, { j: '広い', k: 'ひろい' },
-            { j: '遠い', k: 'とおい' }, { j: '近い', k: 'ちかい' }, { j: '早い', k: 'はやい' },
-            { j: '遅い', k: 'おそい' }, { j: '速い', k: 'はやい' }, { j: '遅い', k: 'おそい' },
-            { j: '強い', k: 'つよい' }, { j: '弱い', k: 'よわい' }, { j: '良い', k: 'よい' },
-            { j: '悪い', k: 'わるい' }, { j: '多い', k: 'おおい' }, { j: '少ない', k: 'すくない' },
-            { j: 'ながい', k: 'ながい' }, { j: '短い', k: 'みじかい' }, { j: '新しい', k: 'あたらしい' },
-            { j: '古い', k: 'ふるい' }, { j: '美しい', k: 'うつくしい' }, { j: '可愛い', k: 'かわいい' },
-            { j: '怖い', k: 'こわい' }, { j: '眠い', k: 'ねむい' }, { j: '忙しい', k: 'いそがしい' },
-            { j: '暇', k: 'ひま' }, { j: '好き', k: 'すき' }, { j: '嫌ai', k: 'きらい' },
-            { j: '上手', k: 'じょうず' }, { j: '下手', k: 'へた' }, { j: '便利', k: 'べんり' },
-            { j: '不便', k: 'ふべん' }, { j: '結構', k: 'けっこう' }, { j: '結構です', k: 'けっこうです' },
-            { j: '大丈夫', k: 'だいじょうぶ' }, { j: '問題', k: 'もんだい' }, { j: '質問', k: 'しつもん' },
-            { j: '答え', k: 'こたえ' }, { j: '分かる', k: 'わかる' }, { j: '分かる', k: 'わかる' },
-            { j: 'できる', k: 'できる' }, { j: 'できない', k: 'できない' }, { j: '使う', k: 'つかう' },
-            { j: '作る', k: 'つくる' }, { j: '売る', k: 'うる' }, { j: '買う', k: 'かう' },
-            { j: '勉強', k: 'べんきょう' }, { j: '運動', k: 'うんどう' }, { j: '仕事', k: 'しごと' },
-            { j: '休み', k: 'やすみ' }, { j: '旅行', k: 'りょこう' }, { j: '音楽', k: 'おんがく' },
-            { j: '映画', k: 'えいが' }, { j: 'テレビ', k: 'テレビ' }, { j: 'ラジオ', k: 'ラジオ' },
-            { j: '新聞', k: 'しんぶん' }, { j: '雑誌', k: 'ざっし' }, { j: '漫画', k: 'まんが' },
-            { j: 'ゲーム', k: 'ゲーム' }, { j: 'スポーツ', k: 'スポーツ' }, { j: '料理', k: 'りょうり' },
-            { j: '食べる', k: 'たべる' }, { j: '飲む', k: 'のむ' }, { j: '行く', k: 'いく' },
-            { j: '来る', k: 'くる' }, { j: '帰る', k: 'かえる' }, { j: '寝る', k: 'ねる' },
-            { j: '起きる', k: 'おきる' }, { j: '座る', k: 'すわる' }, { j: '立つ', k: 'たつ' },
-            { j: '歩く', k: 'あるく' }, { j: '走る', k: 'はしる' }, { j: '泳ぐ', k: 'およぐ' },
-            { j: '歌う', k: 'うたう' }, { j: '踊る', k: 'おどる' }, { j: '描く', k: 'かく' },
-            { j: '話す', k: 'はなす' }, { j: '聞く', k: 'きく' }, { j: '見る', k: 'みる' },
-            { j: '書く', k: 'かく' }, { j: '読む', k: 'よむ' }, { j: '買う', k: 'かう' },
-            { j: '売る', k: 'うる' }, { j: '教える', k: 'おしえる' }, { j: '習う', k: 'ならう' },
-            { j: '学ぶ', k: 'まなぶ' }, { j: '働く', k: 'はたらく' }, { j: '遊ぶ', k: 'あそぶ' },
-            { j: '開ける', k: 'あける' }, { j: '閉める', k: 'しめる' }, { j: '出す', k: 'だす' },
-            { j: '入れる', k: 'いれる' }, { j: '貸す', k: 'かす' }, { j: '借りる', k: 'かりる' },
-            { j: '送る', k: 'おくる' }, { j: 'もらう', k: 'もらう' }, { j: 'あげる', k: 'あげる' },
-            { j: 'くれる', k: 'くれる' }, { j: '待つ', k: 'まつ' }, { j: '急ぐ', k: 'いそぐ' },
-            { j: '死ぬ', k: 'しぬ' }, { j: '生きる', k: 'いきる' }, { j: '始まる', k: 'はじまる' },
-            { j: '終わる', k: 'おわる' }, { j: 'つける', k: 'つける' }, { j: '消す', k: 'けす' },
-            { j: '使う', k: 'つかう' }, { j: '止まる', k: 'とまる' }, { j: '止める', k: 'とめる' },
-            { j: '降る', k: 'ふる' }, { j: '晴れる', k: 'はれる' }, { j: '曇る', k: 'くもる' },
-            { j: '吹く', k: 'ふく' }, { j: '鳴く', k: 'なく' }, { j: '咲く', k: 'さく' },
-            { j: '枯れる', k: 'かれる' }, { j: '咲く', k: 'さく' }, { j: '枯れる', k: 'かれる' }
-        ];
-        
-        // --- UTILITY FUNCTIONS (Diulang di sini agar index9.html bisa berdiri sendiri) ---
-        function shuffle(arr) {
-            for (let i = arr.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [arr[i], arr[j]] = [arr[j], arr[i]];
-            }
-        }
-        function randChoice(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
-
-        function toKatakana(char) {
-            const code = char.charCodeAt(0);
-            if (code >= 0x3041 && code <= 0x3096) { return String.fromCharCode(code + 0x60); }
-            return char;
-        }
-
-        function toHiragana(char) {
-            const code = char.charCodeAt(0);
-            if (code >= 0x30A1 && code <= 0x30F6) { return String.fromCharCode(code - 0x60); }
-            return char;
-        }
-
-        function isHiragana(char) {
-            return char.charCodeAt(0) >= 0x3040 && char.charCodeAt(0) <= 0x309F;
-        }
-
-        function isKatakana(char) {
-            return char.charCodeAt(0) >= 0x30A0 && char.charCodeAt(0) <= 0x30FF;
-        }
-
-        // --- GLOBAL STATE ---
-        let currentKanaWord = '';
-        let targetKanaWord = '';
-        let japaneseVoice = null; // For speech synthesis
-
-        // --- DOM ELEMENTS ---
-        const kcDisplayWord = document.getElementById('kc-display-word');
-        const kcUserInput = document.getElementById('kc-user-input');
-        const kcCheckBtn = document.getElementById('kc-check-btn');
-        const kcNextBtn = document.getElementById('kc-next-btn');
-        const kcSpeakBtn = document.getElementById('kc-speak-btn');
-        const kcStopBtn = document.getElementById('kc-stop-btn'); // New Stop button for index9.html
-        const kcFeedback = document.getElementById('kc-feedback');
-        const toastMessageEl = document.getElementById('toastMessage');
-
-
-        // --- UTILITY FUNCTIONS FOR TOAST ---
-        let toastTimeout;
-        function showToast(message, type = 'info', duration = 2500) {
-            clearTimeout(toastTimeout);
-            toastMessageEl.textContent = message;
-            toastMessageEl.className = 'toast show';
-            if (type === 'warn') {
-                toastMessageEl.classList.add('warn');
-            } else {
-                toastMessageEl.classList.remove('warn');
-            }
-
-            toastTimeout = setTimeout(() => {
-                toastMessageEl.classList.remove('show');
-            }, duration);
-        }
-
-        // --- SPEECH SYNTHESIS FUNCTIONS ---
-        function loadJapaneseVoices() {
-            if ('speechSynthesis' in window) {
-                const voices = speechSynthesis.getVoices();
-                japaneseVoice = voices.find(voice => voice.lang === 'ja-JP' || voice.lang === 'ja_JP');
-                if (!japaneseVoice && voices.length > 0) {
-                    japaneseVoice = voices.find(voice => /japanese/i.test(voice.name)) || voices[0];
-                }
-            }
-        }
-
-        if ('speechSynthesis' in window) {
-            speechSynthesis.onvoiceschanged = loadJapaneseVoices;
-            loadJapaneseVoices();
-        }
-
-        function speakKanaWord(word) {
-            if (!('speechSynthesis' in window)) {
-                showToast('Maaf, browser Anda tidak mendukung fitur suara.', 'warn');
-                return;
-            }
-            if (!japaneseVoice) {
-                showToast('Memuat suara Jepang. Coba lagi sebentar.', 'info');
-                loadJapaneseVoices();
-                return;
-            }
-
-            speechSynthesis.cancel();
-            const utterance = new SpeechSynthesisUtterance(word);
-            utterance.lang = 'ja-JP';
-            utterance.voice = japaneseVoice;
-            utterance.rate = 0.9;
-            speechSynthesis.speak(utterance);
-        }
-
-        function stopSpeaking() {
-            if ('speechSynthesis' in window) {
-                speechSynthesis.cancel();
-                showToast('Pembicaraan dihentikan.', 'info');
-            }
-        }
-
-        // --- CORE LOGIC ---
-
-        /**
-         * Memulai tantangan konversi kana baru.
-         */
-        function generateChallenge() {
-            kcFeedback.textContent = '';
-            kcFeedback.className = 'kc-feedback';
-            kcUserInput.value = '';
-            kcUserInput.focus();
-
-            // Filter dictionary to only kana words, exclude kanji words if they are pure kana.
-            const kanaOnlyWords = DICTIONARY.filter(item => {
-                // Ensure the word (item.k) does not contain any kanji AND is not purely alphanumeric for now.
-                // Simple check for if item.k is entirely kana (Hiragana or Katakana)
-                for (let i = 0; i < item.k.length; i++) {
-                    const char = item.k[i];
-                    // Skip long vowel marks and sokuon for this check, they are part of kana words
-                    if (char === 'ー' || char === 'っ' || char === 'ッ') continue;
-                    if (!isHiragana(char) && !isKatakana(char)) {
-                        return false; // Contains non-kana character or kanji
-                    }
-                }
-                return true;
-            });
-            
-            if (kanaOnlyWords.length === 0) {
-                kcDisplayWord.textContent = 'Tidak ada kata kana yang tersedia di kamus.';
-                showToast('Kamus tidak memiliki kata kana yang cukup.', 'warn');
-                return;
-            }
-
-            const randomWordObj = randChoice(kanaOnlyWords);
-            const originalKana = randomWordObj.k;
-
-            // Decide randomly if originalKana should be displayed in Hiragana or Katakana
-            const startAsHiragana = Math.random() < 0.5;
-
-            if (startAsHiragana) {
-                currentKanaWord = originalKana.split('').map(toHiragana).join('');
-                targetKanaWord = originalKana.split('').map(toKatakana).join('');
-            } else {
-                currentKanaWord = originalKana.split('').map(toKatakana).join('');
-                targetKanaWord = originalKana.split('').map(toHiragana).join('');
-            }
-
-            kcDisplayWord.textContent = currentKanaWord;
-            kcDisplayWord.dataset.target = targetKanaWord; // Simpan target untuk pengecekan
-        }
-
-        /**
-         * Memeriksa jawaban pengguna.
-         */
-        function checkAnswer() {
-            const userAnswer = kcUserInput.value.trim();
-            const correctTarget = kcDisplayWord.dataset.target;
-
-            speechSynthesis.cancel(); // Hentikan suara jika masih ada
-
-            if (userAnswer === correctTarget) {
-                kcFeedback.textContent = `Benar! Jawaban: ${correctTarget}`;
-                kcFeedback.classList.remove('error');
-                kcFeedback.classList.add('success');
-                showToast('Jawaban benar!', 'success');
-            } else {
-                kcFeedback.textContent = `Salah. Jawaban yang benar adalah: ${correctTarget}`;
-                kcFeedback.classList.remove('success');
-                kcFeedback.classList.add('error');
-                showToast('Jawaban salah.', 'warn');
-            }
-        }
-
-        // --- EVENT HANDLERS ---
-        function bindEventListeners() {
-            kcCheckBtn.addEventListener('click', checkAnswer);
-            kcNextBtn.addEventListener('click', generateChallenge);
-            kcSpeakBtn.addEventListener('click', () => speakKanaWord(currentKanaWord));
-            kcStopBtn.addEventListener('click', stopSpeaking); // Event listener for new Stop button in index9.html
-            kcUserInput.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') {
-                    checkAnswer();
-                }
-            });
-        }
-
-        // --- SIDEBAR JS (konsisten dengan index7.html) ---
-        (() => {
-            const sidebar  = document.getElementById('sidebar');
-            const toggle   = document.getElementById('sidebarToggle');
-            const closeBtn = document.getElementById('closeSidebar');
-
-            function open(){ sidebar.classList.add('is-open'); document.body.classList.add('sidebar-open'); }
-            function close(){ sidebar.classList.remove('is-open'); document.body.classList.remove('sidebar-open'); }
-
-            toggle?.addEventListener('click', open);
-            closeBtn?.addEventListener('click', close);
-
-            document.addEventListener('click', (e)=>{
-                if(!sidebar.classList.contains('is-open')) return;
-                const hit = sidebar.contains(e.target) || toggle.contains(e.target);
-                if(!hit) close();
-            });
-            document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') close(); });
-
-            document.querySelectorAll('#sidebar a').forEach(a=>{
-                const href = a.getAttribute('href');
-                if(href && location.pathname.endsWith(href)) {
-                    a.classList.add('active');
-                } else {
-                    a.classList.remove('active');
-                }
-            });
-        })();
-
-        // --- INITIALIZATION ---
-        document.addEventListener('DOMContentLoaded', () => {
-            bindEventListeners();
-            generateChallenge(); // Generate the first challenge on load
         });
     </script>
 </body>
