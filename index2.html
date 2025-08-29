@@ -415,27 +415,36 @@
         const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${GEMINI_API_KEY}`;
         const geminiCache = new Map(); // Cache untuk contoh AI
 
-        // Fungsi untuk menangani percobaan ulang dengan exponential backoff
-        async function fetchWithExponentialBackoff(url, options, retries = 3, delay = 1000) {
+        // Fungsi untuk menangani percobaan ulang dengan exponential backoff dan timeout
+        async function fetchWithTimeout(url, options, timeout = 8000, retries = 3, delay = 1000) {
             for (let i = 0; i < retries; i++) {
+                const controller = new AbortController();
+                const id = setTimeout(() => controller.abort(), timeout);
                 try {
-                    const response = await fetch(url, options);
+                    const response = await fetch(url, { ...options, signal: controller.signal });
+                    clearTimeout(id);
                     if (response.status === 429 && i < retries - 1) { // Too Many Requests
                         await new Promise(resolve => setTimeout(resolve, delay));
                         delay *= 2; // Gandakan delay
                         continue;
                     }
                     return response;
-                } catch (error) {
+                } catch (e) {
+                    clearTimeout(id);
+                    if (e.name === 'AbortError') {
+                        console.warn(`Permintaan API timed out setelah ${timeout}ms. Mencoba lagi...`);
+                    } else {
+                        console.error('Kesalahan fetch:', e);
+                    }
                     if (i < retries - 1) {
                         await new Promise(resolve => setTimeout(resolve, delay));
                         delay *= 2;
                         continue;
                     }
-                    throw error;
+                    throw e; // Lemparkan error jika semua percobaan gagal
                 }
             }
-            throw new Error('Gagal melakukan fetch setelah beberapa percobaan.');
+            throw new Error('Gagal melakukan fetch setelah beberapa percobaan dan timeout.');
         }
 
         // Fungsi untuk memperbarui area umpan balik AI
@@ -444,7 +453,7 @@
             aiFeedbackArea.innerHTML = ''; 
 
             if (message === 'loading') {
-                aiFeedbackArea.innerHTML = '<div class="spinner"></div><span style="margin-left: 8px;">Mendengarkan...</span>';
+                aiFeedbackArea.innerHTML = '<div class="spinner"></div><span style="margin-left: 8px;">Mendengarkan & Memverifikasi...</span>';
             } else if (message) {
                 aiFeedbackArea.textContent = message;
                 if (type === 'correct') {
@@ -459,6 +468,8 @@
         let recognition;
         let isRecognizing = false;
         let hasSpoken = false; // Flag untuk melacak apakah ada suara terdeteksi
+        let listenTimer; // Timer untuk menghentikan pengenalan suara jika hening
+        let micBusy = false; // Guard untuk anti-double tap
 
         function initializeSpeechRecognition() {
             if (!('SpeechRecognition' in window || 'webkitSpeechRecognition' in window)) {
@@ -485,10 +496,20 @@
                 hasSpoken = false; // Reset flag
                 speakAndCheckBtn.innerHTML = '<i class="fa-solid fa-microphone-alt-slash"></i> Berhenti';
                 speakAndCheckBtn.classList.add('listening'); // Tambahkan kelas untuk animasi
-                updateAiFeedback('loading');
+                updateAiFeedback('Mendengarkan...'); // Hanya mendengarkan, belum verifikasi
+
+                // Reset dan mulai timer hening
+                clearTimeout(listenTimer);
+                listenTimer = setTimeout(() => {
+                    if (isRecognizing && !hasSpoken) {
+                        recognition.stop();
+                        updateAiFeedback('Sunyi. Coba bicara lebih dekat ke mic ya 🙏', 'wrong');
+                    }
+                }, 6000); // 6 detik hening otomatis berhenti
             };
 
             recognition.onresult = async (event) => {
+                clearTimeout(listenTimer); // Hentikan timer hening karena suara terdeteksi
                 hasSpoken = true; // Suara terdeteksi
                 const transcript = event.results[0][0].transcript;
                 const currentRomaji = deck[currentIndex].romaji;
@@ -499,6 +520,7 @@
             };
 
             recognition.onerror = (event) => {
+                clearTimeout(listenTimer); // Hentikan timer hening karena ada error
                 isRecognizing = false;
                 speakAndCheckBtn.innerHTML = '<i class="fa-solid fa-microphone"></i> Ucapkan & Cek';
                 speakAndCheckBtn.classList.remove('listening'); // Hapus animasi
@@ -514,6 +536,7 @@
             };
 
             recognition.onend = () => {
+                clearTimeout(listenTimer); // Hentikan timer hening saat pengenalan berakhir
                 isRecognizing = false;
                 speakAndCheckBtn.innerHTML = '<i class="fa-solid fa-microphone"></i> Ucapkan & Cek';
                 speakAndCheckBtn.classList.remove('listening'); // Hapus animasi
@@ -525,22 +548,79 @@
             };
         }
 
+        // Fungsi untuk menghitung Levenshtein distance
+        function levenshtein(a, b) {
+            a = a.toLowerCase();
+            b = b.toLowerCase();
+            const m = Array.from({ length: a.length + 1 }, (_, i) => [i]);
+            for (let j = 1; j <= b.length; j++) m[0][j] = j;
+            for (let i = 1; i <= a.length; i++) {
+                for (let j = 1; j <= b.length; j++) {
+                    const cost = a[i-1] === b[j-1] ? 0 : 1;
+                    m[i][j] = Math.min(
+                        m[i-1][j] + 1,        // delete
+                        m[i][j-1] + 1,        // insert
+                        m[i-1][j-1] + cost    // substitute
+                    );
+                }
+            }
+            return m[a.length][b.length];
+        }
+
+        // Fungsi untuk validasi awal di klien (berbasis Levenshtein distance)
+        function isSimilarPronunciation(user, expected) {
+            const u = user.toLowerCase().trim();
+            const e = expected.toLowerCase().trim();
+            if (!u) return false;
+
+            // Normalisasi variasi umum
+            const norm = s => s.replace(/shi/g,'si').replace(/chi/g,'ci').replace(/tsu/g,'su').replace(/fu/g,'hu');
+            const nu = norm(u);
+            const ne = norm(e);
+
+            // Cepat: persis sama setelah normalisasi
+            if (u === e || nu === ne) return true;
+            
+            // Cepat: jika diharapkan sangat pendek dan cocok sebagai prefix
+            if (e.length <= 2 && u.startsWith(e)) return true;
+
+            // Jarak edit kecil dianggap mirip (threshold 1-2)
+            const d = levenshtein(nu, ne);
+            // Anda bisa menyesuaikan threshold ini. 
+            // 1 untuk kemiripan yang sangat dekat (hanya 1 kesalahan)
+            // 2 untuk sedikit lebih longgar
+            return d <= 1; 
+        }
+
         async function verifyPronunciationWithGemini(userTranscript, expectedRomaji) {
-            // Ubah userTranscript menjadi lowercase untuk perbandingan yang lebih baik
             const cleanUserTranscript = userTranscript.toLowerCase().trim();
             const cleanExpectedRomaji = expectedRomaji.toLowerCase().trim();
 
-            // Verifikasi langsung di klien jika transkrip sama persis dengan romaji yang diharapkan
-            if (cleanUserTranscript === cleanExpectedRomaji) {
-                updateAiFeedback(`Benar! Pelafalan Anda tepat untuk '${expectedRomaji}'.`, 'correct');
-                return; // Tidak perlu memanggil Gemini jika sudah jelas benar
+            // 1. Short-Circuit Validasi di Client dengan Levenshtein
+            if (isSimilarPronunciation(cleanUserTranscript, cleanExpectedRomaji)) {
+                updateAiFeedback(`Bagus! Pelafalan kamu sudah mendekati atau tepat untuk '${expectedRomaji}'.`, 'correct');
+                return;
             }
             
-            // Jika tidak sama persis, baru kirim ke Gemini untuk analisis lebih lanjut
-            const prompt = `Pengguna mencoba mengucapkan karakter Jepang dengan romaji '${expectedRomaji}'. Transkripsi yang dideteksi adalah '${userTranscript}'. Bandingkan transkripsi ini secara ketat dengan romaji yang diharapkan. Jawab 'YA' jika pelafalan **sangat akurat dan mirip persis** dengan romaji yang diharapkan. Jawab 'TIDAK' jika tidak, dan berikan saran singkat dalam bahasa Indonesia mengapa tidak akurat atau cara memperbaikinya (jika 'TIDAK').`;
+            // Tampilkan loading hanya saat memanggil Gemini
+            updateAiFeedback('loading');
+
+            // 3. Sederhanakan Prompt Gemini
+            const prompt = `
+Saya ingin kamu menjadi asisten guru bahasa Jepang.
+Pengguna mencoba mengucapkan romaji '${expectedRomaji}'.
+Transkrip suara yang terdeteksi: '${userTranscript}'.
+
+Nilai pelafalan ini dengan ramah:
+- Kalau sudah cukup mirip atau mendekati benar, bilang "Bagus, sudah benar!" atau "Lumayan, hampir benar!".
+- Kalau kurang tepat, beri saran singkat dan ramah bagaimana cara memperbaikinya.
+
+Balas ringkas (1 kalimat) dalam bahasa Indonesia.
+`;
 
             try {
-                const response = await fetchWithExponentialBackoff(GEMINI_API_URL, {
+                // Gunakan fetchWithTimeout
+                const response = await fetchWithTimeout(GEMINI_API_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -564,20 +644,23 @@
                 const result = await response.json();
                 let geminiResponse = result.candidates?.[0]?.content?.parts?.[0]?.text || 'Tidak dapat memverifikasi pelafalan.';
 
-                if (geminiResponse.toUpperCase().includes('YA')) {
-                    updateAiFeedback(`Benar! Pelafalan Anda tepat untuk '${expectedRomaji}'.`, 'correct');
-                } else if (geminiResponse.toUpperCase().includes('TIDAK')) {
-                    const feedbackMatch = geminiResponse.match(/TIDAK\s*(.*)/i);
-                    const feedback = feedbackMatch && feedbackMatch[1].trim() ? feedbackMatch[1].trim() : 'Coba lagi, perhatikan bunyi vokal dan konsonan.';
-                    updateAiFeedback(`Salah. ${feedback}`, 'wrong');
+                // Deteksi umpan balik positif dari Gemini
+                const positiveKeywords = ['bagus', 'benar', 'tepat', 'lumayan'];
+                const isPositive = positiveKeywords.some(keyword => geminiResponse.toLowerCase().includes(keyword));
+
+                if (isPositive) {
+                    updateAiFeedback(geminiResponse, 'correct');
                 } else {
-                    // Fallback jika Gemini tidak mengikuti format YA/TIDAK
-                    updateAiFeedback(`Umpan balik AI: ${geminiResponse}`, 'info');
+                    updateAiFeedback(geminiResponse, 'wrong');
                 }
 
             } catch (error) {
                 console.error('Error verifying pronunciation with Gemini:', error);
-                updateAiFeedback(`Error verifikasi AI: ${error.message}`, 'wrong');
+                if (error.name === 'AbortError') {
+                    updateAiFeedback('Verifikasi AI gagal karena waktu habis (timeout). Coba lagi.', 'wrong');
+                } else {
+                    updateAiFeedback(`Error verifikasi AI: ${error.message}. Coba lagi nanti.`, 'wrong');
+                }
             }
         }
 
@@ -617,7 +700,7 @@
 Jangan sertakan teks lain, salam, atau penjelasan.`;
 
             try {
-                const response = await fetchWithExponentialBackoff(GEMINI_API_URL, {
+                const response = await fetchWithTimeout(GEMINI_API_URL, { // Gunakan fetchWithTimeout juga untuk contoh AI
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -667,7 +750,11 @@ Jangan sertakan teks lain, salam, atau penjelasan.`;
 
             } catch (error) {
                 console.error('Fetch Error (AI Examples):', error);
-                aiExamplesSection.innerHTML = `<p style="color:var(--warn);">Error: ${error.message}. Coba lagi nanti.</p>`;
+                if (error.name === 'AbortError') {
+                    aiExamplesSection.innerHTML = `<p style="color:var(--warn);">Error: Memuat contoh gagal karena waktu habis (timeout). Coba lagi nanti.</p>`;
+                } else {
+                    aiExamplesSection.innerHTML = `<p style="color:var(--warn);">Error: ${error.message}. Coba lagi nanti.</p>`;
+                }
             } finally {
                 isFetchingExamples = false;
             }
@@ -847,9 +934,14 @@ Jangan sertakan teks lain, salam, atau penjelasan.`;
         shuffleBtn.addEventListener('click', shuffleDeck);
 
         speakAndCheckBtn.addEventListener('click', () => {
+            if (micBusy) return; // Anti-double tap guard
+
             if (isRecognizing) {
                 recognition.stop();
             } else {
+                micBusy = true;
+                setTimeout(()=>{ micBusy = false; }, 600); // Debounce 600ms
+                updateAiFeedback('Mendengarkan...'); 
                 recognition.start();
             }
         });

@@ -1,0 +1,1610 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Pelatih Kana Jepang — v9</title>
+    <meta name="description" content="Aplikasi web offline untuk latihan Hiragana dan Katakana, dirancang untuk membantu Anda membaca lebih lancar 10 menit per hari.">
+    
+    <style>
+        /* ========================================================== */
+        /* === GLOBAL VARIABLES & COLORS === */
+        /* ========================================================== */
+        :root{
+            --bg:#f8fbff; --panel:#ffffff; --soft:#f2f6ff; --ink:#132030; --muted:#76849c;
+            --pri:#7a6cff; --sec:#16c6a1; --warn:#ff7b7b; --ok:#2fb875; --accent:#ffd166;
+            --btn:#e9eefc; --btnText:#0b101a; --border:rgba(19,32,48,.10);
+            --radius:18px;
+            --shadow-sm: 0 2px 8px rgba(0,0,0,.12);
+            --shadow-md: 0 8px 24px rgba(0,0,0,.18);
+            --shadow-lg: 0 16px 40px rgba(0,0,0,.22);
+            --ring: 0 0 0 3px color-mix(in srgb, var(--pri) 60%, white 40%);
+            --iconColor: var(--muted);
+            --transition-duration: .2s;
+            --font-inter: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+            --font-jp: 'Noto Sans JP', 'Noto Serif JP', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+
+            /* Font Scaling */
+            --fs-h1: clamp(22px, 2.2vw, 28px);
+            --fs-h2: clamp(18px, 1.8vw, 24px);
+            --fs-body: clamp(14px, 1.2vw, 16px);
+            --fs-small: clamp(12px, 1.1vw, 14px);
+        }
+
+        /* Dark Mode */
+        [data-theme="dark"]{
+            --bg:#0a0f1a; --panel:#0f1626; --soft:#0c1220; --ink:#e6efff; --muted:#9fb0cc;
+            --pri:#8fa8ff; --sec:#3dd8b5; --warn:#ff8c8c; --ok:#7be0b3; --accent:#ffd98a;
+            --btn:#18243a;
+            --btnText:#e6efff;
+            --border:rgba(230,239,255,.12);
+            --ring: 0 0 0 3px rgba(143,168,255,.35);
+            --iconColor: var(--ink);
+        }
+
+        /* ========================================================== */
+        /* === BASE STYLES === */
+        /* ========================================================== */
+        html, body {
+            max-width: 100%;
+            overflow-x: hidden;
+        }
+        body {
+            min-height: 100vh;
+            margin: 0;
+            font-family: var(--font-inter);
+            background:
+                radial-gradient(900px 420px at -10% -20%, rgba(122,108,255,.10), transparent),
+                radial-gradient(900px 420px at 110% -30%, rgba(22,198,161,.12), transparent),
+                var(--bg);
+            color: var(--ink);
+            transition: background-color var(--transition-duration) ease-out, color var(--transition-duration) ease-out;
+            line-height: 1.6;
+            font-size: var(--fs-body);
+        }
+        *, *::before, *::after {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* ========================================================== */
+        /* === UTILITY & COMPONENT CLASSES === */
+        /* ========================================================== */
+        .wrap {
+            padding: 16px;
+            max-width: 1200px;
+            margin: auto;
+            padding-bottom: 72px; /* Untuk bottom nav */
+            padding-left: calc(16px + env(safe-area-inset-left));
+            padding-right: calc(16px + env(safe-area-inset-right));
+        }
+
+        /* Mobile safe-area untuk bottom nav */
+        .bottom-nav-spacer {
+            height: calc(56px + env(safe-area-inset-bottom));
+        }
+
+        .card {
+            background: var(--panel);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-md);
+            padding: 16px;
+            border: 1px solid var(--border);
+            transition: all var(--transition-duration) ease-out;
+        }
+        @media (hover: hover) {
+            .card:hover {
+                box-shadow: var(--shadow-lg);
+                transform: translateY(-2px);
+            }
+        }
+        .card.no-hover:hover {
+            box-shadow: var(--shadow-md);
+            transform: none;
+        }
+        .card h2 {
+            font-size: var(--fs-h2);
+            margin: 0 0 8px 0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 700;
+        }
+        .card h3 {
+            font-size: calc(var(--fs-body) * 1.2);
+            margin: 16px 0 8px 0;
+            color: var(--muted);
+        }
+        .text-small {
+            font-size: var(--fs-small);
+            color: var(--muted);
+        }
+        .row {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .spacer { height: 16px; }
+        .full-width { width: 100%; }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 52px;
+            padding: 0 16px;
+            border-radius: 12px;
+            border: none;
+            cursor: pointer;
+            font-size: var(--fs-body);
+            font-weight: 500;
+            transition: all var(--transition-duration) ease-out;
+            color: var(--ink);
+            background: var(--btn);
+            text-decoration: none;
+            gap: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+        .btn.primary {
+            background: linear-gradient(135deg, var(--pri), var(--sec));
+            color: white;
+            box-shadow: var(--shadow-sm);
+        }
+        .btn.primary:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+        }
+        .btn.ghost {
+            background: transparent;
+            outline: 1px solid var(--border);
+            color: var(--ink);
+        }
+        .btn.danger {
+            background-color: var(--warn);
+            color: white;
+        }
+        .btn:active {
+            transform: translateY(1px) scale(0.99);
+            box-shadow: var(--shadow-sm);
+        }
+        @media (hover: hover) {
+            .btn:hover {
+                transform: translateY(-2px) scale(1.01);
+                box-shadow: var(--shadow-lg);
+            }
+        }
+        .btn:focus-visible {
+            outline: none;
+            box-shadow: var(--ring);
+            outline-offset: 3px;
+        }
+
+        .seg {
+            display: flex;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: border-color var(--transition-duration) ease-out;
+        }
+        .seg button {
+            flex: 1;
+            background: var(--soft);
+            border: none;
+            padding: 12px 16px;
+            font-size: var(--fs-body);
+            cursor: pointer;
+            transition: all var(--transition-duration) ease-out;
+            color: var(--ink);
+            font-weight: 500;
+        }
+        .seg button.active {
+            background: linear-gradient(135deg, rgba(122,108,255,.18), rgba(22,198,161,.18));
+            color: var(--ink);
+            font-weight: 600;
+        }
+        [data-theme="dark"] .seg button.active {
+            background: linear-gradient(135deg, rgba(143,168,255,.15), rgba(61,216,181,.15));
+        }
+
+        /* Input field */
+        .input-group {
+            position: relative;
+            width: 100%;
+        }
+        .input-group input {
+            width: 100%;
+            padding: 12px 16px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            background: var(--soft);
+            color: var(--ink);
+            font-size: var(--fs-body);
+            transition: all var(--transition-duration) ease-out;
+        }
+        .input-group input:focus {
+            outline: none;
+            border-color: var(--pri);
+            box-shadow: var(--ring);
+        }
+        /* Chips for custom set */
+        .chip-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .chip {
+            padding: 8px 12px;
+            border-radius: 12px;
+            background: var(--soft);
+            color: var(--ink);
+            cursor: pointer;
+            font-size: var(--fs-small);
+            font-weight: 500;
+            transition: background var(--transition-duration) ease;
+        }
+        .chip.active {
+            background: var(--pri);
+            color: white;
+        }
+
+        /* ========================================================== */
+        /* === MAIN LAYOUT: SIDEBAR & BOTTOM NAV === */
+        /* ========================================================== */
+        .main-container {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        
+        /* Sidebar (Desktop) */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: -280px;
+            width: 280px;
+            height: 100%;
+            background: var(--panel);
+            box-shadow: var(--shadow-lg);
+            z-index: 1000;
+            transition: left .3s ease-in-out;
+            padding: 20px;
+            padding-top: calc(20px + env(safe-area-inset-top));
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            overflow-y: auto;
+            border-right: 1px solid var(--border);
+            font-size: var(--fs-body);
+        }
+        .sidebar.is-open { left: 0; }
+        .sidebar .menu { list-style: none; margin: 0; padding: 0; }
+        .sidebar .menu li { position: relative; }
+        .sidebar .menu li a {
+            display: flex; gap: 12px; align-items: center; padding: 12px 16px;
+            border-radius: 12px; color: var(--ink); text-decoration: none;
+            transition: all var(--transition-duration) ease-out;
+        }
+        .sidebar .menu li a:hover { background: var(--soft); }
+        .sidebar .menu li a.active {
+            background: linear-gradient(135deg, rgba(122,108,255,.12), rgba(22,198,161,.12));
+            font-weight: 600;
+        }
+        .sidebar .menu li a.active:hover {
+            background: linear-gradient(135deg, rgba(122,108,255,.18), rgba(22,198,161,.18));
+        }
+        .sidebar .menu li a svg { width: 24px; height: 24px; color: var(--muted); transition: color .2s; }
+        .sidebar .menu li a.active svg { color: var(--pri); }
+        
+        /* Sidebar Toggle Button (Mobile) */
+        .sidebar-toggle-btn {
+            position: fixed; top: calc(16px + env(safe-area-inset-top)); left: calc(16px + env(safe-area-inset-left)); z-index: 1001; background: var(--btn);
+            border: 1px solid var(--border); border-radius: 50%; width: 48px; height: 48px;
+            display: flex; align-items: center; justify-content: center; cursor: pointer;
+            box-shadow: var(--shadow-sm);
+            transition: all .3s ease-in-out;
+        }
+        .sidebar-toggle-btn svg { color: var(--ink); width: 24px; height: 24px; }
+        .sidebar-toggle-btn:focus-visible { outline: none; box-shadow: var(--ring); }
+        
+        /* Bottom Nav (Mobile) */
+        .bottom-nav {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 56px;
+            background: var(--panel);
+            box-shadow: var(--shadow-md);
+            z-index: 999;
+            border-top: 1px solid var(--border);
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+        .bottom-nav .nav-list {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+        .bottom-nav a {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            color: var(--muted);
+            font-size: 10px;
+            gap: 2px;
+            font-weight: 500;
+        }
+        .bottom-nav a.active {
+            color: var(--pri);
+        }
+        .bottom-nav a svg {
+            width: 20px;
+            height: 20px;
+            transition: transform .2s ease-in-out;
+            color: var(--muted);
+        }
+        .bottom-nav a.active svg {
+            transform: scale(1.1);
+            color: var(--pri);
+        }
+
+        /* ========================================================== */
+        /* === RESPONSIVE LAYOUTS & BREAKPOINTS === */
+        /* ========================================================== */
+        /* Mobile Portrait & Small Tablets (≤ 720px) */
+        @media (max-width: 720px) {
+            .sidebar { display: none; }
+            .sidebar-toggle-btn { display: flex; }
+            .bottom-nav { display: block; }
+            body { padding-bottom: 56px; }
+            .kana-grid { grid-template-columns: repeat(auto-fit, minmax(min(38vw, 120px), 1fr)); }
+            .main-container { padding-left: 0; }
+        }
+        /* Mobile & Phablet (721px - 1080px) */
+        @media (min-width: 721px) and (max-width: 1080px) {
+            .wrap { padding: 24px; }
+            .sidebar { display: none; }
+            .sidebar-toggle-btn { display: flex; }
+            .bottom-nav { display: block; }
+            body { padding-bottom: 56px; }
+            .kana-grid { grid-template-columns: repeat(auto-fit, minmax(min(30vw, 140px), 1fr)); }
+            .main-container { padding-left: 0; }
+        }
+        /* Desktop (≥ 1081px) */
+        @media (min-width: 1081px) {
+            .sidebar {
+                left: 0; /* Default open */
+                width: 240px;
+                transition: width .3s ease-in-out;
+            }
+            .sidebar.is-collapsed {
+                width: 64px;
+            }
+            .sidebar.is-collapsed .menu li a {
+                padding: 12px 0;
+                justify-content: center;
+            }
+            .sidebar.is-collapsed .menu li a span {
+                display: none;
+            }
+            .sidebar.is-collapsed .tooltip {
+                visibility: visible;
+                opacity: 1;
+            }
+            .main-container {
+                padding-left: 240px;
+                transition: padding-left .3s ease-in-out;
+            }
+            .main-container.sidebar-collapsed {
+                padding-left: 64px;
+            }
+            .sidebar-toggle-btn {
+                display: none;
+            }
+            .bottom-nav {
+                display: none;
+            }
+            .kana-grid { grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); }
+        }
+
+        /* ========================================================== */
+        /* === PAGES & SECTIONS === */
+        /* ========================================================== */
+        .page {
+            display: none;
+            animation: fadeIn .3s ease-in-out;
+        }
+        .page.active { display: block; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Dashboard */
+        .progress-circle-wrap {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            margin: 0 auto;
+        }
+        .progress-circle-bg, .progress-circle-bar {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+        .progress-circle-bg { background: var(--soft); }
+        .progress-circle-bar { background: conic-gradient(var(--pri) var(--p), transparent var(--p)); }
+        .progress-circle-text {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            font-size: 2rem; font-weight: 700; color: var(--pri);
+        }
+        .checklist-item {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 10px 0; border-bottom: 1px solid var(--border);
+        }
+        .checklist-item:last-child { border-bottom: none; }
+        .checklist-item .checkbox {
+            width: 24px; height: 24px; border-radius: 8px; border: 2px solid var(--muted);
+            background-color: transparent; display: flex; align-items: center; justify-content: center;
+            transition: all .2s ease-in-out;
+        }
+        .checklist-item.completed .checkbox { background-color: var(--ok); border-color: var(--ok); }
+        .checklist-item.completed .checkbox svg { color: white; opacity: 1; }
+        .checklist-item .checkbox svg { width: 16px; height: 16px; color: white; opacity: 0; }
+        .checklist-item.completed .label { color: var(--ink); }
+        .checklist-item .label {
+            flex-grow: 1; margin-left: 12px; color: var(--muted); font-weight: 500;
+            transition: color .2s ease-in-out;
+        }
+        /* Flashcard & Mini-Game */
+        #flashcard-container, #game-container {
+            display: flex; flex-direction: column; align-items: center; gap: 20px;
+        }
+        .kana-card {
+            width: 100%; max-width: 320px; min-height: 180px;
+            background: var(--soft); border-radius: var(--radius);
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            font-family: var(--font-jp); font-size: 6rem; font-weight: 700;
+            cursor: pointer; transition: all .2s ease-out; border: 1px solid var(--border);
+            position: relative;
+        }
+        .kana-card .romaji-display {
+            font-family: var(--font-inter); font-size: 2rem; color: var(--muted);
+            position: absolute; bottom: 20px; opacity: 0; transform: translateY(10px);
+            transition: all .3s ease-in-out;
+        }
+        .kana-card.is-revealed .romaji-display { opacity: 1; transform: translateY(0); }
+        .options-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; width: 100%; }
+        .option-btn { font-size: 1.2rem; height: 52px; font-weight: 600; }
+        .option-btn.correct { background: var(--ok); color: white; }
+        .option-btn.incorrect { background: var(--warn); color: white; }
+        /* Yōon Trainer Grid */
+        .youon-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 8px; text-align: center; }
+        .youon-grid .card { padding: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; font-family: var(--font-jp); font-weight: 600; cursor: pointer; font-size: 2.5rem; }
+        .youon-grid .romaji-display { font-family: var(--font-inter); font-size: 1rem; font-weight: 400; color: var(--muted); }
+        .youon-grid .romaji-display.hidden { display: none; }
+
+        /* Listening & Shadowing Wave */
+        .audio-wave {
+            display: flex; justify-content: center; align-items: flex-end; height: 80px; gap: 4px;
+            filter: grayscale(100%);
+        }
+        .audio-bar {
+            width: 8px; height: 4px; background-color: var(--pri); border-radius: 4px;
+            transform-origin: bottom; animation: waveAnimation 1.2s ease-in-out infinite;
+        }
+        .audio-bar:nth-child(2) { animation-delay: 0.1s; }
+        .audio-bar:nth-child(3) { animation-delay: 0.2s; }
+        .audio-bar:nth-child(4) { animation-delay: 0.3s; }
+        .audio-bar:nth-child(5) { animation-delay: 0.4s; }
+        @keyframes waveAnimation {
+            0%, 100% { transform: scaleY(1); }
+            50% { transform: scaleY(5); }
+        }
+
+        /* Progress Charts */
+        .chart-container {
+            width: 100%; height: 180px; display: flex; justify-content: center; align-items: center;
+        }
+        .bar-chart {
+            display: flex; justify-content: space-around; align-items: flex-end; width: 100%; height: 100%; gap: 8px;
+            padding-top: 10px; border-bottom: 2px solid var(--border); position: relative;
+        }
+        .bar {
+            flex: 1; background: var(--soft); border-radius: 8px 8px 0 0;
+            transition: all .3s ease-out; position: relative;
+        }
+        .bar-label { position: absolute; bottom: -20px; font-size: 10px; color: var(--muted); white-space: nowrap; }
+        .bar-value { position: absolute; top: -18px; font-size: 10px; color: var(--ink); font-weight: 600; }
+        .axis-y { position: absolute; top: 0; left: 0; right: 0; display: flex; flex-direction: column; justify-content: space-between; height: 100%; }
+
+        /* Settings */
+        .settings-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--border); }
+        .settings-item:last-child { border-bottom: none; }
+        .switch { position: relative; display: inline-block; width: 48px; height: 28px; }
+        .switch input { display: none; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--soft); transition: .4s; border-radius: 28px; }
+        .slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: var(--pri); }
+        input:checked + .slider:before { transform: translateX(20px); }
+
+        /* Modal */
+        .modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5);
+            display: flex; justify-content: center; align-items: center; z-index: 10000;
+            visibility: hidden; opacity: 0; transition: visibility .3s, opacity .3s;
+        }
+        .modal.is-open { visibility: visible; opacity: 1; }
+        .modal-content {
+            background-color: var(--panel); padding: 24px; border-radius: var(--radius);
+            box-shadow: var(--shadow-lg); max-width: 400px; text-align: center;
+            transform: scale(0.95); transition: transform .3s ease-out;
+        }
+        .modal.is-open .modal-content { transform: scale(1); }
+        .tooltip {
+            position: absolute; left: calc(100% + 12px); top: 50%; transform: translateY(-50%);
+            background: rgba(0,0,0,0.7); color: white; padding: 6px 10px; border-radius: 8px;
+            font-size: 12px; white-space: nowrap;
+            visibility: hidden; opacity: 0; pointer-events: none;
+            transition: opacity .2s, visibility .2s;
+        }
+        .sidebar.is-collapsed .menu li a:hover .tooltip { visibility: visible; opacity: 1; }
+        
+        /* Reduced Motion */
+        @media (prefers-reduced-motion: reduce) {
+            .card, .btn, .btn:hover, .btn:active, .btn:focus-visible, .sidebar, .page, .modal, .modal-content, .audio-bar, .bar {
+                transition: none !important;
+                animation: none !important;
+            }
+        }
+        
+        /* ========================================================== */
+        /* === SVG ICONS === */
+        /* ========================================================== */
+        .icon-svg {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+<body data-theme="light">
+    <!-- Modal Konfirmasi -->
+    <div id="confirmModal" class="modal">
+        <div class="modal-content">
+            <h2 id="modal-title">Konfirmasi</h2>
+            <p id="modal-message">Apakah Anda yakin?</p>
+            <div class="row" style="justify-content: center; margin-top: 20px;">
+                <button id="modal-confirm-btn" class="btn danger">Ya, Lanjutkan</button>
+                <button id="modal-cancel-btn" class="btn ghost">Batal</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN CONTAINER -->
+    <div class="main-container">
+        <!-- Sidebar Toggle Button (Mobile) -->
+        <button id="sidebar-toggle-btn" class="sidebar-toggle-btn" aria-label="Toggle Sidebar">
+            <svg class="icon-svg" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M4 6h16M4 12h16M4 18h16"></path>
+            </svg>
+        </button>
+
+        <!-- Sidebar (Desktop) -->
+        <nav id="sidebar" class="sidebar">
+            <div class="row" style="justify-content: center; margin-bottom: 20px;">
+                <svg width="48" height="48" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect width="64" height="64" rx="14" fill="url(#g)"/>
+                    <text x="50%" y="50%" text-anchor="middle" dominant-baseline="middle" font-family="Noto Sans JP, 'Noto Serif JP', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif" font-size="38" fill="white" dy="-2">あ</text>
+                    <defs>
+                        <linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#7a6cff"/><stop offset="1" stop-color="#16c6a1"/></linearGradient>
+                    </defs>
+                </svg>
+            </div>
+            <ul class="menu">
+                <li><a href="#dashboard" data-page="dashboard" aria-label="Dashboard Harian">
+                    <svg class="icon-svg" viewBox="0 0 24 24" fill="currentColor"><path d="M3 13h1v8h18v-8h1"></path><path d="M12 2l-9 9h3v13h12v-13h3z"></path></svg>
+                    <span>Dashboard Harian</span><span class="tooltip">Dashboard Harian</span></a></li>
+                <li><a href="#flashcard" data-page="flashcard" aria-label="Speed Drill Flashcard">
+                    <svg class="icon-svg" viewBox="0 0 24 24" fill="currentColor"><path d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4m-2-6h6l2 2-6 6-6-6-2-2z"></path></svg>
+                    <span>Flashcard</span><span class="tooltip">Flashcard</span></a></li>
+                <li><a href="#youon" data-page="youon" aria-label="Yōon Trainer">
+                    <svg class="icon-svg" viewBox="0 0 24 24" fill="currentColor"><path d="M10 18a.999.999 0 01-1-1v-4a.999.999 0 011-1h4a.999.999 0 011 1v4a.999.999 0 01-1 1h-4zm-6 2v-16h16v16H4zM16 4v-.5a1.5 1.5 0 00-3 0V4H7v-.5a1.5 1.5 0 00-3 0V4"></path></svg>
+                    <span>Yōon Trainer</span><span class="tooltip">Yōon Trainer</span></a></li>
+                <li><a href="#game" data-page="game" aria-label="Mini-Game">
+                    <svg class="icon-svg" viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a.998.998 0 00-1 1v2h-2v2h2v2a.998.998 0 001 1h2v-2h2v-2h-2V9h-2zm-8-3H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-2a1 1 0 00-2 0v2H6V7h2a1 1 0 000-2z"></path></svg>
+                    <span>Mini-Game</span><span class="tooltip">Mini-Game</span></a></li>
+                <li><a href="#listening" data-page="listening" aria-label="Listening & Shadowing">
+                    <svg class="icon-svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zm-4 14a1 1 0 01-1-1v-6a1 1 0 012 0v6a1 1 0 01-1 1zm8-2a1 1 0 01-1-1v-4a1 1 0 012 0v4a1 1 0 01-1 1z"></path></svg>
+                    <span>Listening & Shadowing</span><span class="tooltip">Listening & Shadowing</span></a></li>
+                <li><a href="#progress" data-page="progress" aria-label="Progres">
+                    <svg class="icon-svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zM9 16a1 1 0 01-.78-.34L4 10.7l1.56-1.57L9 12.98l7.22-7.22L17.5 7.2l-8.72 8.72A1 1 0 019 16z"></path></svg>
+                    <span>Progres</span><span class="tooltip">Progres</span></a></li>
+                <li><a href="#settings" data-page="settings" aria-label="Pengaturan">
+                    <svg class="icon-svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zM12 16a4 4 0 110-8 4 4 0 010 8z"></path></svg>
+                    <span>Pengaturan</span><span class="tooltip">Pengaturan</span></a></li>
+            </ul>
+        </nav>
+
+        <!-- Bottom Nav (Mobile) -->
+        <nav class="bottom-nav">
+            <ul class="nav-list">
+                <li><a href="#dashboard" data-page="dashboard" aria-label="Dashboard Harian">
+                    <svg class="icon-svg" viewBox="0 0 24 24" fill="currentColor"><path d="M3 13h1v8h18v-8h1"></path><path d="M12 2l-9 9h3v13h12v-13h3z"></path></svg>
+                    <span>Home</span></a></li>
+                <li><a href="#flashcard" data-page="flashcard" aria-label="Speed Drill Flashcard">
+                    <svg class="icon-svg" viewBox="0 0 24 24" fill="currentColor"><path d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4m-2-6h6l2 2-6 6-6-6-2-2z"></path></svg>
+                    <span>Kartu</span></a></li>
+                <li><a href="#youon" data-page="youon" aria-label="Yōon Trainer">
+                    <svg class="icon-svg" viewBox="0 0 24 24" fill="currentColor"><path d="M10 18a.999.999 0 01-1-1v-4a.999.999 0 011-1h4a.999.999 0 011 1v4a.999.999 0 01-1 1h-4zm-6 2v-16h16v16H4zM16 4v-.5a1.5 1.5 0 00-3 0V4H7v-.5a1.5 1.5 0 00-3 0V4"></path></svg>
+                    <span>Yōon</span></a></li>
+                <li><a href="#game" data-page="game" aria-label="Mini-Game">
+                    <svg class="icon-svg" viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a.998.998 0 00-1 1v2h-2v2h2v2a.998.998 0 001 1h2v-2h2v-2h-2V9h-2zm-8-3H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-2a1 1 0 00-2 0v2H6V7h2a1 1 0 000-2z"></path></svg>
+                    <span>Game</span></a></li>
+                <li><a href="#listening" data-page="listening" aria-label="Listening & Shadowing">
+                    <svg class="icon-svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zm-4 14a1 1 0 01-1-1v-6a1 1 0 012 0v6a1 1 0 01-1 1zm8-2a1 1 0 01-1-1v-4a1 1 0 012 0v4a1 1 0 01-1 1z"></path></svg>
+                    <span>Listen</span></a></li>
+                <li><a href="#progress" data-page="progress" aria-label="Progres">
+                    <svg class="icon-svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zM9 16a1 1 0 01-.78-.34L4 10.7l1.56-1.57L9 12.98l7.22-7.22L17.5 7.2l-8.72 8.72A1 1 0 019 16z"></path></svg>
+                    <span>Progres</span></a></li>
+                <li><a href="#settings" data-page="settings" aria-label="Pengaturan">
+                    <svg class="icon-svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zM12 16a4 4 0 110-8 4 4 0 010 8z"></path></svg>
+                    <span>Setelan</span></a></li>
+            </ul>
+        </nav>
+
+        <!-- PAGE CONTENT -->
+        <main id="page-content" class="wrap">
+            <div id="dashboard-page" class="page active">
+                <div class="card no-hover">
+                    <h2>Dashboard Harian</h2>
+                    <p class="text-small">Selesaikan tantangan harian 10 menit untuk melancarkan bacaan Hiragana Anda.</p>
+                    <div class="row" style="justify-content: space-around; margin-top: 20px;">
+                        <div style="text-align: center;">
+                            <div class="progress-circle-wrap">
+                                <div class="progress-circle-bg"></div>
+                                <div id="progress-circle-bar" class="progress-circle-bar" style="--p: 0%;"></div>
+                                <div id="progress-circle-text" class="progress-circle-text">0%</div>
+                            </div>
+                            <div style="margin-top: 10px; font-weight: 600;">Latihan Selesai</div>
+                        </div>
+                        <div style="text-align: center;">
+                            <h2 id="streak-count" style="font-size: 2.5rem; margin-bottom: 0;">0</h2>
+                            <div style="margin-top: -10px; color: var(--muted);">Hari Beruntun</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="spacer"></div>
+
+                <div class="card no-hover">
+                    <h2>Checklist Harian</h2>
+                    <ul id="daily-checklist" style="list-style: none; padding: 0;">
+                        <!-- Items will be generated by JS -->
+                    </ul>
+                </div>
+
+                <div class="spacer"></div>
+                
+                <div class="card no-hover">
+                    <h2>Worksheet Mingguan</h2>
+                    <p class="text-small">Lacak progres latihan harian Anda dalam satu minggu.</p>
+                    <div id="weekly-worksheet" style="overflow-x: auto;">
+                        <!-- Worksheet table will be generated by JS -->
+                    </div>
+                    <div class="row" style="justify-content: center; margin-top: 16px;">
+                        <button id="reset-worksheet-btn" class="btn danger"><svg class="icon-svg" viewBox="0 0 24 24" fill="currentColor" style="width:16px; height:16px;"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zM12 18a1 1 0 01-1-1v-5a1 1 0 012 0v5a1 1 0 01-1 1zm-2-9a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 01-1 1h-2a1 1 0 01-1-1V9z"></path></svg> Reset Minggu</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="flashcard-page" class="page">
+                <div class="card">
+                    <h2>Speed Drill Flashcard</h2>
+                    <p class="text-small">Latih kecepatan membaca kana. Target kurang dari 2 detik per kartu!</p>
+                    <div id="flashcard-ui">
+                        <div class="row full-width" style="margin-bottom: 16px;">
+                            <div class="seg full-width">
+                                <button id="mode-kana-romaji" class="active">Kana → Romaji</button>
+                                <button id="mode-romaji-kana">Romaji → Kana</button>
+                            </div>
+                        </div>
+                        <div id="flashcard-container" style="min-height: 250px;">
+                            <div class="kana-card">
+                                <span id="flashcard-prompt"></span>
+                                <span id="flashcard-answer" class="romaji-display"></span>
+                            </div>
+                        </div>
+                        <div class="row full-width" style="justify-content: center; margin-top: 20px;">
+                            <button id="next-card-btn" class="btn primary full-width">Berikutnya (Space)</button>
+                        </div>
+                    </div>
+                    <div id="flashcard-result" style="text-align: center; display: none;">
+                        <h3>Sesi Selesai!</h3>
+                        <p id="flashcard-summary"></p>
+                        <button id="restart-flashcard-btn" class="btn primary"><svg class="icon-svg" viewBox="0 0 24 24" fill="currentColor" style="width:16px; height:16px;"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zM12 18a1 1 0 01-1-1v-5a1 1 0 012 0v5a1 1 0 01-1 1zm-2-9a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 01-1 1h-2a1 1 0 01-1-1V9z"></path></svg> Mulai Lagi</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="youon-page" class="page">
+                <div class="card">
+                    <h2>Yōon Trainer</h2>
+                    <p class="text-small">Klik kartu untuk mendengar suara dan melihat romajinya.</p>
+                    <div class="youon-grid" id="youon-grid-container">
+                        <!-- Yōon cards will be generated by JS -->
+                    </div>
+                </div>
+            </div>
+
+            <div id="game-page" class="page">
+                <div class="card">
+                    <h2>Mini-Game</h2>
+                    <div class="seg" style="margin-bottom: 16px;">
+                        <button id="mcq-mode-btn" class="active">Pilihan Ganda</button>
+                        <button id="typing-mode-btn">Mode Ketik</button>
+                    </div>
+                    <div id="game-ui">
+                        <div class="kana-card no-hover" id="game-kana-display">
+                            <span id="game-prompt"></span>
+                        </div>
+                        <div id="game-options" class="options-grid" style="margin-top: 20px;">
+                            <!-- Options will be generated by JS -->
+                        </div>
+                        <div id="typing-input-container" class="input-group" style="margin-top: 20px; display: none;">
+                            <input type="text" id="typing-input" placeholder="Ketik romaji di sini...">
+                        </div>
+                        <div id="game-feedback" class="text-small" style="text-align: center; margin-top: 10px;"></div>
+                        <div class="row" style="justify-content: center; margin-top: 20px;">
+                            <button id="next-game-btn" class="btn primary">Berikutnya</button>
+                        </div>
+                    </div>
+                    <div id="game-result" style="display: none; text-align: center;">
+                        <h3>Sesi Selesai!</h3>
+                        <p id="game-summary"></p>
+                        <button id="restart-game-btn" class="btn primary"><svg class="icon-svg" viewBox="0 0 24 24" fill="currentColor" style="width:16px; height:16px;"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zM12 18a1 1 0 01-1-1v-5a1 1 0 012 0v5a1 1 0 01-1 1zm-2-9a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 01-1 1h-2a1 1 0 01-1-1V9z"></path></svg> Main Lagi</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="listening-page" class="page">
+                <div class="card">
+                    <h2>Listening & Shadowing</h2>
+                    <p class="text-small">Dengarkan dan ulangi pelafalan. Pilih subset latihan di pengaturan.</p>
+                    <div class="row" style="justify-content: center; margin-top: 20px;">
+                        <button id="play-listening-btn" class="btn primary"><svg class="icon-svg" viewBox="0 0 24 24" fill="currentColor" style="width:16px; height:16px;"><path d="M10 16.5l6-4.5-6-4.5zM12 2a10 10 0 100 20 10 10 0 000-20z"></path></svg> Mulai</button>
+                    </div>
+                    <div id="listening-display" style="text-align: center; margin-top: 20px; display: none;">
+                        <div id="listening-prompt" class="kana-card no-hover" style="font-size: 4rem; max-width: 200px;"></div>
+                        <div class="audio-wave" style="margin-top: 20px;">
+                            <div class="audio-bar"></div>
+                            <div class="audio-bar"></div>
+                            <div class="audio-bar"></div>
+                            <div class="audio-bar"></div>
+                            <div class="audio-bar"></div>
+                        </div>
+                        <p id="listening-feedback" class="text-small" style="margin-top: 10px;"></p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="progress-page" class="page">
+                <div class="card no-hover">
+                    <h2>Progres</h2>
+                    <h3>Kecepatan Flashcard (detik/kartu)</h3>
+                    <div id="flashcard-speed-chart" class="chart-container">
+                        <!-- Chart akan digenerate oleh JS -->
+                    </div>
+                    <h3>Akurasi Mini-Game (%)</h3>
+                    <div id="game-accuracy-chart" class="chart-container">
+                        <!-- Chart akan digenerate oleh JS -->
+                    </div>
+                    <h3>10 Huruf Paling Sulit</h3>
+                    <div id="difficult-kana-list" class="chip-group">
+                         <!-- Chips will be generated by JS -->
+                    </div>
+                </div>
+            </div>
+
+            <div id="settings-page" class="page">
+                <div class="card no-hover">
+                    <h2>Pengaturan</h2>
+                    <div class="settings-item">
+                        <span>Tema Gelap</span>
+                        <label class="switch">
+                            <input type="checkbox" id="theme-toggle">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    <div class="settings-item">
+                        <span>Filter Dakuten</span>
+                        <label class="switch">
+                            <input type="checkbox" id="filter-dakuten-toggle">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    <div class="settings-item">
+                        <span>Filter Yōon</span>
+                        <label class="switch">
+                            <input type="checkbox" id="filter-youon-toggle">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    <h3>Pilih Subset Latihan</h3>
+                    <div id="custom-set-chips" class="chip-group">
+                        <!-- Chips will be generated by JS -->
+                    </div>
+                    <div class="settings-item">
+                        <span>Reset Semua Data</span>
+                        <button id="reset-data-btn" class="btn danger"><svg class="icon-svg" viewBox="0 0 24 24" fill="currentColor" style="width:16px; height:16px;"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zM12 18a1 1 0 01-1-1v-5a1 1 0 012 0v5a1 1 0 01-1 1zm-2-9a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 01-1 1h-2a1 1 0 01-1-1V9z"></path></svg> Reset</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // ==========================================================
+        // === CORE DATA & STATE MANAGEMENT ===
+        // ==========================================================
+        const state = {
+            ui: {
+                currentPage: 'dashboard',
+                flashcard: { timer: null, mode: 'kana-romaji', score: 0, total: 0, startTime: 0, sessionTimes: [] },
+                game: { mode: 'mcq', score: 0, total: 0, currentQuestion: null },
+            },
+            srs: { byKey: {} },
+            progress: {
+                daily: {
+                    lastDate: null,
+                    lastCompletedDate: null,
+                    streak: 0,
+                    tasks: [
+                        { id: 'flashcard', label: 'Flashcard (2 menit)', completed: false, duration: 120 },
+                        { id: 'shortWords', label: 'Kata Pendek (2 menit)', completed: false, duration: 120 },
+                        { id: 'longWords', label: 'Kata Panjang (2 menit)', completed: false, duration: 120 },
+                        { id: 'youon', label: 'Yōon (1 menit)', completed: false, duration: 60 },
+                        { id: 'sentences', label: 'Kalimat Sederhana (2 menit)', completed: false, duration: 120 },
+                        { id: 'listening', label: 'Listening & Shadowing (1 menit)', completed: false, duration: 60 },
+                    ]
+                },
+                weekly: {
+                    lastReset: null,
+                    data: new Array(7).fill(null).map(() => ({
+                        flashcard: false, shortWords: false, longWords: false, youon: false, sentences: false, listening: false
+                    }))
+                },
+                metrics: {
+                    flashcardSpeed: [],
+                    gameAccuracy: [],
+                },
+                difficultKana: []
+            },
+            settings: {
+                theme: 'light',
+                filterDakuten: true,
+                filterYouon: true,
+                customSet: []
+            }
+        };
+
+        // Kumpulan data Kana (Hiragana & Katakana)
+        const KANA_DATA = {
+            hiragana: {
+                basic: [
+                    { kana: 'あ', romaji: 'a' }, { kana: 'い', romaji: 'i' }, { kana: 'う', romaji: 'u' }, { kana: 'え', romaji: 'e' }, { kana: 'お', romaji: 'o' },
+                    { kana: 'か', romaji: 'ka' }, { kana: 'き', romaji: 'ki' }, { kana: 'く', romaji: 'ku' }, { kana: 'け', romaji: 'ke' }, { kana: 'こ', romaji: 'ko' },
+                    { kana: 'さ', romaji: 'sa' }, { kana: 'し', romaji: 'shi' }, { kana: 'す', romaji: 'su' }, { kana: 'せ', romaji: 'se' }, { kana: 'そ', romaji: 'so' },
+                    { kana: 'た', romaji: 'ta' }, { kana: 'ち', romaji: 'chi' }, { kana: 'つ', romaji: 'tsu' }, { kana: 'て', romaji: 'te' }, { kana: 'と', romaji: 'to' },
+                    { kana: 'な', romaji: 'na' }, { kana: 'に', romaji: 'ni' }, { kana: 'ぬ', romaji: 'nu' }, { kana: 'ね', romaji: 'ne' }, { kana: 'の', romaji: 'no' },
+                    { kana: 'は', romaji: 'ha' }, { kana: 'ひ', romaji: 'hi' }, { kana: 'ふ', romaji: 'fu' }, { kana: 'へ', romaji: 'he' }, { kana: 'ほ', romaji: 'ho' },
+                    { kana: 'ま', romaji: 'ma' }, { kana: 'み', romaji: 'mi' }, { kana: 'む', romaji: 'mu' }, { kana: 'め', romaji: 'me' }, { kana: 'も', romaji: 'mo' },
+                    { kana: 'や', romaji: 'ya' }, { kana: 'ゆ', romaji: 'yu' }, { kana: 'よ', romaji: 'yo' },
+                    { kana: 'ら', romaji: 'ra' }, { kana: 'り', romaji: 'ri' }, { kana: 'る', romaji: 'ru' }, { kana: 'れ', romaji: 're' }, { kana: 'ろ', romaji: 'ro' },
+                    { kana: 'わ', romaji: 'wa' }, { kana: 'を', romaji: 'wo' }, { kana: 'ん', romaji: 'n' },
+                ],
+                dakuten: [
+                    { kana: 'が', romaji: 'ga' }, { kana: 'ぎ', romaji: 'gi' }, { kana: 'ぐ', romaji: 'gu' }, { kana: 'げ', romaji: 'ge' }, { kana: 'ご', romaji: 'go' },
+                    { kana: 'ざ', romaji: 'za' }, { kana: 'じ', romaji: 'ji' }, { kana: 'ず', romaji: 'zu' }, { kana: 'ぜ', romaji: 'ze' }, { kana: 'ぞ', romaji: 'zo' },
+                    { kana: 'だ', romaji: 'da' }, { kana: 'ぢ', romaji: 'dji' }, { kana: 'づ', romaji: 'dzu' }, { kana: 'で', romaji: 'de' }, { kana: 'ど', romaji: 'do' },
+                    { kana: 'ば', romaji: 'ba' }, { kana: 'び', romaji: 'bi' }, { kana: 'ぶ', romaji: 'bu' }, { kana: 'べ', romaji: 'be' }, { kana: 'ぼ', romaji: 'bo' },
+                    { kana: 'ぱ', romaji: 'pa' }, { kana: 'ぴ', romaji: 'pi' }, { kana: 'ぷ', romaji: 'pu' }, { kana: 'ぺ', romaji: 'pe' }, { kana: 'ぽ', romaji: 'po' }
+                ],
+                youon: [
+                    { kana: 'きゃ', romaji: 'kya' }, { kana: 'きゅ', romaji: 'kyu' }, { kana: 'きょ', romaji: 'kyo' },
+                    { kana: 'しゃ', romaji: 'sha' }, { kana: 'しゅ', romaji: 'shu' }, { kana: 'しょ', romaji: 'sho' },
+                    { kana: 'ちゃ', romaji: 'cha' }, { kana: 'ちゅ', romaji: 'chu' }, { kana: 'ちょ', romaji: 'cho' },
+                    { kana: 'にゃ', romaji: 'nya' }, { kana: 'にゅ', romaji: 'nyu' }, { kana: 'にょ', romaji: 'nyo' },
+                    { kana: 'ひゃ', romaji: 'hya' }, { kana: 'ひゅ', romaji: 'hyu' }, { kana: 'ひょ', romaji: 'hyo' },
+                    { kana: 'みゃ', romaji: 'mya' }, { kana: 'みゅ', romaji: 'myu' }, { kana: 'みょ', romaji: 'myo' },
+                    { kana: 'りゃ', romaji: 'rya' }, { kana: 'りゅ', romaji: 'ryu' }, { kana: 'りょ', romaji: 'ryo' },
+                    { kana: 'ぎゃ', romaji: 'gya' }, { kana: 'ぎゅ', romaji: 'gyu' }, { kana: 'ぎょ', romaji: 'gyo' },
+                    { kana: 'じゃ', romaji: 'ja' }, { kana: 'じゅ', romaji: 'ju' }, { kana: 'じょ', romaji: 'jo' },
+                    { kana: 'びゃ', romaji: 'bya' }, { kana: 'びゅ', romaji: 'byu' }, { kana: 'びょ', romaji: 'byo' },
+                    { kana: 'ぴゃ', romaji: 'pya' }, { kana: 'ぴゅ', romaji: 'pyu' }, { kana: 'ぴょ', romaji: 'pyo' },
+                ]
+            },
+            katakana: {
+                 basic: [], dakuten: [], youon: []
+            }
+        };
+
+        const ROMAJI_ALIASES = {
+            'si': 'shi', 'ti': 'chi', 'tu': 'tsu', 'hu': 'fu',
+            'zi': 'ji', 'di': 'ji', 'du': 'zu',
+            'sya': 'sha', 'syu': 'shu', 'syo': 'sho',
+            'tya': 'cha', 'tyu': 'chu', 'tyo': 'cho',
+            'jya': 'ja', 'jyu': 'ju', 'jyo': 'jo',
+            'zya': 'ja', 'zyu': 'ju', 'zyo': 'jo'
+        };
+
+        const CUSTOM_SET_CHIPS = [
+            'あ〜お', 'か〜こ', 'さ〜そ', 'た〜と', 'な〜の', 'は〜ほ', 'ま〜も', 'や〜よ', 'ら〜ろ', 'わ〜ん'
+        ];
+        
+        // ==========================================================
+        // === CORE FUNCTIONS ===
+        // ==========================================================
+        function loadState() {
+            try {
+                const savedState = localStorage.getItem('kanaTrainerState');
+                if (savedState) {
+                    const loadedState = JSON.parse(savedState);
+                    Object.assign(state, loadedState);
+                }
+            } catch (e) {
+                console.error("Gagal memuat state dari localStorage", e);
+            }
+        }
+
+        function saveState() {
+            try {
+                localStorage.setItem('kanaTrainerState', JSON.stringify(state));
+            } catch (e) {
+                console.error("Gagal menyimpan state ke localStorage", e);
+            }
+        }
+
+        function applyTheme() {
+            document.body.setAttribute('data-theme', state.settings.theme);
+            document.getElementById('theme-toggle').checked = state.settings.theme === 'dark';
+        }
+
+        function showPage(pageId) {
+            document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+            const targetPage = document.getElementById(`${pageId}-page`);
+            if (targetPage) {
+                targetPage.classList.add('active');
+            }
+
+            // Update nav links
+            document.querySelectorAll('nav a').forEach(link => {
+                if (link.dataset.page === pageId) {
+                    link.classList.add('active');
+                } else {
+                    link.classList.remove('active');
+                }
+            });
+            state.ui.currentPage = pageId;
+            saveState();
+        }
+
+        function checkDailyReset() {
+            const today = new Date().toDateString();
+            if (state.progress.daily.lastDate !== today) {
+                if (state.progress.daily.tasks.every(t => t.completed)) {
+                    state.progress.daily.streak++;
+                } else {
+                    state.progress.daily.streak = 0;
+                }
+                state.progress.daily.lastDate = today;
+                state.progress.daily.tasks.forEach(task => task.completed = false);
+                saveState();
+            }
+        }
+
+        function checkWeeklyReset() {
+            const now = new Date();
+            const startOfWeek = new Date(now.getFullYear(), now.getMonth(), now.getDate() - (now.getDay() - 1));
+            const lastResetDate = state.progress.weekly.lastReset ? new Date(state.progress.weekly.lastReset) : null;
+
+            if (!lastResetDate || lastResetDate.getTime() < startOfWeek.getTime()) {
+                state.progress.weekly.data = new Array(7).fill(null).map(() => ({
+                    flashcard: false, shortWords: false, longWords: false, youon: false, sentences: false, listening: false
+                }));
+                state.progress.weekly.lastReset = now.toISOString();
+                saveState();
+            }
+        }
+
+        function handleHashChange() {
+            const pageId = window.location.hash.substring(1) || 'dashboard';
+            showPage(pageId);
+            const pageRenderFunction = {
+                dashboard: renderDashboard,
+                flashcard: renderFlashcard,
+                youon: renderYouon,
+                game: renderGame,
+                listening: renderListening,
+                progress: renderProgress,
+                settings: renderSettings
+            }[pageId];
+            if (pageRenderFunction) {
+                pageRenderFunction();
+            }
+        }
+        
+        function getFilteredKanaSet() {
+            let set = [...KANA_DATA.hiragana.basic];
+            if (state.settings.filterDakuten) {
+                set = set.concat(KANA_DATA.hiragana.dakuten);
+            }
+            if (state.settings.filterYouon) {
+                set = set.concat(KANA_DATA.hiragana.youon);
+            }
+            if (state.settings.customSet.length > 0) {
+                set = set.filter(kana => state.settings.customSet.includes(kana.romaji));
+            }
+            return set;
+        }
+
+        function applySRS(kanaItem, isCorrect) {
+            const key = kanaItem.kana;
+            if (!state.srs.byKey[key]) {
+                state.srs.byKey[key] = { correct: 0, wrong: 0, lastSeen: Date.now(), ease: 1 };
+            }
+            const item = state.srs.byKey[key];
+            item.lastSeen = Date.now();
+            if (isCorrect) {
+                item.correct++;
+                item.ease = Math.min(2, item.ease + 0.1);
+            } else {
+                item.wrong++;
+                item.ease = Math.max(0, item.ease - 0.2);
+            }
+            updateDifficultKana();
+            saveState();
+        }
+
+        function updateDifficultKana() {
+            const sorted = Object.entries(state.srs.byKey)
+                .map(([kana, data]) => ({ kana, wrongRatio: data.wrong / (data.correct + data.wrong) }))
+                .sort((a, b) => b.wrongRatio - a.wrongRatio);
+            state.progress.difficultKana = sorted.slice(0, 10).map(item => item.kana);
+            saveState();
+        }
+
+        function shuffle(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        function showConfirmModal(title, message, onConfirm) {
+            const modal = document.getElementById('confirmModal');
+            document.getElementById('modal-title').textContent = title;
+            document.getElementById('modal-message').textContent = message;
+            
+            const confirmBtn = document.getElementById('modal-confirm-btn');
+            const cancelBtn = document.getElementById('modal-cancel-btn');
+
+            confirmBtn.onclick = () => {
+                onConfirm();
+                modal.classList.remove('is-open');
+            };
+            cancelBtn.onclick = () => {
+                modal.classList.remove('is-open');
+            };
+            modal.classList.add('is-open');
+        }
+
+        function speak(text) {
+            try {
+                if ('speechSynthesis' in window && text) {
+                    speechSynthesis.cancel();
+                    const utterance = new SpeechSynthesisUtterance(text);
+                    utterance.lang = 'ja-JP';
+                    utterance.rate = 0.9;
+                    speechSynthesis.speak(utterance);
+                }
+            } catch (e) {
+                console.error("Error speaking text:", e);
+            }
+        }
+        
+        // ==========================================================
+        // === PAGE-SPECIFIC LOGIC & RENDERING ===
+        // ==========================================================
+        function renderDashboard() {
+            const completedTasks = state.progress.daily.tasks.filter(t => t.completed).length;
+            const totalTasks = state.progress.daily.tasks.length;
+            const progressPercentage = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
+
+            document.getElementById('progress-circle-bar').style.setProperty('--p', `${progressPercentage}%`);
+            document.getElementById('progress-circle-text').textContent = `${progressPercentage}%`;
+            document.getElementById('streak-count').textContent = state.progress.daily.streak;
+
+            const checklistEl = document.getElementById('daily-checklist');
+            if (checklistEl) {
+                checklistEl.innerHTML = '';
+                state.progress.daily.tasks.forEach(task => {
+                    const li = document.createElement('li');
+                    li.className = `checklist-item ${task.completed ? 'completed' : ''}`;
+                    li.innerHTML = `
+                        <div class="label">${task.label}</div>
+                        <div class="checkbox">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="20 6 9 17 4 12"></polyline>
+                            </svg>
+                        </div>
+                    `;
+                    checklistEl.appendChild(li);
+                });
+            }
+
+            const worksheetEl = document.getElementById('weekly-worksheet');
+            if (worksheetEl) {
+                const days = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'];
+                let tableHtml = `
+                    <table style="width:100%; border-collapse: collapse; font-size:var(--fs-small);">
+                        <thead>
+                            <tr style="background:var(--soft);">
+                                <th style="padding: 8px; border: 1px solid var(--border);">Hari</th>
+                                ${state.progress.daily.tasks.map(t => `<th style="padding: 8px; border: 1px solid var(--border);">${t.label.replace(/\(.+?\)/g, '')}</th>`).join('')}
+                            </tr>
+                        </thead>
+                        <tbody>`;
+                
+                days.forEach((day, index) => {
+                    const dayData = state.progress.weekly.data[index];
+                    tableHtml += `<tr style="text-align:center;">
+                                  <td style="padding: 8px; border: 1px solid var(--border); font-weight: 600;">${day}</td>`;
+                    state.progress.daily.tasks.forEach(task => {
+                        const isCompleted = dayData && dayData[task.id];
+                        tableHtml += `<td style="padding: 8px; border: 1px solid var(--border);">${isCompleted ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:20px; height:20px; color:var(--ok);"><polyline points="20 6 9 17 4 12"></polyline></svg>' : ''}</td>`;
+                    });
+                    tableHtml += `</tr>`;
+                });
+                
+                tableHtml += `</tbody></table>`;
+                worksheetEl.innerHTML = tableHtml;
+            }
+        }
+
+        function renderFlashcard() {
+            const kanaPrompt = document.getElementById('flashcard-prompt');
+            const romajiAnswer = document.getElementById('flashcard-answer');
+            const cardUI = document.getElementById('flashcard-ui');
+            const resultUI = document.getElementById('flashcard-result');
+
+            let sessionTimer = null;
+            let currentKana = null;
+
+            function getRandomKana() {
+                const availableSet = getFilteredKanaSet();
+                // Prioritize difficult kana
+                if (state.progress.difficultKana.length > 0 && Math.random() < 0.3) { // 30% chance for difficult kana
+                    const difficult = state.progress.difficultKana[Math.floor(Math.random() * state.progress.difficultKana.length)];
+                    return availableSet.find(k => k.kana === difficult) || availableSet[0];
+                }
+                // Otherwise, pick randomly
+                return shuffle(availableSet)[0];
+            }
+
+            function startSession() {
+                state.ui.flashcard.score = 0;
+                state.ui.flashcard.total = 0;
+                state.ui.flashcard.sessionTimes = [];
+                cardUI.style.display = 'block';
+                resultUI.style.display = 'none';
+                nextCard();
+
+                // Set timer
+                sessionTimer = setTimeout(endSession, 60000);
+            }
+
+            function nextCard() {
+                const cardEl = document.querySelector('#flashcard-page .kana-card');
+                cardEl.classList.remove('is-revealed');
+                state.ui.flashcard.startTime = Date.now();
+                currentKana = getRandomKana();
+                if (state.ui.flashcard.mode === 'kana-romaji') {
+                    kanaPrompt.textContent = currentKana.kana;
+                    romajiAnswer.textContent = currentKana.romaji;
+                } else {
+                    kanaPrompt.textContent = currentKana.romaji;
+                    romajiAnswer.textContent = currentKana.kana;
+                }
+            }
+            
+            function endSession() {
+                clearTimeout(sessionTimer);
+                cardUI.style.display = 'none';
+                resultUI.style.display = 'block';
+                const avgTime = state.ui.flashcard.sessionTimes.length > 0 ? 
+                    (state.ui.flashcard.sessionTimes.reduce((a, b) => a + b, 0) / state.ui.flashcard.sessionTimes.length).toFixed(2) : 0;
+                
+                document.getElementById('flashcard-summary').textContent = `Skor Anda: ${state.ui.flashcard.score} dari ${state.ui.flashcard.total}. Waktu rata-rata: ${avgTime} detik/kartu.`;
+                state.progress.metrics.flashcardSpeed.push(Number(avgTime));
+                saveState();
+            }
+
+            document.getElementById('mode-kana-romaji').onclick = () => { state.ui.flashcard.mode = 'kana-romaji'; startSession(); };
+            document.getElementById('mode-romaji-kana').onclick = () => { state.ui.flashcard.mode = 'romaji-kana'; startSession(); };
+            document.getElementById('next-card-btn').onclick = () => {
+                const timeTaken = (Date.now() - state.ui.flashcard.startTime) / 1000;
+                state.ui.flashcard.total++;
+                state.ui.flashcard.score++; // Assume correct for flashcard
+                state.ui.flashcard.sessionTimes.push(timeTaken);
+
+                const cardEl = document.querySelector('#flashcard-page .kana-card');
+                cardEl.classList.add('is-revealed');
+
+                applySRS(currentKana, true);
+                if (state.ui.flashcard.total >= 10) { // Selesaikan sesi setelah 10 kartu
+                    endSession();
+                } else {
+                    setTimeout(nextCard, 500);
+                }
+            };
+            document.getElementById('restart-flashcard-btn').onclick = startSession;
+
+            startSession();
+        }
+
+        function renderYouon() {
+            const youonContainer = document.getElementById('youon-grid-container');
+            const youonData = KANA_DATA.hiragana.youon;
+            if (youonContainer) {
+                youonContainer.innerHTML = '';
+                youonData.forEach(item => {
+                    const card = document.createElement('div');
+                    card.className = 'card';
+                    card.innerHTML = `
+                        <div class="kana-char">${item.kana}</div>
+                        <div class="romaji-display hidden">${item.romaji}</div>
+                    `;
+                    card.onclick = () => {
+                        const romajiEl = card.querySelector('.romaji-display');
+                        romajiEl.classList.remove('hidden');
+                        speak(item.kana);
+                    };
+                    youonContainer.appendChild(card);
+                });
+            }
+        }
+
+        function renderGame() {
+            const gamePromptEl = document.getElementById('game-prompt');
+            const gameOptionsEl = document.getElementById('game-options');
+            const gameFeedbackEl = document.getElementById('game-feedback');
+            const typingInputEl = document.getElementById('typing-input');
+            const nextBtn = document.getElementById('next-game-btn');
+            const uiEl = document.getElementById('game-ui');
+            const resultEl = document.getElementById('game-result');
+            let currentQuestion = null;
+
+            function pickQuestion() {
+                const allKana = getFilteredKanaSet();
+                const correctKana = shuffle(allKana)[0];
+                
+                gamePromptEl.textContent = state.ui.game.mode === 'mcq' ? correctKana.kana : correctKana.romaji;
+                gameFeedbackEl.textContent = '';
+                
+                if (state.ui.game.mode === 'mcq') {
+                    const wrongOptions = [];
+                    while (wrongOptions.length < 3) {
+                        const wrongKana = allKana[Math.floor(Math.random() * allKana.length)];
+                        if (wrongKana.kana !== correctKana.kana && !wrongOptions.includes(wrongKana.romaji)) {
+                            wrongOptions.push(wrongKana.romaji);
+                        }
+                    }
+                    const options = [...wrongOptions, correctKana.romaji];
+                    shuffle(options);
+                    currentQuestion = { kana: correctKana.kana, romaji: correctKana.romaji, options };
+                    renderOptions();
+                } else {
+                    currentQuestion = { kana: correctKana.kana, romaji: correctKana.romaji };
+                    typingInputEl.value = '';
+                    typingInputEl.focus();
+                }
+            }
+
+            function renderOptions() {
+                if (gameOptionsEl) {
+                    gameOptionsEl.innerHTML = '';
+                    currentQuestion.options.forEach((opt, index) => {
+                        const btn = document.createElement('button');
+                        btn.className = 'btn ghost option-btn';
+                        btn.textContent = opt;
+                        btn.onclick = () => checkAnswer(opt);
+                        gameOptionsEl.appendChild(btn);
+                    });
+                }
+            }
+
+            function checkAnswer(answer) {
+                state.ui.game.total++;
+                const isCorrect = answer.toLowerCase() === currentQuestion.romaji.toLowerCase();
+                
+                if (isCorrect) {
+                    state.ui.game.score++;
+                    gameFeedbackEl.innerHTML = '<span style="color:var(--ok);">Benar!</span>';
+                } else {
+                    gameFeedbackEl.innerHTML = `<span style="color:var(--warn);">Salah. Jawaban yang benar adalah <span style="font-weight:600;">${currentQuestion.romaji}</span>.</span>`;
+                }
+                
+                if (state.ui.game.mode === 'mcq') {
+                    gameOptionsEl.querySelectorAll('.option-btn').forEach(btn => {
+                        btn.disabled = true;
+                        if (btn.textContent === currentQuestion.romaji) {
+                            btn.classList.add('correct');
+                        } else if (btn.textContent === answer) {
+                            btn.classList.add('incorrect');
+                        }
+                    });
+                }
+                
+                applySRS(currentQuestion, isCorrect);
+                nextBtn.style.display = 'block';
+            }
+
+            function startSession() {
+                state.ui.game.score = 0;
+                state.ui.game.total = 0;
+                uiEl.style.display = 'block';
+                resultEl.style.display = 'none';
+                nextBtn.style.display = 'none';
+                pickQuestion();
+            }
+
+            function endSession() {
+                uiEl.style.display = 'none';
+                resultEl.style.display = 'block';
+                const accuracy = state.ui.game.total > 0 ? ((state.ui.game.score / state.ui.game.total) * 100).toFixed(0) : 0;
+                document.getElementById('game-summary').textContent = `Skor Anda: ${state.ui.game.score} dari ${state.ui.game.total}. Akurasi: ${accuracy}%.`;
+                state.progress.metrics.gameAccuracy.push(Number(accuracy));
+                saveState();
+            }
+            
+            document.getElementById('mcq-mode-btn').onclick = () => {
+                state.ui.game.mode = 'mcq';
+                document.getElementById('mcq-mode-btn').classList.add('active');
+                document.getElementById('typing-mode-btn').classList.remove('active');
+                gameOptionsEl.style.display = 'grid';
+                typingInputEl.parentNode.style.display = 'none';
+                startSession();
+            };
+            document.getElementById('typing-mode-btn').onclick = () => {
+                state.ui.game.mode = 'typing';
+                document.getElementById('typing-mode-btn').classList.add('active');
+                document.getElementById('mcq-mode-btn').classList.remove('active');
+                gameOptionsEl.style.display = 'none';
+                typingInputEl.parentNode.style.display = 'block';
+                startSession();
+            };
+            nextBtn.onclick = () => {
+                if (state.ui.game.total >= 10) {
+                    endSession();
+                } else {
+                    pickQuestion();
+                }
+                nextBtn.style.display = 'none';
+            };
+            document.getElementById('restart-game-btn').onclick = startSession;
+
+            startSession();
+        }
+
+        function renderListening() {
+            const playBtn = document.getElementById('play-listening-btn');
+            const displayEl = document.getElementById('listening-display');
+            const promptEl = document.getElementById('listening-prompt');
+            const feedbackEl = document.getElementById('listening-feedback');
+            
+            let audioQueue = [];
+
+            function startSession() {
+                audioQueue = shuffle(getFilteredKanaSet()).slice(0, 5); // 5 contoh random
+                playBtn.style.display = 'none';
+                displayEl.style.display = 'block';
+                nextAudio();
+            }
+
+            function nextAudio() {
+                if (audioQueue.length === 0) {
+                    promptEl.textContent = 'Selesai!';
+                    feedbackEl.textContent = 'Kerja bagus!';
+                    playBtn.style.display = 'block';
+                    state.progress.daily.tasks.find(t => t.id === 'listening').completed = true;
+                    saveState();
+                    renderDashboard();
+                    return;
+                }
+                
+                const item = audioQueue.shift();
+                promptEl.textContent = item.kana;
+                feedbackEl.textContent = 'Mendengarkan...';
+                
+                setTimeout(() => {
+                    speak(item.kana);
+                    feedbackEl.textContent = 'Ulangi setelah audio!';
+                    setTimeout(nextAudio, 3000); // Jeda 3 detik
+                }, 1000);
+            }
+
+            playBtn.onclick = startSession;
+        }
+
+        function renderProgress() {
+            function renderChart(containerId, data, title, type = 'bar') {
+                const container = document.getElementById(containerId);
+                if (!container) return;
+                container.innerHTML = '';
+                if (data.length === 0) {
+                    container.textContent = 'Tidak ada data untuk ditampilkan.';
+                    return;
+                }
+                
+                const maxVal = Math.max(...data) + 10;
+                const chart = document.createElement('div');
+                chart.className = 'bar-chart';
+                data.forEach((val, index) => {
+                    const bar = document.createElement('div');
+                    bar.className = 'bar';
+                    const height = (val / maxVal) * 100;
+                    bar.style.height = `${Math.max(1, height)}%`;
+                    bar.innerHTML = `<span class="bar-value">${val}</span>`;
+                    chart.appendChild(bar);
+                });
+                container.appendChild(chart);
+            }
+
+            renderChart('flashcard-speed-chart', state.progress.metrics.flashcardSpeed, 'Kecepatan Flashcard');
+            renderChart('game-accuracy-chart', state.progress.metrics.gameAccuracy, 'Akurasi Mini-Game');
+
+            const difficultList = document.getElementById('difficult-kana-list');
+            if (difficultList) {
+                difficultList.innerHTML = '';
+                state.progress.difficultKana.forEach(kana => {
+                    const chip = document.createElement('span');
+                    chip.className = 'chip';
+                    chip.textContent = kana;
+                    difficultList.appendChild(chip);
+                });
+            }
+        }
+
+        function renderSettings() {
+            document.getElementById('theme-toggle').checked = state.settings.theme === 'dark';
+            document.getElementById('filter-dakuten-toggle').checked = state.settings.filterDakuten;
+            document.getElementById('filter-youon-toggle').checked = state.settings.filterYouon;
+
+            document.getElementById('theme-toggle').onchange = (e) => {
+                state.settings.theme = e.target.checked ? 'dark' : 'light';
+                applyTheme();
+                saveState();
+            };
+            document.getElementById('filter-dakuten-toggle').onchange = (e) => {
+                state.settings.filterDakuten = e.target.checked;
+                saveState();
+            };
+            document.getElementById('filter-youon-toggle').onchange = (e) => {
+                state.settings.filterYouon = e.target.checked;
+                saveState();
+            };
+
+            const customSetChips = document.getElementById('custom-set-chips');
+            if (customSetChips) {
+                customSetChips.innerHTML = '';
+                CUSTOM_SET_CHIPS.forEach(chipText => {
+                    const chip = document.createElement('span');
+                    chip.className = `chip ${state.settings.customSet.includes(chipText) ? 'active' : ''}`;
+                    chip.textContent = chipText;
+                    chip.onclick = () => {
+                        const index = state.settings.customSet.indexOf(chipText);
+                        if (index > -1) {
+                            state.settings.customSet.splice(index, 1);
+                        } else {
+                            state.settings.customSet.push(chipText);
+                        }
+                        renderSettings();
+                        saveState();
+                    };
+                    customSetChips.appendChild(chip);
+                });
+            }
+            document.getElementById('reset-data-btn').onclick = () => {
+                showConfirmModal("Reset Data", "Ini akan menghapus semua progres dan pengaturan. Apakah Anda yakin?", () => {
+                    localStorage.clear();
+                    location.reload();
+                });
+            };
+            document.getElementById('reset-worksheet-btn').onclick = () => {
+                showConfirmModal("Reset Worksheet", "Ini akan menghapus progres worksheet mingguan Anda. Apakah Anda yakin?", () => {
+                    state.progress.weekly.lastReset = null;
+                    checkWeeklyReset();
+                    renderDashboard();
+                });
+            };
+        }
+        
+        // ==========================================================
+        // === INITIALIZATION & EVENT LISTENERS ===
+        // ==========================================================
+        document.addEventListener('DOMContentLoaded', () => {
+            loadState();
+            applyTheme();
+            checkDailyReset();
+            checkWeeklyReset();
+
+            const sidebar = document.getElementById('sidebar');
+            const sidebarToggle = document.getElementById('sidebar-toggle-btn');
+            const mainContainer = document.querySelector('.main-container');
+            const pageContent = document.getElementById('page-content');
+            
+            function openSidebar() {
+                sidebar.classList.add('is-open');
+                document.body.style.overflow = 'hidden';
+            }
+            function closeSidebar() {
+                sidebar.classList.remove('is-open');
+                document.body.style.overflow = '';
+            }
+            if (sidebarToggle) {
+                sidebarToggle.onclick = openSidebar;
+            }
+            document.addEventListener('click', (e) => {
+                if (sidebar.classList.contains('is-open') && !sidebar.contains(e.target) && !sidebarToggle.contains(e.target)) {
+                    closeSidebar();
+                }
+            });
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && sidebar.classList.contains('is-open')) {
+                    closeSidebar();
+                }
+            });
+
+            // Handle hash changes for routing
+            window.onhashchange = handleHashChange;
+            handleHashChange();
+
+            // Hotkeys
+            document.addEventListener('keydown', (e) => {
+                const currentPage = state.ui.currentPage;
+                if (currentPage === 'flashcard') {
+                    if (e.key === ' ') {
+                        e.preventDefault();
+                        document.getElementById('next-card-btn').click();
+                    }
+                } else if (currentPage === 'game' && state.ui.game.mode === 'typing') {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        const input = document.getElementById('typing-input');
+                        const userAnswer = input.value.trim();
+                        // Handle aliases
+                        const alias = ROMAJI_ALIASES[userAnswer.toLowerCase()] || userAnswer;
+                        checkAnswer(alias);
+                    } else if (e.key === 'Escape') {
+                        document.getElementById('typing-input').value = '';
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
