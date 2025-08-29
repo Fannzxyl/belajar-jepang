@@ -477,6 +477,10 @@
                 speakAndCheckBtn.disabled = true;
                 return;
             }
+            if (!('SpeechGrammarList' in window || 'webkitSpeechGrammarList' in window)) {
+                console.warn('Browser tidak mendukung SpeechGrammarList. Hotword bias tidak akan aktif.');
+            }
+
 
             // Periksa izin mikrofon secara lebih proaktif
             if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
@@ -486,10 +490,21 @@
             }
 
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            const SpeechGrammarList = window.SpeechGrammarList || window.webkitSpeechGrammarList;
+
             recognition = new SpeechRecognition();
             recognition.lang = 'ja-JP'; // Mengatur bahasa ke Jepang
-            recognition.interimResults = false;
-            recognition.maxAlternatives = 1;
+            recognition.interimResults = true; // Izinkan hasil sementara
+            recognition.maxAlternatives = 5; // Ambil sampai 5 alternatif transkrip
+
+            // Tambah "Hotword Bias" untuk Kana
+            if (SpeechGrammarList) {
+                const grammar = `#JSGF V1.0; grammar kana; public <kana> = ${[...BASE, ...DAKUON, ...YOUON].join(' | ')};`;
+                const speechRecognitionList = new SpeechGrammarList();
+                speechRecognitionList.addFromString(grammar, 1); // Bobot tinggi (1)
+                recognition.grammars = speechRecognitionList;
+            }
+
 
             recognition.onstart = () => {
                 isRecognizing = true;
@@ -503,20 +518,31 @@
                 listenTimer = setTimeout(() => {
                     if (isRecognizing && !hasSpoken) {
                         recognition.stop();
-                        updateAiFeedback('Sunyi. Coba bicara lebih dekat ke mic ya 🙏', 'wrong');
+                        updateAiFeedback('Masih sunyi, coba bicara lebih dekat ke mic ya 🙏', 'wrong');
                     }
-                }, 6000); // 6 detik hening otomatis berhenti
+                }, 10000); // Diperpanjang menjadi 10 detik hening
             };
 
             recognition.onresult = async (event) => {
                 clearTimeout(listenTimer); // Hentikan timer hening karena suara terdeteksi
                 hasSpoken = true; // Suara terdeteksi
-                const transcript = event.results[0][0].transcript;
-                const currentRomaji = deck[currentIndex].romaji;
-                console.log(`Anda mengucapkan: ${transcript}, yang seharusnya: ${currentRomaji}`);
+                
+                const expected = deck[currentIndex].romaji.toLowerCase();
+                let bestMatch = "";
+                let bestScore = Infinity;
 
-                // Kirim transkrip ke Gemini untuk verifikasi
-                await verifyPronunciationWithGemini(transcript, currentRomaji);
+                // Loop deteksi semua alternatif, pilih yang paling mirip
+                for (let i = 0; i < event.results[0].length; i++) {
+                    const candidate = event.results[0][i].transcript.toLowerCase();
+                    const score = levenshtein(candidate, expected); // pakai fungsi jarak edit
+                    if (score < bestScore) {
+                        bestScore = score;
+                        bestMatch = candidate;
+                    }
+                }
+
+                console.log(`Best match (dari alternatif): ${bestMatch}, skor: ${bestScore}`);
+                await verifyPronunciationWithGemini(bestMatch, expected);
             };
 
             recognition.onerror = (event) => {
@@ -530,7 +556,12 @@
                     updateAiFeedback('Akses mikrofon ditolak. Izinkan browser menggunakan mikrofon di pengaturan situs.', 'wrong');
                 } else if (event.error === 'network') {
                     updateAiFeedback('Terjadi masalah jaringan saat pengenalan suara. Periksa koneksi internet Anda.', 'wrong');
-                } else {
+                } else if (event.error === 'no-speech') {
+                    updateAiFeedback('Tidak ada suara terdeteksi. Coba bicara lebih jelas.', 'wrong');
+                } else if (event.error === 'audio-capture') {
+                    updateAiFeedback('Gagal menangkap audio. Pastikan mikrofon terpasang dan berfungsi.', 'wrong');
+                }
+                else {
                     updateAiFeedback(`Error pengenalan suara: ${event.error}`, 'wrong');
                 }
             };
