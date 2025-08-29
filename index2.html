@@ -471,6 +471,24 @@
         let listenTimer; // Timer untuk menghentikan pengenalan suara jika hening
         let micBusy = false; // Guard untuk anti-double tap
 
+        /**
+         * Meminta izin mikrofon dari pengguna secara proaktif.
+         * Ini membantu memastikan mikrofon diaktifkan sebelum SpeechRecognition dimulai.
+         */
+        async function requestMicPermission() {
+            try {
+                // Mencoba untuk mendapatkan stream audio, yang akan memicu permintaan izin
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                console.log("Akses mikrofon berhasil didapatkan.");
+                // Menghentikan stream agar indikator mic tidak terus menyala
+                stream.getTracks().forEach(track => track.stop());
+            } catch(e) {
+                console.error("Kesalahan akses mikrofon:", e);
+                showCustomAlert("Akses mikrofon ditolak atau tidak tersedia. Mohon izinkan mikrofon di pengaturan browser atau sistem Android Anda untuk menggunakan fitur ini.");
+                speakAndCheckBtn.disabled = true; // Nonaktifkan tombol jika mic tidak dapat diakses
+            }
+        }
+
         function initializeSpeechRecognition() {
             if (!('SpeechRecognition' in window || 'webkitSpeechRecognition' in window)) {
                 showCustomAlert('Maaf, browser Anda tidak mendukung Speech Recognition. Pastikan Anda menggunakan Chrome atau browser modern lainnya.');
@@ -482,12 +500,13 @@
             }
 
 
-            // Periksa izin mikrofon secara lebih proaktif
-            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-                showCustomAlert('Akses mikrofon tidak tersedia. Pastikan browser Anda memiliki izin untuk mengakses mikrofon di pengaturan sistem Anda.');
-                speakAndCheckBtn.disabled = true;
-                return;
-            }
+            // Periksa izin mikrofon secara proaktif (lebih baik dilakukan di awal halaman load)
+            // Ini akan dipanggil di DOMContentLoaded
+            // if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+            //     showCustomAlert('Akses mikrofon tidak tersedia. Pastikan browser Anda memiliki izin untuk mengakses mikrofon di pengaturan sistem Anda.');
+            //     speakAndCheckBtn.disabled = true;
+            //     return;
+            // }
 
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             const SpeechGrammarList = window.SpeechGrammarList || window.webkitSpeechGrammarList;
@@ -496,10 +515,14 @@
             recognition.lang = 'ja-JP'; // Mengatur bahasa ke Jepang
             recognition.interimResults = true; // Izinkan hasil sementara
             recognition.maxAlternatives = 5; // Ambil sampai 5 alternatif transkrip
+            recognition.continuous = true; // Coba dengar lebih lama
 
             // Tambah "Hotword Bias" untuk Kana
             if (SpeechGrammarList) {
-                const grammar = `#JSGF V1.0; grammar kana; public <kana> = ${[...BASE, ...DAKUON, ...YOUON].join(' | ')};`;
+                const allKanaRomaji = [...BASE, ...DAKUON, ...YOUON];
+                // Buat grammar yang mencakup semua romaji kana yang mungkin
+                // String JSGF harus dalam format <ruleName> = item1 | item2 | ... ;
+                const grammar = `#JSGF V1.0; grammar kana; public <kana> = ${allKanaRomaji.join(' | ')};`;
                 const speechRecognitionList = new SpeechGrammarList();
                 speechRecognitionList.addFromString(grammar, 1); // Bobot tinggi (1)
                 recognition.grammars = speechRecognitionList;
@@ -518,9 +541,9 @@
                 listenTimer = setTimeout(() => {
                     if (isRecognizing && !hasSpoken) {
                         recognition.stop();
-                        updateAiFeedback('Masih sunyi, coba bicara lebih dekat ke mic ya 🙏', 'wrong');
+                        updateAiFeedback('Sunyi, coba dekatkan mic & mulai bicara dulu.', 'wrong');
                     }
-                }, 10000); // Diperpanjang menjadi 10 detik hening
+                }, 15000); // Diperpanjang menjadi 15 detik hening
             };
 
             recognition.onresult = async (event) => {
@@ -1000,7 +1023,11 @@ Jangan sertakan teks lain, salam, atau penjelasan.`;
         });
 
         // Inisialisasi
-        document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Pertama, minta izin mikrofon
+            await requestMicPermission();
+
+            // Kemudian lanjutkan dengan inisialisasi aplikasi
             createDeck();
             initializeSpeechRecognition();
             
@@ -1033,6 +1060,18 @@ Jangan sertakan teks lain, salam, atau penjelasan.`;
 
             // Aksesibilitas: ESC untuk tutup
             document.addEventListener('keydown', (e)=>{ if(e.key === 'Escape') closeSidebar(); });
+
+            // Cek status izin mikrofon awal dan perbarui status tombol
+            if (navigator.permissions && navigator.permissions.query) {
+                navigator.permissions.query({ name: 'microphone' }).then(status => {
+                    if (status.state === 'denied') {
+                        speakAndCheckBtn.disabled = true;
+                        updateAiFeedback('Akses mikrofon ditolak. Mohon aktifkan di pengaturan browser/sistem.', 'wrong');
+                    } else if (status.state === 'prompt') {
+                        updateAiFeedback('Browser akan meminta izin mikrofon. Mohon izinkan.', 'info');
+                    }
+                });
+            }
         });
     </script>
 </body>
