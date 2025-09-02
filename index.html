@@ -859,6 +859,31 @@
             <button class="btn">Progres</button>
         </div> -->
 
+        /* --- NEW CHALLENGE MODE CSS --- */
+        #challengeControls {
+            display: grid;
+            grid-template-columns: 1fr 1fr; /* 2 kolom di mobile */
+            gap: 8px;
+            align-items: center;
+            margin-top: var(--space);
+        }
+        #challengeControls .tag {
+            text-align: center;
+            grid-column: span 2; /* Mencakup 2 kolom di mobile */
+        }
+        @media (min-width: 520px) {
+            #challengeControls {
+                grid-template-columns: auto 1fr auto; /* 3 kolom di tablet/desktop */
+            }
+            #challengeControls .tag {
+                grid-column: span 1; /* Kembali ke 1 kolom */
+            }
+        }
+        @media (min-width: 768px) {
+             #challengeControls {
+                grid-template-columns: auto 120px 1fr; /* label, select, tag */
+             }
+        }
     </style>
 </head>
 <body>
@@ -925,6 +950,10 @@
                     <input type="file" id="importFile" accept=".json" style="display:none;" aria-label="Pulihkan progres dari file">
                     <button id="importBtn" class="btn ghost" type="button" title="Pulihkan progres dari file"><i class="fa-solid fa-upload"></i> Pulihkan Progres dari File</button>
                     <button id="resetBtn" class="btn ghost" type="button" title="Atur ulang semua progres">Atur Ulang Semua</button>
+                    <label class="btn ghost" style="display:flex;align-items:center;gap:8px">
+                        <input id="streakToggle" type="checkbox" aria-label="Notifikasi streak 10x" />
+                        Notifikasi Streak 10x
+                    </label>
                 </div>
             </div>
             <!-- NAVIGASI UTAMA (LAMA - TERSEMBUNYI) -->
@@ -1027,7 +1056,20 @@
                         <input id="sylPerItem" class="input" type="number" min="2" max="6" value="3" aria-label="Jumlah suku kata per soal" />
                     </div>
                     <div class="spacer"></div>
-                    <!-- Updated: Changed class to ID for specific styling -->
+                    <!-- Challenge Mode controls -->
+                    <div class="row test-control-group" id="challengeControls">
+                      <label class="btn ghost" style="display:flex;align-items:center;gap:8px">
+                        <input id="challengeToggle" type="checkbox" aria-label="Aktifkan Challenge Mode" />
+                        Challenge Mode (Countdown)
+                      </label>
+                      <select id="challengeDuration" class="input" aria-label="Durasi challenge (menit)">
+                        <option value="1">1 menit</option>
+                        <option value="3" selected>3 menit</option>
+                        <option value="5">5 menit</option>
+                        <option value="10">10 menit</option>
+                      </select>
+                      <div class="tag" id="challengeTimeLeft" aria-live="polite" hidden>Sisa: 03:00</div>
+                    </div>
                     <div id="rangeControls" class="test-control-group">
                         <div class="tag">Atau rentang khusus:</div>
                         <select id="rangeMode" class="input" aria-label="Mode rentang">
@@ -1083,7 +1125,7 @@
             <!-- Subbagian C: Pomodoro mini -->
             <div id="pomoSection" class="grid">
                 <div class="card">
-                    <h2 id="pomoTitle"><i class="fa-solid fa-clock icon"></i> Timer Pomodoro (Opsional)</h2>
+                    <h2 id="pomoTitle"><i class="fa-solid fa-clock icon"></i> Timer Pomodoro</h2>
                     <div class="small">Default 25/5, bisa diubah. Status dan sisa waktu tersimpan otomatis.</div>
                     <div class="row" role="group" aria-label="Kontrol Pomodoro">
                         <label>
@@ -1212,7 +1254,7 @@
         </div>
     </div>
 
-    <!-- UI/UX Mobile-First: Bottom Bar (Opsional) -->
+    <!-- UI/UX Mobile-First: Bottom Bar (opsional) -->
     <!-- <div class="bottom-bar">
         <button class="btn primary">Beranda</button>
         <button class="btn">Tes Cepat</button>
@@ -1347,6 +1389,7 @@
             confusionLog:{ hira:{}, kata:{} },
             srs:{ boxes:{}, due:{} },
             lite: false,
+            streakNotify: true,
         });
         let state = load();
         let _saveTimer = null;
@@ -1361,6 +1404,15 @@
                 mergedState.confusionLog = deepMerge(initState().confusionLog, loadedState.confusionLog);
                 mergedState.srs = deepMerge(initState().srs, loadedState.srs);
                 mergedState.lite = loadedState.lite !== undefined ? loadedState.lite : initState().lite;
+                mergedState.streakNotify = loadedState.streakNotify !== undefined ? loadedState.streakNotify : initState().streakNotify;
+                
+                // Default challenge state di state.test (aman jika belum ada)
+                if (!mergedState.test) mergedState.test = {};
+                if (typeof mergedState.test.challengeEnabled === 'undefined') mergedState.test.challengeEnabled = false;
+                if (typeof mergedState.test.challengeTotalSec === 'undefined') mergedState.test.challengeTotalSec = 180; // 3 menit default
+                if (typeof mergedState.test.challengeLeftSec === 'undefined') mergedState.test.challengeLeftSec = 180;
+                if (typeof mergedState.test.challengeRunning === 'undefined') mergedState.test.challengeRunning = false;
+                
                 return mergedState;
             }catch(e){
                 console.error("Error loading state from localStorage:", e);
@@ -1646,6 +1698,7 @@
 
         // ---------- TEST MODE ----------
         let testPool=[], poolIdx=[], usingRange=false, qIndex=0, currentItem=null, mcMap={}, wrongList=[];
+        let challengeTimerId = null;
 
         // --- Utils aman ---
         const AUDIO_TYPES = new Set(['audio_k2r','audio_r2k']);
@@ -2120,6 +2173,8 @@
          * Membangun uniquePoolItems dari labels dan mengisi testPool.
          */
         function startTest(){
+            if (!canAnswerNow()) return; // GUARD
+            
             wrongList=[];
             const set=qs('#testSet').value; state.test.set=set;
             const mode=qs('#answerMode').value; state.test.mode=mode;
@@ -2181,6 +2236,7 @@
             }, 10); // Small delay to trigger transition
 
             updateProgress();
+            startChallengeIfNeeded(); // start challenge timer
             nextQ();
         }
 
@@ -2271,6 +2327,7 @@
             }, { once: true });
             
             finishTest();
+            stopChallengeTimer(false); // Stop challenge timer when test is ended manually
             updateProgress();
         }
 
@@ -2381,6 +2438,7 @@
 
             // Panggil afterRenderQuestion() di akhir fungsi render soalmu.
             afterRenderQuestion();
+            onNextQuestionRender(); // Panggil onNextQuestionRender() saat soal baru di-render
             // FIX: Otomatis putar audio jika mode listening
             if (AUDIO_TYPES.has(qType)) {
                 playCurrentQuestionAudio();
@@ -2405,7 +2463,42 @@
         };
 
 
+        function canAnswerNow(){
+          if (!state.test.challengeEnabled) return true;
+          return state.test.challengeRunning && (state.test.challengeLeftSec > 0);
+        }
+        
+        function setAnsweringEnabled(enabled){
+          const input = document.getElementById('ans');
+          const btnCheck = document.getElementById('btnCheck');
+          const mcWrap = document.getElementById('mcWrap');
+          const skip = document.getElementById('btnSkip');
+          if (input){ input.disabled = !enabled; }
+          if (btnCheck){ btnCheck.disabled = !enabled; }
+          if (mcWrap){
+            qsa('.mc-btn', mcWrap).forEach(b => b.disabled = !enabled);
+            mcWrap.style.opacity = enabled ? '1' : '.5';
+          }
+          if (skip) { skip.disabled = !enabled; }
+        }
+
+        function onChallengeTimeUp(){
+          setAnsweringEnabled(false);
+          qs('#testInfoText').textContent = 'Waktu habis!'; // Update info text
+          qs('#btnEnd').click(); // Auto-end the test
+        }
+
+        function onNextQuestionRender(){
+          const enabled = !state.test.challengeEnabled || (state.test.challengeRunning && state.test.challengeLeftSec > 0);
+          setAnsweringEnabled(enabled);
+        }
+
         function chooseMC(idx){
+            if (!canAnswerNow()){
+              showToast('Waktu habis! Tekan Selesai.');
+              return;
+            } // GUARD
+            
             const cq = currentItem; // FIX: Simplify to currentItem
             if (!cq) return;
             
@@ -2449,6 +2542,16 @@
             return (s||'').toLowerCase().replace(/\s+/g,''); 
         }
 
+        function normalizeRomaji(v){
+            v = (v||'').toLowerCase().trim();
+            const alias = {
+                si:'shi', ti:'chi', tu:'tsu', hu:'fu', wo:'o',
+                di:'dji',
+                du:'dzu'
+            };
+            return alias[v] || v;
+        }
+
         function romajiEquals(a,b){
             if (!a || !b) return false;
             if (a === b) return true; // Cepat keluar jika sama persis
@@ -2463,6 +2566,11 @@
         }
 
         function checkAns(){
+            if (!canAnswerNow()) {
+              showToast('Waktu habis! Tekan Selesai.');
+              return;
+            } // GUARD
+
             const valRaw=(qs('#ans')?.value||'').trim();
             const qType=state.test.qType;
             let correct=false;
@@ -3091,6 +3199,7 @@
         let _modalKeydownListener = null;
 
         function maybeCelebrate(type, level = 0){
+            if (!state.streakNotify) return;
             const isReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
             if(type==='streak' && state.test.correctStreak>0 && state.test.correctStreak % 10 === 0){
@@ -3338,16 +3447,6 @@
 
         // ---------- NORMALIZATION & CONVERSION ----------
         function hasKana(s){ return /[ぁ-んァ-ン]/.test(s); }
-        function normalizeRomaji(v){
-            v=(v||'').toLowerCase().trim();
-            const alias = {
-                si:'shi', ti:'chi', tu:'tsu', hu:'fu', wo:'o',
-                di:'dji', du:'dzu',
-                ji:'dji', zu:'dzu'
-            };
-            return alias[v] || v;
-        }
-
         function romajiStringToKana(str,set){
             let s=(str||'').toLowerCase().replace(/\s+/g,'');
             let out='';
@@ -3459,6 +3558,11 @@
             safe.pomo.running = !!safe.pomo.running;
             safe.hasSeenOnboarding = !!safe.hasSeenOnboarding;
             safe.lite = !!safe.lite;
+            safe.streakNotify = !!safe.streakNotify;
+            safe.test.challengeEnabled = !!safe.test.challengeEnabled;
+            safe.test.challengeTotalSec = clamp(safe.test.challengeTotalSec, 60, 600); // 1-10 menit
+            safe.test.challengeLeftSec = clamp(safe.test.challengeLeftSec, 0, 600);
+            safe.test.challengeRunning = !!safe.test.challengeRunning;
 
             safe.theme = ['pastel', 'hc'].includes(safe.theme) ? safe.theme : 'pastel';
             safe.test.set = ['hira', 'kata'].includes(safe.test.set) ? safe.test.set : 'hira';
@@ -3611,8 +3715,14 @@
 
         // ---------- BINDINGS ----------
         bind('#btnShowLearn', 'click', startLearn);
-        bind('#btnStart', 'click', startTest);
-        bind('#btnEnd', 'click', endTest);
+        bind('#btnStart', 'click', ()=>{ 
+          startTest();
+          startChallengeIfNeeded();
+        });
+        bind('#btnEnd', 'click', ()=>{
+          endTest();
+          stopChallengeTimer(false);
+        });
         bind('#btnSkip', 'click', skipQ);
         bind('#btnCheck', 'click', checkAns);
 
@@ -3871,9 +3981,55 @@
             updatePointsAndLevelDisplay();
             updateTestInfo(); // Initial update of test info text
             applyAnswerModeUI(); // panggil saat mulai tes & tiap render soal
+
+            // Apply streak notify state
+            const streakToggleEl = qs('#streakToggle');
+            if (streakToggleEl) {
+                streakToggleEl.checked = !!state.streakNotify;
+            }
+            applyChallengeUI();
         }
 
         document.addEventListener('DOMContentLoaded', ()=>{
+            if (typeof state.streakNotify === 'undefined') state.streakNotify = true;
+            const streakToggleEl = qs('#streakToggle');
+            if (streakToggleEl) {
+                streakToggleEl.checked = !!state.streakNotify;
+            }
+            
+            // Binding for streakToggle
+            (function(){
+              const el = qs('#streakToggle');
+              if (!el) return;
+              el.addEventListener('change', (e)=>{
+                state.streakNotify = !!e.target.checked;
+                save && save();
+              });
+            })();
+            
+            // Binding for Challenge Mode controls
+            const challengeToggleEl = document.getElementById('challengeToggle');
+            const challengeDurationEl = document.getElementById('challengeDuration');
+            if (challengeToggleEl) {
+              challengeToggleEl.addEventListener('change', (e) => {
+                state.test.challengeEnabled = !!e.target.checked;
+                state.test.challengeLeftSec = state.test.challengeTotalSec;
+                save();
+                applyChallengeUI();
+                onNextQuestionRender();
+              });
+            }
+            if (challengeDurationEl) {
+              challengeDurationEl.addEventListener('change', (e) => {
+                const mins = parseInt(e.target.value, 10) || 3;
+                state.test.challengeTotalSec = mins * 60;
+                state.test.challengeLeftSec = state.test.challengeTotalSec;
+                save();
+                applyChallengeUI();
+              });
+            }
+
+
             const deviceMemory = navigator.deviceMemory || 0;
             const hardwareConcurrency = navigator.hardwareConcurrency || 0;
             if (!state.hasSeenOnboarding && (deviceMemory < 4 || hardwareConcurrency <= 4)) {
@@ -3936,6 +4092,75 @@
             testCountInput?.addEventListener('input', updateStartButtonState);
             updateStartButtonState(); // Initial check
         });
+
+        function maybeCelebrate(type, level = 0){
+            if (type === 'streak'){
+                if (!state.streakNotify) return;
+                if (state?.test?.correctStreak > 0 && state.test.correctStreak % 10 === 0){
+                    openCelebrate('streak');
+                }
+                return;
+            }
+            // cabang lain tetap sama
+        }
+        
+        function mmss(sec){
+          const m = Math.max(0, Math.floor(sec/60));
+          const s = Math.max(0, sec % 60);
+          return `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+        }
+        
+        function applyChallengeUI(){
+          const tgl = document.getElementById('challengeToggle');
+          const sel = document.getElementById('challengeDuration');
+          const lbl = document.getElementById('challengeTimeLeft');
+          if (!tgl || !sel || !lbl) return;
+
+          tgl.checked = !!state.test.challengeEnabled;
+
+          // Set dropdown sesuai total detik
+          const mins = Math.round((state.test.challengeTotalSec||180)/60);
+          if ([1,3,5,10].includes(mins)) sel.value = String(mins);
+
+          // Label sisa waktu
+          if (state.test.challengeEnabled){
+            lbl.hidden = false;
+            lbl.textContent = `Sisa: ${mmss(state.test.challengeLeftSec||state.test.challengeTotalSec||180)}`;
+          } else {
+            lbl.hidden = true;
+          }
+        }
+        
+        function startChallengeIfNeeded(){
+          const lbl = document.getElementById('challengeTimeLeft');
+          if (!state.test.challengeEnabled) return;
+          // Inisialisasi ulang saat mulai tes
+          state.test.challengeLeftSec = state.test.challengeTotalSec;
+          state.test.challengeRunning = true;
+          save();
+          if (lbl){ lbl.hidden = false; lbl.textContent = `Sisa: ${mmss(state.test.challengeLeftSec)}`; }
+
+          clearInterval(challengeTimerId);
+          challengeTimerId = setInterval(()=>{
+            state.test.challengeLeftSec = Math.max(0, (state.test.challengeLeftSec||0)-1);
+            if (lbl) lbl.textContent = `Sisa: ${mmss(state.test.challengeLeftSec)}`;
+
+            if (state.test.challengeLeftSec <= 0){
+              stopChallengeTimer(true); // hard stop: waktu habis
+              onChallengeTimeUp();
+            }
+          }, 1000);
+        }
+        
+        function stopChallengeTimer(hard=false){
+          clearInterval(challengeTimerId);
+          challengeTimerId = null;
+          state.test.challengeRunning = false;
+          save();
+          if (hard){
+            showToast('Waktu habis! ⏰');
+          }
+        }
     </script>
 </body>
 </html>
