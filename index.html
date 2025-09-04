@@ -188,7 +188,7 @@
         }
         @media (max-width: 767px) {
             header .brand {
-                padding-left: 16px; /* Reset padding for mobile if needed, or adjust */
+                padding-left: calc(16px + env(safe-area-inset-left)); /* Reset padding for mobile if needed, or adjust */
             }
         }
 
@@ -884,6 +884,70 @@
                 grid-template-columns: auto 120px 1fr; /* label, select, tag */
              }
         }
+        /* Custom Set Modal Styles */
+        #customSetModal .kana.selected {
+            background: var(--pri);
+            color: var(--btnText);
+        }
+        #customSetModal .kana.selected .ro {
+            color: rgba(255,255,255,.8);
+        }
+        #customSetModal .kana:active {
+            transform: scale(0.98);
+        }
+        #customSetModal .kana.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        #customSetModal .kana.disabled .ro {
+            color: var(--muted);
+        }
+        /* ==== Custom Set Modal – Layout Fix ==== */
+        /* Kotak modal jadi kolom fleksibel + tinggi maksimum aman */
+        #customSetModal .box{
+            display: flex;
+            flex-direction: column;
+            width: min(92vw, 640px);
+            max-height: 92vh;            /* kunci tinggi <= viewport */
+            overflow: hidden;            /* biar isi scroll di dalam */
+        }
+        /* Header filter selalu terlihat (sticky di atas) */
+        #customSetModal .row:nth-of-type(1),  /* bar set/kelompok/search */
+        #customSetModal .small + .row{        /* bar quick picks kalau perlu */
+            position: sticky;
+            top: 0;
+            z-index: 2;
+            background: var(--panel);
+            padding-top: 4px;
+            padding-bottom: 8px;
+        }
+        /* Grid huruf: ambil sisa tinggi lalu scroll */
+        #customSetKanaGrid{
+            flex: 1 1 auto;      /* ambil ruang sisa */
+            min-height: 0;       /* penting agar flex child bisa menyusut */
+            overflow: auto;      /* scroll di grid, bukan di body */
+            display: grid;
+            gap: 8px;
+            grid-template-columns: repeat(4, 1fr);
+        }
+        @media (min-width:480px){ #customSetKanaGrid{ grid-template-columns: repeat(5,1fr); } }
+        @media (min-width:680px){ #customSetKanaGrid{ grid-template-columns: repeat(6,1fr); } }
+        /* Footer action selalu terlihat (sticky di bawah) */
+        #customSetModal .row:last-of-type{
+            position: sticky;
+            bottom: 0;
+            z-index: 2;
+            background: linear-gradient(180deg, var(--panel) 70%, transparent);
+            padding-top: 8px;
+            padding-bottom: calc(8px + env(safe-area-inset-bottom));
+        }
+        /* Ukuran tile huruf khusus di dalam modal: pas untuk HP/laptop */
+        #customSetModal .kana{
+            min-height: clamp(56px, 9vh, 72px);
+        }
+        #customSetModal .kana .jp{
+            font-size: clamp(20px, 5.5vw, 28px);
+        }
     </style>
 </head>
 <body>
@@ -1253,6 +1317,50 @@
             </div>
         </div>
     </div>
+    
+    <!-- Custom Set Modal -->
+    <div id="customSetModal" class="modal" aria-modal="true" role="dialog"
+       aria-labelledby="customSetModalTitle" aria-describedby="customSetModalMsg" hidden>
+        <div class="box">
+            <h3 id="customSetModalTitle" style="margin:0 0 6px 0">Pilih Huruf Tertentu</h3>
+            <div id="customSetModalMsg" class="small">Pilih kana yang ingin kamu latih.</div>
+            <hr style="border: none; border-top: 1px solid var(--border); width: 100%; margin: 12px 0;">
+
+            <div class="row" style="gap: 12px; align-items:center; flex-wrap:wrap;">
+                <div class="seg" aria-label="Pilih set">
+                    <button id="customSetHira" class="btn" aria-selected="true" type="button">Hiragana</button>
+                    <button id="customSetKata" class="btn" aria-selected="false" type="button">Katakana</button>
+                </div>
+                <div class="seg" aria-label="Pilih kelompok">
+                    <button id="customSetBase" class="btn" aria-selected="true" type="button">Dasar</button>
+                    <button id="customSetDakuon" class="btn" aria-selected="true" type="button">Dakuon</button>
+                    <button id="customSetYouon" class="btn" aria-selected="true" type="button">Youon</button>
+                </div>
+                <input id="customSetSearch" class="input" type="text" placeholder="Cari kana/romaji..." style="flex-grow:1;">
+            </div>
+
+            <div class="row" style="margin: 12px 0; justify-content: space-between; flex-wrap:wrap;">
+                <div class="row" style="flex-grow:1; justify-content: flex-start;">
+                    <button class="btn ghost small" id="quickPickConfusion" type="button">Dari Confusion Log</button>
+                    <button class="btn ghost small" id="quickPickWrong" type="button">Jawaban Salah Terakhir</button>
+                </div>
+                <button class="btn ghost small" id="clearCustomSet" type="button">Kosongkan Pilihan</button>
+            </div>
+
+            <div id="customSetKanaGrid" class="pillbox" aria-live="polite" role="listbox">
+                <!-- Kana tiles will be generated here -->
+            </div>
+            
+            <div class="row" style="justify-content:space-between; align-items:center; margin-top:12px;">
+                <div class="small" id="customSetCounter">Dipilih: 0 huruf</div>
+                <div class="row" style="justify-content:flex-end;">
+                    <button class="btn warn" id="btnCancelCustomSet" type="button">Batal</button>
+                    <button class="btn primary" id="btnSaveCustomSet" type="button">Simpan Set</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 
     <!-- UI/UX Mobile-First: Bottom Bar (opsional) -->
     <!-- <div class="bottom-bar">
@@ -1358,6 +1466,15 @@
             lite_mode_off: 'Mode Ringan NONAKTIF!',
             all_kana_label: 'Semua Kana',
             jft_drill_label: 'JFT Drill',
+            custom_set_label: '🎯 Huruf Tertentu',
+            custom_set_modal_title: 'Pilih Huruf Tertentu',
+            custom_set_modal_msg: 'Pilih kana yang ingin kamu latih.',
+            custom_set_search_placeholder: 'Cari kana/romaji...',
+            custom_set_quick_confusion: 'Dari Confusion Log',
+            custom_set_quick_wrong: 'Jawaban Salah Terakhir',
+            custom_set_quick_clear: 'Kosongkan Pilihan',
+            custom_set_counter: (count) => `Dipilih: ${count} huruf`,
+            custom_set_empty_toast: 'Belum ada huruf dipilih. Pilih huruf dulu, ya.',
         };
 
         const t = (key, ...args) => {
@@ -1387,9 +1504,11 @@
             level: 1,
             hasSeenOnboarding: false,
             confusionLog:{ hira:{}, kata:{} },
+            lastSessionWrong: { hira: [], kata: [] },
             srs:{ boxes:{}, due:{} },
             lite: false,
             streakNotify: true,
+            customSet: { hira: [], kata: [] },
         });
         let state = load();
         let _saveTimer = null;
@@ -1402,9 +1521,11 @@
                 mergedState.pomo = deepMerge(initState().pomo, loadedState.pomo);
                 mergedState.hasSeenOnboarding = loadedState.hasSeenOnboarding !== undefined ? loadedState.hasSeenOnboarding : initState().hasSeenOnboarding;
                 mergedState.confusionLog = deepMerge(initState().confusionLog, loadedState.confusionLog);
+                mergedState.lastSessionWrong = deepMerge(initState().lastSessionWrong, loadedState.lastSessionWrong);
                 mergedState.srs = deepMerge(initState().srs, loadedState.srs);
                 mergedState.lite = loadedState.lite !== undefined ? loadedState.lite : initState().lite;
                 mergedState.streakNotify = loadedState.streakNotify !== undefined ? loadedState.streakNotify : initState().streakNotify;
+                mergedState.customSet = deepMerge(initState().customSet, loadedState.customSet);
                 
                 // Default challenge state di state.test (aman jika belum ada)
                 if (!mergedState.test) mergedState.test = {};
@@ -1460,32 +1581,32 @@
         const KATA_YOU = ['キャ','キュ','キョ','シャ','シュ','ショ','チャ','チュ','チョ','ニャ','ニュ','ニョ','ヒャ','ヒュ','ヒョ','ミャ','ミュ','ミョ','リャ','リュ','リョ','ギャ','ギュ','ギョ','ジャ','ジュ','ジョ','ビャ','ビュ','ビョ','ピャ','ピュ','ピョ'];
 
         const GROUPS = [
-            {key:'aiueo', label:'a i u e o', list:BASE, idx:[0,1,2,3,4]},
-            {key:'k', label:'ka ki ku ke ko', list:BASE, idx:[5,6,7,8,9]},
-            {key:'s', label:'sa shi su se so', list:BASE, idx:[10,11,12,13,14]},
-            {key:'t', label:'ta chi tsu te to', list:BASE, idx:[15,16,17,18,19]},
-            {key:'n', label:'na ni nu ne no', list:BASE, idx:[20,21,22,23,24]},
-            {key:'h', label:'ha hi fu he ho', list:BASE, idx:[25,26,27,28,29]},
-            {key:'m', label:'ma mi mu me mo', list:BASE, idx:[30,31,32,33,34]},
-            {key:'y', label:'ya yu yo', list:BASE, idx:[35,36,37]},
-            {key:'r', label:'ra ri ru re ro', list:BASE, idx:[38,39,40,41,42]},
-            {key:'w', label:'wa wo n', list:BASE, idx:[43,44,45]},
-            {key:'g', label:'ga gi gu ge go', list:DAKUON, idx:[0,1,2,3,4]},
-            {key:'z', label:'za ji zu ze zo', list:DAKUON, idx:[5,6,7,8,9]},
-            {key:'d', label:'da dji dzu de do', list:DAKUON, idx:[10,11,12,13,14]},
-            {key:'b', label:'ba bi bu be bo', list:DAKUON, idx:[15,16,17,18,19]},
-            {key:'p', label:'pa pi pu pe po', list:DAKUON, idx:[20,21,22,23,24]},
-            {key:'ky', label:'kya kyu kyo', list:YOUON, idx:[0,1,2]},
-            {key:'sh', label:'sha shu sho', list:YOUON, idx:[3,4,5]},
-            {key:'ch', label:'cha chu cho', list:YOUON, idx:[6,7,8]},
-            {key:'ny', label:'nya nyu nyo', list:YOUON, idx:[9,10,11]},
-            {key:'hy', label:'hya hyu hyo', list:YOUON, idx:[12,13,14]},
-            {key:'my', label:'mya myu myo', list:YOUON, idx:[15,16,17]},
-            {key:'ry', label:'rya ryu ryo', list:YOUON, idx:[18,19,20]},
-            {key:'gy', label:'gya gyu gyo', list:YOUON, idx:[21,22,23]},
-            {key:'j',  label:'ja ju jo', list:YOUON, idx:[24,25,26]},
-            {key:'by', label:'bya byu byo', list:YOUON, idx:[27,28,29]},
-            {key:'py', label:'pya pyu pyo', list:YOUON, idx:[30,31,32]},
+            {key:'aiueo', label:'a i u e o', list:BASE, idx:[0,1,2,3,4], type: 'base'},
+            {key:'k', label:'ka ki ku ke ko', list:BASE, idx:[5,6,7,8,9], type: 'base'},
+            {key:'s', label:'sa shi su se so', list:BASE, idx:[10,11,12,13,14], type: 'base'},
+            {key:'t', label:'ta chi tsu te to', list:BASE, idx:[15,16,17,18,19], type: 'base'},
+            {key:'n', label:'na ni nu ne no', list:BASE, idx:[20,21,22,23,24], type: 'base'},
+            {key:'h', label:'ha hi fu he ho', list:BASE, idx:[25,26,27,28,29], type: 'base'},
+            {key:'m', label:'ma mi mu me mo', list:BASE, idx:[30,31,32,33,34], type: 'base'},
+            {key:'y', label:'ya yu yo', list:BASE, idx:[35,36,37], type: 'base'},
+            {key:'r', label:'ra ri ru re ro', list:BASE, idx:[38,39,40,41,42], type: 'base'},
+            {key:'w', label:'wa wo n', list:BASE, idx:[43,44,45], type: 'base'},
+            {key:'g', label:'ga gi gu ge go', list:DAKUON, idx:[0,1,2,3,4], type: 'dakuon'},
+            {key:'z', label:'za ji zu ze zo', list:DAKUON, idx:[5,6,7,8,9], type: 'dakuon'},
+            {key:'d', label:'da dji dzu de do', list:DAKUON, idx:[10,11,12,13,14], type: 'dakuon'},
+            {key:'b', label:'ba bi bu be bo', list:DAKUON, idx:[15,16,17,18,19], type: 'dakuon'},
+            {key:'p', label:'pa pi pu pe po', list:DAKUON, idx:[20,21,22,23,24], type: 'dakuon'},
+            {key:'ky', label:'kya kyu kyo', list:YOUON, idx:[0,1,2], type: 'youon'},
+            {key:'sh', label:'sha shu sho', list:YOUON, idx:[3,4,5], type: 'youon'},
+            {key:'ch', label:'cha chu cho', list:YOUON, idx:[6,7,8], type: 'youon'},
+            {key:'ny', label:'nya nyu nyo', list:YOUON, idx:[9,10,11], type: 'youon'},
+            {key:'hy', label:'hya hyu hyo', list:YOUON, idx:[12,13,14], type: 'youon'},
+            {key:'my', label:'mya myu myo', list:YOUON, idx:[15,16,17], type: 'youon'},
+            {key:'ry', label:'rya ryu ryo', list:YOUON, idx:[18,19,20], type: 'youon'},
+            {key:'gy', label:'gya gyu gyo', list:YOUON, idx:[21,22,23], type: 'youon'},
+            {key:'j',  label:'ja ju jo', list:YOUON, idx:[24,25,26], type: 'youon'},
+            {key:'by', label:'bya byu byo', list:YOUON, idx:[27,28,29], type: 'youon'},
+            {key:'py', label:'pya pyu pyo', list:YOUON, idx:[30,31,32], type: 'youon'},
         ];
 
         const HIRA_MAP = new Map();
@@ -1497,6 +1618,10 @@
         // FIX: Perbaiki definisi gabungan ROMAJI (hilangkan titik nyasar)
         const ALL_ROMAJI = [...new Set([...BASE, ...DAKUON, ...YOUON])];
         const ROMAJI_SORTED = [...ALL_ROMAJI].sort((a, b) => b.length - a.length);
+        const ROMAJI_TO_KANA_MAP = {
+            'hira': HIRA_MAP,
+            'kata': KATA_MAP
+        };
 
         const CONFUSE_KATA = [
             ['シ','ツ'], ['ソ','ン'], ['ク','ケ'], ['フ','ワ'], ['ヂ','ジ'], ['ヅ','ズ'],
@@ -1935,7 +2060,7 @@
             save(); // Save state immediately when rangeMode changes
 
             // Disable/hide range controls if a special subset (all, confusion, srs_due, jft-drill) is active
-            const isSpecialSubsetActive = (state.test.subset === 'all' || state.test.subset === 'confusion' || state.test.subset === 'srs_due' || state.test.subset === 'jft-drill' || state.test.subset === 'base-all' || state.test.subset === 'dakuon-all' || state.test.subset === 'youon-all');
+            const isSpecialSubsetActive = (state.test.subset === 'all' || state.test.subset === 'confusion' || state.test.subset === 'srs_due' || state.test.subset === 'jft-drill' || state.test.subset === 'base-all' || state.test.subset === 'dakuon-all' || state.test.subset === 'youon-all' || state.test.subset === 'custom');
 
             if (isSpecialSubsetActive) { // Only hide if an actual special subset is selected
                 setEnabled(elRangeMode, false);
@@ -2001,6 +2126,12 @@
             // g.list menunjuk BASE/DAKUON/YOUON, g.idx indeks romaji di list tsb.
             return g.idx.map(i => g.list[i]);
         }
+        
+        const GROUP_TYPE_MAP = new Map(GROUPS.flatMap(g => g.idx.map(i => [g.list[i], g.type])));
+        function getRomajiByType(type, set) {
+            const allRomajiInSet = Object.keys(ROMAJI_TO_KANA_MAP[set]).filter(r => ROMAJI_TO_KANA_MAP[set][r] !== undefined);
+            return allRomajiInSet.filter(r => GROUP_TYPE_MAP.get(r) === type);
+        }
 
         /**
          * Mengembalikan array romaji final untuk pool tes berdasarkan state.test.subset atau state.test.rangeMode.
@@ -2037,6 +2168,12 @@
             if (state.test.subset === 'youon-all') {
                 const youonGroups = GROUPS.filter(g => g.list === YOUON);
                 return youonGroups.flatMap(g => romajiFromGroup(g));
+            }
+            
+            // Perubahan: Tambahkan logika untuk custom set
+            if (state.test.subset === 'custom') {
+                const customArr = state.customSet[state.test.set];
+                return (customArr && customArr.length) ? customArr : ALL_ROMAJI;
             }
 
 
@@ -2151,6 +2288,17 @@
             reviewChip.textContent = t('review_today_label');
             reviewChip.dataset.subsetType = 'srs_due'; // <-- ADDED
             frag.appendChild(reviewChip);
+            
+            // Add custom set chip
+            const customSetCount = state.customSet[state.test.set]?.length || 0;
+            const customSetChip = document.createElement('button');
+            customSetChip.type = 'button';
+            customSetChip.className = 'chip ' + (state.test.subset === 'custom' ? 'active' : '');
+            customSetChip.setAttribute('aria-pressed', state.test.subset === 'custom');
+            customSetChip.textContent = `${t('custom_set_label')} (${customSetCount})`;
+            customSetChip.dataset.subsetType = 'custom';
+            frag.appendChild(customSetChip);
+
 
             // Add individual group chips dynamically (e.g., 'aiueo', 'k', 's')
             GROUPS.forEach(g => {
@@ -2185,15 +2333,15 @@
             // 1. Panggil getChosenSubset() untuk mendapatkan label
             let labels = getChosenSubset(); // FIX: Sekarang ini adalah sumber kebenaran untuk pool item
 
+            if (state.test.subset === 'custom' && (!labels || labels.length === 0)) {
+                showToast(t('custom_set_empty_toast'), 'warn');
+                return;
+            }
+
             // 2. Membangun uniquePoolItems dari labels (filter char yang undefined)
             let uniquePoolItems = labels.map(r => ({ romaji: r, char: (set === 'hira' ? HIRA_MAP : KATA_MAP).get(r) }));
             uniquePoolItems = uniquePoolItems.filter(item => item.char !== undefined); // Filter out items that don't have a corresponding Kana
             
-            // FIX: Menghapus blok redundan ini karena getChosenSubset sudah menanganinya
-            // if (state.test.subset === 'base-all') { ... }
-            // else if (state.test.subset === 'dakuon-all') { ... }
-            // else if (state.test.subset === 'youon-all') { ... }
-
             if(!uniquePoolItems.length){ 
                 showCustomAlert('Tidak ada item untuk subset ini. Pakai chip "Semua Kana" ya.'); 
                 return; 
@@ -2214,9 +2362,7 @@
                 testPool = testPool.slice(0, req);
             }
             
-            // poolIdx masih perlu untuk buildPoolLabels jika digunakan oleh makeSequence/makeKanaSequence (sekali lagi, ini diubah)
-            // Namun, karena buildPoolLabels juga di-refactor, poolIdx kemungkinan tidak lagi diperlukan.
-            // Untuk jaga-jaga, kita set saja agar tidak error.
+            // Menggunakan getChosenSubset() untuk poolIdx atau langsung dari wrongList.
             poolIdx = labels.map(r=> ALL_ROMAJI.indexOf(r)).filter(x=>x>=0);
 
             state.test.target = req;
@@ -2272,11 +2418,9 @@
             // Atur visibilitas dan disabled state untuk tombol audio di .btn-audio-current
             // Note: The audio button is now part of the .question flex container.
             // We just control its data-kana and visibility via bindAudioButtonToCurrent and its parent logic.
+            // We ensure it's generally visible, and only hide it if explicitly not an audio type
             const audioButton = qs('.btn-audio-current');
             if (audioButton) {
-                // The visibility is handled by the question content itself now,
-                // and bindAudioButtonToCurrent will ensure it plays the correct sound.
-                // We ensure it's generally visible, and only hide it if explicitly not an audio type
                 const isAudioQType = qType.startsWith('audio');
                 audioButton.hidden = !isAudioQType;
                 audioButton.disabled = !isAudioQType;
@@ -2640,7 +2784,14 @@
 
             } else {
                 state.test.correctStreak=0;
-                // Rapikan push ke wrong list (kalau sebelumnya ada {.currentItem, .extra})
+                // Simpan jawaban salah terakhir untuk fitur "Quick Pick"
+                const romajiKey = currentItem.romaji || currentItem.romajiSeq;
+                if (romajiKey) {
+                    const wrongSet = state.test.set;
+                    if (!state.lastSessionWrong[wrongSet].includes(romajiKey)) {
+                        state.lastSessionWrong[wrongSet].push(romajiKey);
+                    }
+                }
                 wrongList.push({ ...currentItem, ...extra }); // Corrected spread
                 clickTone('bad');
                 if (qKanaElement) qKanaElement.classList.add('wrong-answer');
@@ -2678,10 +2829,10 @@
                     state.confusionLog[currentSet][pair] = (state.confusionLog[currentSet][pair] || 0) + 1;
                 }
 
-                const romajiKey = currentItem.romaji || currentItem.romajiSeq;
-                if (romajiKey) {
-                    state.srs.boxes[romajiKey] = 1;
-                    state.srs.due[romajiKey] = Math.floor(Date.now() / 1000);
+                const romajiKeyForSRS = currentItem.romaji || currentItem.romajiSeq;
+                if (romajiKeyForSRS) {
+                    state.srs.boxes[romajiKeyForSRS] = 1;
+                    state.srs.due[romajiKeyForSRS] = Math.floor(Date.now() / 1000);
                 }
             }
 
@@ -2697,7 +2848,7 @@
             renderStats();
             nextQ(); 
         }
-
+        
         // FIX: Perbaiki util shuffleReturn
         function shuffleReturn(arr){ 
             const a = [...arr];      // shallow copy aman
@@ -2737,9 +2888,8 @@
                 .map(([pair])=> { const [k1,k2]=pair.split('|'); return k1===targetKana ? k2 : k1; })
                 .filter(k => k && k!==targetKana);
 
-            const confusedRomaji = confusedKana.map(kanaToRomaji).filter(r => r && r!==targetRomaji);
             // FIX: Hapus titik nyasar pada pemanggilan helper & spread hasilnya saat push
-            decoys.push(...shuffleReturn(confusedRomaji).slice(0,2));
+            decoys.push(...shuffleReturn(confusedKana).slice(0,2));
 
             // 2) Tambah romaji dengan panjang sama
             const available = ALL_R.filter(r => r!==targetRomaji && !decoys.includes(r));
@@ -2860,7 +3010,11 @@
                 return 'Dakuon';
             } else if (state.test.subset === 'youon-all') {
                 return 'Youon';
-            } else {
+            } else if (state.test.subset === 'custom') {
+                const count = state.customSet[state.test.set]?.length || 0;
+                return `${t('custom_set_label')} (${count})`;
+            }
+             else {
                 // Check if a group chip is active (e.g., 'k', 's', 'm')
                 const activeGroupChip = GROUPS.find(g => g.key === state.test.subset);
                 if (activeGroupChip) {
@@ -2937,6 +3091,9 @@
                     startTest();
                 }
             });
+            // Clear last session wrong list
+            state.lastSessionWrong[state.test.set] = [];
+            save();
         }
 
         function renderReview(){
@@ -3016,10 +3173,8 @@
             });
             shuffle(testPool);
 
-            // FIX: Menggunakan getChosenSubset() untuk poolIdx atau langsung dari wrongList.
-            // PoolIdx tidak lagi relevan jika pool dibuat langsung dari wrongList.
-            // Menghapus penggunaan buildPoolLabels.
-            // poolIdx = getChosenSubset().map(r=>ALL_ROMAJI.indexOf(r)).filter(x=>x>=0);
+            // Menggunakan getChosenSubset() untuk poolIdx atau langsung dari wrongList.
+            poolIdx = getChosenSubset().map(r=>ALL_ROMAJI.indexOf(r)).filter(x=>x>=0);
             
             state.test.total=0; state.test.score=0; state.test.correctStreak=0; state.test.target = Math.min(20, testPool.length); qIndex=0; 
             closeCelebrate(); 
@@ -3034,24 +3189,8 @@
             nextQ(); 
         });
 
-        /**
-         * FIX: Fungsi ini dihapus karena getChosenSubset() lebih universal dan buildPoolLabels
-         * sebelumnya memiliki tujuan yang tumpang tindih atau tidak jelas.
-         * Jika ada kebutuhan khusus untuk poolLabels, harus didefinisikan ulang secara terpisah.
-         */
-        // function buildPoolLabels(){
-        //     // ... (kode lama buildPoolLabels) ...
-        //     return getChosenSubset(); // Hanya mengembalikan hasil dari getChosenSubset
-        // }
-
         function rangeLabels(fromKey,toKey){ const a=GROUPS.findIndex(g=>g.key===fromKey); const b=GROUPS.findIndex(g=>g.key===toKey); if(a<0||b<0) return []; const [from,to] = a<=b? [a,b]:[b,a]; return GROUPS.slice(from,to+1).flatMap(g=> g.idx.map(i=> g.list[i]) ); }
         
-        // FIX: Fungsi toggleRangeInputs dihapus karena redundan, updateRangeUI sudah menanganinya.
-        // function toggleRangeInputs() {
-        //     // ... (kode lama toggleRangeInputs) ...
-        // }
-
-
         // New: Quick Presets
         const QUICK_PRESETS = {
             'aiueo-m': ['aiueo', 'm'], // a i u e o → ma mi mu me mo
@@ -3569,7 +3708,7 @@
             safe.test.mode = ['type', 'mc'].includes(safe.test.mode) ? safe.test.mode : 'type';
             safe.test.qType = ['k2r', 'r2k', 'seq', 'audio_k2r', 'audio_r2k', 'kseq'].includes(safe.test.qType) ? safe.test.qType : 'k2r'; 
             safe.test.rangeMode = ['range', 'single'].includes(safe.test.rangeMode) ? safe.test.rangeMode : 'range';
-            safe.test.subset = ['all', 'base-all', 'dakuon-all', 'youon-all', ...GROUPS.map(g => g.key), 'confusion', 'srs_due', 'jft-drill'].includes(safe.test.subset) ? safe.test.subset : 'all'; // Updated for JFT Drill
+            safe.test.subset = ['all', 'base-all', 'dakuon-all', 'youon-all', ...GROUPS.map(g => g.key), 'confusion', 'srs_due', 'jft-drill', 'custom'].includes(safe.test.subset) ? safe.test.subset : 'all'; // Updated for Custom Set
             
             if (!safe.confusionLog) safe.confusionLog = {hira:{}, kata:{}};
             if (typeof safe.confusionLog.hira !== 'object') safe.confusionLog.hira = {};
@@ -3579,6 +3718,9 @@
                     safe.confusionLog[setType][pair] = clamp(safe.confusionLog[setType][pair], 0, 10000);
                 }
             }
+            if (!safe.lastSessionWrong) safe.lastSessionWrong = {hira:[], kata:[]};
+            safe.lastSessionWrong.hira = onlyRomaji(safe.lastSessionWrong.hira);
+            safe.lastSessionWrong.kata = onlyRomaji(safe.lastSessionWrong.kata);
 
             if (!safe.srs) safe.srs = {boxes:{}, due:{}};
             if (typeof safe.srs.boxes !== 'object') safe.srs.boxes = {};
@@ -3587,6 +3729,9 @@
                 safe.srs.boxes[romaji] = clamp(safe.srs.boxes[romaji], 1, 5);
                 safe.srs.due[romaji] = clamp(safe.srs.due[romaji], 0, 9999999999);
             }
+            if (!safe.customSet) safe.customSet = {hira:[], kata:[]};
+            safe.customSet.hira = onlyRomaji(safe.customSet.hira);
+            safe.customSet.kata = onlyRomaji(safe.customSet.kata);
 
             return safe;
         }
@@ -3843,10 +3988,13 @@
             if (!clickedChip) return;
 
             const presetKey = clickedChip.dataset.preset;      // For 'aiueo-m', 'base-all', etc.
-            const subsetType = clickedChip.dataset.subsetType; // For 'all', 'confusion', 'srs_due', 'jft-drill', 'base-all', 'dakuon-all', 'youon-all'
+            const subsetType = clickedChip.dataset.subsetType; // For 'all', 'confusion', 'srs_due', 'jft-drill', 'base-all', 'dakuon-all', 'youon-all', 'custom'
             const groupKey = clickedChip.dataset.groupKey;     // For individual group chips like 'aiueo', 'k', 's'
 
-            if (presetKey) {
+            if (subsetType === 'custom') {
+                openCustomSetModal();
+                state.test.subset = 'custom';
+            } else if (presetKey) {
                 // Handle presets like 'aiueo-m', 'base-all', 'dakuon-all', 'youon-all'
                 applyPreset(presetKey);
             } else if (subsetType) {
@@ -3942,6 +4090,454 @@
             state.test.mode = qs('#answerMode').value; // FIX: Use state.test.mode
             typeof save === 'function' && save();
             applyAnswerModeUI();
+        });
+
+
+        // Removed old scrollToSection, replaced by router
+
+        // ---------- RENDER ----------
+        function renderAll(){
+            buildKana('hiraBox','hira');
+            buildKana('kataBox','kata');
+            buildSubsetChips(); // Re-added
+            fillLearnRange();
+            populateRangeSelects();
+            // Ensure state.test.rangeMode is set before calling updateRangeUI
+            // It should be set during load() or initState(), but explicit safety check
+            if (!state.test.rangeMode && elRangeMode) {
+                state.test.rangeMode = elRangeMode.value;
+                save();
+            }
+            updateRangeUI(); // Initial call to updateRangeUI
+
+            renderStats();
+            applyTheme();
+            applyAudio();
+            applyPerfMode();
+            upPomoLabel();
+            if(!state.pomo.remaining) state.pomo.remaining=state.pomo.work*60;
+            drawRemain();
+            if (qs('#pomoWork')) qs('#pomoWork').value=state.pomo.work;
+            if (qs('#pomoBreak')) qs('#pomoBreak').value=state.pomo.break;
+            // Set values without affecting width
+            const testCountInput = qs('#testCount');
+            if (testCountInput) testCountInput.value = state.test.target || 10;
+            const sylPerItemInput = qs('#sylPerItem');
+            if (sylPerItemInput) sylPerItemInput.value = state.test.sylPerItem;
+
+            toggleAnswerUI();
+            updatePointsAndLevelDisplay();
+            updateTestInfo(); // Initial update of test info text
+            applyAnswerModeUI(); // panggil saat mulai tes & tiap render soal
+
+            // Apply streak notify state
+            const streakToggleEl = qs('#streakToggle');
+            if (streakToggleEl) {
+                streakToggleEl.checked = !!state.streakNotify;
+            }
+            applyChallengeUI();
+        }
+
+        document.addEventListener('DOMContentLoaded', ()=>{
+            if (typeof state.streakNotify === 'undefined') state.streakNotify = true;
+            const streakToggleEl = qs('#streakToggle');
+            if (streakToggleEl) {
+                streakToggleEl.checked = !!state.streakNotify;
+            }
+            
+            // Binding for streakToggle
+            (function(){
+              const el = qs('#streakToggle');
+              if (!el) return;
+              el.addEventListener('change', (e)=>{
+                state.streakNotify = !!e.target.checked;
+                save && save();
+              });
+            })();
+            
+            // Binding for Challenge Mode controls
+            const challengeToggleEl = document.getElementById('challengeToggle');
+            const challengeDurationEl = document.getElementById('challengeDuration');
+            if (challengeToggleEl) {
+              challengeToggleEl.addEventListener('change', (e) => {
+                state.test.challengeEnabled = !!e.target.checked;
+                state.test.challengeLeftSec = state.test.challengeTotalSec;
+                save();
+                applyChallengeUI();
+                onNextQuestionRender();
+              });
+            }
+            if (challengeDurationEl) {
+              challengeDurationEl.addEventListener('change', (e) => {
+                const mins = parseInt(e.target.value, 10) || 3;
+                state.test.challengeTotalSec = mins * 60;
+                state.test.challengeLeftSec = state.test.challengeTotalSec;
+                save();
+                applyChallengeUI();
+              });
+            }
+
+
+            const deviceMemory = navigator.deviceMemory || 0;
+            const hardwareConcurrency = navigator.hardwareConcurrency || 0;
+            if (!state.hasSeenOnboarding && (deviceMemory < 4 || hardwareConcurrency <= 4)) {
+                state.lite = true;
+                save();
+            }
+
+            renderAll();
+            if(state.pomo.running){ startPomo(); }
+            showOnboarding();
+            setInterval(renderStats, 5000);
+
+            bind('#sidebarToggle', 'click', toggleSidebar);
+            bind('#closeSidebar', 'click', closeSidebar);
+            // Close sidebar when any link inside it is clicked
+            qsa('#sidebar .menu a').forEach(link => {
+                link.addEventListener('click', closeSidebar);
+            });
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && qs('#sidebar')?.classList.contains('is-open')) {
+                    closeSidebar();
+                }
+            });
+
+            // --- NEW JS ROUTER ---
+            // PAGES now reference actual HTML files for full page reloads
+            const PAGES = ["index.html","index2.html","index3.html","index4.html","index5.html","index6.html","index7.html","index8.html"]; // Added index8.html
+            const $menu  = document.querySelectorAll('#sidebar [href]');
+
+            // Active state for sidebar links
+            $menu.forEach(a=>{
+                // Compare current pathname with link href
+                const currentPath = location.pathname.split('/').pop() || 'index.html'; // Default to index.html if root
+                const linkPath = a.getAttribute('href').split('/').pop();
+
+                if(currentPath === linkPath){
+                    a.classList.add('active');
+                } else {
+                    a.classList.remove('active');
+                }
+            });
+
+            // For the main page (index.html), ensure the content is shown
+            const mainContent = qs('#main');
+            if (mainContent) {
+                // The display logic for #main is now primarily handled by showOnboarding().
+                // Keeping this as a fallback if showOnboarding doesn't run or has issues.
+                mainContent.style.display = 'block';
+            }
+            // --- END NEW JS ROUTER ---
+
+            // Disable/enable start button based on test count
+            const btnStart = qs('#btnStart');
+            const testCountInput = qs('#testCount');
+            function updateStartButtonState() {
+                if (btnStart && testCountInput) {
+                    btnStart.disabled = (parseInt(testCountInput.value, 10) <= 0);
+                }
+            }
+            testCountInput?.addEventListener('input', updateStartButtonState);
+            updateStartButtonState(); // Initial check
+        });
+
+        function maybeCelebrate(type, level = 0){
+            if (type === 'streak'){
+                if (!state.streakNotify) return;
+                if (state?.test?.correctStreak > 0 && state.test.correctStreak % 10 === 0){
+                    openCelebrate('streak');
+                }
+                return;
+            }
+            // cabang lain tetap sama
+        }
+        
+        function mmss(sec){
+          const m = Math.max(0, Math.floor(sec/60));
+          const s = Math.max(0, sec % 60);
+          return `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+        }
+        
+        function applyChallengeUI(){
+          const tgl = document.getElementById('challengeToggle');
+          const sel = document.getElementById('challengeDuration');
+          const lbl = document.getElementById('challengeTimeLeft');
+          if (!tgl || !sel || !lbl) return;
+
+          tgl.checked = !!state.test.challengeEnabled;
+
+          // Set dropdown sesuai total detik
+          const mins = Math.round((state.test.challengeTotalSec||180)/60);
+          if ([1,3,5,10].includes(mins)) sel.value = String(mins);
+
+          // Label sisa waktu
+          if (state.test.challengeEnabled){
+            lbl.hidden = false;
+            lbl.textContent = `Sisa: ${mmss(state.test.challengeLeftSec||state.test.challengeTotalSec||180)}`;
+          } else {
+            lbl.hidden = true;
+          }
+        }
+        
+        function startChallengeIfNeeded(){
+          const lbl = document.getElementById('challengeTimeLeft');
+          if (!state.test.challengeEnabled) return;
+          // Inisialisasi ulang saat mulai tes
+          state.test.challengeLeftSec = state.test.challengeTotalSec;
+          state.test.challengeRunning = true;
+          save();
+          if (lbl){ lbl.hidden = false; lbl.textContent = `Sisa: ${mmss(state.test.challengeLeftSec)}`; }
+
+          clearInterval(challengeTimerId);
+          challengeTimerId = setInterval(()=>{
+            state.test.challengeLeftSec = Math.max(0, (state.test.challengeLeftSec||0)-1);
+            if (lbl) lbl.textContent = `Sisa: ${mmss(state.test.challengeLeftSec)}`;
+
+            if (state.test.challengeLeftSec <= 0){
+              stopChallengeTimer(true); // hard stop: waktu habis
+              onChallengeTimeUp();
+            }
+          }, 1000);
+        }
+        
+        function stopChallengeTimer(hard=false){
+          clearInterval(challengeTimerId);
+          challengeTimerId = null;
+          state.test.challengeRunning = false;
+          save();
+          if (hard){
+            showToast('Waktu habis! ⏰');
+          }
+        }
+
+        // --- Custom Set Modal Functions ---
+        let selectedRomaji = [];
+        let modalCurrentSet = 'hira';
+        let modalKanaGroups = {
+            base: true,
+            dakuon: true,
+            youon: true
+        };
+
+        function openCustomSetModal() {
+            const modal = qs('#customSetModal');
+            if (!modal) return;
+            
+            document.body.style.overflow = 'hidden';
+
+            modal.hidden = false;
+            modal.classList.add('is-open');
+            _trapModalCustomSet();
+
+            // Set initial state
+            modalCurrentSet = state.test.set;
+            selectedRomaji = [...state.customSet[modalCurrentSet]];
+            qs('#customSetHira').classList.toggle('active', modalCurrentSet === 'hira');
+            qs('#customSetKata').classList.toggle('active', modalCurrentSet === 'kata');
+            
+            // Set initial filter buttons state (all selected by default)
+            qsa('#customSetModal .seg:nth-of-type(2) button').forEach(btn => {
+                btn.classList.add('active');
+                btn.setAttribute('aria-selected', 'true');
+            });
+            modalKanaGroups = { base: true, dakuon: true, youon: true };
+            
+            qs('#customSetSearch').value = '';
+            
+            renderCustomSetGrid();
+            updateCustomSetCounter();
+        }
+
+        function closeCustomSetModal() {
+            const modal = qs('#customSetModal');
+            if (!modal) return;
+            
+            document.body.style.overflow = '';
+
+            modal.classList.remove('is-open');
+            modal.addEventListener('transitionend', function handler() {
+                modal.hidden = true;
+                modal.removeEventListener('transitionend', handler);
+            }, { once: true });
+            
+            _releaseTrapCustomSet();
+        }
+
+        function renderCustomSetGrid() {
+            const grid = qs('#customSetKanaGrid');
+            if (!grid) return;
+            grid.innerHTML = '';
+
+            const map = ROMAJI_TO_KANA_MAP[modalCurrentSet];
+            const filterText = (qs('#customSetSearch')?.value || '').toLowerCase();
+            const filteredGroups = GROUPS.filter(g => modalKanaGroups[g.type]);
+            
+            const allCandidates = filteredGroups.flatMap(g => romajiFromGroup(g));
+            
+            const frag = df();
+            allCandidates.forEach(romaji => {
+                const kana = map.get(romaji);
+                if (!kana) return; // Skip if no Kana found
+
+                // Apply text filter
+                if (filterText && !kana.includes(filterText) && !romaji.includes(filterText)) {
+                    return;
+                }
+
+                const button = document.createElement('button');
+                button.type = 'button';
+                button.className = 'kana';
+                button.setAttribute('role', 'option');
+                button.dataset.romaji = romaji;
+                
+                const isSelected = selectedRomaji.includes(romaji);
+                if (isSelected) {
+                    button.classList.add('selected');
+                    button.setAttribute('aria-selected', 'true');
+                } else {
+                    button.setAttribute('aria-selected', 'false');
+                }
+
+                button.innerHTML = `<div class="jp">${escapeHTML(kana)}</div><div class="ro">${escapeHTML(romaji)}</div>`;
+                
+                button.addEventListener('click', () => {
+                    toggleCustomSetSelection(romaji);
+                });
+                frag.appendChild(button);
+            });
+            grid.appendChild(frag);
+        }
+
+        function updateCustomSetCounter() {
+            const counter = qs('#customSetCounter');
+            if (counter) {
+                counter.textContent = t('custom_set_counter', selectedRomaji.length);
+            }
+        }
+
+        function toggleCustomSetSelection(romaji) {
+            const index = selectedRomaji.indexOf(romaji);
+            if (index > -1) {
+                selectedRomaji.splice(index, 1);
+            } else {
+                selectedRomaji.push(romaji);
+            }
+            const btn = qs(`[data-romaji="${romaji}"]`, qs('#customSetKanaGrid'));
+            if (btn) {
+                const isSelected = selectedRomaji.includes(romaji);
+                btn.classList.toggle('selected', isSelected);
+                btn.setAttribute('aria-selected', String(isSelected));
+            }
+            updateCustomSetCounter();
+        }
+
+        function _trapModalCustomSet(){
+            const modal = qs('#customSetModal');
+            if (!modal) return;
+            const focusableElements = 'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
+            const focusables = modal.querySelectorAll(focusableElements);
+            const firstFocusable = qs('#customSetSearch');
+            const lastFocusable = focusables[focusables.length - 1];
+            
+            firstFocusable?.focus();
+
+            modal.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    e.preventDefault();
+                    closeCustomSetModal();
+                } else if (e.key === 'Enter') {
+                    const activeEl = document.activeElement;
+                    if (activeEl && activeEl.tagName.toLowerCase() === 'button' && activeEl.id === 'btnSaveCustomSet') {
+                        e.preventDefault();
+                        saveCustomSet();
+                    }
+                }
+            });
+        }
+        
+        function _releaseTrapCustomSet(){
+            const modal = qs('#customSetModal');
+            if(modal) modal.removeEventListener('keydown',_trapModalCustomSet);
+        }
+
+        function saveCustomSet() {
+            state.customSet[modalCurrentSet] = selectedRomaji;
+            state.test.subset = 'custom';
+            save();
+            buildSubsetChips();
+            updateRangeUI();
+            updateTestInfo();
+            closeCustomSetModal();
+            showToast(`Set kustom (${selectedRomaji.length} huruf) berhasil disimpan.`);
+        }
+
+        // --- Custom Set Modal Event Listeners ---
+        on('#customSetHira', 'click', () => {
+            modalCurrentSet = 'hira';
+            selectedRomaji = [...state.customSet.hira];
+            qs('#customSetHira').classList.add('active');
+            qs('#customSetKata').classList.remove('active');
+            renderCustomSetGrid();
+            updateCustomSetCounter();
+        });
+        on('#customSetKata', 'click', () => {
+            modalCurrentSet = 'kata';
+            selectedRomaji = [...state.customSet.kata];
+            qs('#customSetHira').classList.remove('active');
+            qs('#customSetKata').classList.add('active');
+            renderCustomSetGrid();
+            updateCustomSetCounter();
+        });
+        on('#customSetBase', 'click', (e) => {
+            const btn = e.target;
+            const wasActive = btn.classList.toggle('active');
+            btn.setAttribute('aria-selected', String(wasActive));
+            modalKanaGroups.base = wasActive;
+            renderCustomSetGrid();
+        });
+        on('#customSetDakuon', 'click', (e) => {
+            const btn = e.target;
+            const wasActive = btn.classList.toggle('active');
+            btn.setAttribute('aria-selected', String(wasActive));
+            modalKanaGroups.dakuon = wasActive;
+            renderCustomSetGrid();
+        });
+        on('#customSetYouon', 'click', (e) => {
+            const btn = e.target;
+            const wasActive = btn.classList.toggle('active');
+            btn.setAttribute('aria-selected', String(wasActive));
+            modalKanaGroups.youon = wasActive;
+            renderCustomSetGrid();
+        });
+        on('#customSetSearch', 'input', renderCustomSetGrid);
+
+        on('#quickPickConfusion', 'click', () => {
+            const set = modalCurrentSet;
+            const confused = _confuseTopPairs(set, 20); // Top 20 confused pairs
+            selectedRomaji = [...new Set([...selectedRomaji, ...confused])];
+            renderCustomSetGrid();
+            updateCustomSetCounter();
+        });
+
+        on('#quickPickWrong', 'click', () => {
+            const set = modalCurrentSet;
+            const lastWrong = state.lastSessionWrong[set];
+            selectedRomaji = [...new Set([...selectedRomaji, ...lastWrong])];
+            renderCustomSetGrid();
+            updateCustomSetCounter();
+        });
+
+        on('#clearCustomSet', 'click', () => {
+            selectedRomaji = [];
+            renderCustomSetGrid();
+            updateCustomSetCounter();
+        });
+
+        on('#btnSaveCustomSet', 'click', saveCustomSet);
+        on('#btnCancelCustomSet', 'click', closeCustomSetModal);
+        
+        on('#customSetModal', 'click', (e) => {
+            if (e.target.id === 'customSetModal') closeCustomSetModal();
         });
 
 
